@@ -18,10 +18,11 @@ export default function Products() {
 
   const categories = [
     { id: "all", label: "Todos" },
-    { id: "tech", label: "Tech" },
-    { id: "design", label: "Design" },
-    { id: "courses", label: "Cursos" },
-    { id: "equipment", label: "Equipamentos" },
+    { id: "casa", label: "Casa & Organização" },
+    { id: "autocuidado", label: "Autocuidado" },
+    { id: "familia", label: "Família" },
+    { id: "saude", label: "Saúde & Bem-estar" },
+    { id: "tecnologia", label: "Tecnologia" },
   ];
 
   const filteredProducts = products?.filter(product => {
@@ -44,10 +45,10 @@ export default function Products() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="font-fredoka text-5xl gradient-text mb-4">
-              Produtos em Destaque
+              Facilita a Vida
             </h1>
             <p className="font-poppins text-xl text-gray-600">
-              Curadoria especial de ferramentas e recursos
+              Produtos testados e aprovados que realmente fazem diferença no seu dia a dia
             </p>
             {/* String.com Integration Notice */}
             <motion.div 
@@ -73,7 +74,7 @@ export default function Products() {
             <div className="relative max-w-md mx-auto">
               <Input
                 type="text"
-                placeholder="Buscar produtos..."
+                placeholder="Que produto você precisa?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 py-3 rounded-full bg-white/70 backdrop-blur-sm border border-white/30"
