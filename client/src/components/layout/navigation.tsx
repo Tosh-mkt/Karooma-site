@@ -61,7 +61,7 @@ export default function Navigation() {
           {navItems.map((item) => (
             <Link key={item.id} href={item.href}>
               <motion.span
-                className={`font-poppins transition-colors duration-300 cursor-pointer ${
+                className={`font-outfit font-medium transition-colors duration-300 cursor-pointer ${
                   isActive(item.href) 
                     ? "text-pink-500 font-semibold" 
                     : "text-gray-700 hover:text-pink-500"

@@ -39,7 +39,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <motion.h2 
-              className="font-fredoka text-6xl md:text-8xl gradient-text mb-6"
+              className="font-outfit font-bold text-6xl md:text-8xl gradient-text mb-6"
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
