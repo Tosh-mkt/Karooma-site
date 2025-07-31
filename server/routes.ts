@@ -157,6 +157,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // String.com Automation endpoints
+  app.post("/api/automation/products/sync", async (req, res) => {
+    try {
+      const productData = req.body;
+      
+      // Validar dados obrigatórios
+      const requiredFields = ['title', 'currentPrice', 'affiliateLink', 'category'];
+      for (const field of requiredFields) {
+        if (!productData[field]) {
+          return res.status(400).json({ error: `Campo obrigatório: ${field}` });
+        }
+      }
+      
+      // Validar categoria
+      const validCategories = ['casa', 'autocuidado', 'familia', 'saude', 'tecnologia'];
+      if (!validCategories.includes(productData.category)) {
+        return res.status(400).json({ error: 'Categoria inválida' });
+      }
+      
+      // Validar preço
+      const price = parseFloat(productData.currentPrice);
+      if (price < 10 || price > 5000) {
+        return res.status(400).json({ error: 'Preço inválido' });
+      }
+      
+      // Verificar se produto já existe pelo link afiliado
+      const existingProducts = await storage.getAllProducts();
+      const existingProduct = existingProducts.find(p => p.affiliateLink === productData.affiliateLink);
+      
+      const formattedProduct = {
+        title: productData.title,
+        description: productData.description || '',
+        category: productData.category,
+        imageUrl: productData.imageUrl || null,
+        currentPrice: productData.currentPrice.toString(),
+        originalPrice: productData.originalPrice?.toString() || null,
+        affiliateLink: productData.affiliateLink,
+        rating: productData.rating?.toString() || null,
+        discount: productData.discount || null,
+        featured: productData.featured || false
+      };
+      
+      if (existingProduct) {
+        // Atualizar produto existente (implementar updateProduct se necessário)
+        console.log(`Produto já existe: ${existingProduct.id}`);
+        res.json({ success: true, message: 'Produto já existe', productId: existingProduct.id });
+      } else {
+        // Criar novo produto
+        const newProduct = await storage.createProduct(formattedProduct);
+        console.log(`Novo produto criado via String.com: ${newProduct.title}`);
+        res.json({ success: true, message: 'Produto criado', productId: newProduct.id });
+      }
+      
+    } catch (error) {
+      console.error('Erro na sincronização String.com:', error);
+      res.status(500).json({ error: "Falha na sincronização do produto" });
+    }
+  });
+  
+  app.get("/api/automation/products/status", async (req, res) => {
+    try {
+      const products = await storage.getAllProducts();
+      const totalProducts = products.length;
+      const featuredProducts = products.filter(p => p.featured).length;
+      
+      res.json({
+        totalProducts,
+        featuredProducts,
+        lastSync: new Date().toISOString(),
+        status: 'active'
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Falha ao obter status" });
+    }
+  });
+
   // Analytics/tracking routes
   app.post("/api/analytics/affiliate-click", async (req, res) => {
     try {
