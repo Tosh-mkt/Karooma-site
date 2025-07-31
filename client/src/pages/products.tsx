@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Search, ShoppingBag, ChevronDown } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -7,14 +7,26 @@ import { ProductCard } from "@/components/content/product-card";
 import { useQuery } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data: products, isLoading } = useQuery<Product[]>({
+  // Invalidate cache on component mount to ensure fresh data
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+  }, []);
+
+  const { data: products, isLoading, error } = useQuery<Product[]>({
     queryKey: ["/api/products"],
+    staleTime: 0, // Always refetch
+    cacheTime: 0, // Don't cache
   });
+
+  console.log("Products data:", products);
+  console.log("Loading:", isLoading);
+  console.log("Error:", error);
 
   const categories = [
     { id: "all", label: "Todos" },
