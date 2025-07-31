@@ -1,0 +1,41 @@
+Crie um projeto de web moderno e altamente visual para um site de conteúdo e afiliados, focado em vídeos, textos e cards de produtos. A prioridade é uma UI/UX inovadora, divertida, e com animações leves, que transmita uma sensação de criatividade e engajamento.
+
+Objetivo Principal: Um site que sirva como um hub vibrante para meus conteúdos, ao mesmo tempo que apresenta produtos afiliados de forma dinâmica e automatizada via String.com.
+
+Requisitos Essenciais:
+Estilo Visual e Experiência (UI/UX):
+
+Paleta de Cores: Sugira uma paleta de cores primárias e secundárias que seja vibrante, moderna e divertida. Pense em gradientes suaves, talvez tons pastéis com toques neon, ou cores primárias com um twist.
+
+Tipografia: Escolha fontes que transmitam personalidade, mas que sejam legíveis. Combinações de fontes que evoquem criatividade e diversão.
+
+Animações: Implemente micro-interações e animações sutis em elementos como botões, cards de produtos, transições de página e ao passar o mouse. Pense em efeitos "bounce", "fade-in" ou "slide-in" que tornem a navegação mais "viva".
+
+Layout: Um layout responsivo, talvez com um toque de "magazine digital" ou "quadrinhos", que organize bem vídeos, artigos e cards de produtos de forma visualmente atraente.
+
+Elementos Divertidos: Inclua pequenos detalhes visuais ou "easter eggs" que surpreendam e divirtam o usuário (ex: cursores personalizados, ícones animados, ilustrações abstratas ou lúdicas).
+
+Estrutura do Conteúdo:
+
+Home Page: Um feed dinâmico com os conteúdos mais recentes (vídeos, posts) e uma seção de "produtos em destaque" ou "lançamentos".
+
+Página de Vídeos: Uma galeria intuitiva onde os vídeos são o foco, com opções de categorização e busca.
+
+Página de Artigos/Blog: Layout limpo e agradável para leitura, com suporte para imagens e embeds de vídeo.
+
+Página de Produtos Afiliados: Uma vitrine de produtos organizados por categorias, que destaque os cards de forma atraente.
+
+Funcionalidades Técnicas (Foco na Integração):
+
+Integração com String.com: O site deve ter placeholders ou uma estrutura pronta para receber dados de cards de produtos afiliados automatizados via String.com. Pense em como os dados (imagem do produto, título, descrição curta, link de afiliado, preço) seriam injetados nos cards.
+
+Embed de Vídeos: Capacidade de incorporar vídeos do YouTube ou outras plataformas de forma elegante e responsiva.
+
+Navegação: Menu de navegação claro e talvez uma barra de pesquisa.
+
+Sugestões para o "Vibe Coding" (Direcionamento Visual):
+Pense em: "Um parque de diversões digital", "um caderno de esboços interativo", "uma revista pop-art".
+
+Foco em: Fluidez, cores que "saltam", e elementos que reagem ao toque/interação.
+
+Evite: Interfaces genéricas, blocos de texto maçantes, ou falta de personalidade.
