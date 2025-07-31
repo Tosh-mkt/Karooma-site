@@ -18,10 +18,11 @@ export default function Videos() {
 
   const categories = [
     { id: "all", label: "Todos" },
-    { id: "tutorial", label: "Tutoriais" },
-    { id: "review", label: "Reviews" },
-    { id: "lifestyle", label: "Lifestyle" },
-    { id: "tech", label: "Tecnologia" },
+    { id: "casa", label: "Casa & Organização" },
+    { id: "autocuidado", label: "Autocuidado" },
+    { id: "familia", label: "Família" },
+    { id: "reflexoes", label: "Reflexões" },
+    { id: "produtos", label: "Produtos" },
   ];
 
   const filteredVideos = videos?.filter(video => {
@@ -44,10 +45,10 @@ export default function Videos() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="font-fredoka text-5xl gradient-text mb-4">
-              Galeria de Vídeos
+              Te Entendo
             </h1>
             <p className="font-poppins text-xl text-gray-600">
-              Conteúdos que inspiram e transformam
+              Momentos reais do dia a dia, conversas verdadeiras e a vida como ela é
             </p>
           </motion.div>
 
@@ -62,7 +63,7 @@ export default function Videos() {
             <div className="relative max-w-md mx-auto">
               <Input
                 type="text"
-                placeholder="Buscar vídeos..."
+                placeholder="Que momento você quer ver?"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10 pr-4 py-3 rounded-full bg-white/70 backdrop-blur-sm border border-white/30"

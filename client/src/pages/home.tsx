@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Play, Rocket } from "lucide-react";
+import { Link } from "wouter";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { VideoCard } from "@/components/content/video-card";
 import { BlogCard } from "@/components/content/blog-card";
@@ -55,15 +56,19 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.6 }}
             >
-              <GradientButton size="lg">
-                Descubra o que Funciona
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </GradientButton>
+              <Link href="/products">
+                <GradientButton size="lg">
+                  Descubra o que Funciona
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </GradientButton>
+              </Link>
               
-              <GradientButton variant="glass" size="lg">
-                Dicas Práticas
-                <Play className="ml-2 w-5 h-5" />
-              </GradientButton>
+              <Link href="/videos">
+                <GradientButton variant="glass" size="lg">
+                  Te Entendo
+                  <Play className="ml-2 w-5 h-5" />
+                </GradientButton>
+              </Link>
             </motion.div>
           </motion.div>
 
@@ -117,10 +122,10 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
             >
               <h2 className="font-fredoka text-5xl gradient-text mb-4">
-                Dicas que Funcionam
+                Te Entendo
               </h2>
               <p className="font-poppins text-xl text-gray-600">
-                Soluções práticas para o seu dia a dia
+                Momentos reais, conversas verdadeiras e soluções que funcionam
               </p>
             </motion.div>
 
