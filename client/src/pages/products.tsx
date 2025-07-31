@@ -18,15 +18,10 @@ export default function Products() {
     queryClient.invalidateQueries({ queryKey: ["/api/products"] });
   }, []);
 
-  const { data: products, isLoading, error } = useQuery<Product[]>({
+  const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
     staleTime: 0, // Always refetch
-    cacheTime: 0, // Don't cache
   });
-
-  console.log("Products data:", products);
-  console.log("Loading:", isLoading);
-  console.log("Error:", error);
 
   const categories = [
     { id: "all", label: "Todos" },
