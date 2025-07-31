@@ -5,6 +5,7 @@ This is a modern, full-stack content and affiliate website called "Karooma" buil
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+Target persona: Cláudia - 39-year-old working mom of three (ages 10, 6, 2), seeks practical solutions for daily chaos, values empathetic and solution-focused content that helps simplify family life and allows moments for self-care.
 
 ## System Architecture
 

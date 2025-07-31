@@ -14,10 +14,10 @@ export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
-    { href: "/", label: "Home", id: "home" },
-    { href: "/videos", label: "Vídeos", id: "videos" },
-    { href: "/blog", label: "Blog", id: "blog" },
-    { href: "/products", label: "Produtos", id: "products" },
+    { href: "/", label: "Início", id: "home" },
+    { href: "/videos", label: "Dicas Práticas", id: "videos" },
+    { href: "/blog", label: "Momentos Meus", id: "blog" },
+    { href: "/products", label: "Facilita a Vida", id: "products" },
   ];
 
   const isActive = (href: string) => location === href;
@@ -80,7 +80,7 @@ export default function Navigation() {
           <div className="relative hidden sm:block">
             <Input
               type="text"
-              placeholder="Buscar..."
+              placeholder="O que você precisa?"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 pr-4 py-2 rounded-full bg-white/50 backdrop-blur-sm border border-white/30 focus:ring-2 focus:ring-pink-500 transition-all duration-300"
@@ -100,7 +100,7 @@ export default function Navigation() {
                 <div className="relative">
                   <Input
                     type="text"
-                    placeholder="Buscar..."
+                    placeholder="O que você precisa?"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 pr-4 py-2 rounded-full"

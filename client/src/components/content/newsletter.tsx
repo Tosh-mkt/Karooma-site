@@ -56,11 +56,11 @@ export function Newsletter() {
             </motion.div>
             
             <h2 className="font-fredoka text-4xl md:text-5xl text-white mb-4">
-              Não Perca Nada!
+              Você Merece Esse Tempo
             </h2>
             
             <p className="font-poppins text-xl text-white/90 max-w-2xl mx-auto">
-              Receba os melhores conteúdos, dicas exclusivas e produtos selecionados diretamente no seu email
+              Dicas práticas que funcionam, produtos testados e momentos para você se reconectar - tudo no seu email, sem spam
             </p>
           </div>
           
@@ -73,7 +73,7 @@ export function Newsletter() {
           >
             <Input
               type="email"
-              placeholder="Seu melhor email"
+              placeholder="Digite seu email aqui"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -94,7 +94,7 @@ export function Newsletter() {
                 </motion.div>
               ) : (
                 <>
-                  Inscrever
+                  Quero Receber
                   <Send className="ml-2 w-4 h-4" />
                 </>
               )}
@@ -108,7 +108,7 @@ export function Newsletter() {
             transition={{ delay: 0.5 }}
           >
             <Shield className="w-4 h-4" />
-            Seus dados estão seguros. Sem spam, apenas conteúdo de qualidade.
+            Seus dados estão seguros. Só conteúdo que faz sentido para você.
           </motion.p>
         </motion.div>
       </div>

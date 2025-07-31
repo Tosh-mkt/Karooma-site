@@ -42,11 +42,11 @@ export default function Home() {
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              Bem-vindo ao Futuro
+              Você Merece Mais
             </motion.h2>
             
             <p className="font-poppins text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-              Descubra conteúdos incríveis, vídeos inspiradores e produtos que vão transformar sua vida digital
+              Dicas práticas, produtos que realmente funcionam e momentos para você se reconectar com quem você é
             </p>
             
             <motion.div 
@@ -56,12 +56,12 @@ export default function Home() {
               transition={{ delay: 0.3, duration: 0.6 }}
             >
               <GradientButton size="lg">
-                Explorar Agora
+                Descubra o que Funciona
                 <ArrowRight className="ml-2 w-5 h-5" />
               </GradientButton>
               
               <GradientButton variant="glass" size="lg">
-                Ver Vídeos
+                Dicas Práticas
                 <Play className="ml-2 w-5 h-5" />
               </GradientButton>
             </motion.div>
@@ -97,10 +97,10 @@ export default function Home() {
             >
               <Rocket className="w-16 h-16 text-pink-500 mx-auto mb-4 animate-bounce-slow" />
               <h3 className="font-poppins text-2xl text-gray-600 mb-2">
-                Conteúdo em Preparação
+                Preparando Algo Especial
               </h3>
               <p className="text-gray-500">
-                Estamos preparando conteúdos incríveis para você!
+                Estamos organizando dicas práticas que vão fazer diferença no seu dia a dia!
               </p>
             </motion.div>
           )}
@@ -117,10 +117,10 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
             >
               <h2 className="font-fredoka text-5xl gradient-text mb-4">
-                Últimos Vídeos
+                Dicas que Funcionam
               </h2>
               <p className="font-poppins text-xl text-gray-600">
-                Conteúdos que inspiram e transformam
+                Soluções práticas para o seu dia a dia
               </p>
             </motion.div>
 
@@ -151,10 +151,10 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
             >
               <h2 className="font-fredoka text-5xl gradient-text mb-4">
-                Produtos em Destaque
+                Produtos que Facilitam
               </h2>
               <p className="font-poppins text-xl text-gray-600">
-                Curadoria especial de ferramentas e recursos
+                Testados e aprovados para otimizar seu tempo
               </p>
             </motion.div>
 
