@@ -125,6 +125,9 @@ The backend follows a simple Express.js REST API pattern:
 - **API Endpoints Added**: `/api/automation/products/sync` and `/api/automation/products/status` for automated workflows
 - **Data Validation**: Rigorous validation of product data (prices, categories, required fields) to ensure authenticity
 - **Template Scripts**: Python automation scripts ready for String.com implementation
+- **N8N Workflow Created**: Complete visual automation workflow for n8n with drag-and-drop interface
+- **Dual Automation Options**: Both String.com (cloud) and n8n (self-hosted) solutions available
+- **Visual Flow Design**: Easy-to-understand nodes for Amazon scraping, data validation, and API sync
 - **Impact**: Eliminates manual data entry and ensures 100% authentic product information from Amazon
 
 The application is designed as a modern, highly visual content and affiliate platform with emphasis on user experience, smooth animations, and modular architecture that can scale with business needs.

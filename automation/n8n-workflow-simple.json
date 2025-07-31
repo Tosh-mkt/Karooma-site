@@ -1,0 +1,93 @@
+{
+  "name": "Karooma Simple Sync",
+  "version": "1.0",
+  "description": "Versão simplificada para começar rapidamente",
+  "nodes": [
+    {
+      "name": "⏰ Executar Diariamente 6h",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "cronExpression", "value": "0 6 * * *" }]
+        }
+      }
+    },
+    {
+      "name": "📋 URLs dos Produtos",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "// ✏️ EDITE AQUI: Liste seus produtos da Amazon\nconst produtos = [\n  'https://amzn.to/44TPsu4',  // Balance Bike Nathor\n  // 'https://amzn.to/seu-link-2',  // Adicione mais aqui\n];\n\n// ✏️ EDITE AQUI: URL do seu Replit\nconst KAROOMA_URL = 'https://seu-projeto.replit.app';\n\nreturn produtos.map(url => ({ json: { amazonUrl: url, karoomaUrl: KAROOMA_URL } }));"
+      }
+    },
+    {
+      "name": "🌐 Buscar Página Amazon",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{ $json.amazonUrl }}",
+        "options": {
+          "timeout": 30000,
+          "headers": { "User-Agent": "Mozilla/5.0 (compatible; KaroomaBot/1.0)" }
+        }
+      }
+    },
+    {
+      "name": "📊 Extrair Dados",
+      "type": "n8n-nodes-base.function", 
+      "parameters": {
+        "functionCode": "const html = $input.first().json.data;\nconst url = $input.first().json.amazonUrl;\n\n// Extrair título\nconst titulo = (html.match(/<title[^>]*>([^<]+)<\\/title>/i) || [])[1]\n  ?.replace(' : Amazon.com.br', '').trim() || '';\n\n// Extrair preço\nconst precos = html.match(/R\\$\\s*([\\d,\\.]+)/g) || [];\nconst preco = precos[0] ? parseFloat(precos[0].replace(/[R$,]/g, '').replace('.', '')) / 100 : null;\n\n// Extrair rating\nconst rating = (html.match(/(\\d+[,\\.]\\d+)\\s*de\\s*5\\s*estrelas/i) || [])[1]\n  ?.replace(',', '.') || null;\n\n// Definir categoria baseada no título\nconst categorias = {\n  familia: ['bicicleta', 'bike', 'infantil', 'criança', 'brinquedo'],\n  casa: ['casa', 'cozinha', 'organiz', 'decoração'],\n  autocuidado: ['beleza', 'cuidado', 'cosmético', 'shampoo'],\n  saude: ['saúde', 'vitamina', 'suplemento', 'remédio'],\n  tecnologia: ['eletrônico', 'computador', 'celular', 'fone']\n};\n\nlet categoria = 'casa';\nfor (const [cat, palavras] of Object.entries(categorias)) {\n  if (palavras.some(p => titulo.toLowerCase().includes(p))) {\n    categoria = cat;\n    break;\n  }\n}\n\nreturn [{\n  json: {\n    title: titulo,\n    currentPrice: preco?.toString() || '0',\n    rating: rating,\n    category: categoria,\n    affiliateLink: url,\n    featured: parseFloat(rating) >= 4.5,\n    karoomaUrl: $input.first().json.karoomaUrl\n  }\n}];"
+      }
+    },
+    {
+      "name": "✅ Validar Dados",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            { "leftValue": "={{ $json.title }}", "operator": { "type": "string", "operation": "notEmpty" }},
+            { "leftValue": "={{ $json.currentPrice }}", "operator": { "type": "number", "operation": "gte" }, "rightValue": 10 }
+          ],
+          "combineOperation": "all"
+        }
+      }
+    },
+    {
+      "name": "🔄 Sincronizar Karooma",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "url": "={{ $json.karoomaUrl }}/api/automation/products/sync",
+        "method": "POST",
+        "sendHeaders": true,
+        "headers": { "parameters": [{ "name": "Content-Type", "value": "application/json" }] },
+        "sendBody": true,
+        "jsonBody": "={{ JSON.stringify({ title: $json.title, currentPrice: $json.currentPrice, rating: $json.rating, category: $json.category, affiliateLink: $json.affiliateLink, featured: $json.featured, description: $json.title + '. Produto selecionado com base em avaliações positivas na Amazon.' }) }}"
+      }
+    },
+    {
+      "name": "📈 Log Resultado",
+      "type": "n8n-nodes-base.function",
+      "parameters": {
+        "functionCode": "const dados = $input.first().json;\nconsole.log('✅ SUCESSO:', dados.title || 'Produto');\nconsole.log('💰 Preço: R$', dados.currentPrice);\nconsole.log('⭐ Rating:', dados.rating);\nconsole.log('📂 Categoria:', dados.category);\nreturn [{ json: { status: 'success', produto: dados.title } }];"
+      }
+    },
+    {
+      "name": "❌ Log Erro",
+      "type": "n8n-nodes-base.function", 
+      "parameters": {
+        "functionCode": "const dados = $input.first().json;\nconsole.log('❌ ERRO: Dados inválidos');\nconsole.log('Título:', dados.title || 'VAZIO');\nconsole.log('Preço:', dados.currentPrice || 'VAZIO');\nreturn [{ json: { status: 'error', dados } }];"
+      }
+    }
+  ],
+  "connections": {
+    "⏰ Executar Diariamente 6h": { "main": [["📋 URLs dos Produtos"]] },
+    "📋 URLs dos Produtos": { "main": [["🌐 Buscar Página Amazon"]] },
+    "🌐 Buscar Página Amazon": { "main": [["📊 Extrair Dados"]] },
+    "📊 Extrair Dados": { "main": [["✅ Validar Dados"]] },
+    "✅ Validar Dados": { 
+      "main": [
+        ["🔄 Sincronizar Karooma"], 
+        ["❌ Log Erro"]
+      ] 
+    },
+    "🔄 Sincronizar Karooma": { "main": [["📈 Log Resultado"]] }
+  }
+}
