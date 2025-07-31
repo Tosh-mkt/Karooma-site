@@ -114,4 +114,14 @@ The backend follows a simple Express.js REST API pattern:
 - **PostgreSQL**: Compatible with Neon serverless or traditional PostgreSQL
 - **Static Assets**: CDN-ready build output structure
 
+## Recent Changes
+
+### 2025-07-31 - Database Migration to PostgreSQL
+- **Migrated from MemStorage to PostgreSQL**: Replaced in-memory storage with permanent database storage using Neon serverless PostgreSQL
+- **Fixed persistent storage issues**: Products and content now persist across server restarts
+- **Database Configuration**: Added DatabaseStorage class implementing IStorage interface with full CRUD operations
+- **Schema Push**: Successfully migrated all tables (users, content, products, newsletter_subscriptions) to PostgreSQL
+- **Affiliate Product Added**: Bicicleta Balance Bike Nathor now permanently stored in database with real Amazon data
+- **Impact**: Resolves the critical issue where product cards disappeared after server restarts
+
 The application is designed as a modern, highly visual content and affiliate platform with emphasis on user experience, smooth animations, and modular architecture that can scale with business needs.

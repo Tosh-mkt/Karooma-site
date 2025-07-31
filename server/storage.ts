@@ -6,9 +6,15 @@ import {
   type Product,
   type InsertProduct,
   type NewsletterSubscription,
-  type InsertNewsletterSubscription
+  type InsertNewsletterSubscription,
+  users,
+  content,
+  products,
+  newsletterSubscriptions
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -184,4 +190,100 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  // User methods
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  // Content methods
+  async getContent(id: string): Promise<Content | undefined> {
+    const [contentItem] = await db.select().from(content).where(eq(content.id, id));
+    return contentItem || undefined;
+  }
+
+  async getAllContent(): Promise<Content[]> {
+    return await db.select().from(content).orderBy(desc(content.createdAt));
+  }
+
+  async getContentByType(type: string): Promise<Content[]> {
+    return await db.select().from(content)
+      .where(eq(content.type, type))
+      .orderBy(desc(content.createdAt));
+  }
+
+  async getContentByTypeAndCategory(type: string, category: string): Promise<Content[]> {
+    return await db.select().from(content)
+      .where(eq(content.type, type))
+      .orderBy(desc(content.createdAt));
+  }
+
+  async getFeaturedContent(): Promise<Content[]> {
+    return await db.select().from(content)
+      .where(eq(content.featured, true))
+      .orderBy(desc(content.createdAt));
+  }
+
+  async createContent(insertContent: InsertContent): Promise<Content> {
+    const [contentItem] = await db
+      .insert(content)
+      .values(insertContent)
+      .returning();
+    return contentItem;
+  }
+
+  // Product methods
+  async getProduct(id: string): Promise<Product | undefined> {
+    const [product] = await db.select().from(products).where(eq(products.id, id));
+    return product || undefined;
+  }
+
+  async getAllProducts(): Promise<Product[]> {
+    return await db.select().from(products).orderBy(desc(products.createdAt));
+  }
+
+  async getProductsByCategory(category: string): Promise<Product[]> {
+    return await db.select().from(products)
+      .where(eq(products.category, category))
+      .orderBy(desc(products.createdAt));
+  }
+
+  async getFeaturedProducts(): Promise<Product[]> {
+    return await db.select().from(products)
+      .where(eq(products.featured, true))
+      .orderBy(desc(products.createdAt));
+  }
+
+  async createProduct(insertProduct: InsertProduct): Promise<Product> {
+    const [product] = await db
+      .insert(products)
+      .values(insertProduct)
+      .returning();
+    return product;
+  }
+
+  // Newsletter methods
+  async createNewsletterSubscription(insertSubscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
+    const [subscription] = await db
+      .insert(newsletterSubscriptions)
+      .values(insertSubscription)
+      .returning();
+    return subscription;
+  }
+}
+
+export const storage = new DatabaseStorage();
