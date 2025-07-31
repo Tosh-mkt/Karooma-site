@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Search, Menu, Rocket } from "lucide-react";
+import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
+import karoomaLogo from "@assets/LOGO_KAROOMA_TIPO_1753945361411.png";
 
 export default function Navigation() {
   const [location] = useLocation();
@@ -31,17 +33,26 @@ export default function Navigation() {
         {/* Logo */}
         <Link href="/">
           <motion.div 
-            className="flex items-center space-x-2 cursor-pointer"
+            className="flex items-center space-x-3 cursor-pointer"
             whileHover={{ scale: 1.05 }}
           >
             <motion.div 
-              className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 flex items-center justify-center"
+              whileHover={{ rotate: [0, -10, 10, 0] }}
+              transition={{ duration: 0.5 }}
             >
-              <Rocket className="text-white text-lg" />
+              <img 
+                src={karoomaIcon} 
+                alt="Karooma Icon" 
+                className="w-full h-full object-contain"
+              />
             </motion.div>
-            <h1 className="font-fredoka text-2xl gradient-text">CreativeHub</h1>
+            <motion.img 
+              src={karoomaLogo} 
+              alt="Karooma" 
+              className="h-8 object-contain"
+              whileHover={{ scale: 1.02 }}
+            />
           </motion.div>
         </Link>
         
@@ -49,8 +60,8 @@ export default function Navigation() {
         <div className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
             <Link key={item.id} href={item.href}>
-              <motion.a
-                className={`font-poppins transition-colors duration-300 ${
+              <motion.span
+                className={`font-poppins transition-colors duration-300 cursor-pointer ${
                   isActive(item.href) 
                     ? "text-pink-500 font-semibold" 
                     : "text-gray-700 hover:text-pink-500"
@@ -59,7 +70,7 @@ export default function Navigation() {
                 whileTap={{ scale: 0.95 }}
               >
                 {item.label}
-              </motion.a>
+              </motion.span>
             </Link>
           ))}
         </div>
@@ -99,8 +110,8 @@ export default function Navigation() {
                 
                 {navItems.map((item) => (
                   <Link key={item.id} href={item.href}>
-                    <motion.a
-                      className={`block font-poppins text-lg transition-colors duration-300 ${
+                    <motion.span
+                      className={`block font-poppins text-lg transition-colors duration-300 cursor-pointer ${
                         isActive(item.href) 
                           ? "text-pink-500 font-semibold" 
                           : "text-gray-700"
@@ -109,7 +120,7 @@ export default function Navigation() {
                       whileHover={{ x: 10 }}
                     >
                       {item.label}
-                    </motion.a>
+                    </motion.span>
                   </Link>
                 ))}
               </div>

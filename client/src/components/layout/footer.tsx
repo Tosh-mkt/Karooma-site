@@ -2,6 +2,8 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Rocket, Instagram, Youtube, Twitter } from "lucide-react";
 import { FaTiktok } from "react-icons/fa";
+import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
+import karoomaLogo from "@assets/LOGO_KAROOMA_TIPO_1753945361411.png";
 
 export default function Footer() {
   const footerSections = [
@@ -48,16 +50,24 @@ export default function Footer() {
           {/* Brand Section */}
           <div>
             <motion.div 
-              className="flex items-center space-x-2 mb-4"
+              className="flex items-center space-x-3 mb-4"
               whileHover={{ scale: 1.05 }}
             >
-              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-                <Rocket className="text-white w-5 h-5" />
+              <div className="w-10 h-10 flex items-center justify-center">
+                <img 
+                  src={karoomaIcon} 
+                  alt="Karooma Icon" 
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <h3 className="font-fredoka text-2xl gradient-text">CreativeHub</h3>
+              <img 
+                src={karoomaLogo} 
+                alt="Karooma" 
+                className="h-6 object-contain brightness-0 invert"
+              />
             </motion.div>
             <p className="text-gray-400 font-inter mb-4">
-              Sua plataforma completa para conteúdo digital e descobertas incríveis.
+              Sua plataforma completa para conteúdo digital e descobertas incríveis com Karooma.
             </p>
             <div className="flex space-x-4">
               {socialLinks.map((social, index) => (
@@ -91,12 +101,12 @@ export default function Footer() {
                 {section.links.map((link) => (
                   <li key={link.label}>
                     <Link href={link.href}>
-                      <motion.a 
-                        className="text-gray-400 hover:text-white transition-colors duration-300 font-inter"
+                      <motion.span 
+                        className="text-gray-400 hover:text-white transition-colors duration-300 font-inter cursor-pointer"
                         whileHover={{ x: 5 }}
                       >
                         {link.label}
-                      </motion.a>
+                      </motion.span>
                     </Link>
                   </li>
                 ))}
@@ -112,7 +122,7 @@ export default function Footer() {
           whileInView={{ opacity: 1 }}
         >
           <p className="text-gray-400 font-inter text-sm">
-            © 2024 CreativeHub. Todos os direitos reservados.
+            © 2024 Karooma. Todos os direitos reservados.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             {["Privacidade", "Termos", "Cookies"].map((item) => (

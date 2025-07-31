@@ -1,6 +1,6 @@
 # Project Overview
 
-This is a modern, full-stack content and affiliate website called "CreativeHub" built with React, TypeScript, Express.js, and PostgreSQL. The application focuses on providing a vibrant, animated user experience for content discovery and affiliate product promotion.
+This is a modern, full-stack content and affiliate website called "Karooma" built with React, TypeScript, Express.js, and PostgreSQL. The application focuses on providing a vibrant, animated user experience for content discovery and affiliate product promotion with custom Karooma branding.
 
 ## User Preferences
 
