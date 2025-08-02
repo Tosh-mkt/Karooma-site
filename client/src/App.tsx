@@ -7,6 +7,7 @@ import Home from "./pages/home";
 import Videos from "./pages/videos";
 import Blog from "./pages/blog";
 import Products from "./pages/products";
+import { Admin } from "./pages/Admin";
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
 import Footer from "./components/layout/footer";
@@ -22,6 +23,7 @@ function Router() {
           <Route path="/videos" component={Videos} />
           <Route path="/blog" component={Blog} />
           <Route path="/products" component={Products} />
+          <Route path="/admin" component={Admin} />
           <Route component={NotFound} />
         </Switch>
       </main>
