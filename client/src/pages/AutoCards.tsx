@@ -6,19 +6,22 @@ import { RefreshCw, Zap, Database } from "lucide-react";
 import { useEffect, useState } from "react";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { Badge } from "@/components/ui/badge";
+import { useSSE } from "@/hooks/useSSE";
 
 export default function AutoCards() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [newProductsCount, setNewProductsCount] = useState(0);
   const queryClient = useQueryClient();
+  
+  // Hook SSE para atualizações em tempo real
+  const { events, isConnected } = useSSE();
 
-  // Buscar todos os produtos
+  // Buscar todos os produtos (sem polling)
   const { data: products, isLoading, refetch } = useQuery<Product[]>({
     queryKey: ["/api/products"],
-    refetchInterval: 5000, // Atualiza a cada 5 segundos
   });
 
-  // Buscar status da automação
+  // Buscar status da automação (sem polling)
   const { data: automationStatus } = useQuery<{
     totalProducts: number;
     featuredProducts: number;
@@ -26,8 +29,24 @@ export default function AutoCards() {
     status: string;
   }>({
     queryKey: ["/api/automation/products/status"],
-    refetchInterval: 10000, // Atualiza a cada 10 segundos
   });
+
+  // Processar eventos SSE
+  useEffect(() => {
+    events.forEach(event => {
+      if (event.type === 'newProduct') {
+        setLastUpdate(new Date());
+        queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/automation/products/status"] });
+      }
+      
+      if (event.type === 'batchComplete') {
+        setLastUpdate(new Date());
+        queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/automation/products/status"] });
+      }
+    });
+  }, [events, queryClient]);
 
   // Detectar novos produtos
   useEffect(() => {
@@ -104,10 +123,14 @@ export default function AutoCards() {
               {products?.length || 0} Produtos Total
             </Badge>
             
+            <Badge className={`px-4 py-2 ${isConnected ? 'bg-blue-500 animate-pulse' : 'bg-gray-500'} text-white`}>
+              <Zap className="w-4 h-4 mr-2" />
+              {isConnected ? 'Tempo Real Ativo' : 'Desconectado'}
+            </Badge>
+
             {newProductsCount > 0 && (
-              <Badge className="bg-blue-500 text-white px-4 py-2 animate-pulse">
-                <Zap className="w-4 h-4 mr-2" />
-                {newProductsCount} Novos (5min)
+              <Badge className="bg-orange-500 text-white px-4 py-2 animate-bounce">
+                {newProductsCount} Recentes
               </Badge>
             )}
 

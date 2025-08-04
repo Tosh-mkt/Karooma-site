@@ -1,47 +1,44 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
 import { useEffect, useState } from "react";
-import { Zap, X, ExternalLink } from "lucide-react";
+import { Zap, X, ExternalLink, Wifi, WifiOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useSSE } from "@/hooks/useSSE";
 
 export function AutoNotification() {
   const [notifications, setNotifications] = useState<Product[]>([]);
-  const [lastProductCount, setLastProductCount] = useState(0);
+  const queryClient = useQueryClient();
+  
+  // Hook SSE para atualizações em tempo real
+  const { events, isConnected } = useSSE();
 
-  // Buscar produtos com polling frequente
-  const { data: products } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
-    refetchInterval: 3000, // Verifica a cada 3 segundos
-  });
-
-  // Detectar novos produtos
+  // Processar eventos SSE
   useEffect(() => {
-    if (products && products.length > lastProductCount && lastProductCount > 0) {
-      const newProducts = products.slice(lastProductCount);
-      const recentNewProducts = newProducts.filter(product => {
-        if (!product.createdAt) return false;
-        const productDate = new Date(product.createdAt);
-        const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
-        return productDate > oneMinuteAgo;
-      });
-
-      if (recentNewProducts.length > 0) {
-        setNotifications(prev => [...prev, ...recentNewProducts]);
+    events.forEach(event => {
+      if (event.type === 'newProduct' && event.data.product) {
+        const product = event.data.product;
         
-        // Auto-remover notificação após 10 segundos
+        // Adicionar notificação
+        setNotifications(prev => [...prev, product]);
+        
+        // Invalidar cache para atualizar listas
+        queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/products/featured"] });
+        
+        // Auto-remover após 10 segundos
         setTimeout(() => {
-          setNotifications(prev => 
-            prev.filter(n => !recentNewProducts.includes(n))
-          );
+          setNotifications(prev => prev.filter(n => n.id !== product.id));
         }, 10000);
       }
-    }
-    
-    if (products) {
-      setLastProductCount(products.length);
-    }
-  }, [products, lastProductCount]);
+      
+      if (event.type === 'batchComplete') {
+        // Invalidar cache quando lote N8N for concluído
+        queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/automation/products/status"] });
+      }
+    });
+  }, [events, queryClient]);
 
   const removeNotification = (productId: string) => {
     setNotifications(prev => prev.filter(n => n.id !== productId));
@@ -49,6 +46,29 @@ export function AutoNotification() {
 
   return (
     <div className="fixed top-24 right-4 z-50 space-y-2">
+      {/* Indicador de Conexão SSE */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium ${
+          isConnected 
+            ? 'bg-green-500/20 text-green-700 border border-green-200' 
+            : 'bg-red-500/20 text-red-700 border border-red-200'
+        }`}
+      >
+        {isConnected ? (
+          <>
+            <Wifi className="w-3 h-3" />
+            <span>Automação Ativa</span>
+          </>
+        ) : (
+          <>
+            <WifiOff className="w-3 h-3" />
+            <span>Reconectando...</span>
+          </>
+        )}
+      </motion.div>
+
       <AnimatePresence>
         {notifications.map((product) => (
           <motion.div

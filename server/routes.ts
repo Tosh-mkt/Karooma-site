@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertContentSchema, insertProductSchema, insertNewsletterSchema } from "@shared/schema";
 import { z } from "zod";
+import { sseManager } from "./sse";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Content routes
@@ -274,6 +275,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           const newProduct = await storage.createProduct(formattedProduct);
           (results.successful as any[]).push({ index: i + 1, title: newProduct.title || 'Produto criado', id: newProduct.id });
+          
+          // Notificar clientes SSE sobre novo produto
+          sseManager.notifyNewProduct(newProduct);
+          
           console.log(`✅ NOVO PRODUTO CRIADO VIA N8N:`);
           console.log(`   Título: ${newProduct.title}`);
           console.log(`   Preço: R$ ${newProduct.currentPrice}`);
@@ -293,6 +298,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`⏭️ Ignorados: ${results.skipped.length}`);
       console.log(`❌ Falhas: ${results.failed.length}`);
       console.log(`Taxa de sucesso: ${((results.successful.length / results.total) * 100).toFixed(1)}%`);
+      
+      // Notificar conclusão do lote via SSE
+      sseManager.notifyBatchComplete({
+        successful: results.successful.length,
+        failed: results.failed.length,
+        total: results.total
+      });
       
       res.json({
         success: true,
@@ -321,6 +333,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       res.status(500).json({ error: "Falha ao obter status" });
     }
+  });
+
+  // Server-Sent Events endpoint
+  app.get("/api/events", (req, res) => {
+    const clientId = `client_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sseManager.addClient(clientId, res);
   });
 
   // Analytics/tracking routes
