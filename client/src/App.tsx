@@ -8,21 +8,25 @@ import Videos from "./pages/videos";
 import Blog from "./pages/blog";
 import Products from "./pages/products";
 import { Admin } from "./pages/Admin";
+import AutoCards from "./pages/AutoCards";
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
 import Footer from "./components/layout/footer";
+import { AutoNotification } from "./components/content/auto-notification";
 import { motion } from "framer-motion";
 
 function Router() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navigation />
+      <AutoNotification />
       <main className="flex-1">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/videos" component={Videos} />
           <Route path="/blog" component={Blog} />
           <Route path="/products" component={Products} />
+          <Route path="/autocards" component={AutoCards} />
           <Route path="/admin" component={Admin} />
           <Route component={NotFound} />
         </Switch>

@@ -274,7 +274,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           
           const newProduct = await storage.createProduct(formattedProduct);
           (results.successful as any[]).push({ index: i + 1, title: newProduct.title || 'Produto criado', id: newProduct.id });
-          console.log(`Produto ${i + 1}/${products.length} criado: ${newProduct.title}`);
+          console.log(`✅ NOVO PRODUTO CRIADO VIA N8N:`);
+          console.log(`   Título: ${newProduct.title}`);
+          console.log(`   Preço: R$ ${newProduct.currentPrice}`);
+          console.log(`   Categoria: ${newProduct.category}`);
+          console.log(`   ID: ${newProduct.id}`);
           
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
