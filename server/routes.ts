@@ -215,6 +215,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Falha na sincronização do produto" });
     }
   });
+
+  // Endpoint para lotes de produtos (5-20)
+  app.post("/api/automation/products/batch", async (req, res) => {
+    try {
+      const { products } = req.body;
+      
+      if (!products || !Array.isArray(products)) {
+        return res.status(400).json({ error: 'Campo "products" deve ser um array' });
+      }
+      
+      if (products.length === 0 || products.length > 20) {
+        return res.status(400).json({ error: 'Envie entre 1 e 20 produtos por lote' });
+      }
+      
+      const results = {
+        successful: [],
+        failed: [],
+        skipped: [],
+        total: products.length
+      };
+      
+      for (let i = 0; i < products.length; i++) {
+        const productData = products[i];
+        
+        try {
+          // Validação usando schema existente
+          const validatedProduct = insertProductSchema.parse(productData);
+          
+          // Validação de preço
+          const price = parseFloat(validatedProduct.currentPrice);
+          if (price < 10 || price > 5000) {
+            results.failed.push({ index: i + 1, title: productData.title || 'Sem título', reason: 'Preço inválido' });
+            continue;
+          }
+          
+          // Verificar duplicata
+          const existingProducts = await storage.getAllProducts();
+          const existingProduct = existingProducts.find(p => p.affiliateLink === validatedProduct.affiliateLink);
+          
+          if (existingProduct) {
+            results.skipped.push({ index: i + 1, title: productData.title || 'Sem título', reason: 'Produto já existe', id: existingProduct.id });
+            continue;
+          }
+          
+          const formattedProduct = {
+            title: validatedProduct.title,
+            description: validatedProduct.description || '',
+            category: validatedProduct.category,
+            imageUrl: validatedProduct.imageUrl || null,
+            currentPrice: validatedProduct.currentPrice?.toString() || '0',
+            originalPrice: validatedProduct.originalPrice?.toString() || null,
+            affiliateLink: validatedProduct.affiliateLink,
+            rating: validatedProduct.rating?.toString() || null,
+            discount: validatedProduct.discount || null,
+            featured: validatedProduct.featured || false
+          };
+          
+          const newProduct = await storage.createProduct(formattedProduct);
+          results.successful.push({ index: i + 1, title: newProduct.title || 'Produto criado', id: newProduct.id });
+          console.log(`Produto ${i + 1}/${products.length} criado: ${newProduct.title}`);
+          
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+          results.failed.push({ index: i + 1, title: productData.title || 'Sem título', reason: errorMessage });
+        }
+      }
+      
+      console.log(`\n📊 RELATÓRIO BATCH N8N`);
+      console.log(`=======================`);
+      console.log(`Total processados: ${results.total}`);
+      console.log(`✅ Sucessos: ${results.successful.length}`);
+      console.log(`⏭️ Ignorados: ${results.skipped.length}`);
+      console.log(`❌ Falhas: ${results.failed.length}`);
+      console.log(`Taxa de sucesso: ${((results.successful.length / results.total) * 100).toFixed(1)}%`);
+      
+      res.json({
+        success: true,
+        message: `Lote processado: ${results.successful.length} criados, ${results.skipped.length} ignorados, ${results.failed.length} falhas`,
+        results
+      });
+      
+    } catch (error) {
+      console.error('Erro no processamento em lote:', error);
+      res.status(500).json({ error: "Falha no processamento em lote" });
+    }
+  });
   
   app.get("/api/automation/products/status", async (req, res) => {
     try {
