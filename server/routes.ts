@@ -244,9 +244,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const validatedProduct = insertProductSchema.parse(productData);
           
           // Validação de preço
-          const price = parseFloat(validatedProduct.currentPrice);
+          const price = parseFloat(validatedProduct.currentPrice || '0');
           if (price < 10 || price > 5000) {
-            results.failed.push({ index: i + 1, title: productData.title || 'Sem título', reason: 'Preço inválido' });
+            (results.failed as any[]).push({ index: i + 1, title: productData.title || 'Sem título', reason: 'Preço inválido' });
             continue;
           }
           
@@ -255,7 +255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const existingProduct = existingProducts.find(p => p.affiliateLink === validatedProduct.affiliateLink);
           
           if (existingProduct) {
-            results.skipped.push({ index: i + 1, title: productData.title || 'Sem título', reason: 'Produto já existe', id: existingProduct.id });
+            (results.skipped as any[]).push({ index: i + 1, title: productData.title || 'Sem título', reason: 'Produto já existe', id: existingProduct.id });
             continue;
           }
           
@@ -273,12 +273,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
           
           const newProduct = await storage.createProduct(formattedProduct);
-          results.successful.push({ index: i + 1, title: newProduct.title || 'Produto criado', id: newProduct.id });
+          (results.successful as any[]).push({ index: i + 1, title: newProduct.title || 'Produto criado', id: newProduct.id });
           console.log(`Produto ${i + 1}/${products.length} criado: ${newProduct.title}`);
           
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
-          results.failed.push({ index: i + 1, title: productData.title || 'Sem título', reason: errorMessage });
+          (results.failed as any[]).push({ index: i + 1, title: productData.title || 'Sem título', reason: errorMessage });
         }
       }
       
