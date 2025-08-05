@@ -19,6 +19,7 @@ export default function Navigation() {
     { href: "/blog", label: "Momentos Meus", id: "blog" },
     { href: "/products", label: "Facilita a Vida", id: "products" },
     { href: "/autocards", label: "Auto Cards", id: "autocards" },
+    { href: "/admin/dashboard", label: "Admin", id: "admin" },
   ];
 
   const isActive = (href: string) => location === href;

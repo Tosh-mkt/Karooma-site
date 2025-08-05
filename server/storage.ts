@@ -36,6 +36,8 @@ export interface IStorage {
   getProductsByCategory(category: string): Promise<Product[]>;
   getFeaturedProducts(): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: string, updates: Partial<Product>): Promise<Product>;
+  deleteProduct(id: string): Promise<void>;
   
   // Newsletter methods
   createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
@@ -177,6 +179,20 @@ export class MemStorage implements IStorage {
     return product;
   }
 
+  async updateProduct(id: string, updates: Partial<Product>): Promise<Product> {
+    const existingProduct = this.products.get(id);
+    if (!existingProduct) {
+      throw new Error('Product not found');
+    }
+    const updatedProduct = { ...existingProduct, ...updates };
+    this.products.set(id, updatedProduct);
+    return updatedProduct;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    this.products.delete(id);
+  }
+
   // Newsletter methods
   async createNewsletterSubscription(insertSubscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
     const id = randomUUID();
@@ -274,6 +290,19 @@ export class DatabaseStorage implements IStorage {
       .values(insertProduct)
       .returning();
     return product;
+  }
+
+  async updateProduct(id: string, updates: Partial<Product>): Promise<Product> {
+    const [product] = await db
+      .update(products)
+      .set(updates)
+      .where(eq(products.id, id))
+      .returning();
+    return product;
+  }
+
+  async deleteProduct(id: string): Promise<void> {
+    await db.delete(products).where(eq(products.id, id));
   }
 
   // Newsletter methods

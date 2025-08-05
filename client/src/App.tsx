@@ -8,6 +8,7 @@ import Videos from "./pages/videos";
 import Blog from "./pages/blog";
 import Products from "./pages/products";
 import { Admin } from "./pages/Admin";
+import { AdminDashboard } from "./pages/AdminDashboard";
 import AutoCards from "./pages/AutoCards";
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/products" component={Products} />
           <Route path="/autocards" component={AutoCards} />
           <Route path="/admin" component={Admin} />
+          <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route component={NotFound} />
         </Switch>
       </main>

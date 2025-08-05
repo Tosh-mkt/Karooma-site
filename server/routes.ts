@@ -341,6 +341,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     sseManager.addClient(clientId, res);
   });
 
+  // Update product by ID
+  app.patch("/api/products/:id", async (req, res) => {
+    try {
+      const productId = req.params.id;
+      const updates = req.body;
+      
+      // Get existing product
+      const existingProduct = await storage.getProduct(productId);
+      if (!existingProduct) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      // Update product
+      const updatedProduct = await storage.updateProduct(productId, updates);
+      res.json(updatedProduct);
+    } catch (error) {
+      console.error("Erro ao atualizar produto:", error);
+      res.status(500).json({ error: "Falha ao atualizar produto" });
+    }
+  });
+
+  // Delete product by ID
+  app.delete("/api/products/:id", async (req, res) => {
+    try {
+      const productId = req.params.id;
+      
+      // Check if product exists
+      const existingProduct = await storage.getProduct(productId);
+      if (!existingProduct) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      // Delete product
+      await storage.deleteProduct(productId);
+      res.json({ message: "Produto deletado com sucesso" });
+    } catch (error) {
+      console.error("Erro ao deletar produto:", error);
+      res.status(500).json({ error: "Falha ao deletar produto" });
+    }
+  });
+
   // Analytics/tracking routes
   app.post("/api/analytics/affiliate-click", async (req, res) => {
     try {
