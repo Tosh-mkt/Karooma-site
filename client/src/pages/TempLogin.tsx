@@ -16,15 +16,25 @@ export function TempLogin() {
 
   const loginMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return await apiRequest("/api/auth/temp-login", {
+      const response = await fetch("/api/auth/temp-login", {
         method: "POST",
-        body: { userId },
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId }),
       });
+      
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+      
+      return await response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
+      console.log("Login successful:", data);
       toast({
         title: "Login realizado com sucesso!",
-        description: `Bem-vinda, ${data.user.firstName || data.user.email}!`,
+        description: `Bem-vinda, ${data.user?.firstName || data.user?.email || "Admin"}!`,
       });
       
       // Invalidate auth queries to refresh user data
@@ -35,7 +45,8 @@ export function TempLogin() {
         window.location.href = data.isAdmin ? "/admin/dashboard" : "/";
       }, 1000);
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error("Login error:", error);
       toast({
         title: "Erro no login",
         description: "Não foi possível fazer login. Verifique o ID do usuário.",
@@ -57,9 +68,14 @@ export function TempLogin() {
     loginMutation.mutate(userId);
   };
 
-  const quickLoginAdmin = () => {
-    setUserId("admin-karooma");
-    loginMutation.mutate("admin-karooma");
+  const quickLoginAdmin = async () => {
+    try {
+      console.log("Iniciando login rápido admin...");
+      setUserId("admin-karooma");
+      await loginMutation.mutateAsync("admin-karooma");
+    } catch (error) {
+      console.error("Erro no login rápido:", error);
+    }
   };
 
   return (
@@ -119,9 +135,10 @@ export function TempLogin() {
               disabled={loginMutation.isPending}
               variant="outline"
               className="w-full border-purple-200 hover:bg-purple-50"
+              type="button"
             >
               <Shield className="w-4 h-4 mr-2" />
-              Login Rápido - Admin
+              {loginMutation.isPending ? "Entrando..." : "Login Rápido - Admin"}
             </Button>
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
