@@ -62,6 +62,17 @@ export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Favorites table for user-product relationships
+export const favorites = pgTable("favorites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  productId: varchar("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_favorites_user_id").on(table.userId),
+  index("idx_favorites_product_id").on(table.productId),
+]);
+
 export const upsertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
@@ -98,3 +109,7 @@ export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSchema>;
+
+// Favorites types
+export type Favorite = typeof favorites.$inferSelect;
+export type InsertFavorite = typeof favorites.$inferInsert;

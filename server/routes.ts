@@ -470,6 +470,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Favorites routes (protected)
+  app.get("/api/favorites", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const favorites = await storage.getUserFavorites(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+      res.status(500).json({ message: "Failed to fetch favorites" });
+    }
+  });
+
+  app.post("/api/favorites/:productId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { productId } = req.params;
+      
+      const favorite = await storage.addToFavorites(userId, productId);
+      res.json(favorite);
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+      res.status(500).json({ message: "Failed to add to favorites" });
+    }
+  });
+
+  app.delete("/api/favorites/:productId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { productId } = req.params;
+      
+      await storage.removeFromFavorites(userId, productId);
+      res.json({ message: "Removed from favorites" });
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      res.status(500).json({ message: "Failed to remove from favorites" });
+    }
+  });
+
+  app.get("/api/favorites/check/:productId", isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user?.claims?.sub;
+      const { productId } = req.params;
+      
+      const isFavorite = await storage.isFavorite(userId, productId);
+      res.json({ isFavorite });
+    } catch (error) {
+      console.error("Error checking favorite status:", error);
+      res.status(500).json({ message: "Failed to check favorite status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

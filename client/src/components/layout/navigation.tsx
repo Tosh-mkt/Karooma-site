@@ -20,6 +20,7 @@ export default function Navigation() {
     { href: "/videos", label: "Te Entendo", id: "videos" },
     { href: "/blog", label: "Momentos Meus", id: "blog" },
     { href: "/products", label: "Facilita a Vida", id: "products" },
+    { href: "/favoritos", label: "Favoritos", id: "favorites" },
     { href: "/autocards", label: "Auto Cards", id: "autocards" },
   ];
 

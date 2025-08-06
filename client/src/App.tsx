@@ -11,6 +11,7 @@ import { Admin } from "./pages/Admin";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
 import AutoCards from "./pages/AutoCards";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
 import Footer from "./components/layout/footer";
@@ -29,6 +30,7 @@ function Router() {
           <Route path="/blog" component={Blog} />
           <Route path="/products" component={Products} />
           <Route path="/autocards" component={AutoCards} />
+          <Route path="/favoritos" component={Favorites} />
           <Route path="/admin" component={Admin} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/login" component={() => <TempLogin />} />

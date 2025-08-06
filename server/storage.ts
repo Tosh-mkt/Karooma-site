@@ -8,14 +8,17 @@ import {
   type InsertProduct,
   type NewsletterSubscription,
   type InsertNewsletterSubscription,
+  type Favorite,
+  type InsertFavorite,
   users,
   content,
   products,
-  newsletterSubscriptions
+  newsletterSubscriptions,
+  favorites
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -42,6 +45,12 @@ export interface IStorage {
   
   // Newsletter methods
   createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
+  
+  // Favorites methods
+  getUserFavorites(userId: string): Promise<(Favorite & { product: Product })[]>;
+  addToFavorites(userId: string, productId: string): Promise<Favorite>;
+  removeFromFavorites(userId: string, productId: string): Promise<void>;
+  isFavorite(userId: string, productId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -216,6 +225,29 @@ export class MemStorage implements IStorage {
     this.newsletters.set(id, subscription);
     return subscription;
   }
+
+  // Favorites methods for MemStorage (simplified in-memory implementation)
+  async getUserFavorites(userId: string): Promise<(Favorite & { product: Product })[]> {
+    return []; // Simplified implementation for memory storage
+  }
+
+  async addToFavorites(userId: string, productId: string): Promise<Favorite> {
+    const favorite: Favorite = {
+      id: randomUUID(),
+      userId,
+      productId,
+      createdAt: new Date(),
+    };
+    return favorite;
+  }
+
+  async removeFromFavorites(userId: string, productId: string): Promise<void> {
+    // Simplified implementation for memory storage
+  }
+
+  async isFavorite(userId: string, productId: string): Promise<boolean> {
+    return false; // Simplified implementation for memory storage
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -336,6 +368,58 @@ export class DatabaseStorage implements IStorage {
       .values(insertSubscription)
       .returning();
     return subscription;
+  }
+
+  // Favorites methods
+  async getUserFavorites(userId: string): Promise<(Favorite & { product: Product })[]> {
+    const result = await db
+      .select({
+        id: favorites.id,
+        userId: favorites.userId,
+        productId: favorites.productId,
+        createdAt: favorites.createdAt,
+        product: products
+      })
+      .from(favorites)
+      .innerJoin(products, eq(favorites.productId, products.id))
+      .where(eq(favorites.userId, userId))
+      .orderBy(desc(favorites.createdAt));
+    
+    return result;
+  }
+
+  async addToFavorites(userId: string, productId: string): Promise<Favorite> {
+    try {
+      const [result] = await db
+        .insert(favorites)
+        .values({ userId, productId })
+        .returning();
+      return result;
+    } catch (error) {
+      // If already exists, just return the existing one
+      const [existing] = await db
+        .select()
+        .from(favorites)
+        .where(and(eq(favorites.userId, userId), eq(favorites.productId, productId)))
+        .limit(1);
+      return existing;
+    }
+  }
+
+  async removeFromFavorites(userId: string, productId: string): Promise<void> {
+    await db
+      .delete(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.productId, productId)));
+  }
+
+  async isFavorite(userId: string, productId: string): Promise<boolean> {
+    const result = await db
+      .select()
+      .from(favorites)
+      .where(and(eq(favorites.userId, userId), eq(favorites.productId, productId)))
+      .limit(1);
+    
+    return result.length > 0;
   }
 }
 
