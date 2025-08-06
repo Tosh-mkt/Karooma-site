@@ -40,6 +40,7 @@ export function getSession() {
       httpOnly: true,
       secure: false, // Set to false for development
       maxAge: sessionTtl,
+      sameSite: 'lax',
     },
   });
 }
