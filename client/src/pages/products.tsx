@@ -57,17 +57,6 @@ export default function Products() {
             <p className="font-poppins text-xl text-gray-600">
               Produtos testados e aprovados que realmente fazem diferença no seu dia a dia
             </p>
-            {/* String.com Integration Notice */}
-            <motion.div 
-              className="mt-4 p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-white/30 max-w-2xl mx-auto"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              <p className="text-sm text-gray-600 font-inter">
-                🔗 <strong>Integração String.com:</strong> Esta seção está preparada para receber produtos automatizados via API
-              </p>
-            </motion.div>
           </motion.div>
 
           {/* Search and Filters */}

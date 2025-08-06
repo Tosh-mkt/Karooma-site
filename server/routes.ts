@@ -5,6 +5,7 @@ import { insertContentSchema, insertProductSchema, insertNewsletterSchema } from
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
+import { isSessionAuthenticated, isSessionAdmin } from "./middleware";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
@@ -470,10 +471,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Favorites routes (protected)
-  app.get("/api/favorites", isAuthenticated, async (req: any, res) => {
+  // Favorites routes (protected by session)
+  app.get("/api/favorites", isSessionAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.sessionUserId;
       const favorites = await storage.getUserFavorites(userId);
       res.json(favorites);
     } catch (error) {
@@ -482,9 +483,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/favorites/:productId", isAuthenticated, async (req: any, res) => {
+  app.post("/api/favorites/:productId", isSessionAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.sessionUserId;
       const { productId } = req.params;
       
       const favorite = await storage.addToFavorites(userId, productId);
@@ -495,9 +496,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/favorites/:productId", isAuthenticated, async (req: any, res) => {
+  app.delete("/api/favorites/:productId", isSessionAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.sessionUserId;
       const { productId } = req.params;
       
       await storage.removeFromFavorites(userId, productId);
@@ -508,9 +509,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/check/:productId", isAuthenticated, async (req: any, res) => {
+  app.get("/api/favorites/check/:productId", isSessionAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user?.claims?.sub;
+      const userId = req.sessionUserId;
       const { productId } = req.params;
       
       const isFavorite = await storage.isFavorite(userId, productId);
