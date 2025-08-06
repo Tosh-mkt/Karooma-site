@@ -299,6 +299,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { products } = req.body;
       
+      // 🔍 LOG TEMPORÁRIO: Ver dados que chegam do N8N
+      console.log('\n🔍 DADOS RECEBIDOS DO N8N:');
+      console.log('products array:', JSON.stringify(products, null, 2));
+      
       if (!products || !Array.isArray(products)) {
         return res.status(400).json({ error: 'Campo "products" deve ser um array' });
       }
