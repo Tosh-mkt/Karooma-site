@@ -22,6 +22,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test route to create user (temporary - only for setup)
+  app.post('/api/test/create-user', async (req, res) => {
+    try {
+      const userData = req.body;
+      const user = await storage.upsertUser(userData);
+      res.json({ message: "User created", user });
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Failed to create user" });
+    }
+  });
+
   // Admin route to make user admin (temporary - only for setup)
   app.post('/api/admin/make-admin/:userId', async (req, res) => {
     try {

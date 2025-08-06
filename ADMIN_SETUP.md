@@ -2,31 +2,56 @@
 
 ## Como criar o primeiro usuário administrador
 
-1. **Faça login no site usando Replit Auth:**
-   - Clique em "Admin" no menu (se aparecer) ou acesse `/admin/dashboard`
-   - Você será redirecionado para fazer login com sua conta Replit
-   - Após o login, anote seu ID de usuário
+### Passo 1: Fazer Login via Replit
+1. **Acesse o site e faça login:**
+   - Vá para `/api/login` diretamente no navegador
+   - Ou clique em "Admin" no menu se aparecer
+   - Faça login com sua conta Replit quando solicitado
+   - Você será redirecionado para a página inicial após o login
 
-2. **Obtenha seu ID de usuário:**
-   - Após fazer login, abra o console do navegador (F12)
+### Passo 2: Obter seu ID de usuário
+**Opção A - Via Console do Navegador:**
+   - Abra o console do navegador (F12)
    - Vá para a aba Network
+   - Atualize a página
    - Procure pela requisição para `/api/auth/user`
-   - Na resposta, você verá um campo `id` - esse é seu ID de usuário
+   - Na resposta, você verá um campo `id` - anote esse valor
 
-3. **Torne-se administrador via API:**
+**Opção B - Via Banco de Dados:**
+   - Use o terminal do Replit
+   - Execute: `SELECT id, email FROM users;`
+   - Localize seu email e anote o ID correspondente
+
+### Passo 3: Tornar-se Administrador
+
+**Opção A - Usuário de Teste (Para desenvolvimento):**
+   ```bash
+   # Criar usuário admin de teste
+   curl -X POST http://localhost:5000/api/test/create-user \
+     -H "Content-Type: application/json" \
+     -d '{"id":"admin-user","email":"admin@karooma.com","firstName":"Admin","lastName":"User","isAdmin":true}'
+   ```
+
+**Opção B - Via API com seu ID (Recomendado):**
    ```bash
    curl -X POST http://localhost:5000/api/admin/make-admin/SEU_ID_AQUI
    ```
    
-   Ou use o terminal do Replit:
+**Em Produção:**
    ```bash
    curl -X POST https://SEU_DOMINIO.replit.app/api/admin/make-admin/SEU_ID_AQUI
    ```
 
-4. **Acesse o painel administrativo:**
-   - Atualize a página
-   - O botão "Admin" aparecerá no menu
-   - Clique para acessar o painel completo
+**Opção C - Diretamente no Banco (Emergência):**
+   ```sql
+   INSERT INTO users (id, email, first_name, is_admin) 
+   VALUES ('seu-id', 'seu-email@gmail.com', 'Seu Nome', true);
+   ```
+
+### Passo 4: Verificar Acesso Admin
+1. **Atualize a página** - o botão "Admin" deve aparecer no menu
+2. **Clique no botão Admin** para acessar o painel completo
+3. **Verifique se consegue ver todas as funcionalidades**
 
 ## Recursos do Painel Administrativo
 

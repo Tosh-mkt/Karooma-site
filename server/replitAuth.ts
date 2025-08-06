@@ -27,7 +27,7 @@ export function getSession() {
   const pgStore = connectPg(session);
   const sessionStore = new pgStore({
     conString: process.env.DATABASE_URL,
-    createTableIfMissing: false,
+    createTableIfMissing: true,
     ttl: sessionTtl,
     tableName: "sessions",
   });
@@ -38,7 +38,7 @@ export function getSession() {
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: true,
+      secure: false, // Set to false for development
       maxAge: sessionTtl,
     },
   });
@@ -157,19 +157,27 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 };
 
 export const isAdmin: RequestHandler = async (req, res, next) => {
-  const user = req.user as any;
+  // First check if user is authenticated
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
 
-  if (!req.isAuthenticated() || !user.claims?.sub) {
+  const user = req.user as any;
+  const userId = user?.claims?.sub;
+  
+  if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 
   try {
-    const dbUser = await storage.getUser(user.claims.sub);
+    const dbUser = await storage.getUser(userId);
     if (!dbUser || !dbUser.isAdmin) {
       return res.status(403).json({ message: "Admin access required" });
     }
+    
     return next();
   } catch (error) {
+    console.error("Error checking admin status:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
