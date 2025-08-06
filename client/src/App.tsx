@@ -9,6 +9,7 @@ import Blog from "./pages/blog";
 import Products from "./pages/products";
 import { Admin } from "./pages/Admin";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { TempLogin } from "./pages/TempLogin";
 import AutoCards from "./pages/AutoCards";
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
