@@ -30,6 +30,7 @@ function Router() {
           <Route path="/autocards" component={AutoCards} />
           <Route path="/admin" component={Admin} />
           <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route path="/login" component={() => <TempLogin />} />
           <Route component={NotFound} />
         </Switch>
       </main>

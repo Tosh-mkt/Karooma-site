@@ -79,7 +79,7 @@ export default function Navigation() {
         </div>
         
         {/* Admin Button (conditional) */}
-        {isAdmin && (
+        {isAdmin ? (
           <Link href="/admin/dashboard">
             <Button
               variant="outline"
@@ -88,6 +88,17 @@ export default function Navigation() {
             >
               <Shield className="w-4 h-4 mr-2" />
               Admin
+            </Button>
+          </Link>
+        ) : (
+          <Link href="/login">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-purple-200 hover:bg-purple-50"
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Login
             </Button>
           </Link>
         )}

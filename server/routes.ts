@@ -22,6 +22,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Temporary login route for testing
+  app.post('/api/auth/temp-login', async (req, res) => {
+    try {
+      const { userId } = req.body;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Set a simple session cookie for testing
+      (req.session as any).user = user;
+      res.json({ 
+        message: "Logged in successfully", 
+        user,
+        isAdmin: user.isAdmin 
+      });
+    } catch (error) {
+      console.error("Error in temp login:", error);
+      res.status(500).json({ error: "Login failed" });
+    }
+  });
+
+  // Get current session user
+  app.get('/api/auth/session-user', async (req, res) => {
+    try {
+      const sessionUser = (req.session as any).user;
+      if (!sessionUser) {
+        return res.status(401).json({ message: "Not logged in" });
+      }
+      res.json(sessionUser);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get session user" });
+    }
+  });
+
   // Test route to create user (temporary - only for setup)
   app.post('/api/test/create-user', async (req, res) => {
     try {
