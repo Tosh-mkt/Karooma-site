@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,9 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { useSSE } from "@/hooks/useSSE";
+import { useAuth } from "@/hooks/useAuth";
+import { isForbiddenError, isUnauthorizedError } from "@/lib/authUtils";
 import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
-  Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff
+  Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 
@@ -319,6 +321,94 @@ function ProductsManagement() {
 
 // Main Admin Dashboard Component
 export function AdminDashboard() {
+  const { user, isLoading, isAuthenticated, isAdmin } = useAuth();
+  const { toast } = useToast();
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      toast({
+        title: "Acesso Restrito",
+        description: "Você precisa fazer login para acessar o painel administrativo.",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/api/login";
+      }, 2000);
+      return;
+    }
+  }, [isAuthenticated, isLoading, toast]);
+
+  // Redirect if not admin
+  useEffect(() => {
+    if (!isLoading && isAuthenticated && !isAdmin) {
+      toast({
+        title: "Acesso Negado",
+        description: "Apenas administradores podem acessar este painel.",
+        variant: "destructive",
+      });
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 2000);
+      return;
+    }
+  }, [isAuthenticated, isAdmin, isLoading, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="pt-20 min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4 text-purple-600" />
+          <p className="text-gray-600">Verificando permissões...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="pt-20 min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
+        <Card className="glassmorphism border-0 max-w-md">
+          <CardContent className="p-8 text-center">
+            <LogIn className="w-12 h-12 mx-auto mb-4 text-purple-600" />
+            <h2 className="text-xl font-outfit font-bold mb-2">Login Necessário</h2>
+            <p className="text-gray-600 mb-4">
+              Você será redirecionado para o login em instantes...
+            </p>
+            <Button 
+              onClick={() => window.location.href = "/api/login"}
+              className="bg-gradient-to-r from-purple-500 to-pink-500"
+            >
+              Fazer Login
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="pt-20 min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
+        <Card className="glassmorphism border-0 max-w-md">
+          <CardContent className="p-8 text-center">
+            <Shield className="w-12 h-12 mx-auto mb-4 text-red-500" />
+            <h2 className="text-xl font-outfit font-bold mb-2">Acesso Restrito</h2>
+            <p className="text-gray-600 mb-4">
+              Apenas administradores podem acessar este painel.
+            </p>
+            <Button 
+              onClick={() => window.location.href = "/"}
+              variant="outline"
+            >
+              Voltar ao Início
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-20 min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -327,11 +417,32 @@ export function AdminDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center space-x-3 mb-4">
-            <Shield className="w-8 h-8 text-purple-600" />
-            <h1 className="font-outfit font-bold text-4xl gradient-text">
-              Painel Administrativo
-            </h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <Shield className="w-8 h-8 text-purple-600" />
+              <h1 className="font-outfit font-bold text-4xl gradient-text">
+                Painel Administrativo
+              </h1>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Bem-vinda,</p>
+                <p className="font-semibold">{user?.firstName || user?.email}</p>
+              </div>
+              {user?.profileImageUrl && (
+                <img 
+                  src={user.profileImageUrl} 
+                  alt="Profile" 
+                  className="w-10 h-10 rounded-full"
+                />
+              )}
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = "/api/logout"}
+              >
+                Sair
+              </Button>
+            </div>
           </div>
           <p className="text-gray-600 font-poppins text-lg">
             Gerencie todo o conteúdo e configurações do site Karooma

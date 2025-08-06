@@ -4,7 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Search, Menu, Rocket } from "lucide-react";
+import { Search, Menu, Rocket, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
 import karoomaLogo from "@assets/LOGO_KAROOMA_TIPO_1753945361411.png";
 
@@ -12,6 +13,7 @@ export default function Navigation() {
   const [location] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const { isAdmin } = useAuth();
 
   const navItems = [
     { href: "/", label: "Início", id: "home" },
@@ -19,7 +21,6 @@ export default function Navigation() {
     { href: "/blog", label: "Momentos Meus", id: "blog" },
     { href: "/products", label: "Facilita a Vida", id: "products" },
     { href: "/autocards", label: "Auto Cards", id: "autocards" },
-    { href: "/admin/dashboard", label: "Admin", id: "admin" },
   ];
 
   const isActive = (href: string) => location === href;
@@ -77,6 +78,20 @@ export default function Navigation() {
           ))}
         </div>
         
+        {/* Admin Button (conditional) */}
+        {isAdmin && (
+          <Link href="/admin/dashboard">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:scale-105 transition-all duration-300"
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Admin
+            </Button>
+          </Link>
+        )}
+
         {/* Search and Mobile Menu */}
         <div className="flex items-center space-x-4">
           <div className="relative hidden sm:block">
@@ -125,6 +140,20 @@ export default function Navigation() {
                     </motion.span>
                   </Link>
                 ))}
+                
+                {/* Admin button in mobile menu */}
+                {isAdmin && (
+                  <Link href="/admin/dashboard">
+                    <motion.div
+                      className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg"
+                      onClick={() => setIsOpen(false)}
+                      whileHover={{ x: 10 }}
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span className="font-poppins text-lg">Admin</span>
+                    </motion.div>
+                  </Link>
+                )}
               </div>
             </SheetContent>
           </Sheet>

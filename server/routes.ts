@@ -4,8 +4,36 @@ import { storage } from "./storage";
 import { insertContentSchema, insertProductSchema, insertNewsletterSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
+import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication
+  await setupAuth(app);
+
+  // Auth routes
+  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const user = await storage.getUser(userId);
+      res.json(user);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Admin route to make user admin (temporary - only for setup)
+  app.post('/api/admin/make-admin/:userId', async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const adminUser = await storage.makeUserAdmin(userId);
+      res.json({ message: "User is now admin", user: adminUser });
+    } catch (error) {
+      console.error("Error making user admin:", error);
+      res.status(500).json({ error: "Failed to make user admin" });
+    }
+  });
+
   // Content routes
   app.get("/api/content/featured", async (req, res) => {
     try {
@@ -341,8 +369,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     sseManager.addClient(clientId, res);
   });
 
-  // Update product by ID
-  app.patch("/api/products/:id", async (req, res) => {
+  // Update product by ID (Admin only)
+  app.patch("/api/products/:id", isAdmin, async (req, res) => {
     try {
       const productId = req.params.id;
       const updates = req.body;
@@ -362,8 +390,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Delete product by ID
-  app.delete("/api/products/:id", async (req, res) => {
+  // Delete product by ID (Admin only)
+  app.delete("/api/products/:id", isAdmin, async (req, res) => {
     try {
       const productId = req.params.id;
       

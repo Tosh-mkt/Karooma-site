@@ -1,6 +1,7 @@
 import { 
   type User, 
   type InsertUser, 
+  type UpsertUser,
   type Content, 
   type InsertContent,
   type Product,
@@ -19,8 +20,8 @@ import { eq, desc } from "drizzle-orm";
 export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  upsertUser(user: UpsertUser): Promise<User>;
+  makeUserAdmin(userId: string): Promise<User>;
   
   // Content methods
   getContent(id: string): Promise<Content | undefined>;
@@ -64,17 +65,28 @@ export class MemStorage implements IStorage {
     return this.users.get(id);
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
+  async upsertUser(userData: UpsertUser): Promise<User> {
+    const id = userData.id || randomUUID();
+    const user: User = { 
+      id,
+      email: userData.email || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+      isAdmin: userData.isAdmin || false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
     this.users.set(id, user);
     return user;
+  }
+
+  async makeUserAdmin(userId: string): Promise<User> {
+    const user = this.users.get(userId);
+    if (!user) throw new Error('User not found');
+    const adminUser = { ...user, isAdmin: true, updatedAt: new Date() };
+    this.users.set(userId, adminUser);
+    return adminUser;
   }
 
   // Content methods
@@ -210,19 +222,31 @@ export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return user;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values(userData)
+      .onConflictDoUpdate({
+        target: users.id,
+        set: {
+          ...userData,
+          updatedAt: new Date(),
+        },
+      })
       .returning();
+    return user;
+  }
+
+  async makeUserAdmin(userId: string): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ isAdmin: true, updatedAt: new Date() })
+      .where(eq(users.id, userId))
+      .returning();
+    if (!user) throw new Error('User not found');
     return user;
   }
 
