@@ -40,7 +40,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <motion.h2 
-              className="font-outfit font-bold text-5xl md:text-7xl gradient-text mb-6"
+              className="font-outfit font-bold text-5xl md:text-7xl gradient-text mt-[54px] mb-[54px]"
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
