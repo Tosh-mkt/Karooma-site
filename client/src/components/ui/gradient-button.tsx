@@ -43,7 +43,7 @@ export function GradientButton({
         onClick={onClick}
         disabled={disabled}
         type={type}
-        className="inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 rounded-full font-poppins font-semibold transition-all duration-300 shadow-lg from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-base hover:shadow-pink-500/25 bg-white hover:bg-gray-100 px-8 py-4 text-[#ffffff]"
+        className="inline-flex items-center justify-center gap-2 whitespace-nowrap ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-10 rounded-full font-poppins font-semibold transition-all duration-300 shadow-lg from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-base hover:shadow-pink-500/25 hover:bg-gray-100 px-8 py-4 text-[#ffffff] bg-[#9c0839]"
       >
         {children}
       </Button>
