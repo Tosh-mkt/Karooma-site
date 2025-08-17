@@ -9,6 +9,7 @@ import { Newsletter } from "@/components/content/newsletter";
 import { useQuery } from "@tanstack/react-query";
 import { Content, Product } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
+import equilibristaImage from "@assets/generated_images/woman_balancing_life_plates_c97c57fa.png";
 
 export default function Home() {
   const { data: featuredContent } = useQuery<Content[]>({
@@ -111,7 +112,7 @@ export default function Home() {
                   transition={{ delay: 0.2 }}
                 >
                   <img 
-                    src="/attached_assets/generated_images/woman_balancing_life_plates_c97c57fa.png"
+                    src={equilibristaImage}
                     alt="Mulher equilibrando pratos representando as responsabilidades da vida"
                     className="w-full max-w-sm rounded-2xl shadow-lg"
                   />
