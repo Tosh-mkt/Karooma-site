@@ -71,7 +71,7 @@ export default function Home() {
               </Link>
               
               <Link href="/card-demo">
-                <GradientButton variant="outline" size="lg">
+                <GradientButton variant="glass" size="lg">
                   Demo Cards Amazon
                   <Rocket className="ml-2 w-5 h-5" />
                 </GradientButton>

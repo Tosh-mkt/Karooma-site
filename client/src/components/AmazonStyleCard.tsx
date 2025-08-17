@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ExternalLink, Star } from "lucide-react";
 import FavoriteButton from "./FavoriteButton";
+import RecommendationModal from "./RecommendationModal";
 
 interface Product {
   id: string;
@@ -24,6 +26,8 @@ interface AmazonStyleCardProps {
 }
 
 export default function AmazonStyleCard({ product, index = 0, compact = false }: AmazonStyleCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const formatPrice = (price: string | null) => {
     if (!price) return "Preço não disponível";
     const numPrice = parseFloat(price);
@@ -146,6 +150,21 @@ export default function AmazonStyleCard({ product, index = 0, compact = false }:
           {product.category}
         </div>
 
+        {/* Why We Recommend Button */}
+        <button
+          className={`
+            w-full bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md mb-2
+            transition-all duration-200 ease-in-out
+            hover:transform hover:-translate-y-0.5 active:translate-y-0
+            flex items-center justify-center gap-2
+            ${compact ? 'py-2 px-3 text-xs' : 'py-2.5 px-4 text-sm'}
+          `}
+          onClick={() => setIsModalOpen(true)}
+          data-testid={`button-why-recommend-${product.id}`}
+        >
+          💡 Porque Indicamos?
+        </button>
+
         {/* Buy Button */}
         <button
           className={`
@@ -162,6 +181,13 @@ export default function AmazonStyleCard({ product, index = 0, compact = false }:
           Comprar na Amazon
         </button>
       </div>
+
+      {/* Recommendation Modal */}
+      <RecommendationModal
+        product={product}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </motion.div>
   );
 }
