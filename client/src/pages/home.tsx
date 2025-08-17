@@ -39,15 +39,19 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <motion.h2 
-              className="font-outfit font-bold text-6xl md:text-8xl gradient-text mb-6"
+              className="font-outfit font-bold text-5xl md:text-7xl gradient-text mb-6"
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              Você Merece Mais
+              Mãe, Você Não Está Sozinha
             </motion.h2>
             
-            <p className="font-poppins text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-              Dicas práticas, produtos que realmente funcionam e momentos para você se reconectar com quem você é
+            <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
+              Sei como é correr atrás de três filhos, casa, trabalho... e ainda tentar sobrar um tempinho pra você. 
+            </p>
+            
+            <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
+              Aqui você encontra produtos que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️
             </p>
             
             <motion.div 
@@ -58,14 +62,14 @@ export default function Home() {
             >
               <Link href="/products">
                 <GradientButton size="lg">
-                  Descubra o que Funciona
+                  Produtos que Salvam o Dia
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </GradientButton>
               </Link>
               
               <Link href="/videos">
                 <GradientButton variant="glass" size="lg">
-                  Te Entendo
+                  Momentos pra Respirar
                   <Play className="ml-2 w-5 h-5" />
                 </GradientButton>
               </Link>
@@ -102,13 +106,86 @@ export default function Home() {
             >
               <Rocket className="w-16 h-16 text-pink-500 mx-auto mb-4 animate-bounce-slow" />
               <h3 className="font-poppins text-2xl text-gray-600 mb-2">
-                Preparando Algo Especial
+                Organizando Coisas Boas pra Você
               </h3>
               <p className="text-gray-500">
-                Estamos organizando dicas práticas que vão fazer diferença no seu dia a dia!
+                Estou preparando dicas que realmente funcionam na correria do dia a dia. Em breve!
               </p>
             </motion.div>
           )}
+        </div>
+      </section>
+
+      {/* Empathy Section */}
+      <section className="py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+          >
+            <h2 className="font-fredoka text-4xl md:text-5xl gradient-text mb-8">
+              Se Você Chegou Até Aqui...
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <motion.div 
+              className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-3xl border border-white/20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <div className="text-4xl mb-4">😓</div>
+              <h3 className="font-poppins text-lg font-semibold text-gray-700 mb-3">
+                Provavelmente você está cansada
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Aquela sensação de que o dia acabou e você não fez nem metade do que queria. Eu conheço bem isso.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-3xl border border-white/20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="text-4xl mb-4">🤹‍♀️</div>
+              <h3 className="font-poppins text-lg font-semibold text-gray-700 mb-3">
+                Fazendo malabarismo com tudo
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Criança chorando, trabalho chamando, casa bagunçada... e você tentando dar conta de tudo ao mesmo tempo.
+              </p>
+            </motion.div>
+
+            <motion.div 
+              className="text-center p-6 bg-white/60 backdrop-blur-sm rounded-3xl border border-white/20"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="text-4xl mb-4">💝</div>
+              <h3 className="font-poppins text-lg font-semibold text-gray-700 mb-3">
+                Precisando de um abraço
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed">
+                Daqueles que dizem "você está fazendo um trabalho incrível, mesmo quando parece que não está".
+              </p>
+            </motion.div>
+          </div>
+
+          <motion.div 
+            className="text-center mt-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            <p className="font-poppins text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
+              <strong>Você chegou no lugar certo.</strong> Aqui não tem julgamento, só soluções práticas e a certeza de que você não precisa ser perfeita para ser uma mãe incrível.
+            </p>
+          </motion.div>
         </div>
       </section>
 
@@ -122,10 +199,10 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
             >
               <h2 className="font-fredoka text-5xl gradient-text mb-4">
-                Te Entendo
+                "Mãe, Respira..."
               </h2>
               <p className="font-poppins text-xl text-gray-600">
-                Momentos reais, conversas verdadeiras e soluções que funcionam
+                Aqueles momentos onde você precisa ouvir: "Está tudo bem, você está fazendo o seu melhor"
               </p>
             </motion.div>
 
@@ -156,10 +233,10 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
             >
               <h2 className="font-fredoka text-5xl gradient-text mb-4">
-                Produtos que Facilitam
+                Descobertas que Mudaram Minha Vida
               </h2>
               <p className="font-poppins text-xl text-gray-600">
-                Testados e aprovados para otimizar seu tempo
+                Produtos que realmente funcionam (testados na correria de casa com 3 filhos!)
               </p>
             </motion.div>
 
