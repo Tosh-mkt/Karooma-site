@@ -130,17 +130,17 @@ export default function Home() {
                   </h3>
                   
                   <div className="space-y-5">
-                    <p className="font-poppins text-gray-700 text-xl md:text-2xl leading-relaxed font-medium">
+                    <p className="font-poppins text-gray-900 text-xl md:text-2xl leading-relaxed font-semibold">
                       A vida está um malabarismo constante?
                     </p>
                     
-                    <p className="text-gray-600 text-lg md:text-xl leading-relaxed">
+                    <p className="text-gray-800 text-lg md:text-xl leading-relaxed font-medium">
                       Estamos preparando dicas que realmente funcionam na correria do dia a dia. Continue por aqui e assine a newsletter para receber avisos de novidades!
                     </p>
                     
-                    <div className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full border border-pink-200 mt-6">
-                      <div className="w-2.5 h-2.5 bg-pink-500 rounded-full animate-pulse"></div>
-                      <span className="text-pink-700 font-semibold text-sm">Novidades chegando em breve!</span>
+                    <div className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-pink-200 to-purple-200 rounded-full border-2 border-pink-300 mt-6 shadow-sm">
+                      <div className="w-2.5 h-2.5 bg-pink-600 rounded-full animate-pulse"></div>
+                      <span className="text-pink-800 font-bold text-sm">Novidades chegando em breve!</span>
                     </div>
                   </div>
                 </motion.div>
