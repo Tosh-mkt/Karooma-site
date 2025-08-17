@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Search, ShoppingBag, ChevronDown } from "lucide-react";
+import { Search, ShoppingBag, ChevronDown, Heart } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { ProductCard } from "@/components/content/product-card";
@@ -8,10 +8,13 @@ import { useQuery } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
 import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [showFavorites, setShowFavorites] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   // Invalidate cache on component mount to ensure fresh data
   useEffect(() => {
@@ -23,6 +26,12 @@ export default function Products() {
     staleTime: 0, // Always refetch
   });
 
+  // Fetch user favorites
+  const { data: favorites, isLoading: favoritesLoading } = useQuery<Product[]>({
+    queryKey: ["/api/favorites"],
+    enabled: isAuthenticated && showFavorites,
+  });
+
   const categories = [
     { id: "all", label: "Todos" },
     { id: "casa", label: "Casa & Organização" },
@@ -32,7 +41,10 @@ export default function Products() {
     { id: "tecnologia", label: "Tecnologia" },
   ];
 
-  const filteredProducts = products?.filter(product => {
+  // Use favorites or all products based on toggle
+  const sourceProducts = showFavorites ? favorites : products;
+  
+  const filteredProducts = sourceProducts?.filter(product => {
     const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
     const matchesSearch = !searchQuery || 
       product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -40,6 +52,8 @@ export default function Products() {
     
     return matchesCategory && matchesSearch;
   }) || [];
+
+  const currentLoading = showFavorites ? favoritesLoading : isLoading;
 
   return (
     <div className="pt-20">
@@ -78,6 +92,24 @@ export default function Products() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
             </div>
 
+            {/* Favorites Toggle */}
+            {isAuthenticated && (
+              <div className="flex justify-center mb-6">
+                <GradientButton
+                  variant={showFavorites ? "primary" : "glass"}
+                  onClick={() => {
+                    setShowFavorites(!showFavorites);
+                    setSelectedCategory("all"); // Reset category filter when switching
+                  }}
+                  size="sm"
+                  className="mx-2"
+                >
+                  <Heart className={`w-4 h-4 mr-2 ${showFavorites ? 'fill-current' : ''}`} />
+                  {showFavorites ? "Ver Todos os Produtos" : "Meus Favoritos"}
+                </GradientButton>
+              </div>
+            )}
+
             {/* Category Filters */}
             <div className="flex flex-wrap justify-center gap-4">
               {categories.map((category) => (
@@ -94,7 +126,7 @@ export default function Products() {
           </motion.div>
 
           {/* Products Grid - Adjusted for new card dimensions */}
-          {isLoading ? (
+          {currentLoading ? (
             <div className="flex flex-wrap justify-center gap-6">
               {[...Array(8)].map((_, i) => (
                 <div key={i} className="animate-pulse" style={{ width: '264px', height: '450px' }}>
@@ -121,13 +153,27 @@ export default function Products() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="font-poppins text-2xl text-gray-600 mb-2">
-                Nenhum produto encontrado
-              </h3>
-              <p className="text-gray-500">
-                Tente ajustar os filtros ou termo de busca
-              </p>
+              {showFavorites ? (
+                <>
+                  <Heart className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="font-poppins text-2xl text-gray-600 mb-2">
+                    Nenhum favorito ainda
+                  </h3>
+                  <p className="text-gray-500">
+                    Clique no coração dos produtos que você gosta para salvá-los aqui!
+                  </p>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="font-poppins text-2xl text-gray-600 mb-2">
+                    Nenhum produto encontrado
+                  </h3>
+                  <p className="text-gray-500">
+                    Tente ajustar os filtros ou termo de busca
+                  </p>
+                </>
+              )}
             </motion.div>
           )}
 
