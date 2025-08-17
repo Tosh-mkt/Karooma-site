@@ -103,7 +103,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <div className="flex flex-col lg:flex-row items-center gap-8 max-w-4xl mx-auto">
+              <div className="flex flex-col lg:flex-row items-center gap-12 max-w-5xl mx-auto">
                 {/* Image Section */}
                 <motion.div 
                   className="lg:w-2/5 flex justify-center"
@@ -114,22 +114,35 @@ export default function Home() {
                   <img 
                     src={equilibristaImage}
                     alt="Mulher equilibrando pratos representando as responsabilidades da vida"
-                    className="w-full max-w-sm rounded-2xl shadow-lg"
+                    className="w-full max-w-sm rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300"
                   />
                 </motion.div>
                 
                 {/* Text Section */}
                 <motion.div 
-                  className="lg:w-3/5 text-center lg:text-left"
+                  className="lg:w-3/5 text-center lg:text-left space-y-6"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <h3 className="font-fredoka text-3xl md:text-4xl gradient-text mb-4">
+                  <h3 className="font-fredoka text-3xl md:text-4xl lg:text-5xl gradient-text leading-tight mb-6">
                     Organizando Coisas Boas pra Você
                   </h3>
-                  <p className="text-gray-600 mb-6 text-[23px]">A vida está um malabarismo constante?.</p>
-                  <p className="text-gray-500">Estamos preparando dicas que realmente funcionam na correria do dia a dia. Continue por aqui e assine a newsletter para receber avisos de novidades!</p>
+                  
+                  <div className="space-y-5">
+                    <p className="font-poppins text-gray-700 text-xl md:text-2xl leading-relaxed font-medium">
+                      A vida está um malabarismo constante?
+                    </p>
+                    
+                    <p className="text-gray-600 text-lg md:text-xl leading-relaxed">
+                      Estamos preparando dicas que realmente funcionam na correria do dia a dia. Continue por aqui e assine a newsletter para receber avisos de novidades!
+                    </p>
+                    
+                    <div className="inline-flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full border border-pink-200 mt-6">
+                      <div className="w-2.5 h-2.5 bg-pink-500 rounded-full animate-pulse"></div>
+                      <span className="text-pink-700 font-semibold text-sm">Novidades chegando em breve!</span>
+                    </div>
+                  </div>
                 </motion.div>
               </div>
             </motion.div>
