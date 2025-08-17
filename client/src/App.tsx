@@ -10,7 +10,6 @@ import Products from "./pages/products";
 import { Admin } from "./pages/Admin";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
-import AutoCards from "./pages/AutoCards";
 import Favorites from "./pages/Favorites";
 
 import NotFound from "./pages/not-found";
@@ -30,7 +29,6 @@ function Router() {
           <Route path="/videos" component={Videos} />
           <Route path="/blog" component={Blog} />
           <Route path="/products" component={Products} />
-          <Route path="/autocards" component={AutoCards} />
           <Route path="/favoritos" component={Favorites} />
 
           <Route path="/admin" component={Admin} />
