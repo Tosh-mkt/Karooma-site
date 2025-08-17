@@ -129,9 +129,7 @@ export default function Home() {
                     Organizando Coisas Boas pra Você
                   </h3>
                   <p className="text-gray-600 mb-6 text-[23px]">A vida está um malabarismo constante?.</p>
-                  <p className="text-gray-500">
-                    Estou preparando dicas que realmente funcionam na correria do dia a dia. Em breve!
-                  </p>
+                  <p className="text-gray-500">Estamos preparando dicas que realmente funcionam na correria do dia a dia. Continue por aqui e assine a newsletter para receber avisos de novidades!</p>
                 </motion.div>
               </div>
             </motion.div>
