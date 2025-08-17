@@ -44,9 +44,9 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       className="group"
-      style={{ width: '264px' }} // Same width as Amazon card
+      style={{ width: '264px', height: '520px' }} // Fixed dimensions like Amazon cards
     >
-      <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-white/20 overflow-hidden h-full max-w-none w-full">
+      <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-white/20 overflow-hidden h-full max-w-none w-full flex flex-col">
         {/* Product Image */}
         <div className="relative h-48 overflow-hidden" style={{ height: '200px' }}>
           {product.imageUrl ? (
@@ -76,10 +76,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
         </div>
 
-        <CardHeader className="pb-2 px-4 pt-4">
+        <CardHeader className="pb-2 px-4 pt-4 flex-shrink-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <CardTitle className="text-base font-semibold text-gray-800 line-clamp-2 leading-tight mb-3" style={{ minHeight: '2.8em' }}>
+              <CardTitle className="text-base font-semibold text-gray-800 line-clamp-2 leading-tight mb-3" style={{ height: '2.8em', overflow: 'hidden' }}>
                 {product.title}
               </CardTitle>
               <Badge variant="secondary" className="text-xs">
@@ -91,15 +91,19 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
         <CardContent className="pt-2 px-4 pb-4 flex-1 flex flex-col">
           {/* Rating */}
-          {product.rating && (
-            <div className="flex items-center justify-center gap-1 mb-3">
-              <span className="text-yellow-500">★</span>
-              <span className="text-sm text-gray-600">({product.rating})</span>
-            </div>
-          )}
+          <div className="flex items-center justify-center gap-1 mb-3" style={{ height: '24px' }}>
+            {product.rating ? (
+              <>
+                <span className="text-yellow-500">★</span>
+                <span className="text-sm text-gray-600">({product.rating})</span>
+              </>
+            ) : (
+              <span className="text-sm text-gray-400">Sem avaliações</span>
+            )}
+          </div>
 
           {/* Pricing */}
-          <div className="mb-3 text-center">
+          <div className="mb-3 text-center flex-shrink-0">
             <div className="flex items-center justify-center space-x-2">
               <span className="text-xl font-bold text-red-700">
                 {product.currentPrice ? formatPrice(product.currentPrice) : 'Preço não disponível'}
@@ -117,8 +121,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             )}
           </div>
 
+          {/* Spacer to push buttons to bottom */}
+          <div className="flex-1"></div>
+
           {/* Why We Recommend Button */}
-          <div className="mb-2">
+          <div className="mb-2 flex-shrink-0">
             <Button
               variant="outline"
               size="sm"
@@ -131,7 +138,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2 mt-auto">
+          <div className="flex gap-2 flex-shrink-0">
             <Button 
               size="sm"
               className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-sm py-2.5"
@@ -143,7 +150,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
           
           {/* Favorite Button - Separate row for better layout */}
-          <div className="mt-2">
+          <div className="mt-2 flex-shrink-0">
             <FavoriteButton productId={product.id} showText />
           </div>
         </CardContent>
@@ -151,7 +158,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
       {/* Recommendation Modal */}
       <RecommendationModal 
-        product={product}
+        product={{
+          ...product,
+          createdAt: product.createdAt || new Date()
+        }}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
