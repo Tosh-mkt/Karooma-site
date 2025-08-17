@@ -93,8 +93,8 @@ export default function Products() {
             </div>
 
             {/* Favorites Toggle */}
-            {isAuthenticated && (
-              <div className="flex justify-center mb-6">
+            <div className="flex justify-center mb-6">
+              {isAuthenticated ? (
                 <GradientButton
                   variant={showFavorites ? "primary" : "glass"}
                   onClick={() => {
@@ -107,8 +107,18 @@ export default function Products() {
                   <Heart className={`w-4 h-4 mr-2 ${showFavorites ? 'fill-current' : ''}`} />
                   {showFavorites ? "Ver Todos os Produtos" : "Meus Favoritos"}
                 </GradientButton>
-              </div>
-            )}
+              ) : (
+                <GradientButton
+                  variant="glass"
+                  onClick={() => window.location.href = '/login'}
+                  size="sm"
+                  className="mx-2 opacity-75"
+                >
+                  <Heart className="w-4 h-4 mr-2" />
+                  Meus Favoritos (Login Necessário)
+                </GradientButton>
+              )}
+            </div>
 
             {/* Category Filters */}
             <div className="flex flex-wrap justify-center gap-4">
