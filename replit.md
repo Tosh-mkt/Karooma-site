@@ -116,6 +116,17 @@ The backend follows a simple Express.js REST API pattern:
 
 ## Recent Changes
 
+### 2025-08-17 - Product Card Model Unification & Demo Cleanup
+- **Karooma Card Model Update**: Modified ProductCard component to match Amazon card dimensions (264px width, 200px image height)
+- **Layout Optimization**: Updated product page layout from CSS Grid to Flexbox for better card alignment with fixed dimensions
+- **Visual Consistency**: Maintained Karooma's unique glassmorphism effects and gradients while adopting compact Amazon-style sizing
+- **Component Integration**: Successfully integrated "Porque Indicamos?" (Why We Recommend?) modal with recommendation system
+- **Demo Page Removal**: Deleted CardDemo page and removed "Demo Cards Amazon" button from homepage
+- **Import Fixes**: Corrected component imports to use proper default exports for FavoriteButton and RecommendationModal
+- **Type Safety**: Enhanced type handling to support null values from database schema
+- **User Experience**: Streamlined navigation by removing demo elements and focusing on production features
+- **Impact**: Unified card design across the platform while preserving Karooma's distinctive visual identity
+
 ### 2025-08-06 - Admin Authentication & Favorites System Implementation
 - **Replit Auth Integration**: Complete OAuth integration with Replit for secure user authentication
 - **Temporary Login System**: Simple session-based login for development with instant admin access
