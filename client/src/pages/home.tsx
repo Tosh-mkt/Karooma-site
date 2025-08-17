@@ -100,17 +100,43 @@ export default function Home() {
           {/* Fallback Content */}
           {(!featuredContent || featuredContent.length === 0) && (
             <motion.div 
-              className="text-center py-16"
+              className="py-16"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              <Rocket className="w-16 h-16 text-pink-500 mx-auto mb-4 animate-bounce-slow" />
-              <h3 className="font-poppins text-2xl text-gray-600 mb-2">
-                Organizando Coisas Boas pra Você
-              </h3>
-              <p className="text-gray-500">
-                Estou preparando dicas que realmente funcionam na correria do dia a dia. Em breve!
-              </p>
+              <div className="flex flex-col lg:flex-row items-center gap-8 max-w-4xl mx-auto">
+                {/* Image Section */}
+                <motion.div 
+                  className="lg:w-2/5 flex justify-center"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <img 
+                    src="/attached_assets/generated_images/woman_balancing_life_plates_c97c57fa.png"
+                    alt="Mulher equilibrando pratos representando as responsabilidades da vida"
+                    className="w-full max-w-sm rounded-2xl shadow-lg"
+                  />
+                </motion.div>
+                
+                {/* Text Section */}
+                <motion.div 
+                  className="lg:w-3/5 text-center lg:text-left"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <h3 className="font-fredoka text-3xl md:text-4xl gradient-text mb-4">
+                    Organizando Coisas Boas pra Você
+                  </h3>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6">
+                    Sei como é fazer malabarismo com casa, filhos, trabalho... e ainda tentar sobrar um tempinho pra você.
+                  </p>
+                  <p className="text-gray-500">
+                    Estou preparando dicas que realmente funcionam na correria do dia a dia. Em breve!
+                  </p>
+                </motion.div>
+              </div>
             </motion.div>
           )}
         </div>
