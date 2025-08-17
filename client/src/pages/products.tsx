@@ -93,18 +93,18 @@ export default function Products() {
             </div>
           </motion.div>
 
-          {/* Products Grid */}
+          {/* Products Grid - Adjusted for new card dimensions */}
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="flex flex-wrap justify-center gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 rounded-3xl h-80"></div>
+                <div key={i} className="animate-pulse" style={{ width: '264px', height: '450px' }}>
+                  <div className="bg-gray-200 rounded-3xl h-full w-full"></div>
                 </div>
               ))}
             </div>
           ) : filteredProducts.length > 0 ? (
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+              className="flex flex-wrap justify-center gap-6"
               variants={staggerContainer}
               initial="initial"
               animate="animate"
