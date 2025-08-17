@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
 import FavoriteButton from "./FavoriteButton";
+import RecommendationModal from "./RecommendationModal";
 
 interface Product {
   id: string;
@@ -26,6 +28,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, index = 0 }: ProductCardProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const formatPrice = (price: string | null) => {
     if (!price) return "Preço não disponível";
     const numPrice = parseFloat(price);
@@ -127,6 +131,18 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </div>
           )}
 
+          {/* Why We Recommend Button */}
+          <div className="mb-3">
+            <Button
+              variant="outline"
+              className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
+              onClick={() => setIsModalOpen(true)}
+              data-testid={`button-why-recommend-${product.id}`}
+            >
+              💡 Porque Indicamos?
+            </Button>
+          </div>
+
           {/* Action Buttons */}
           <div className="flex gap-2 mt-auto">
             <Button 
@@ -140,6 +156,13 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Recommendation Modal */}
+      <RecommendationModal
+        product={product}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </motion.div>
   );
 }
