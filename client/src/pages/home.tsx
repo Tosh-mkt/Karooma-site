@@ -263,9 +263,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
             >
-              <h2 className="font-fredoka text-5xl gradient-text mb-4">
-                Descobertas que Mudaram Minha Vida
-              </h2>
+              <h2 className="font-fredoka text-5xl gradient-text mb-4">Descobertas que Mudam Vidas</h2>
               <p className="font-poppins text-xl text-gray-600">
                 Produtos que realmente funcionam (testados na correria de casa com 3 filhos!)
               </p>
