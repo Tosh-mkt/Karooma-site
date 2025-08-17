@@ -26,7 +26,7 @@ export default function Navigation() {
 
   return (
     <motion.nav 
-      className="glassmorphism fixed top-0 w-full z-50 px-4 py-3"
+      className="glassmorphism fixed top-0 w-full z-50 px-4 py-4"
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
@@ -39,7 +39,7 @@ export default function Navigation() {
             whileHover={{ scale: 1.05 }}
           >
             <motion.div 
-              className="w-12 h-12 flex items-center justify-center"
+              className="w-14 h-14 md:w-12 md:h-12 flex items-center justify-center"
               whileHover={{ rotate: [0, -10, 10, 0] }}
               transition={{ duration: 0.5 }}
             >
@@ -52,7 +52,7 @@ export default function Navigation() {
             <motion.img 
               src={karoomaLogo} 
               alt="Karooma" 
-              className="h-8 object-contain"
+              className="h-10 md:h-8 object-contain"
               whileHover={{ scale: 1.02 }}
             />
           </motion.div>
@@ -77,30 +77,32 @@ export default function Navigation() {
           ))}
         </div>
         
-        {/* Admin Button (conditional) */}
-        {isAdmin ? (
-          <Link href="/admin/dashboard">
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:scale-105 transition-all duration-300"
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              Admin
-            </Button>
-          </Link>
-        ) : (
-          <Link href="/login">
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-purple-200 hover:bg-purple-50"
-            >
-              <Shield className="w-4 h-4 mr-2" />
-              Login
-            </Button>
-          </Link>
-        )}
+        {/* Admin Button (conditional) - Desktop only */}
+        <div className="hidden md:block">
+          {isAdmin ? (
+            <Link href="/admin/dashboard">
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:scale-105 transition-all duration-300"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Admin
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-purple-200 hover:bg-purple-50"
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                Login
+              </Button>
+            </Link>
+          )}
+        </div>
 
         {/* Search and Mobile Menu */}
         <div className="flex items-center space-x-4">
@@ -118,8 +120,12 @@ export default function Navigation() {
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
-                <Menu className="h-6 w-6" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="md:hidden w-12 h-12 hover:bg-pink-100/50"
+              >
+                <Menu className="h-7 w-7 text-gray-700" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 bg-white/90 backdrop-blur-md">
@@ -151,16 +157,27 @@ export default function Navigation() {
                   </Link>
                 ))}
                 
-                {/* Admin button in mobile menu */}
-                {isAdmin && (
+                {/* Login/Admin button in mobile menu */}
+                {isAdmin ? (
                   <Link href="/admin/dashboard">
                     <motion.div
-                      className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-2 rounded-lg"
+                      className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-3 rounded-lg"
                       onClick={() => setIsOpen(false)}
                       whileHover={{ x: 10 }}
                     >
-                      <Shield className="w-4 h-4" />
-                      <span className="font-poppins text-lg">Admin</span>
+                      <Shield className="w-5 h-5" />
+                      <span className="font-poppins text-lg font-medium">Admin</span>
+                    </motion.div>
+                  </Link>
+                ) : (
+                  <Link href="/login">
+                    <motion.div
+                      className="flex items-center space-x-2 border-2 border-purple-200 text-purple-700 px-4 py-3 rounded-lg hover:bg-purple-50"
+                      onClick={() => setIsOpen(false)}
+                      whileHover={{ x: 10 }}
+                    >
+                      <Shield className="w-5 h-5" />
+                      <span className="font-poppins text-lg font-medium">Login</span>
                     </motion.div>
                   </Link>
                 )}
