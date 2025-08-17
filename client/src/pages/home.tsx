@@ -128,9 +128,7 @@ export default function Home() {
                   <h3 className="font-fredoka text-3xl md:text-4xl gradient-text mb-4">
                     Organizando Coisas Boas pra Você
                   </h3>
-                  <p className="text-gray-600 text-lg leading-relaxed mb-6">
-                    Sei como é fazer malabarismo com casa, filhos, trabalho... e ainda tentar sobrar um tempinho pra você.
-                  </p>
+                  <p className="text-gray-600 mb-6 text-[23px]">A vida está um malabarismo constante?.</p>
                   <p className="text-gray-500">
                     Estou preparando dicas que realmente funcionam na correria do dia a dia. Em breve!
                   </p>
