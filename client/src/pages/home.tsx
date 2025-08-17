@@ -46,9 +46,7 @@ export default function Home() {
               Mãe, Você Não Está Sozinha
             </motion.h2>
             
-            <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
-              Sei como é correr atrás de três filhos, casa, trabalho... e ainda tentar sobrar um tempinho pra você. 
-            </p>
+            <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">Sabemos como é correr atrás de três filhos, casa, trabalho... e ainda tentar sobrar um tempinho pra você.</p>
             
             <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
               Aqui você encontra produtos que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️
@@ -141,7 +139,6 @@ export default function Home() {
           )}
         </div>
       </section>
-
       {/* Empathy Section */}
       <section className="py-16 bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
         <div className="max-w-6xl mx-auto px-4">
@@ -214,7 +211,6 @@ export default function Home() {
           </motion.div>
         </div>
       </section>
-
       {/* Latest Videos Preview */}
       {latestVideos && latestVideos.length > 0 && (
         <section className="py-16 bg-gradient-to-r from-purple-100 via-pink-50 to-blue-100">
@@ -248,7 +244,6 @@ export default function Home() {
           </div>
         </section>
       )}
-
       {/* Featured Products Preview */}
       {featuredProducts && featuredProducts.length > 0 && (
         <section className="py-16">
@@ -282,7 +277,6 @@ export default function Home() {
           </div>
         </section>
       )}
-
       {/* Newsletter Section */}
       <Newsletter />
     </div>
