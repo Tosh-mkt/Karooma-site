@@ -199,9 +199,7 @@ export default function Home() {
             >
               <div className="text-4xl mb-4">💝</div>
               <h3 className="font-poppins text-lg font-semibold text-gray-700 mb-3">Está precisando de um abraço</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Daqueles que dizem "você está fazendo um trabalho incrível, mesmo quando parece que não está".
-              </p>
+              <p className="text-gray-600 text-sm leading-relaxed">Daqueles que dizem "você está fazendo um trabalho incrível dentro do possível, mesmo quando parece que não está".</p>
             </motion.div>
           </div>
 
