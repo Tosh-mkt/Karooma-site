@@ -173,9 +173,7 @@ export default function Home() {
               <h3 className="font-poppins text-lg font-semibold text-gray-700 mb-3">
                 Provavelmente você está cansada
               </h3>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Aquela sensação de que o dia acabou e você não fez nem metade do que queria. Eu conheço bem isso.
-              </p>
+              <p className="text-gray-600 text-sm leading-relaxed">Aquela sensação de que o dia acabou e você não fez nem metade do que queria. Conhecemos  bem isso.</p>
             </motion.div>
 
             <motion.div 
