@@ -118,24 +118,24 @@ function ExpandableText({ text, title }: { text: string; title: string }) {
 
   return (
     <div>
-      <h4 className="font-medium text-gray-900 text-sm mb-1">
+      <h4 className="font-medium text-gray-900 text-base mb-2">
         {title}
       </h4>
-      <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line">
+      <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
         {displayText}
       </p>
       {isLong && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-600 hover:text-blue-700 text-xs mt-1 flex items-center gap-1 transition-colors"
+          className="text-blue-600 hover:text-blue-700 text-sm mt-2 flex items-center gap-1 transition-colors"
         >
           {isExpanded ? (
             <>
-              Ver menos <ChevronUp className="w-3 h-3" />
+              Ver menos <ChevronUp className="w-4 h-4" />
             </>
           ) : (
             <>
-              Ver mais <ChevronDown className="w-3 h-3" />
+              Ver mais <ChevronDown className="w-4 h-4" />
             </>
           )}
         </button>
@@ -237,7 +237,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
               {/* Introduction Section */}
               {product.introduction && (
                 <div className="p-6 border-b border-gray-100 bg-blue-50/50">
-                  <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line">
+                  <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
                     {product.introduction}
                   </p>
                 </div>
@@ -261,10 +261,10 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                         <ExpandableText text={reason.description} title={reason.title} />
                       ) : (
                         <div>
-                          <h4 className="font-medium text-gray-900 text-sm mb-1">
+                          <h4 className="font-medium text-gray-900 text-base mb-2">
                             {reason.title}
                           </h4>
-                          <p className="text-gray-600 text-xs leading-relaxed">
+                          <p className="text-gray-600 text-sm leading-relaxed">
                             {reason.description}
                           </p>
                         </div>
