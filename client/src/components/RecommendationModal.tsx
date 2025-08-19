@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, Star, Heart, ShoppingBag } from "lucide-react";
+import { X, Check, Star, Heart, ShoppingBag, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
@@ -40,21 +40,19 @@ const generateRecommendations = (product: Product) => {
     recommendations.push({
       icon: <Star className="w-5 h-5 text-purple-500" />,
       title: "Avaliação Equipe KAROOMA",
-      description: product.teamEvaluation.length > 150 
-        ? product.teamEvaluation.substring(0, 150) + "..." 
-        : product.teamEvaluation
+      description: product.teamEvaluation, // Texto completo
+      fullText: true
     });
   }
 
-  // Se tem benefícios por avaliador, mostra resumo
+  // Se tem benefícios por avaliador, mostra completo
   if (product.benefits) {
-    const benefitsText = product.benefits.replace(/<br>/g, ' ').replace(/Nutricionista:|Organizadora:|Planejadora:|Especialista:/g, '');
+    const benefitsText = product.benefits.replace(/<br>/g, '\n');
     recommendations.push({
       icon: <Check className="w-5 h-5 text-green-500" />,
       title: "Benefícios Validados",
-      description: benefitsText.length > 150 
-        ? benefitsText.substring(0, 150) + "..."
-        : benefitsText
+      description: benefitsText, // Texto completo
+      fullText: true
     });
   }
 
@@ -63,21 +61,20 @@ const generateRecommendations = (product: Product) => {
     recommendations.push({
       icon: <Star className="w-5 h-5 text-yellow-500" />,
       title: "Avaliação Excelente",
-      description: `Nota ${product.rating} de 5.0 estrelas, confirmando a satisfação dos usuários.`
+      description: `Nota ${product.rating} de 5.0 estrelas, confirmando a satisfação dos usuários.`,
+      fullText: false
     });
   }
 
-  // Tags como benefícios
+  // Tags como seção separada
   if (product.tags) {
-    const tagsList = product.tags.replace(/<br>/g, ' ').replace(/Benefícios:|Locais e Segmentos:/g, '');
-    const hashtags = tagsList.match(/#\w+/g);
-    if (hashtags && hashtags.length > 0) {
-      recommendations.push({
-        icon: <Heart className="w-5 h-5 text-pink-500" />,
-        title: "Facilita a Vida",
-        description: `Benefícios comprovados: ${hashtags.slice(0, 4).join(' ')}`
-      });
-    }
+    const tagsFormatted = product.tags.replace(/<br>/g, '\n');
+    recommendations.push({
+      icon: <Heart className="w-5 h-5 text-pink-500" />,
+      title: "Tags e Benefícios",
+      description: tagsFormatted, // Tags completas
+      fullText: true
+    });
   }
 
   // Fallback para produtos sem dados de especialistas
@@ -86,18 +83,54 @@ const generateRecommendations = (product: Product) => {
       {
         icon: <Check className="w-5 h-5 text-blue-500" />,
         title: "Produto Selecionado",
-        description: "Escolhido pela nossa equipe para facilitar o seu dia a dia."
+        description: "Escolhido pela nossa equipe para facilitar o seu dia a dia.",
+        fullText: false
       },
       {
         icon: <Heart className="w-5 h-5 text-pink-500" />,
         title: "Recomendado por Mães",
-        description: "Testado e aprovado por mães reais que compartilham experiências similares."
+        description: "Testado e aprovado por mães reais que compartilham experiências similares.",
+        fullText: false
       }
     );
   }
 
-  return recommendations.slice(0, 3); // Máximo 3 recomendações
+  return recommendations.slice(0, 4); // Máximo 4 recomendações incluindo tags
 };
+
+// Componente para texto expansível
+function ExpandableText({ text, title }: { text: string; title: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isLong = text.length > 120;
+  const displayText = isExpanded || !isLong ? text : text.substring(0, 120) + "...";
+
+  return (
+    <div>
+      <h4 className="font-medium text-gray-900 text-sm mb-1">
+        {title}
+      </h4>
+      <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line">
+        {displayText}
+      </p>
+      {isLong && (
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="text-blue-600 hover:text-blue-700 text-xs mt-1 flex items-center gap-1 transition-colors"
+        >
+          {isExpanded ? (
+            <>
+              Ver menos <ChevronUp className="w-3 h-3" />
+            </>
+          ) : (
+            <>
+              Ver mais <ChevronDown className="w-3 h-3" />
+            </>
+          )}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export default function RecommendationModal({ product, isOpen, onClose }: RecommendationModalProps) {
   const recommendations = generateRecommendations(product);
@@ -189,8 +222,36 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                 </div>
               </div>
 
+              {/* Introduction Section */}
+              {product.introduction && (
+                <div className="p-6 border-b border-gray-100 bg-blue-50/50">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">K</span>
+                      </div>
+                    </div>
+                    <ExpandableText text={product.introduction} title="Análise da Equipe Karooma" />
+                  </div>
+                </div>
+              )}
+
+              {/* Evaluators Section */}
+              {product.evaluators && (
+                <div className="p-6 border-b border-gray-100 bg-purple-50/50">
+                  <div className="flex gap-3">
+                    <div className="flex-shrink-0 mt-0.5">
+                      <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs">👥</span>
+                      </div>
+                    </div>
+                    <ExpandableText text={product.evaluators.replace(/<br>/g, '\n')} title="Equipe de Especialistas" />
+                  </div>
+                </div>
+              )}
+
               {/* Recommendations */}
-              <div className="p-6 space-y-4 max-h-60 overflow-y-auto">
+              <div className="p-6 space-y-4 max-h-80 overflow-y-auto">
                 {recommendations.map((reason, index) => (
                   <motion.div
                     key={index}
@@ -202,13 +263,19 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                     <div className="flex-shrink-0 mt-0.5">
                       {reason.icon}
                     </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900 text-sm">
-                        {reason.title}
-                      </h4>
-                      <p className="text-gray-600 text-xs mt-1 leading-relaxed">
-                        {reason.description}
-                      </p>
+                    <div className="flex-1">
+                      {reason.fullText ? (
+                        <ExpandableText text={reason.description} title={reason.title} />
+                      ) : (
+                        <div>
+                          <h4 className="font-medium text-gray-900 text-sm mb-1">
+                            {reason.title}
+                          </h4>
+                          <p className="text-gray-600 text-xs leading-relaxed">
+                            {reason.description}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </motion.div>
                 ))}
