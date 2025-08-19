@@ -46,28 +46,7 @@ export function AutoNotification() {
 
   return (
     <div className="fixed top-24 right-4 z-50 space-y-2">
-      {/* Indicador de Conexão SSE */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium ${
-          isConnected 
-            ? 'bg-green-500/20 text-green-700 border border-green-200' 
-            : 'bg-red-500/20 text-red-700 border border-red-200'
-        }`}
-      >
-        {isConnected ? (
-          <>
-            <Wifi className="w-3 h-3" />
-            <span>Automação Ativa</span>
-          </>
-        ) : (
-          <>
-            <WifiOff className="w-3 h-3" />
-            <span>Reconectando...</span>
-          </>
-        )}
-      </motion.div>
+      {/* Indicador de Conexão SSE - REMOVIDO conforme solicitado */}
 
       <AnimatePresence>
         {notifications.map((product) => (

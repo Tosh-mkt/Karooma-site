@@ -52,7 +52,7 @@ export default function Navigation() {
             <motion.img 
               src={karoomaLogo} 
               alt="Karooma" 
-              className="h-10 md:h-8 object-contain"
+              className="h-8.5 md:h-6.5 object-contain"
               whileHover={{ scale: 1.02 }}
             />
           </motion.div>
@@ -123,9 +123,9 @@ export default function Navigation() {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="md:hidden w-12 h-12 hover:bg-pink-100/50"
+                className="md:hidden w-15 h-15 hover:bg-pink-100/50"
               >
-                <Menu className="h-7 w-7 text-gray-700" />
+                <Menu className="h-9 w-9 text-gray-700" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-72 bg-white/90 backdrop-blur-md">
