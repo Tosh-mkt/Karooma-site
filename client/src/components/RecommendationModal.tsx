@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Check, Star, Heart, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface Product {
   id: string;
@@ -16,6 +17,12 @@ interface Product {
   discount: number | null;
   featured: boolean | null;
   createdAt: Date;
+  // Novos campos para avaliações
+  teamEvaluation?: string | null;
+  benefits?: string | null;
+  evaluators?: string | null;
+  introduction?: string | null;
+  tags?: string | null;
 }
 
 interface RecommendationModalProps {
@@ -24,73 +31,91 @@ interface RecommendationModalProps {
   onClose: () => void;
 }
 
-// Função para gerar recomendações baseadas no produto
+// Função para gerar recomendações baseadas nos dados reais dos especialistas
 const generateRecommendations = (product: Product) => {
-  const baseReasons = [
-    {
-      icon: <Star className="w-5 h-5 text-yellow-500" />,
-      title: "Alta Qualidade",
-      description: "Produto com excelentes avaliações dos usuários e qualidade comprovada."
-    },
-    {
+  const recommendations = [];
+  
+  // Se tem avaliação da equipe Karooma, usa como principal recomendação
+  if (product.teamEvaluation) {
+    recommendations.push({
+      icon: <Star className="w-5 h-5 text-purple-500" />,
+      title: "Avaliação Equipe KAROOMA",
+      description: product.teamEvaluation.length > 150 
+        ? product.teamEvaluation.substring(0, 150) + "..." 
+        : product.teamEvaluation
+    });
+  }
+
+  // Se tem benefícios por avaliador, mostra resumo
+  if (product.benefits) {
+    const benefitsText = product.benefits.replace(/<br>/g, ' ').replace(/Nutricionista:|Organizadora:|Planejadora:|Especialista:/g, '');
+    recommendations.push({
       icon: <Check className="w-5 h-5 text-green-500" />,
-      title: "Custo-Benefício",
-      description: "Oferece o melhor valor pelo preço, ideal para quem busca economia inteligente."
-    },
-    {
-      icon: <Heart className="w-5 h-5 text-pink-500" />,
-      title: "Recomendado por Mães",
-      description: "Testado e aprovado por mães reais que compartilham experiências similares."
-    }
-  ];
+      title: "Benefícios Validados",
+      description: benefitsText.length > 150 
+        ? benefitsText.substring(0, 150) + "..."
+        : benefitsText
+    });
+  }
 
-  // Adiciona razões específicas baseadas no produto
-  const specificReasons = [];
-
+  // Rating dos usuários
   if (product.rating && parseFloat(product.rating) >= 4.0) {
-    specificReasons.push({
+    recommendations.push({
       icon: <Star className="w-5 h-5 text-yellow-500" />,
       title: "Avaliação Excelente",
       description: `Nota ${product.rating} de 5.0 estrelas, confirmando a satisfação dos usuários.`
     });
   }
 
-  if (product.discount && product.discount > 20) {
-    specificReasons.push({
-      icon: <ShoppingBag className="w-5 h-5 text-red-500" />,
-      title: "Desconto Especial",
-      description: `Oferta imperdível com ${product.discount}% de desconto no preço original.`
-    });
-  }
-
-  // Razões específicas por categoria
-  const categoryReasons: Record<string, any> = {
-    "Eletrônicos": {
-      icon: <Check className="w-5 h-5 text-blue-500" />,
-      title: "Tecnologia Confiável",
-      description: "Dispositivo moderno que simplifica o dia a dia e traz praticidade para a rotina."
-    },
-    "Casa": {
-      icon: <Heart className="w-5 h-5 text-purple-500" />,
-      title: "Facilita a Vida Doméstica",
-      description: "Produto que otimiza tarefas do lar, proporcionando mais tempo para você."
-    },
-    "Livros": {
-      icon: <Star className="w-5 h-5 text-orange-500" />,
-      title: "Desenvolvimento Pessoal",
-      description: "Conteúdo valioso que contribui para seu crescimento e bem-estar."
+  // Tags como benefícios
+  if (product.tags) {
+    const tagsList = product.tags.replace(/<br>/g, ' ').replace(/Benefícios:|Locais e Segmentos:/g, '');
+    const hashtags = tagsList.match(/#\w+/g);
+    if (hashtags && hashtags.length > 0) {
+      recommendations.push({
+        icon: <Heart className="w-5 h-5 text-pink-500" />,
+        title: "Facilita a Vida",
+        description: `Benefícios comprovados: ${hashtags.slice(0, 4).join(' ')}`
+      });
     }
-  };
-
-  if (categoryReasons[product.category]) {
-    specificReasons.push(categoryReasons[product.category]);
   }
 
-  return [...specificReasons, ...baseReasons.slice(0, 3 - specificReasons.length)];
+  // Fallback para produtos sem dados de especialistas
+  if (recommendations.length === 0) {
+    recommendations.push(
+      {
+        icon: <Check className="w-5 h-5 text-blue-500" />,
+        title: "Produto Selecionado",
+        description: "Escolhido pela nossa equipe para facilitar o seu dia a dia."
+      },
+      {
+        icon: <Heart className="w-5 h-5 text-pink-500" />,
+        title: "Recomendado por Mães",
+        description: "Testado e aprovado por mães reais que compartilham experiências similares."
+      }
+    );
+  }
+
+  return recommendations.slice(0, 3); // Máximo 3 recomendações
 };
 
 export default function RecommendationModal({ product, isOpen, onClose }: RecommendationModalProps) {
   const recommendations = generateRecommendations(product);
+  const { toast } = useToast();
+
+  const handleAmazonClick = () => {
+    if (!product.affiliateLink) {
+      toast({
+        title: "Link indisponível",
+        description: "O link afiliado para este produto não está disponível no momento.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    window.open(product.affiliateLink, '_blank');
+    onClose();
+  };
 
   return (
     <AnimatePresence>
@@ -205,10 +230,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                     Entendi
                   </Button>
                   <Button
-                    onClick={() => {
-                      window.open(product.affiliateLink, '_blank');
-                      onClose();
-                    }}
+                    onClick={handleAmazonClick}
                     size="sm"
                     className="flex-1 bg-orange-500 hover:bg-orange-600"
                     data-testid="button-buy-from-modal"
