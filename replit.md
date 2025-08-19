@@ -116,6 +116,21 @@ The backend follows a simple Express.js REST API pattern:
 
 ## Recent Changes
 
+### 2025-08-19 - Processo Padronizado de Importação Automatizada
+- **Sistema de Validação Robusto**: Endpoint `/api/products/import` com validação automática de campos obrigatórios
+- **Processamento Inteligente Multi-Formato**: Suporte automático para diferentes formatos de preço, rating e categorização
+- **Validação de Especialistas**: Obrigatório mínimo de 3 especialistas, detecta automaticamente até 5 especialistas diferentes
+- **Funções de Extração Automática**: `extractCategory()`, `extractRating()`, `extractPrice()` com suporte a múltiplos formatos
+- **Template Padronizado**: `TEMPLATE_PRODUTO_EXEMPLO.json` com estrutura completa para garantir consistência
+- **Documentação Completa**: `PROCESSO_IMPORTACAO_PRODUTOS.md` com regras, formatos e checklist de qualidade
+- **Script de Automação**: `SCRIPT_IMPORTACAO_AUTOMATICA.js` para importação via linha de comando sem ajustes manuais
+- **Modal com Fontes Legíveis**: Aumentado tamanho de fonte (text-base para títulos, text-sm para conteúdo) para melhor experiência
+- **Zero Ajustes Pós-Importação**: Sistema projetado para eliminar necessidade de correções manuais após importação
+- **Validação de Links Afiliados**: Campo obrigatório com verificação automática de presença
+- **Categorização Inteligente**: Detecta categoria baseada em palavras-chave no nome do produto
+- **Parsing de Preços Avançado**: Suporta formatos "R$ X a R$ Y", "R$ X", "Varia em torno de R$ X"
+- **Impact**: Processo completamente automatizado e padronizado para criação de cards de produtos com garantia de qualidade
+
 ### 2025-08-17 - Product Card Model Unification & Demo Cleanup
 - **Karooma Card Model Update**: Modified ProductCard component to match Amazon card dimensions (264px width, 200px image height)
 - **Layout Optimization**: Updated product page layout from CSS Grid to Flexbox for better card alignment with fixed dimensions

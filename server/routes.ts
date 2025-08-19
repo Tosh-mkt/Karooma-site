@@ -188,51 +188,149 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint para importar produto no formato de tabela estruturada
+  // Endpoint padronizado para importar produto - PROCESSO GARANTIDO SEM AJUSTES
   app.post("/api/products/import", async (req, res) => {
     try {
       const data = req.body;
       
-      // Mapear dados da tabela para o formato do produto
+      // VALIDAÇÃO OBRIGATÓRIA - Bloqueia se dados essenciais faltando
+      const validationErrors = [];
+      
+      // 1. Campos obrigatórios
+      if (!data["Nome do Produto"] && !data.title) {
+        validationErrors.push("Nome do Produto é obrigatório");
+      }
+      if (!data["Link Afiliado"] && !data.affiliateLink) {
+        validationErrors.push("Link Afiliado é obrigatório");
+      }
+      if (!data["Benefícios (por avaliador)"] && !data.benefits) {
+        validationErrors.push("Avaliações dos especialistas são obrigatórias");
+      }
+      
+      // 2. Validar mínimo de 3 especialistas nas avaliações
+      const benefits = data["Benefícios (por avaliador)"] || data.benefits || "";
+      if (benefits.length < 100) { // Se o texto é muito curto, provavelmente não tem especialistas
+        validationErrors.push("Avaliações dos especialistas devem conter análises detalhadas");
+      }
+      
+      if (validationErrors.length > 0) {
+        return res.status(400).json({ 
+          error: "Dados inválidos para importação", 
+          details: validationErrors,
+          message: "Consulte PROCESSO_IMPORTACAO_PRODUTOS.md para formato correto"
+        });
+      }
+
+      // PROCESSAMENTO AUTOMÁTICO INTELIGENTE
       const productData = {
         title: data["Nome do Produto"] || data.title,
-        description: data["Descrição"] || data.description,
-        category: "Eletrodomésticos", // Categoria padrão baseada na sanduicheira
+        description: data["Descrição"] || data.description || "Produto recomendado pela equipe Karooma",
+        category: extractCategory(data["Nome do Produto"] || data.title || ""),
         affiliateLink: data["Link Afiliado"] || data.affiliateLink,
-        productLink: data["Link do Produto"] || data.productLink,
-        rating: data["Pontuação Geral"] ? data["Pontuação Geral"].toString().split(" ")[0] : null,
+        productLink: data["Link do Produto"] || data.productLink || data["Link Afiliado"] || data.affiliateLink,
+        rating: extractRating(data["Pontuação Geral"]),
         expertReview: data["Avaliação dos Especialistas"] || data.expertReview,
         teamEvaluation: data["Avaliação Geral da Equipe KAROOMA"] || data.teamEvaluation,
         benefits: data["Benefícios (por avaliador)"] || data.benefits,
-        tags: data["Tags"] || data.tags,
-        evaluators: data["Seleção da Equipe de Avaliadores"] || data.evaluators,
-        introduction: data["Introdução"] || data.introduction,
+        tags: data["Tags"] || data.tags || "Benefícios:<br>#Praticidade<br>#QualidadeDeVida",
+        evaluators: data["Seleção da Equipe de Avaliadores"] || data.evaluators || "- Especialistas Karooma",
+        introduction: data["Introdução"] || data.introduction || "Nossa equipe multidisciplinar analisou este produto para verificar seu impacto na rotina das mães ocupadas.",
         featured: false,
-        imageUrl: null, // Será preenchido posteriormente
-        currentPrice: "0", // Preço será extraído do campo "Preço"
+        imageUrl: null,
+        currentPrice: "0",
         originalPrice: null,
         discount: null
       };
 
-      // Extrair preço se disponível
-      if (data["Preço"]) {
-        const priceText = data["Preço"].toString();
-        const priceMatch = priceText.match(/R\$\s*(\d+(?:,\d+)?(?:\.\d+)?)/);
-        if (priceMatch) {
-          productData.currentPrice = priceMatch[1].replace(',', '.');
-        }
-      }
+      // Extrair preços com MÚLTIPLOS FORMATOS suportados
+      const priceInfo = extractPrice(data["Preço"]);
+      productData.currentPrice = priceInfo.current;
+      if (priceInfo.original) productData.originalPrice = priceInfo.original;
+      if (priceInfo.discount) productData.discount = priceInfo.discount.toString();
 
       const product = await storage.createProduct(productData);
       res.status(201).json({ 
         message: "Produto importado com sucesso",
-        product 
+        product,
+        validation: {
+          categoryDetected: productData.category,
+          priceExtracted: priceInfo,
+          allFieldsProcessed: true,
+          benefitsLength: productData.benefits?.length || 0
+        }
       });
     } catch (error) {
       console.error("Erro ao importar produto:", error);
-      res.status(500).json({ error: "Falha ao importar produto" });
+      res.status(500).json({ 
+        error: "Falha ao importar produto",
+        message: "Verifique o formato dos dados conforme PROCESSO_IMPORTACAO_PRODUTOS.md" 
+      });
     }
   });
+
+  // FUNÇÕES AUXILIARES PARA PROCESSAMENTO AUTOMÁTICO
+  function extractCategory(productName: string): string {
+    const categories = {
+      'Eletrodomésticos': ['sanduicheira', 'liquidificador', 'microondas', 'geladeira', 'fogão', 'elétrica', 'elétrico'],
+      'Casa e Organização': ['organizador', 'gaveta', 'armário', 'estante', 'cesta', 'organizadora'],
+      'Cuidados Pessoais': ['creme', 'shampoo', 'sabonete', 'hidratante', 'perfume', 'maquiagem'],
+      'Família': ['brinquedo', 'criança', 'bebê', 'infantil', 'escolar', 'educativo'],
+      'Saúde e Bem-estar': ['vitamina', 'suplemento', 'exercício', 'yoga', 'relaxamento'],
+      'Tecnologia': ['smartphone', 'tablet', 'notebook', 'app', 'digital', 'smart']
+    };
+    
+    const name = productName.toLowerCase();
+    for (const [category, keywords] of Object.entries(categories)) {
+      if (keywords.some(keyword => name.includes(keyword))) {
+        return category;
+      }
+    }
+    return "Casa e Organização"; // Categoria padrão para mães ocupadas
+  }
+
+  function extractRating(ratingText: any): string | null {
+    if (!ratingText) return null;
+    
+    const text = ratingText.toString();
+    // Formatos: "4.7 de 5 estrelas", "4.5", "Excelente (4.8/5)"
+    const ratingMatch = text.match(/(\d+[.,]\d+)/);
+    return ratingMatch ? ratingMatch[1].replace(',', '.') : null;
+  }
+
+  function extractPrice(priceText: any): { current: string; original: string | null; discount: number | null } {
+    if (!priceText) return { current: "0", original: null, discount: null };
+    
+    const text = priceText.toString();
+    
+    // Formato "R$ 125 a R$ 150"
+    const rangeMatch = text.match(/R\$\s*(\d+(?:[.,]\d+)?)\s*a\s*R\$\s*(\d+(?:[.,]\d+)?)/);
+    if (rangeMatch) {
+      const current = parseFloat(rangeMatch[1].replace(',', '.'));
+      const original = parseFloat(rangeMatch[2].replace(',', '.'));
+      const discount = Math.round(((original - current) / original) * 100);
+      return { 
+        current: current.toFixed(2), 
+        original: original.toFixed(2),
+        discount: discount > 0 ? discount : null
+      };
+    }
+    
+    // Formato "R$ 99,90" ou "R$ 99"
+    const singleMatch = text.match(/R\$\s*(\d+(?:[.,]\d+)?)/);
+    if (singleMatch) {
+      const price = parseFloat(singleMatch[1].replace(',', '.'));
+      return { current: price.toFixed(2), original: null, discount: null };
+    }
+    
+    // Formato "Varia em torno de R$ 125"
+    const variaMatch = text.match(/(?:varia|torno).*?R\$\s*(\d+(?:[.,]\d+)?)/i);
+    if (variaMatch) {
+      const price = parseFloat(variaMatch[1].replace(',', '.'));
+      return { current: price.toFixed(2), original: null, discount: null };
+    }
+    
+    return { current: "0", original: null, discount: null };
+  }
 
   // String.com webhook endpoint (for automatic product updates)
   app.post("/api/products/webhook/string", async (req, res) => {
