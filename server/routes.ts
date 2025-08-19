@@ -188,6 +188,52 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para importar produto no formato de tabela estruturada
+  app.post("/api/products/import", async (req, res) => {
+    try {
+      const data = req.body;
+      
+      // Mapear dados da tabela para o formato do produto
+      const productData = {
+        title: data["Nome do Produto"] || data.title,
+        description: data["Descrição"] || data.description,
+        category: "Eletrodomésticos", // Categoria padrão baseada na sanduicheira
+        affiliateLink: data["Link Afiliado"] || data.affiliateLink,
+        productLink: data["Link do Produto"] || data.productLink,
+        rating: data["Pontuação Geral"] ? data["Pontuação Geral"].toString().split(" ")[0] : null,
+        expertReview: data["Avaliação dos Especialistas"] || data.expertReview,
+        teamEvaluation: data["Avaliação Geral da Equipe KAROOMA"] || data.teamEvaluation,
+        benefits: data["Benefícios (por avaliador)"] || data.benefits,
+        tags: data["Tags"] || data.tags,
+        evaluators: data["Seleção da Equipe de Avaliadores"] || data.evaluators,
+        introduction: data["Introdução"] || data.introduction,
+        featured: false,
+        imageUrl: null, // Será preenchido posteriormente
+        currentPrice: "0", // Preço será extraído do campo "Preço"
+        originalPrice: null,
+        discount: null
+      };
+
+      // Extrair preço se disponível
+      if (data["Preço"]) {
+        const priceText = data["Preço"].toString();
+        const priceMatch = priceText.match(/R\$\s*(\d+(?:,\d+)?(?:\.\d+)?)/);
+        if (priceMatch) {
+          productData.currentPrice = priceMatch[1].replace(',', '.');
+        }
+      }
+
+      const product = await storage.createProduct(productData);
+      res.status(201).json({ 
+        message: "Produto importado com sucesso",
+        product 
+      });
+    } catch (error) {
+      console.error("Erro ao importar produto:", error);
+      res.status(500).json({ error: "Falha ao importar produto" });
+    }
+  });
+
   // String.com webhook endpoint (for automatic product updates)
   app.post("/api/products/webhook/string", async (req, res) => {
     try {

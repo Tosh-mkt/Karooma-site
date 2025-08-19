@@ -50,9 +50,17 @@ export const products = pgTable("products", {
   currentPrice: decimal("current_price", { precision: 10, scale: 2 }),
   originalPrice: decimal("original_price", { precision: 10, scale: 2 }),
   affiliateLink: text("affiliate_link").notNull(),
+  productLink: text("product_link"),
   rating: decimal("rating", { precision: 2, scale: 1 }),
   discount: integer("discount"),
   featured: boolean("featured").default(false),
+  // Campos expandidos para dados detalhados
+  expertReview: text("expert_review"),
+  teamEvaluation: text("team_evaluation"),
+  benefits: text("benefits"),
+  tags: text("tags"),
+  evaluators: text("evaluators"),
+  introduction: text("introduction"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
