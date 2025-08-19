@@ -35,6 +35,18 @@ interface RecommendationModalProps {
 const generateRecommendations = (product: Product) => {
   const recommendations = [];
   
+  // Seção de Especialistas movida para dentro do scroll
+  if (product.evaluators) {
+    recommendations.push({
+      icon: <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
+        <span className="text-white text-xs">👥</span>
+      </div>,
+      title: "Equipe de Especialistas",
+      description: product.evaluators.replace(/<br>/g, '\n'),
+      fullText: true
+    });
+  }
+
   // Se tem avaliação da equipe Karooma, usa como principal recomendação
   if (product.teamEvaluation) {
     recommendations.push({
@@ -95,7 +107,7 @@ const generateRecommendations = (product: Product) => {
     );
   }
 
-  return recommendations.slice(0, 4); // Máximo 4 recomendações incluindo tags
+  return recommendations.slice(0, 5); // Máximo 5 seções incluindo especialistas
 };
 
 // Componente para texto expansível
@@ -225,28 +237,9 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
               {/* Introduction Section */}
               {product.introduction && (
                 <div className="p-6 border-b border-gray-100 bg-blue-50/50">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">K</span>
-                      </div>
-                    </div>
-                    <ExpandableText text={product.introduction} title="Análise da Equipe Karooma" />
-                  </div>
-                </div>
-              )}
-
-              {/* Evaluators Section */}
-              {product.evaluators && (
-                <div className="p-6 border-b border-gray-100 bg-purple-50/50">
-                  <div className="flex gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">👥</span>
-                      </div>
-                    </div>
-                    <ExpandableText text={product.evaluators.replace(/<br>/g, '\n')} title="Equipe de Especialistas" />
-                  </div>
+                  <p className="text-gray-600 text-xs leading-relaxed whitespace-pre-line">
+                    {product.introduction}
+                  </p>
                 </div>
               )}
 
