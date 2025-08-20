@@ -162,6 +162,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.delete("/api/content/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteContent(id);
+      res.json({ message: "Content deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete content" });
+    }
+  });
+
   // Product routes (String.com integration ready)
   app.get("/api/products", async (req, res) => {
     try {

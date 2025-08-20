@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
+import { CreatePostModal } from "@/components/admin/CreatePostModal";
 
 // Dashboard Overview Component
 function DashboardOverview() {
@@ -492,20 +493,7 @@ export function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="content">
-            <Card className="glassmorphism border-0">
-              <CardHeader>
-                <CardTitle>Gestão de Conteúdo</CardTitle>
-                <CardDescription>
-                  Gerencie posts do blog, vídeos e conteúdo featured
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <Edit className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Gestão de conteúdo em desenvolvimento</p>
-                </div>
-              </CardContent>
-            </Card>
+            <ContentManagement />
           </TabsContent>
 
           <TabsContent value="analytics">
@@ -543,6 +531,209 @@ export function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+    </div>
+  );
+}
+
+// Content Management Component
+function ContentManagement() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const { data: blogPosts, isLoading } = useQuery<Content[]>({
+    queryKey: ["/api/content/blog"],
+  });
+
+  const deletePostMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/content/${id}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Falha ao deletar post");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Post deletado",
+        description: "O post foi removido com sucesso.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/content/blog"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Erro ao deletar",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const formatDate = (dateString: string) => {
+    return new Intl.DateTimeFormat('pt-BR', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date(dateString));
+  };
+
+  if (isLoading) {
+    return (
+      <Card className="glassmorphism border-0">
+        <CardContent className="p-8">
+          <div className="flex items-center justify-center">
+            <RefreshCw className="w-6 h-6 animate-spin mr-2" />
+            <span>Carregando posts...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card className="glassmorphism border-0">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Edit className="w-5 h-5" />
+                Gestão de Blog - Estrutura Moderna
+              </CardTitle>
+              <CardDescription>
+                Crie e gerencie posts com o padrão Karooma de alto impacto
+              </CardDescription>
+            </div>
+            <CreatePostModal />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {!blogPosts || blogPosts.length === 0 ? (
+            <div className="text-center py-12">
+              <Edit className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                Nenhum post criado ainda
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Comece criando seu primeiro post com a estrutura moderna de alto impacto
+              </p>
+              <CreatePostModal 
+                trigger={
+                  <Button className="bg-gradient-to-r from-purple-500 to-pink-500">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Criar Primeiro Post
+                  </Button>
+                }
+              />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {blogPosts.map((post) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Badge 
+                          variant={post.featured ? "default" : "outline"}
+                          className={post.featured ? "bg-gradient-to-r from-purple-500 to-pink-500" : ""}
+                        >
+                          {post.category}
+                        </Badge>
+                        {post.featured && (
+                          <Badge variant="outline" className="text-yellow-600 border-yellow-300">
+                            <Star className="w-3 h-3 mr-1" />
+                            Destaque
+                          </Badge>
+                        )}
+                        <span className="text-sm text-gray-500">
+                          {post.views || 0} visualizações
+                        </span>
+                      </div>
+                      <h3 className="font-semibold text-lg text-gray-800 mb-1 line-clamp-1">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                        {post.description}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Criado em {post.createdAt ? formatDate(post.createdAt) : "Data não disponível"}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-2 ml-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(`/blog/${post.id}`, '_blank')}
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Ver
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deletePostMutation.mutate(post.id)}
+                        disabled={deletePostMutation.isPending}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Estatísticas de Conteúdo */}
+      {blogPosts && blogPosts.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="glassmorphism border-0">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total de Posts</p>
+                  <p className="text-2xl font-bold">{blogPosts.length}</p>
+                </div>
+                <Edit className="w-8 h-8 text-purple-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glassmorphism border-0">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Posts em Destaque</p>
+                  <p className="text-2xl font-bold">
+                    {blogPosts.filter(p => p.featured).length}
+                  </p>
+                </div>
+                <Star className="w-8 h-8 text-yellow-500" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="glassmorphism border-0">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total de Views</p>
+                  <p className="text-2xl font-bold">
+                    {blogPosts.reduce((total, post) => total + (post.views || 0), 0)}
+                  </p>
+                </div>
+                <Eye className="w-8 h-8 text-blue-500" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
