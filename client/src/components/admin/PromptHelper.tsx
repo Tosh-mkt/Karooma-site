@@ -60,64 +60,88 @@ export function PromptHelper({ trigger }: PromptHelperProps) {
 
 **TEMA:** ${theme}
 
-**INSTRUÇÕES:**
-1. Escreva um post seguindo EXATAMENTE a estrutura Karooma de 5 partes
-2. Tom: Empático, prático, humanizado, sem julgamentos
-3. Foco: Soluções que facilitam a vida, não complicam
-4. Linguagem: Conversacional, como uma amiga experiente
-5. Tamanho: 800-1200 palavras
+**FORMATO DE SAÍDA OBRIGATÓRIO:**
+Organize sua resposta EXATAMENTE neste formato para facilitar cópia/cola no painel administrativo:
 
-**ESTRUTURA OBRIGATÓRIA:**
+---
+**TÍTULO (Hook Magnético):**
+[Escreva uma pergunta ou situação reconhecível de 60-80 caracteres]
+
+---
+**DESCRIÇÃO (Chamada Empática):**
+[Resuma o benefício principal em 150-200 caracteres, focando na transformação]
+
+---
+**CATEGORIA:**
+[Escolha: Organização Familiar | Produtividade | Cuidados Pessoais | Família | Saúde e Bem-estar | Casa e Decoração | Economia Doméstica]
+
+---
+**CONTEÚDO COMPLETO:**
+[Escreva aqui o post completo seguindo a estrutura de 5 partes abaixo]
+
+**ESTRUTURA DO CONTEÚDO:**
 
 **PARTE 1 - HOOK EMOCIONAL (100-150 palavras)**
-- Comece com uma situação específica e reconhecível
+- Comece com situação específica e reconhecível
 - Use detalhes concretos (horários, ações, sensações)
 - Conecte emocionalmente sem dramatizar
-- Exemplo de abertura: "Eu sei que você conhece essa sensação..."
 
 **PARTE 2 - VALIDAÇÃO COM DADOS (80-100 palavras)**
-- Inclua uma estatística real sobre mães brasileiras
-- Valide que ela não está sozinha no problema
+- Inclua estatística real sobre mães brasileiras
 - Use formato: "**A verdade é que X% das mães brasileiras relatam [problema].** Você não está sozinha nessa."
-- Adicione uma seção "## Eu Entendo Completamente Essa Realidade"
+- Adicione seção "## Eu Entendo Completamente Essa Realidade"
 
 **PARTE 3 - 5 ESTRATÉGIAS PRÁTICAS (400-500 palavras)**
 - Título: "## 5 Estratégias Que Realmente Funcionam (Testadas por Mães Reais)"
 - Numere de 1 a 5 com emojis diferentes
-- Cada estratégia: título claro + explicação prática de 2-3 frases
-- Foque em ações simples de 15-25 minutos
-- Use subtítulos com ### e emojis
+- Cada estratégia: ### título + explicação prática
 
 **PARTE 4 - REFLEXÃO PESSOAL (150-200 palavras)**
 - Título: "## O Que Mudou na Minha Rotina (e Pode Mudar na Sua)"
-- Compartilhe experiência autêntica (pode ser fictícia mas realista)
-- Inclua exemplos concretos de mudanças
+- Experiência autêntica com exemplos concretos
 - Termine com: "**Às vezes, facilitar a vida não é preguiça. É autocuidado.**"
 
 **PARTE 5 - FECHAMENTO EMPÁTICO (100-150 palavras)**
 - Título: "## Lembre-se Sempre:"
-- Reforce a autoestima dela
-- Crie senso de comunidade e união
-- Termine SEMPRE com: "**Porque juntas, a gente sempre encontra um jeito. ✨**"
+- Reforce autoestima e senso de comunidade
+- Termine com: "**Porque juntas, a gente sempre encontra um jeito. ✨**"
 
-**FORMATAÇÃO:**
+**INSTRUÇÕES FINAIS:**
+- Tom: Empático, prático, conversacional
 - Use **negrito** para frases de impacto
-- Use ## para títulos principais
-- Use ### para subtítulos das estratégias
-- Inclua emojis nos subtítulos das estratégias
 - Parágrafos curtos (máximo 3 linhas)
+- 800-1200 palavras no total
 
-Agora escreva o post sobre: ${theme}`;
+Agora escreva sobre: ${theme}`;
   };
 
   const promptSimplificado = (theme: string) => {
-    return `Escreva um post para mães ocupadas sobre "${theme}" seguindo a estrutura Karooma:
+    return `Escreva um post para mães ocupadas sobre "${theme}" seguindo este FORMATO EXATO:
 
-1. Hook emocional situacional
+---
+**TÍTULO (Hook Magnético):**
+[Pergunta ou situação reconhecível]
+
+---
+**DESCRIÇÃO (Chamada Empática):**
+[Benefício principal em 150-200 caracteres]
+
+---
+**CATEGORIA:**
+[Organização Familiar | Produtividade | Cuidados Pessoais | Família | Saúde e Bem-estar]
+
+---
+**CONTEÚDO COMPLETO:**
+1. Hook emocional situacional (100-150 palavras)
 2. Validação com dados (X% das mães brasileiras...)
-3. 5 estratégias práticas numeradas com emojis
-4. Reflexão pessoal autêntica 
-5. Fechamento empático ("Porque juntas, a gente sempre encontra um jeito. ✨")
+3. ## 5 Estratégias Que Realmente Funcionam (Testadas por Mães Reais)
+   ### 🔸 1. [Estratégia com emoji]
+   ### 🔸 2. [Estratégia com emoji]
+   ### 🔸 3. [Estratégia com emoji]
+   ### 🔸 4. [Estratégia com emoji]
+   ### 🔸 5. [Estratégia com emoji]
+4. ## O Que Mudou na Minha Rotina (e Pode Mudar na Sua)
+5. ## Lembre-se Sempre: [termine com "Porque juntas, a gente sempre encontra um jeito. ✨"]
 
 Tom: Empático, prático, conversacional. 800-1200 palavras.
 Público: Cláudia, 39 anos, mãe de 3, trabalha, busca soluções simples.`;
@@ -310,15 +334,21 @@ Público: Cláudia, 39 anos, mãe de 3, trabalha, busca soluções simples.`;
           {/* Instruções */}
           <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
             <CardContent className="p-4">
-              <h4 className="font-semibold mb-2">🚀 Como usar:</h4>
+              <h4 className="font-semibold mb-2">🚀 Como usar (Cópia/Cola Simplificado):</h4>
               <ol className="text-sm space-y-1 list-decimal list-inside">
                 <li>Defina o tema do post acima</li>
                 <li>Copie o prompt (completo ou simplificado)</li>
                 <li>Cole na sua LLM favorita (ChatGPT, Claude, etc.)</li>
-                <li>Copie o conteúdo gerado</li>
-                <li>Cole diretamente no formulário "Criar Post"</li>
+                <li><strong>Cole cada seção da resposta nos campos correspondentes:</strong>
+                  <ul className="ml-4 mt-1 space-y-1 list-disc list-inside text-xs">
+                    <li>"TÍTULO" → Campo "Título (Hook Magnético)"</li>
+                    <li>"DESCRIÇÃO" → Campo "Descrição (Chamada Empática)"</li>
+                    <li>"CATEGORIA" → Seletor "Categoria"</li>
+                    <li>"CONTEÚDO COMPLETO" → Campo "Conteúdo (Markdown aceito)"</li>
+                  </ul>
+                </li>
                 <li>Selecione uma URL de imagem recomendada</li>
-                <li>Configure categoria e publique!</li>
+                <li>Configure "Post em Destaque" se necessário e publique!</li>
               </ol>
             </CardContent>
           </Card>
