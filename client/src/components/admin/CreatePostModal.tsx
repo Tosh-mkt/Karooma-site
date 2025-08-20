@@ -113,11 +113,14 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
 
   const createPostMutation = useMutation({
     mutationFn: async (data: CreatePostForm) => {
-      return await apiRequest("/api/content", "POST", {
+      console.log("Enviando dados:", data);
+      const response = await apiRequest("POST", "/api/content", {
         ...data,
         type: "blog",
         imageUrl: data.imageUrl || null,
       });
+      console.log("Resposta da API:", response);
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({
@@ -130,6 +133,7 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
       setPreviewMode(false);
     },
     onError: (error) => {
+      console.error("Erro na mutation:", error);
       toast({
         title: "Erro ao criar post",
         description: error.message,
@@ -176,7 +180,10 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
           {/* Formulário */}
           <div className="space-y-6">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit((data) => createPostMutation.mutate(data))} className="space-y-4">
+              <form onSubmit={form.handleSubmit((data) => {
+                console.log("Form submitted:", data);
+                createPostMutation.mutate(data);
+              })} className="space-y-4">
                 {/* Título */}
                 <FormField
                   control={form.control}
