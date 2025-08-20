@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { User, Calendar, ArrowRight } from "lucide-react";
+import { Link } from "wouter";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { Badge } from "@/components/ui/badge";
 import { GradientButton } from "@/components/ui/gradient-button";
@@ -60,9 +61,11 @@ export function BlogCard({ article, featured = false, index = 0 }: BlogCardProps
               </div>
             </div>
             
-            <GradientButton variant="glass" size="sm">
-              Ler mais <ArrowRight className="ml-1 w-4 h-4" />
-            </GradientButton>
+            <Link href={`/blog/${article.id}`}>
+              <GradientButton variant="glass" size="sm">
+                Ler mais <ArrowRight className="ml-1 w-4 h-4" />
+              </GradientButton>
+            </Link>
           </div>
         </div>
       </AnimatedCard>
@@ -70,28 +73,30 @@ export function BlogCard({ article, featured = false, index = 0 }: BlogCardProps
   }
 
   return (
-    <AnimatedCard delay={index * 0.1} className="p-6">
-      <img
-        src={article.imageUrl || "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300"}
-        alt={article.title}
-        className="w-full h-32 object-cover rounded-xl mb-4"
-      />
-      
-      <Badge className="bg-gradient-to-r from-green-400 to-blue-500 text-white mb-3">
-        {article.category || "Artigo"}
-      </Badge>
-      
-      <h4 className="font-poppins font-bold text-lg text-gray-800 mb-2 line-clamp-2">
-        {article.title}
-      </h4>
-      
-      <p className="text-gray-600 font-inter text-sm mb-3 line-clamp-3">
-        {article.description}
-      </p>
-      
-      <span className="text-gray-500 text-xs">
-        {article.createdAt ? formatDate(new Date(article.createdAt)) : "Recente"}
-      </span>
-    </AnimatedCard>
+    <Link href={`/blog/${article.id}`}>
+      <AnimatedCard delay={index * 0.1} className="p-6 cursor-pointer hover:scale-105 transition-transform duration-300">
+        <img
+          src={article.imageUrl || "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300"}
+          alt={article.title}
+          className="w-full h-32 object-cover rounded-xl mb-4"
+        />
+        
+        <Badge className="bg-gradient-to-r from-green-400 to-blue-500 text-white mb-3">
+          {article.category || "Artigo"}
+        </Badge>
+        
+        <h4 className="font-poppins font-bold text-lg text-gray-800 mb-2 line-clamp-2">
+          {article.title}
+        </h4>
+        
+        <p className="text-gray-600 font-inter text-sm mb-3 line-clamp-3">
+          {article.description}
+        </p>
+        
+        <span className="text-gray-500 text-xs">
+          {article.createdAt ? formatDate(new Date(article.createdAt)) : "Recente"}
+        </span>
+      </AnimatedCard>
+    </Link>
   );
 }

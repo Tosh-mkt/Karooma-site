@@ -131,6 +131,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/content/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const content = await storage.getContentById(id);
+      if (!content) {
+        return res.status(404).json({ error: "Content not found" });
+      }
+      
+      // Incrementar views
+      await storage.incrementContentViews(id);
+      
+      res.json(content);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch content" });
+    }
+  });
+
   app.post("/api/content", async (req, res) => {
     try {
       const validatedData = insertContentSchema.parse(req.body);

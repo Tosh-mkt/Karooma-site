@@ -28,11 +28,13 @@ export interface IStorage {
   
   // Content methods
   getContent(id: string): Promise<Content | undefined>;
+  getContentById(id: string): Promise<Content | undefined>;
   getAllContent(): Promise<Content[]>;
   getContentByType(type: string): Promise<Content[]>;
   getContentByTypeAndCategory(type: string, category: string): Promise<Content[]>;
   getFeaturedContent(): Promise<Content[]>;
   createContent(content: InsertContent): Promise<Content>;
+  incrementContentViews(id: string): Promise<void>;
   
   // Product methods
   getProduct(id: string): Promise<Product | undefined>;
@@ -288,6 +290,11 @@ export class DatabaseStorage implements IStorage {
     return contentItem || undefined;
   }
 
+  async getContentById(id: string): Promise<Content | undefined> {
+    const [contentItem] = await db.select().from(content).where(eq(content.id, id));
+    return contentItem || undefined;
+  }
+
   async getAllContent(): Promise<Content[]> {
     return await db.select().from(content).orderBy(desc(content.createdAt));
   }
@@ -316,6 +323,18 @@ export class DatabaseStorage implements IStorage {
       .values(insertContent)
       .returning();
     return contentItem;
+  }
+
+  async incrementContentViews(id: string): Promise<void> {
+    // Buscar views atual
+    const [currentContent] = await db.select({ views: content.views }).from(content).where(eq(content.id, id));
+    const currentViews = currentContent?.views || 0;
+    
+    // Incrementar views
+    await db
+      .update(content)
+      .set({ views: currentViews + 1 })
+      .where(eq(content.id, id));
   }
 
   // Product methods

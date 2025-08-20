@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "./pages/home";
 import Videos from "./pages/videos";
 import Blog from "./pages/blog";
+import BlogPost from "./pages/blog-post";
 import Products from "./pages/products";
 import { Admin } from "./pages/Admin";
 import { AdminDashboard } from "./pages/AdminDashboard";
@@ -28,6 +29,7 @@ function Router() {
           <Route path="/" component={Home} />
           <Route path="/videos" component={Videos} />
           <Route path="/blog" component={Blog} />
+          <Route path="/blog/:id" component={BlogPost} />
           <Route path="/products" component={Products} />
           <Route path="/favoritos" component={Favorites} />
 
