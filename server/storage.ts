@@ -35,6 +35,7 @@ export interface IStorage {
   getFeaturedContent(): Promise<Content[]>;
   createContent(content: InsertContent): Promise<Content>;
   incrementContentViews(id: string): Promise<void>;
+  updateContent(id: string, data: Partial<InsertContent>): Promise<Content>;
   deleteContent(id: string): Promise<void>;
   
   // Product methods
@@ -336,6 +337,15 @@ export class DatabaseStorage implements IStorage {
       .update(content)
       .set({ views: currentViews + 1 })
       .where(eq(content.id, id));
+  }
+
+  async updateContent(id: string, data: Partial<InsertContent>): Promise<Content> {
+    const [updatedContent] = await db
+      .update(content)
+      .set(data)
+      .where(eq(content.id, id))
+      .returning();
+    return updatedContent;
   }
 
   async deleteContent(id: string): Promise<void> {

@@ -162,6 +162,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/content/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertContentSchema.partial().parse(req.body);
+      const updatedContent = await storage.updateContent(id, validatedData);
+      res.json(updatedContent);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Invalid content data", details: error.errors });
+      } else {
+        res.status(500).json({ error: "Failed to update content" });
+      }
+    }
+  });
+
   app.delete("/api/content/:id", async (req, res) => {
     try {
       const { id } = req.params;

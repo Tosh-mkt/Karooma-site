@@ -21,6 +21,7 @@ import {
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
 import { CreatePostModal } from "@/components/admin/CreatePostModal";
+import { EditPostModal } from "@/components/admin/EditPostModal";
 
 // Dashboard Overview Component
 function DashboardOverview() {
@@ -674,6 +675,15 @@ function ContentManagement() {
                         <Eye className="w-4 h-4 mr-1" />
                         Ver
                       </Button>
+                      <EditPostModal 
+                        postId={post.id}
+                        trigger={
+                          <Button variant="outline" size="sm">
+                            <Edit className="w-4 h-4 mr-1" />
+                            Editar
+                          </Button>
+                        }
+                      />
                       <Button
                         variant="outline"
                         size="sm"
