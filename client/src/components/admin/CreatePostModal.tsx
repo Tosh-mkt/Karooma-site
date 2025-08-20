@@ -12,6 +12,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Form,
   FormControl,
   FormField,
@@ -43,7 +49,12 @@ import {
   Tag,
   Sparkles,
   Users,
-  Heart
+  Heart,
+  HelpCircle,
+  Lightbulb,
+  TrendingUp,
+  Brain,
+  Target
 } from "lucide-react";
 
 const createPostSchema = z.object({
@@ -173,6 +184,20 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                       <FormLabel className="flex items-center gap-2">
                         <Sparkles className="w-4 h-4" />
                         Título (Hook Magnético)
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p className="text-sm">
+                                <strong>Hook Magnético:</strong> Título que desperta curiosidade e se conecta emocionalmente. 
+                                Use perguntas, situações reconhecíveis ou estatísticas surpreendentes. 
+                                Ex: "Você já acordou às 5h30..." gera identificação imediata.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </FormLabel>
                       <FormControl>
                         <Input 
@@ -194,6 +219,20 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                       <FormLabel className="flex items-center gap-2">
                         <Users className="w-4 h-4" />
                         Descrição (Chamada Empática)
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p className="text-sm">
+                                <strong>Chamada Empática:</strong> Resume o benefício principal de forma humanizada. 
+                                Foque na transformação que o conteúdo oferece para a vida da leitora. 
+                                Use palavras como "estratégias práticas", "sem se sobrecarregar", "equilíbrio".
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </FormLabel>
                       <FormControl>
                         <Textarea 
@@ -268,6 +307,20 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                       <FormLabel className="flex items-center gap-2">
                         <Image className="w-4 h-4" />
                         URL da Imagem (Unsplash recomendado)
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p className="text-sm">
+                                <strong>Imagem Estratégica:</strong> Use imagens que representem mães reais, 
+                                ambientes familiares acolhedores ou símbolos de organização. 
+                                Unsplash oferece fotos gratuitas de alta qualidade. Evite imagens muito "perfeitas".
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </FormLabel>
                       <FormControl>
                         <Input 
@@ -282,49 +335,137 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
 
                 {/* Templates Rápidos */}
                 <div className="border rounded-lg p-4">
-                  <h4 className="font-semibold mb-3">Templates da Estrutura Moderna:</h4>
+                  <div className="flex items-center gap-2 mb-3">
+                    <h4 className="font-semibold">Templates da Estrutura Moderna:</h4>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm">
+                          <p className="text-sm">
+                            <strong>Estrutura Comprovada:</strong> Templates baseados na metodologia Karooma 
+                            para posts de alto engajamento com mães ocupadas. Use em sequência para máximo impacto.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => insertTemplate("hook_emocional")}
-                    >
-                      Hook Emocional
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => insertTemplate("validacao")}
-                    >
-                      Validação + Dados
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => insertTemplate("estrategias")}
-                    >
-                      5 Estratégias
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => insertTemplate("reflexao")}
-                    >
-                      Reflexão Pessoal
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="col-span-2"
-                      onClick={() => insertTemplate("fechamento")}
-                    >
-                      Fechamento Empático
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertTemplate("hook_emocional")}
+                            className="flex items-center gap-2"
+                          >
+                            <Lightbulb className="w-3 h-3" />
+                            Hook Emocional
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs max-w-xs">
+                            <strong>Hook Emocional:</strong> Abertura que conecta emocionalmente com uma situação reconhecível. 
+                            Ex: "Eu sei que você conhece essa sensação..."
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertTemplate("validacao")}
+                            className="flex items-center gap-2"
+                          >
+                            <TrendingUp className="w-3 h-3" />
+                            Validação + Dados
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs max-w-xs">
+                            <strong>Validação + Dados:</strong> Estatística que valida o problema e mostra que ela não está sozinha. 
+                            Ex: "73% das mães relatam se sentir sobrecarregadas..."
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertTemplate("estrategias")}
+                            className="flex items-center gap-2"
+                          >
+                            <Target className="w-3 h-3" />
+                            5 Estratégias
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs max-w-xs">
+                            <strong>5 Estratégias:</strong> Soluções práticas numeradas e testadas. 
+                            Use emojis, títulos claros e benefícios concretos para cada estratégia.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => insertTemplate("reflexao")}
+                            className="flex items-center gap-2"
+                          >
+                            <Brain className="w-3 h-3" />
+                            Reflexão Pessoal
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs max-w-xs">
+                            <strong>Reflexão Pessoal:</strong> Compartilhamento autêntico da experiência pessoal. 
+                            Humaniza o conteúdo e cria conexão através da vulnerabilidade.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="col-span-2 flex items-center gap-2"
+                            onClick={() => insertTemplate("fechamento")}
+                          >
+                            <Heart className="w-3 h-3" />
+                            Fechamento Empático
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="text-xs max-w-xs">
+                            <strong>Fechamento Empático:</strong> Finalização memorável que reforça a autoestima 
+                            e cria senso de comunidade. Sempre termine com esperança e união.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
 
@@ -337,6 +478,20 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                       <FormLabel className="flex items-center gap-2">
                         <FileText className="w-4 h-4" />
                         Conteúdo (Markdown aceito)
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-sm">
+                              <p className="text-sm">
+                                <strong>Estrutura do Conteúdo:</strong> Use os templates em sequência para criar 
+                                posts de alto impacto. Markdown suportado: **negrito**, ## títulos, ### subtítulos. 
+                                Mantenha parágrafos curtos e use emojis para facilitar a leitura.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </FormLabel>
                       <FormControl>
                         <Textarea 
