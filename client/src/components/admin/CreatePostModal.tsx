@@ -122,11 +122,12 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
     onSuccess: (data) => {
       toast({
         title: "Post Criado!",
-        description: `"${data.title}" foi publicado com sucesso.`,
+        description: "Post foi publicado com sucesso.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/content/blog"] });
       setOpen(false);
       form.reset();
+      setPreviewMode(false);
     },
     onError: (error) => {
       toast({
