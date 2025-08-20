@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { PromptHelper } from "./PromptHelper";
 import { 
   PlusCircle, 
   Save, 
@@ -573,6 +574,16 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                         <li>• Reflexão pessoal autêntica</li>
                         <li>• Fechamento empático memorável</li>
                       </ul>
+                    </div>
+                    <div className="pt-4 border-t">
+                      <PromptHelper 
+                        trigger={
+                          <Button variant="outline" className="flex items-center gap-2">
+                            <Sparkles className="w-4 h-4" />
+                            Gerar com IA
+                          </Button>
+                        }
+                      />
                     </div>
                   </div>
                 )}
