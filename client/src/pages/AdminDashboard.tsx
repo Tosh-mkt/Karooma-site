@@ -19,6 +19,7 @@ import {
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
+import { NewProductModal } from "@/components/admin/NewProductModal";
 
 // Dashboard Overview Component
 function DashboardOverview() {
@@ -184,6 +185,7 @@ function ProductsManagement() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [newProductModalOpen, setNewProductModalOpen] = useState(false);
 
   const { data: products, isLoading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
@@ -237,11 +239,19 @@ function ProductsManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Gerenciar Produtos</h3>
-        <Button className="bg-gradient-to-r from-purple-500 to-pink-500">
+        <Button 
+          className="bg-gradient-to-r from-purple-500 to-pink-500"
+          onClick={() => setNewProductModalOpen(true)}
+        >
           <Plus className="w-4 h-4 mr-2" />
           Novo Produto
         </Button>
       </div>
+
+      <NewProductModal 
+        open={newProductModalOpen}
+        onOpenChange={setNewProductModalOpen}
+      />
 
       <div className="grid gap-4">
         {products?.map((product) => (
