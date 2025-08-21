@@ -131,6 +131,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/content/page/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const pageContent = await storage.getContentByTypeAndCategory("page", slug);
+      if (!pageContent || pageContent.length === 0) {
+        return res.status(404).json({ error: "Page content not found" });
+      }
+      res.json(pageContent[0]);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch page content" });
+    }
+  });
+
   app.get("/api/content/:id", async (req, res) => {
     try {
       const { id } = req.params;

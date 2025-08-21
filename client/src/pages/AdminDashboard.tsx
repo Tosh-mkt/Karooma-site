@@ -22,6 +22,7 @@ import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
 import { CreatePostModal } from "@/components/admin/CreatePostModal";
 import { EditPostModal } from "@/components/admin/EditPostModal";
+import { EditPageContentModal } from "@/components/admin/EditPageContentModal";
 
 // Dashboard Overview Component
 function DashboardOverview() {
@@ -606,7 +607,10 @@ function ContentManagement() {
                 Crie e gerencie posts com o padrão Karooma de alto impacto
               </CardDescription>
             </div>
-            <CreatePostModal />
+            <div className="flex gap-3">
+              <CreatePostModal />
+              <EditPageContentModal />
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -663,7 +667,7 @@ function ContentManagement() {
                         {post.description}
                       </p>
                       <p className="text-xs text-gray-500">
-                        Criado em {post.createdAt ? formatDate(post.createdAt) : "Data não disponível"}
+                        Criado em {post.createdAt ? formatDate(post.createdAt.toString()) : "Data não disponível"}
                       </p>
                     </div>
                     <div className="flex items-center space-x-2 ml-4">
