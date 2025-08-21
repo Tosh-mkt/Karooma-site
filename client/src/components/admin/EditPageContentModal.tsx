@@ -95,6 +95,7 @@ export function EditPageContentModal({ trigger }: EditPageContentModalProps) {
     queryKey: ["/api/content/page/about"],
     enabled: open,
     retry: false,
+    staleTime: 0, // Sempre buscar dados atualizados
   });
 
   const form = useForm<EditPageContentForm>({
@@ -119,7 +120,7 @@ export function EditPageContentModal({ trigger }: EditPageContentModalProps) {
 
   const updatePageContentMutation = useMutation({
     mutationFn: async (data: EditPageContentForm) => {
-      console.log("Atualizando conteúdo da página:", data);
+      console.log("Salvando conteúdo da página:", data);
       
       const contentData = {
         title: "Página Sobre",
@@ -133,6 +134,9 @@ export function EditPageContentModal({ trigger }: EditPageContentModalProps) {
       const method = pageContent ? "PUT" : "POST";
       const url = pageContent ? `/api/content/${(pageContent as any).id}` : "/api/content";
       
+      console.log("Enviando para:", url, "método:", method);
+      console.log("Dados:", contentData);
+      
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -140,10 +144,14 @@ export function EditPageContentModal({ trigger }: EditPageContentModalProps) {
       });
       
       if (!response.ok) {
-        throw new Error("Falha ao salvar conteúdo da página");
+        const errorText = await response.text();
+        console.error("Erro na resposta:", response.status, errorText);
+        throw new Error(`Falha ao salvar conteúdo: ${response.status} ${errorText}`);
       }
       
-      return await response.json();
+      const result = await response.json();
+      console.log("Resultado:", result);
+      return result;
     },
     onSuccess: () => {
       toast({

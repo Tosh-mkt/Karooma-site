@@ -157,6 +157,40 @@ export class MemStorage implements IStorage {
     return content;
   }
 
+  async updateContent(id: string, updateData: Partial<InsertContent>): Promise<Content> {
+    const existingContent = this.content.get(id);
+    if (!existingContent) {
+      throw new Error('Content not found');
+    }
+    
+    const updatedContent: Content = {
+      ...existingContent,
+      ...updateData,
+    };
+    
+    this.content.set(id, updatedContent);
+    return updatedContent;
+  }
+
+  async deleteContent(id: string): Promise<void> {
+    if (!this.content.has(id)) {
+      throw new Error('Content not found');
+    }
+    this.content.delete(id);
+  }
+
+  async getContentById(id: string): Promise<Content | undefined> {
+    return this.content.get(id);
+  }
+
+  async incrementContentViews(id: string): Promise<void> {
+    const content = this.content.get(id);
+    if (content) {
+      content.views = (content.views || 0) + 1;
+      this.content.set(id, content);
+    }
+  }
+
   // Product methods
   async getProduct(id: string): Promise<Product | undefined> {
     return this.products.get(id);
@@ -309,7 +343,7 @@ export class DatabaseStorage implements IStorage {
 
   async getContentByTypeAndCategory(type: string, category: string): Promise<Content[]> {
     return await db.select().from(content)
-      .where(eq(content.type, type))
+      .where(and(eq(content.type, type), eq(content.category, category)))
       .orderBy(desc(content.createdAt));
   }
 
