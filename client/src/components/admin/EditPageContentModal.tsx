@@ -50,6 +50,13 @@ const editPageContentSchema = z.object({
   valuesDescription: z.string().min(20, "Descrição dos valores é obrigatória"),
   helpTitle: z.string().min(5, "Título de como auxiliamos é obrigatório"),
   helpDescription: z.string().min(20, "Descrição de como auxiliamos é obrigatória"),
+  // Valores editáveis
+  valor1Title: z.string().min(3, "Título do Valor 1 é obrigatório"),
+  valor1Description: z.string().min(20, "Descrição do Valor 1 é obrigatória"),
+  valor2Title: z.string().min(3, "Título do Valor 2 é obrigatório"), 
+  valor2Description: z.string().min(20, "Descrição do Valor 2 é obrigatória"),
+  valor3Title: z.string().min(3, "Título do Valor 3 é obrigatório"),
+  valor3Description: z.string().min(20, "Descrição do Valor 3 é obrigatória"),
   // Seções "Como Te Auxiliamos"
   momentosMeusTitle: z.string().min(3, "Título Momentos Meus é obrigatório"),
   momentosMeusContent: z.string().min(20, "Conteúdo Momentos Meus é obrigatório"),
@@ -82,6 +89,13 @@ Sabemos que você carrega uma carga mental imensa - desde lembrar dos compromiss
 Não somos apenas mais um site. Somos uma comunidade que entende que por trás de cada mãe existe uma mulher que também precisa de cuidado, compreensão e momentos para si mesma.`,
   valuesTitle: "Nossos Valores",
   valuesDescription: "Cada decisão que tomamos é guiada por estes princípios fundamentais que definem quem somos e como queremos impactar sua vida.",
+  // Valores editáveis
+  valor1Title: "Empatia Genuína",
+  valor1Description: "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
+  valor2Title: "Soluções Práticas", 
+  valor2Description: "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
+  valor3Title: "Objetivos Claros",
+  valor3Description: "Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.",
   helpTitle: "Como Te Auxiliamos",
   helpDescription: "Oferecemos apoio prático e emocional através de diferentes canais, sempre com foco em soluções que realmente funcionam.",
   // Seções "Como Te Auxiliamos"
@@ -347,6 +361,115 @@ export function EditPageContentModal({ trigger }: EditPageContentModalProps) {
                         </FormItem>
                       )}
                     />
+                  </div>
+                </Card>
+
+                {/* Cards dos Valores */}
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    Cards dos Valores
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    {/* Valor 1 - Empatia Genuína */}
+                    <div className="border-l-4 border-pink-500 pl-4">
+                      <h4 className="font-medium text-pink-700 mb-3">Valor 1 - Empatia Genuína</h4>
+                      <div className="space-y-3">
+                        <FormField
+                          control={form.control}
+                          name="valor1Title"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Título</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="valor1Description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Descrição</FormLabel>
+                              <FormControl>
+                                <Textarea rows={3} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Valor 2 - Soluções Práticas */}
+                    <div className="border-l-4 border-purple-500 pl-4">
+                      <h4 className="font-medium text-purple-700 mb-3">Valor 2 - Soluções Práticas</h4>
+                      <div className="space-y-3">
+                        <FormField
+                          control={form.control}
+                          name="valor2Title"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Título</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="valor2Description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Descrição</FormLabel>
+                              <FormControl>
+                                <Textarea rows={3} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Valor 3 - Objetivos Claros */}
+                    <div className="border-l-4 border-green-500 pl-4">
+                      <h4 className="font-medium text-green-700 mb-3">Valor 3 - Objetivos Claros</h4>
+                      <div className="space-y-3">
+                        <FormField
+                          control={form.control}
+                          name="valor3Title"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Título</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="valor3Description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Descrição</FormLabel>
+                              <FormControl>
+                                <Textarea rows={3} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Card>
 

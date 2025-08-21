@@ -4,30 +4,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 
-// Dados padrão para valores e estatísticas (estáticos)
-const defaultValues = [
+// Dados padrão para valores (editáveis via CMS)
+const getDefaultValues = (content: PageContent) => [
   {
     icon: Heart,
-    title: "Empatia Genuína",
-    description: "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
+    title: content.valor1Title || "Empatia Genuína",
+    description: content.valor1Description || "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
     color: "from-pink-500 to-rose-500"
   },
   {
     icon: Lightbulb,
-    title: "Soluções Práticas",
-    description: "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
+    title: content.valor2Title || "Soluções Práticas",
+    description: content.valor2Description || "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
     color: "from-purple-500 to-indigo-500"
   },
   {
-    icon: Users,
-    title: "Comunidade Acolhedora",
-    description: "Criamos um espaço onde mães podem se conectar, compartilhar experiências e encontrar apoio mútuo sem julgamentos.",
-    color: "from-blue-500 to-cyan-500"
-  },
-  {
     icon: Target,
-    title: "Objetivos Claros",
-    description: "Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.",
+    title: content.valor3Title || "Objetivos Claros",
+    description: content.valor3Description || "Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.",
     color: "from-green-500 to-emerald-500"
   }
 ];
@@ -46,6 +40,12 @@ interface PageContent {
   missionTitle: string;
   missionContent: string;
   valuesTitle: string;
+  valor1Title?: string;
+  valor1Description?: string;
+  valor2Title?: string;
+  valor2Description?: string;
+  valor3Title?: string;
+  valor3Description?: string;
   helpSectionTitle?: string;
   helpSectionSubtitle?: string;
   momentosMeusTitle?: string;
@@ -67,6 +67,12 @@ const defaultContent: PageContent = {
   missionTitle: "Nossa Missão",
   missionContent: "Acreditamos que toda mãe merece sentir-se apoiada e confiante. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano familiar.\n\nSabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas e estratégias que funcionam.\n\nNão somos apenas mais um site. Somos uma comunidade que entende que por trás de cada mãe existe uma mulher que também precisa de cuidado, compreensão e momentos para si mesma.",
   valuesTitle: "Nossos Valores",
+  valor1Title: "Empatia Genuína",
+  valor1Description: "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
+  valor2Title: "Soluções Práticas", 
+  valor2Description: "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
+  valor3Title: "Objetivos Claros",
+  valor3Description: "Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.",
   closingTitle: "Você Não Está Sozinha",
   closingQuote: "Sua família tem sorte de ter você",
   closingDescription: "Esta é nossa mensagem principal: reconhecer o trabalho incrível que você faz todos os dias, mesmo nos momentos quando tudo parece caótico.",
@@ -193,7 +199,7 @@ export default function About() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
-            {defaultValues.map((value, index) => (
+            {getDefaultValues(content).map((value, index) => (
               <motion.div
                 key={value.title}
                 initial={{ y: 50, opacity: 0 }}
