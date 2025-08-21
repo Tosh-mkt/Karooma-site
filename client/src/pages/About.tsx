@@ -46,6 +46,14 @@ interface PageContent {
   missionTitle: string;
   missionContent: string;
   valuesTitle: string;
+  helpSectionTitle?: string;
+  helpSectionSubtitle?: string;
+  momentosMeusTitle?: string;
+  momentosMeusContent?: string;
+  facilitaVidaTitle?: string;
+  facilitaVidaContent?: string;
+  suporteContinuoTitle?: string;
+  suporteContinuoContent?: string;
   closingTitle: string;
   closingQuote: string;
   closingDescription: string;
@@ -236,11 +244,10 @@ export default function About() {
               <CardContent className="p-8 text-center">
                 <Coffee className="w-16 h-16 mx-auto mb-6 text-purple-600" />
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 font-fredoka">
-                  Momentos Meus
+                  {content.momentosMeusTitle || "Momentos Meus"}
                 </h3>
                 <p className="text-gray-600 leading-relaxed font-poppins">
-                  Artigos empáticos e estratégias práticas para organização familiar, 
-                  autocuidado e gestão da carga mental. Conteúdo criado por e para mães reais.
+                  {content.momentosMeusContent || "Artigos empáticos e estratégias práticas para organização familiar, autocuidado e gestão da carga mental. Conteúdo criado por e para mães reais."}
                 </p>
               </CardContent>
             </Card>
@@ -249,11 +256,10 @@ export default function About() {
               <CardContent className="p-8 text-center">
                 <Star className="w-16 h-16 mx-auto mb-6 text-blue-600" />
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 font-fredoka">
-                  Facilita a Vida
+                  {content.facilitaVidaTitle || "Facilita a Vida"}
                 </h3>
                 <p className="text-gray-600 leading-relaxed font-poppins">
-                  Produtos cuidadosamente avaliados que realmente facilitam o dia a dia familiar. 
-                  Cada recomendação é testada e aprovada por especialistas e mães.
+                  {content.facilitaVidaContent || "Produtos cuidadosamente avaliados que realmente facilitam o dia a dia familiar. Cada recomendação é testada e aprovada por especialistas e mães."}
                 </p>
               </CardContent>
             </Card>
@@ -262,11 +268,10 @@ export default function About() {
               <CardContent className="p-8 text-center">
                 <Shield className="w-16 h-16 mx-auto mb-6 text-green-600" />
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 font-fredoka">
-                  Suporte Contínuo
+                  {content.suporteContinuoTitle || "Suporte Contínuo"}
                 </h3>
                 <p className="text-gray-600 leading-relaxed font-poppins">
-                  Uma comunidade acolhedora onde você pode encontrar apoio, trocar experiências 
-                  e lembrar que não está sozinha nessa jornada.
+                  {content.suporteContinuoContent || "Uma comunidade acolhedora onde você pode encontrar apoio, trocar experiências e lembrar que não está sozinha nessa jornada."}
                 </p>
               </CardContent>
             </Card>

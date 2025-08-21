@@ -50,6 +50,13 @@ const editPageContentSchema = z.object({
   valuesDescription: z.string().min(20, "Descrição dos valores é obrigatória"),
   helpTitle: z.string().min(5, "Título de como auxiliamos é obrigatório"),
   helpDescription: z.string().min(20, "Descrição de como auxiliamos é obrigatória"),
+  // Seções "Como Te Auxiliamos"
+  momentosMeusTitle: z.string().min(3, "Título Momentos Meus é obrigatório"),
+  momentosMeusContent: z.string().min(20, "Conteúdo Momentos Meus é obrigatório"),
+  facilitaVidaTitle: z.string().min(3, "Título Facilita a Vida é obrigatório"),
+  facilitaVidaContent: z.string().min(20, "Conteúdo Facilita a Vida é obrigatório"),
+  suporteContinuoTitle: z.string().min(3, "Título Suporte Contínuo é obrigatório"),
+  suporteContinuoContent: z.string().min(20, "Conteúdo Suporte Contínuo é obrigatório"),
   impactTitle: z.string().min(5, "Título do impacto é obrigatório"),
   closingTitle: z.string().min(5, "Título de fechamento é obrigatório"),
   closingQuote: z.string().min(10, "Citação de fechamento é obrigatória"),
@@ -77,6 +84,13 @@ Não somos apenas mais um site. Somos uma comunidade que entende que por trás d
   valuesDescription: "Cada decisão que tomamos é guiada por estes princípios fundamentais que definem quem somos e como queremos impactar sua vida.",
   helpTitle: "Como Te Auxiliamos",
   helpDescription: "Oferecemos apoio prático e emocional através de diferentes canais, sempre com foco em soluções que realmente funcionam.",
+  // Seções "Como Te Auxiliamos"
+  momentosMeusTitle: "Momentos Meus",
+  momentosMeusContent: "Artigos empáticos e estratégias práticas para organização familiar, autocuidado e gestão da carga mental. Conteúdo criado por e para mães reais.",
+  facilitaVidaTitle: "Facilita a Vida",
+  facilitaVidaContent: "Produtos cuidadosamente avaliados que realmente facilitam o dia a dia familiar. Cada recomendação é testada e aprovada por especialistas e mães.",
+  suporteContinuoTitle: "Suporte Contínuo",
+  suporteContinuoContent: "Uma comunidade acolhedora onde você pode encontrar apoio, trocar experiências e lembrar que não está sozinha nessa jornada.",
   impactTitle: "Nosso Impacto",
   closingTitle: "Lembre-se Sempre",
   closingQuote: "Você está fazendo um trabalho incrível, mesmo quando parece que tudo está bagunçado.",
@@ -371,6 +385,115 @@ export function EditPageContentModal({ trigger }: EditPageContentModalProps) {
                         </FormItem>
                       )}
                     />
+                  </div>
+                </Card>
+
+                {/* Seções dos Cards de Auxílio */}
+                <Card className="p-4">
+                  <h3 className="font-semibold mb-4 flex items-center gap-2">
+                    <Coffee className="w-4 h-4" />
+                    Cards de Como Te Auxiliamos
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    {/* Momentos Meus */}
+                    <div className="border-l-4 border-purple-500 pl-4">
+                      <h4 className="font-medium text-purple-700 mb-3">Momentos Meus</h4>
+                      <div className="space-y-3">
+                        <FormField
+                          control={form.control}
+                          name="momentosMeusTitle"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Título</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="momentosMeusContent"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Conteúdo</FormLabel>
+                              <FormControl>
+                                <Textarea rows={3} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Facilita a Vida */}
+                    <div className="border-l-4 border-blue-500 pl-4">
+                      <h4 className="font-medium text-blue-700 mb-3">Facilita a Vida</h4>
+                      <div className="space-y-3">
+                        <FormField
+                          control={form.control}
+                          name="facilitaVidaTitle"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Título</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="facilitaVidaContent"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Conteúdo</FormLabel>
+                              <FormControl>
+                                <Textarea rows={3} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Suporte Contínuo */}
+                    <div className="border-l-4 border-green-500 pl-4">
+                      <h4 className="font-medium text-green-700 mb-3">Suporte Contínuo</h4>
+                      <div className="space-y-3">
+                        <FormField
+                          control={form.control}
+                          name="suporteContinuoTitle"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Título</FormLabel>
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="suporteContinuoContent"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Conteúdo</FormLabel>
+                              <FormControl>
+                                <Textarea rows={3} {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
                   </div>
                 </Card>
 
