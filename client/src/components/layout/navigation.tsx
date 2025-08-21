@@ -17,7 +17,7 @@ export default function Navigation() {
 
   const navItems = [
     { href: "/", label: "Início", id: "home" },
-    { href: "/videos", label: "Te Entendo", id: "videos" },
+    { href: "/videos", label: "Sobre", id: "videos" },
     { href: "/blog", label: "Momentos Meus", id: "blog" },
     { href: "/products", label: "Facilita a Vida", id: "products" },
   ];
