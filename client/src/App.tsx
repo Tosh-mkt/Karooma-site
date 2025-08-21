@@ -9,7 +9,7 @@ import About from "./pages/About";
 import Blog from "./pages/blog";
 import BlogPost from "./pages/blog-post";
 import Products from "./pages/products";
-import { Admin } from "./pages/Admin";
+
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
 import Favorites from "./pages/Favorites";
@@ -34,7 +34,7 @@ function Router() {
           <Route path="/products" component={Products} />
           <Route path="/favoritos" component={Favorites} />
 
-          <Route path="/admin" component={Admin} />
+
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/login" component={() => <TempLogin />} />
           <Route component={NotFound} />

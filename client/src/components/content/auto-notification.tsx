@@ -33,9 +33,9 @@ export function AutoNotification() {
       }
       
       if (event.type === 'batchComplete') {
-        // Invalidar cache quando lote N8N for concluído
+        // Invalidar cache quando evento for concluído
         queryClient.invalidateQueries({ queryKey: ["/api/products"] });
-        queryClient.invalidateQueries({ queryKey: ["/api/automation/products/status"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/products"] });
       }
     });
   }, [events, queryClient]);

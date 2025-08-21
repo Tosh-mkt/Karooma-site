@@ -51,5 +51,3 @@ Target persona: Cláudia - 39-year-old working mom of three (ages 10, 6, 2), see
 ## Third-party Integrations
 - **LLMs**: ChatGPT, Claude, Gemini (for content generation)
 - **Media**: YouTube, Unsplash
-- **Future Integration**: String.com (for automated affiliate products)
-- **Automation**: n8n (for product data extraction and syncing)

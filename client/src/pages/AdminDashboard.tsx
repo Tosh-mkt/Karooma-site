@@ -32,9 +32,7 @@ function DashboardOverview() {
     queryKey: ["/api/products"],
   });
 
-  const { data: automationStatus } = useQuery({
-    queryKey: ["/api/automation/products/status"],
-  });
+
 
   const stats = {
     totalProducts: products?.length || 0,
@@ -45,7 +43,7 @@ function DashboardOverview() {
       const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       return date > dayAgo;
     }).length || 0,
-    automationActive: isConnected
+    systemStatus: isConnected
   };
 
   return (
@@ -117,17 +115,17 @@ function DashboardOverview() {
           <Card className="glassmorphism border-0">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium flex items-center">
-                {stats.automationActive ? (
+                {stats.systemStatus ? (
                   <Wifi className="w-4 h-4 mr-2 text-green-500" />
                 ) : (
                   <WifiOff className="w-4 h-4 mr-2 text-red-500" />
                 )}
-                Automação N8N
+                Sistema
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats.automationActive ? "ATIVA" : "OFF"}
+                {stats.systemStatus ? "ONLINE" : "OFFLINE"}
               </div>
               <p className="text-xs text-muted-foreground">
                 Status em tempo real
@@ -165,7 +163,7 @@ function DashboardOverview() {
                     </div>
                   </div>
                   <Badge className="bg-green-100 text-green-700 text-xs">
-                    {event.type === 'newProduct' ? 'N8N' : 'BATCH'}
+                    {event.type === 'newProduct' ? 'NOVO' : 'EVENTO'}
                   </Badge>
                 </div>
               ))}
