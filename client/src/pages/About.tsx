@@ -1,42 +1,99 @@
 import { motion } from "framer-motion";
-import { Heart, Users, Target, Lightbulb, Shield, Star, Coffee, Home } from "lucide-react";
+import { Heart, Users, Target, Lightbulb, Shield, Star, Coffee, Home, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
+
+// Dados padrão para valores e estatísticas (estáticos)
+const defaultValues = [
+  {
+    icon: Heart,
+    title: "Empatia Genuína",
+    description: "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
+    color: "from-pink-500 to-rose-500"
+  },
+  {
+    icon: Lightbulb,
+    title: "Soluções Práticas",
+    description: "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
+    color: "from-purple-500 to-indigo-500"
+  },
+  {
+    icon: Users,
+    title: "Comunidade Acolhedora",
+    description: "Criamos um espaço onde mães podem se conectar, compartilhar experiências e encontrar apoio mútuo sem julgamentos.",
+    color: "from-blue-500 to-cyan-500"
+  },
+  {
+    icon: Target,
+    title: "Objetivos Claros",
+    description: "Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.",
+    color: "from-green-500 to-emerald-500"
+  }
+];
+
+const defaultStats = [
+  { number: "1000+", label: "Mães Ajudadas", icon: Users },
+  { number: "500+", label: "Produtos Avaliados", icon: Star },
+  { number: "200+", label: "Artigos Publicados", icon: Coffee },
+  { number: "95%", label: "Satisfação", icon: Heart }
+];
+
+// Interface para o conteúdo da página
+interface PageContent {
+  heroTitle: string;
+  heroSubtitle: string;
+  missionTitle: string;
+  missionContent: string;
+  valuesTitle: string;
+  closingTitle: string;
+  closingQuote: string;
+  closingDescription: string;
+  closingSignature: string;
+}
+
+// Conteúdo padrão caso não haja dados no CMS
+const defaultContent: PageContent = {
+  heroTitle: "Juntas, Sempre Encontramos um Jeito",
+  heroSubtitle: "A Karooma nasceu da compreensão profunda de que ser mãe é uma das experiências mais transformadoras e desafiadoras da vida. Estamos aqui para simplificar seu dia a dia e fortalecer sua confiança como mãe.",
+  missionTitle: "Nossa Missão",
+  missionContent: "Acreditamos que toda mãe merece sentir-se apoiada e confiante. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano familiar.\n\nSabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas e estratégias que funcionam.\n\nNão somos apenas mais um site. Somos uma comunidade que entende que por trás de cada mãe existe uma mulher que também precisa de cuidado, compreensão e momentos para si mesma.",
+  valuesTitle: "Nossos Valores",
+  closingTitle: "Você Não Está Sozinha",
+  closingQuote: "Sua família tem sorte de ter você",
+  closingDescription: "Esta é nossa mensagem principal: reconhecer o trabalho incrível que você faz todos os dias, mesmo nos momentos quando tudo parece caótico.",
+  closingSignature: "Equipe Karooma"
+};
 
 export default function About() {
-  const values = [
-    {
-      icon: Heart,
-      title: "Empatia Genuína",
-      description: "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
-      color: "from-pink-500 to-rose-500"
-    },
-    {
-      icon: Lightbulb,
-      title: "Soluções Práticas",
-      description: "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
-      color: "from-purple-500 to-indigo-500"
-    },
-    {
-      icon: Users,
-      title: "Comunidade Acolhedora",
-      description: "Criamos um espaço onde mães podem se conectar, compartilhar experiências e encontrar apoio mútuo sem julgamentos.",
-      color: "from-blue-500 to-cyan-500"
-    },
-    {
-      icon: Target,
-      title: "Objetivos Claros",
-      description: "Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.",
-      color: "from-green-500 to-emerald-500"
-    }
-  ];
+  // Buscar conteúdo dinâmico do CMS
+  const { data: pageContentData, isLoading } = useQuery({
+    queryKey: ["/api/content/page/about"],
+    retry: false,
+  });
 
-  const stats = [
-    { number: "1000+", label: "Mães Ajudadas", icon: Users },
-    { number: "500+", label: "Produtos Avaliados", icon: Star },
-    { number: "200+", label: "Artigos Publicados", icon: Coffee },
-    { number: "95%", label: "Satisfação", icon: Heart }
-  ];
+  // Processar conteúdo do CMS ou usar padrão
+  let content = defaultContent;
+  if (pageContentData && (pageContentData as any).content) {
+    try {
+      const parsedContent = JSON.parse((pageContentData as any).content);
+      content = { ...defaultContent, ...parsedContent };
+    } catch (error) {
+      console.error("Erro ao processar conteúdo da página:", error);
+    }
+  }
+
+  // Mostrar loading se ainda estiver carregando
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-purple-600" />
+          <p className="text-gray-600 font-poppins">Carregando conteúdo...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50">
@@ -57,11 +114,10 @@ export default function About() {
               Sobre a Karooma
             </Badge>
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-700 to-pink-600 bg-clip-text text-transparent mb-8 font-fredoka">
-              Juntas, Sempre Encontramos um Jeito
+              {content.heroTitle}
             </h1>
             <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed font-poppins">
-              A Karooma nasceu da compreensão profunda de que ser mãe é uma das experiências mais transformadoras e desafiadoras da vida. 
-              Estamos aqui para <strong>simplificar seu dia a dia</strong> e <strong>fortalecer sua confiança</strong> como mãe.
+              {content.heroSubtitle}
             </p>
           </motion.div>
         </div>
@@ -84,23 +140,12 @@ export default function About() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-8 font-fredoka">
-                Nossa Missão
+                {content.missionTitle}
               </h2>
               <div className="space-y-6 text-lg text-gray-700 font-poppins">
-                <p className="leading-relaxed">
-                  <strong>Acreditamos que toda mãe merece sentir-se apoiada e confiante.</strong> Nossa missão é 
-                  fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que 
-                  realmente fazem a diferença no cotidiano familiar.
-                </p>
-                <p className="leading-relaxed">
-                  Sabemos que você carrega uma <strong>carga mental</strong> imensa - desde lembrar dos compromissos 
-                  médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde 
-                  você encontra <strong>soluções testadas</strong> e <strong>estratégias que funcionam</strong>.
-                </p>
-                <p className="leading-relaxed">
-                  <strong>Não somos apenas mais um site</strong>. Somos uma comunidade que entende que por trás 
-                  de cada mãe existe uma mulher que também precisa de cuidado, compreensão e momentos para si mesma.
-                </p>
+                {content.missionContent.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="leading-relaxed" dangerouslySetInnerHTML={{ __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                ))}
               </div>
             </div>
             <div className="relative">
@@ -108,11 +153,10 @@ export default function About() {
                 <CardContent className="text-center space-y-6">
                   <Home className="w-20 h-20 mx-auto text-purple-600" />
                   <h3 className="text-2xl font-bold text-gray-800 font-fredoka">
-                    "Sua família tem sorte de ter você"
+                    "{content.closingQuote}"
                   </h3>
                   <p className="text-gray-600 italic font-poppins">
-                    Esta é nossa mensagem principal: reconhecer o trabalho incrível que você faz todos os dias, 
-                    mesmo nos momentos quando tudo parece caótico.
+                    {content.closingDescription}
                   </p>
                 </CardContent>
               </Card>
@@ -141,7 +185,7 @@ export default function About() {
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
-            {values.map((value, index) => (
+            {defaultValues.map((value, index) => (
               <motion.div
                 key={value.title}
                 initial={{ y: 50, opacity: 0 }}
@@ -244,7 +288,7 @@ export default function About() {
           </h2>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+            {defaultStats.map((stat, index) => (
               <motion.div
                 key={stat.label}
                 initial={{ scale: 0 }}
