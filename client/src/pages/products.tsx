@@ -65,9 +65,7 @@ export default function Products() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <h1 className="font-fredoka text-5xl gradient-text mb-4">
-              Facilita a Vida
-            </h1>
+            <h1 className="font-fredoka text-5xl gradient-text mb-4">Facilitam a Vida</h1>
             <p className="font-poppins text-xl text-gray-600">
               Produtos testados e aprovados que realmente fazem diferença no seu dia a dia
             </p>
