@@ -44,7 +44,7 @@ export default function Home() {
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              Mãe, Você Não Está Sozinha
+              Você Não Está Sozinha
             </motion.h2>
             
             <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">Sabemos como é correr atrás de três filhos, casa, trabalho... e ainda tentar sobrar um tempinho pra você.</p>
