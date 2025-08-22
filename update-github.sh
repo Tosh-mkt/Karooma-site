@@ -32,7 +32,7 @@ git push origin main
 # Verifica se deu certo
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✅ Sucesso! Mudanças enviadas para GitHub!${NC}"
-    echo -e "${GREEN}🔗 Repositório: https://github.com/Cosh-sk1/karooma-site${NC}"
+    echo -e "${GREEN}🔗 Repositório: https://github.com/Tosh-mkt/Karooma-site${NC}"
 else
     echo -e "${RED}❌ Erro ao enviar. Verifique sua conexão.${NC}"
 fi
