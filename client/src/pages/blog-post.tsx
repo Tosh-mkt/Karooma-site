@@ -31,6 +31,7 @@ export default function BlogPost() {
 
   const formatContent = (content: string) => {
     return content
+      .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="w-full max-w-2xl mx-auto rounded-lg shadow-md my-6" />')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/## (.*?)(\n|$)/g, '<h2 class="text-2xl font-bold text-gray-800 mt-8 mb-4 font-poppins">$1</h2>')
       .replace(/### (.*?)(\n|$)/g, '<h3 class="text-xl font-semibold text-gray-700 mt-6 mb-3 font-poppins">$1</h3>')
