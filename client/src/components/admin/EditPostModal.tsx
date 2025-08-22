@@ -556,10 +556,10 @@ export function EditPostModal({ postId, trigger }: EditPostModalProps) {
                         {form.watch("description") || "Descrição do post aparecerá aqui"}
                       </p>
                     </div>
-                    {form.watch("imageUrl") && (
+                    {form.watch("heroImageUrl") && (
                       <img
-                        src={form.watch("imageUrl")}
-                        alt="Preview"
+                        src={form.watch("heroImageUrl")}
+                        alt="Preview Hero"
                         className="w-full h-48 object-cover rounded-lg"
                       />
                     )}
