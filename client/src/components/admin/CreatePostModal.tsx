@@ -41,6 +41,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { PromptHelper } from "./PromptHelper";
+import { ImageUploader } from "./ImageUploader";
 import { 
   PlusCircle, 
   Save, 
@@ -484,24 +485,34 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        Conteúdo (Markdown aceito)
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-sm">
-                              <p className="text-sm">
-                                <strong>Estrutura do Conteúdo:</strong> Use os templates em sequência para criar 
-                                posts de alto impacto. Markdown suportado: **negrito**, ## títulos, ### subtítulos. 
-                                Mantenha parágrafos curtos e use emojis para facilitar a leitura.
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </FormLabel>
+                      <div className="flex items-center justify-between mb-2">
+                        <FormLabel className="flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          Conteúdo (Markdown aceito)
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-sm">
+                                <p className="text-sm">
+                                  <strong>Estrutura do Conteúdo:</strong> Use os templates em sequência para criar 
+                                  posts de alto impacto. Markdown suportado: **negrito**, ## títulos, ### subtítulos. 
+                                  Mantenha parágrafos curtos e use emojis para facilitar a leitura.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
+                        
+                        <ImageUploader 
+                          onImageInserted={(markdown) => {
+                            const currentContent = field.value || "";
+                            const newContent = currentContent + "\n\n" + markdown;
+                            field.onChange(newContent);
+                          }}
+                        />
+                      </div>
                       <FormControl>
                         <Textarea 
                           placeholder="Use os templates acima ou escreva seu conteúdo..."

@@ -39,6 +39,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { PromptHelper } from "./PromptHelper";
+import { ImageUploader } from "./ImageUploader";
 import { 
   Edit, 
   Save, 
@@ -445,10 +448,20 @@ export function EditPostModal({ postId, trigger }: EditPostModalProps) {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <FileText className="w-4 h-4" />
-                        Conteúdo (Markdown aceito)
-                      </FormLabel>
+                      <div className="flex items-center justify-between mb-2">
+                        <FormLabel className="flex items-center gap-2">
+                          <FileText className="w-4 h-4" />
+                          Conteúdo (Markdown aceito)
+                        </FormLabel>
+                        
+                        <ImageUploader 
+                          onImageInserted={(markdown) => {
+                            const currentContent = field.value || "";
+                            const newContent = currentContent + "\n\n" + markdown;
+                            field.onChange(newContent);
+                          }}
+                        />
+                      </div>
                       <FormControl>
                         <Textarea 
                           rows={12}
