@@ -10,11 +10,14 @@ import {
   type InsertNewsletterSubscription,
   type Favorite,
   type InsertFavorite,
+  type Page,
+  type InsertPage,
   users,
   content,
   products,
   newsletterSubscriptions,
-  favorites
+  favorites,
+  pages
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -55,6 +58,15 @@ export interface IStorage {
   addToFavorites(userId: string, productId: string): Promise<Favorite>;
   removeFromFavorites(userId: string, productId: string): Promise<void>;
   isFavorite(userId: string, productId: string): Promise<boolean>;
+  
+  // Pages methods
+  getAllPages(): Promise<Page[]>;
+  getPageById(id: string): Promise<Page | undefined>;
+  getPageBySlug(slug: string): Promise<Page | undefined>;
+  createPage(pageData: InsertPage): Promise<Page>;
+  updatePage(id: string, pageData: Partial<InsertPage>): Promise<Page | undefined>;
+  deletePage(id: string): Promise<void>;
+  getPublishedPages(): Promise<Page[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -488,6 +500,84 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     
     return result.length > 0;
+  }
+
+  // Pages methods
+  async getAllPages(): Promise<Page[]> {
+    const allPages = await db.select().from(pages).orderBy(desc(pages.updatedAt));
+    return allPages.map(page => ({
+      ...page,
+      sections: typeof page.sections === 'string' ? JSON.parse(page.sections) : page.sections
+    })) as Page[];
+  }
+
+  async getPageById(id: string): Promise<Page | undefined> {
+    const [page] = await db.select().from(pages).where(eq(pages.id, id));
+    if (!page) return undefined;
+    
+    return {
+      ...page,
+      sections: typeof page.sections === 'string' ? JSON.parse(page.sections) : page.sections
+    } as Page;
+  }
+
+  async getPageBySlug(slug: string): Promise<Page | undefined> {
+    const [page] = await db.select().from(pages).where(eq(pages.slug, slug));
+    if (!page) return undefined;
+    
+    return {
+      ...page,
+      sections: typeof page.sections === 'string' ? JSON.parse(page.sections) : page.sections
+    } as Page;
+  }
+
+  async createPage(pageData: InsertPage): Promise<Page> {
+    const [page] = await db.insert(pages).values({
+      ...pageData,
+      sections: JSON.stringify(pageData.sections || []),
+      updatedAt: new Date()
+    }).returning();
+    
+    return {
+      ...page,
+      sections: typeof page.sections === 'string' ? JSON.parse(page.sections) : page.sections
+    } as Page;
+  }
+
+  async updatePage(id: string, pageData: Partial<InsertPage>): Promise<Page | undefined> {
+    const [page] = await db
+      .update(pages)
+      .set({
+        ...pageData,
+        sections: pageData.sections ? JSON.stringify(pageData.sections) : undefined,
+        updatedAt: new Date()
+      })
+      .where(eq(pages.id, id))
+      .returning();
+    
+    if (!page) return undefined;
+    
+    return {
+      ...page,
+      sections: typeof page.sections === 'string' ? JSON.parse(page.sections) : page.sections
+    } as Page;
+  }
+
+  async deletePage(id: string): Promise<void> {
+    await db.delete(pages).where(eq(pages.id, id));
+  }
+
+  async getPublishedPages(): Promise<Page[]> {
+    const publishedPages = await db
+      .select()
+      .from(pages)
+      .where(eq(pages.isPublished, true))
+      .orderBy(desc(pages.updatedAt));
+    
+    return publishedPages.map(page => ({
+      ...page,
+      sections: typeof page.sections === 'string' ? JSON.parse(page.sections) : page.sections
+    })) as Page[];
   }
 }
 

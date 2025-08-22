@@ -13,6 +13,8 @@ import Products from "./pages/products";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
 import Favorites from "./pages/Favorites";
+import { PageManager } from "./pages/PageManager";
+import { PageBuilder } from "./pages/PageBuilder";
 
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
@@ -36,6 +38,9 @@ function Router() {
 
 
           <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route path="/admin/pages" component={PageManager} />
+          <Route path="/admin/pages/new" component={PageBuilder} />
+          <Route path="/admin/pages/:id/edit" component={PageBuilder} />
           <Route path="/login" component={() => <TempLogin />} />
           <Route component={NotFound} />
         </Switch>

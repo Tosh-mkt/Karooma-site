@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertPageSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
@@ -613,6 +613,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error checking favorite status:", error);
       res.status(500).json({ message: "Failed to check favorite status" });
+    }
+  });
+
+  // Pages management routes
+  app.get("/api/pages", isSessionAdmin, async (req, res) => {
+    try {
+      const pages = await storage.getAllPages();
+      res.json(pages);
+    } catch (error) {
+      console.error("Error fetching pages:", error);
+      res.status(500).json({ message: "Failed to fetch pages" });
+    }
+  });
+
+  app.get("/api/pages/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const page = await storage.getPageBySlug(slug);
+      
+      if (!page) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      
+      res.json(page);
+    } catch (error) {
+      console.error("Error fetching page:", error);
+      res.status(500).json({ message: "Failed to fetch page" });
+    }
+  });
+
+  app.post("/api/pages", isSessionAdmin, async (req, res) => {
+    try {
+      const validatedData = insertPageSchema.parse(req.body);
+      
+      // Verificar se slug já existe
+      const existingPage = await storage.getPageBySlug(validatedData.slug);
+      if (existingPage) {
+        return res.status(400).json({ message: "A page with this slug already exists" });
+      }
+      
+      const page = await storage.createPage(validatedData);
+      res.status(201).json(page);
+    } catch (error) {
+      console.error("Error creating page:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create page" });
+    }
+  });
+
+  app.put("/api/pages/:id", isSessionAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertPageSchema.parse(req.body);
+      
+      const page = await storage.updatePage(id, validatedData);
+      if (!page) {
+        return res.status(404).json({ message: "Page not found" });
+      }
+      
+      res.json(page);
+    } catch (error) {
+      console.error("Error updating page:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Validation error", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update page" });
+    }
+  });
+
+  app.delete("/api/pages/:id", isSessionAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deletePage(id);
+      res.json({ message: "Page deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting page:", error);
+      res.status(500).json({ message: "Failed to delete page" });
     }
   });
 

@@ -43,6 +43,33 @@ export const content = pgTable("content", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Nova tabela para páginas com estrutura de blocos/seções
+export const pages = pgTable("pages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug").notNull().unique(), // URL da página (ex: "sobre", "contato")
+  title: text("title").notNull(),
+  metaDescription: text("meta_description"),
+  layout: text("layout").notNull().default("default"), // Layout/template usado
+  sections: text("sections").notNull().default("[]"), // JSON array de seções
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tabela para seções reutilizáveis
+export const sections = pgTable("sections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(), // Nome da seção
+  type: text("type").notNull(), // hero, content, gallery, testimonials, etc.
+  category: text("category"), // Para agrupar seções similares
+  template: text("template").notNull(), // Estrutura HTML/componente
+  defaultData: text("default_data").notNull().default("{}"), // Dados padrão em JSON
+  schema: text("schema").notNull().default("{}"), // Schema de validação dos dados
+  preview: text("preview"), // URL para preview da seção
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const products = pgTable("products", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
@@ -101,6 +128,17 @@ export const insertContentSchema = createInsertSchema(content).omit({
   createdAt: true,
 });
 
+export const insertPageSchema = createInsertSchema(pages).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSectionSchema = createInsertSchema(sections).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertProductSchema = createInsertSchema(products).omit({
   id: true,
   createdAt: true,
@@ -115,6 +153,10 @@ export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Content = typeof content.$inferSelect;
 export type InsertContent = z.infer<typeof insertContentSchema>;
+export type Page = typeof pages.$inferSelect;
+export type InsertPage = z.infer<typeof insertPageSchema>;
+export type Section = typeof sections.$inferSelect;
+export type InsertSection = z.infer<typeof insertSectionSchema>;
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;

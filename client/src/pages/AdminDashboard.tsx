@@ -501,7 +501,33 @@ export function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="pages">
-            <PageManagement />
+            <Card className="glassmorphism border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Layout className="w-5 h-5 mr-2" />
+                  Gerenciamento de Páginas
+                </CardTitle>
+                <CardDescription>
+                  Construa páginas personalizadas com o editor visual drag-and-drop
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Layout className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                  <h3 className="text-lg font-semibold mb-2">Editor Visual de Páginas</h3>
+                  <p className="text-gray-600 mb-6">
+                    Crie páginas personalizadas com seções arrastar-e-soltar, templates prontos e editor visual em tempo real.
+                  </p>
+                  <Button 
+                    onClick={() => window.location.href = '/admin/pages'}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600"
+                  >
+                    <Layout className="w-4 h-4 mr-2" />
+                    Abrir Gerenciador
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="analytics">
