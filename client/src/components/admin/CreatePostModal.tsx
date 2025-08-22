@@ -464,7 +464,7 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                         
                         <ImageUploader 
                           onImageInserted={(url) => {
-                            field.onChange(url.replace(/!\[.*?\]\((.*?)\)/, '$1'));
+                            field.onChange(url);
                           }}
                         />
                       </div>
@@ -493,7 +493,7 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                         
                         <ImageUploader 
                           onImageInserted={(url) => {
-                            field.onChange(url.replace(/!\[.*?\]\((.*?)\)/, '$1'));
+                            field.onChange(url);
                           }}
                         />
                       </div>

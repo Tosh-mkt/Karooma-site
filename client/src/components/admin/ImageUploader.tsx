@@ -87,11 +87,11 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
 
       const aclData = await aclResponse.json();
 
-      // Criar markdown da imagem usando a URL normalizada
-      const imageMarkdown = `![${file.name}](${aclData.objectPath})`;
+      // Retornar a URL completa para uso direto nos campos de imagem
+      const imageUrl = `https://${window.location.hostname}${aclData.objectPath}`;
       
-      // Inserir no editor
-      onImageInserted(imageMarkdown);
+      // Inserir a URL diretamente (não markdown)
+      onImageInserted(imageUrl);
       
       toast({
         title: "Imagem enviada com sucesso!",
