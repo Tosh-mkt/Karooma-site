@@ -65,6 +65,8 @@ const createPostSchema = z.object({
   content: z.string().min(100, "Conteúdo deve ter pelo menos 100 caracteres"),
   category: z.string().min(1, "Categoria é obrigatória"),
   imageUrl: z.string().url("URL da imagem deve ser válida").optional().or(z.literal("")),
+  heroImageUrl: z.string().url("URL da imagem deve ser válida").optional().or(z.literal("")),
+  footerImageUrl: z.string().url("URL da imagem deve ser válida").optional().or(z.literal("")),
   featured: z.boolean().default(false),
 });
 
@@ -108,6 +110,8 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
       content: "",
       category: "",
       imageUrl: "",
+      heroImageUrl: "",
+      footerImageUrl: "",
       featured: false,
     },
   });
@@ -119,6 +123,8 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
         ...data,
         type: "blog",
         imageUrl: data.imageUrl || null,
+        heroImageUrl: data.heroImageUrl || null,
+        footerImageUrl: data.footerImageUrl || null,
       });
       console.log("Resposta da API:", response);
       return await response.json();
@@ -469,6 +475,64 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                       <FormControl>
                         <Input
                           placeholder="https://images.unsplash.com/photo-... ou faça upload"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Imagem Hero */}
+                <FormField
+                  control={form.control}
+                  name="heroImageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between mb-2">
+                        <FormLabel className="flex items-center gap-2">
+                          <Image className="w-4 h-4" />
+                          Imagem do Início (Hero)
+                        </FormLabel>
+                        
+                        <ImageUploader 
+                          onImageInserted={(url) => {
+                            field.onChange(url.replace(/!\[.*?\]\((.*?)\)/, '$1'));
+                          }}
+                        />
+                      </div>
+                      <FormControl>
+                        <Input
+                          placeholder="URL da imagem que aparecerá no início do post"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Imagem Footer */}
+                <FormField
+                  control={form.control}
+                  name="footerImageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between mb-2">
+                        <FormLabel className="flex items-center gap-2">
+                          <Image className="w-4 h-4" />
+                          Imagem do Final (Footer)
+                        </FormLabel>
+                        
+                        <ImageUploader 
+                          onImageInserted={(url) => {
+                            field.onChange(url.replace(/!\[.*?\]\((.*?)\)/, '$1'));
+                          }}
+                        />
+                      </div>
+                      <FormControl>
+                        <Input
+                          placeholder="URL da imagem que aparecerá no final do post"
                           {...field}
                         />
                       </FormControl>

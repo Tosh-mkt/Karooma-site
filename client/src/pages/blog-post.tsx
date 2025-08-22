@@ -146,8 +146,8 @@ export default function BlogPost() {
           </div>
         </motion.div>
 
-        {/* Imagem Principal */}
-        {post.imageUrl && (
+        {/* Imagem Hero (prioridade) ou Imagem Principal (fallback) */}
+        {(post.heroImageUrl || post.imageUrl) && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -155,7 +155,7 @@ export default function BlogPost() {
             className="mb-12"
           >
             <img
-              src={post.imageUrl}
+              src={post.heroImageUrl || post.imageUrl}
               alt={post.title}
               className="w-full h-64 lg:h-96 object-cover rounded-2xl shadow-2xl"
             />
@@ -176,6 +176,22 @@ export default function BlogPost() {
             }}
           />
         </motion.div>
+
+        {/* Imagem Footer */}
+        {post.footerImageUrl && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mb-12"
+          >
+            <img
+              src={post.footerImageUrl}
+              alt="Imagem de fechamento do post"
+              className="w-full h-64 lg:h-80 object-cover rounded-2xl shadow-2xl"
+            />
+          </motion.div>
+        )}
 
         {/* Call to Action */}
         <motion.div

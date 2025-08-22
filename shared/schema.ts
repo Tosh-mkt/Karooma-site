@@ -34,6 +34,8 @@ export const content = pgTable("content", {
   type: text("type").notNull(), // video, blog, featured
   category: text("category"),
   imageUrl: text("image_url"),
+  heroImageUrl: text("hero_image_url"), // Imagem no início do post
+  footerImageUrl: text("footer_image_url"), // Imagem no final do post
   videoUrl: text("video_url"),
   youtubeId: text("youtube_id"),
   views: integer("views").default(0),
