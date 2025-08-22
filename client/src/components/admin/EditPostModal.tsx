@@ -371,12 +371,25 @@ export function EditPostModal({ postId, trigger }: EditPostModalProps) {
                   name="imageUrl"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Image className="w-4 h-4" />
-                        URL da Imagem
-                      </FormLabel>
+                      <div className="flex items-center justify-between mb-2">
+                        <FormLabel className="flex items-center gap-2">
+                          <Image className="w-4 h-4" />
+                          URL da Imagem
+                        </FormLabel>
+                        
+                        <ImageUploader 
+                          onImageInserted={(markdown) => {
+                            const currentContent = form.getValues("content") || "";
+                            const newContent = currentContent + "\n\n" + markdown;
+                            form.setValue("content", newContent);
+                          }}
+                        />
+                      </div>
                       <FormControl>
-                        <Input placeholder="https://images.unsplash.com/photo-..." {...field} />
+                        <Input 
+                          placeholder="https://images.unsplash.com/photo-... ou faça upload"
+                          {...field} 
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -448,20 +461,10 @@ export function EditPostModal({ postId, trigger }: EditPostModalProps) {
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex items-center justify-between mb-2">
-                        <FormLabel className="flex items-center gap-2">
-                          <FileText className="w-4 h-4" />
-                          Conteúdo (Markdown aceito)
-                        </FormLabel>
-                        
-                        <ImageUploader 
-                          onImageInserted={(markdown) => {
-                            const currentContent = field.value || "";
-                            const newContent = currentContent + "\n\n" + markdown;
-                            field.onChange(newContent);
-                          }}
-                        />
-                      </div>
+                      <FormLabel className="flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Conteúdo (Markdown aceito)
+                      </FormLabel>
                       <FormControl>
                         <Textarea 
                           rows={12}

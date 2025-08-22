@@ -30,9 +30,10 @@ Target persona: Cláudia - 39-year-old working mom of three (ages 10, 6, 2), see
 - **Migrations**: Drizzle Kit
 
 ## Key Components
-- **Content Management System**: Supports videos, blog posts, featured content. Includes an administrative panel, LLM integration for automated content generation (ChatGPT, Claude, Gemini), a 5-part template system for content structure, a prompt generator, and compartmentalized LLM output. Features category-based organization, YouTube embedding, Unsplash image integration, view tracking, real-time preview, and tooltip guidance.
+- **Content Management System**: Supports videos, blog posts, featured content. Includes an administrative panel, LLM integration for automated content generation (ChatGPT, Claude, Gemini), a 5-part template system for content structure, a prompt generator, and compartmentalized LLM output. Features category-based organization, YouTube embedding, Unsplash image integration, view tracking, real-time preview, and tooltip guidance. **NEW**: Direct image upload system integrated with Google Cloud Storage for blog posts.
 - **Affiliate Product System**: Dynamic product cards with pricing, ratings, discounts. Organized categorization, external link tracking for affiliate commissions, and featured product promotion.
 - **Newsletter System**: Email capture and toast notifications for user feedback.
+- **Image Upload System**: Google Cloud Storage integration with direct upload functionality. Features file validation (5MB max, images only), automatic markdown insertion into blog content, and public ACL configuration for web serving.
 
 # External Dependencies
 

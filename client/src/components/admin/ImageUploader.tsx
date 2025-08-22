@@ -45,8 +45,19 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
 
     try {
       // Obter URL de upload
-      const uploadResponse = await apiRequest("/api/objects/upload", "POST");
-      const uploadURL = (uploadResponse as any).uploadURL;
+      const uploadResponse = await fetch("/api/objects/upload", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Erro ao obter URL de upload");
+      }
+
+      const uploadData = await uploadResponse.json();
+      const uploadURL = uploadData.uploadURL;
 
       // Fazer upload direto para o storage
       const uploadResult = await fetch(uploadURL, {

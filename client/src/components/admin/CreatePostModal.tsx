@@ -308,40 +308,7 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                   />
                 </div>
 
-                {/* URL da Imagem */}
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="flex items-center gap-2">
-                        <Image className="w-4 h-4" />
-                        URL da Imagem (Unsplash recomendado)
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
-                            </TooltipTrigger>
-                            <TooltipContent className="max-w-xs">
-                              <p className="text-sm">
-                                <strong>Imagem Estratégica:</strong> Use imagens que representem mães reais, 
-                                ambientes familiares acolhedores ou símbolos de organização. 
-                                Unsplash oferece fotos gratuitas de alta qualidade. Evite imagens muito "perfeitas".
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </FormLabel>
-                      <FormControl>
-                        <Input 
-                          placeholder="https://images.unsplash.com/photo-..."
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
 
                 {/* Templates Rápidos */}
                 <div className="border rounded-lg p-4">
@@ -479,40 +446,61 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                   </div>
                 </div>
 
+                {/* URL da Imagem */}
+                <FormField
+                  control={form.control}
+                  name="imageUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center justify-between mb-2">
+                        <FormLabel className="flex items-center gap-2">
+                          <Image className="w-4 h-4" />
+                          URL da Imagem
+                        </FormLabel>
+                        
+                        <ImageUploader 
+                          onImageInserted={(markdown) => {
+                            const currentContent = form.getValues("content") || "";
+                            const newContent = currentContent + "\n\n" + markdown;
+                            form.setValue("content", newContent);
+                          }}
+                        />
+                      </div>
+                      <FormControl>
+                        <Input
+                          placeholder="https://images.unsplash.com/photo-... ou faça upload"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 {/* Conteúdo */}
                 <FormField
                   control={form.control}
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex items-center justify-between mb-2">
-                        <FormLabel className="flex items-center gap-2">
-                          <FileText className="w-4 h-4" />
-                          Conteúdo (Markdown aceito)
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-sm">
-                                <p className="text-sm">
-                                  <strong>Estrutura do Conteúdo:</strong> Use os templates em sequência para criar 
-                                  posts de alto impacto. Markdown suportado: **negrito**, ## títulos, ### subtítulos. 
-                                  Mantenha parágrafos curtos e use emojis para facilitar a leitura.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </FormLabel>
-                        
-                        <ImageUploader 
-                          onImageInserted={(markdown) => {
-                            const currentContent = field.value || "";
-                            const newContent = currentContent + "\n\n" + markdown;
-                            field.onChange(newContent);
-                          }}
-                        />
-                      </div>
+                      <FormLabel className="flex items-center gap-2">
+                        <FileText className="w-4 h-4" />
+                        Conteúdo (Markdown aceito)
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <HelpCircle className="w-4 h-4 text-gray-400 hover:text-purple-600" />
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-sm">
+                              <p className="text-sm">
+                                <strong>Estrutura do Conteúdo:</strong> Use os templates em sequência para criar 
+                                posts de alto impacto. Markdown suportado: **negrito**, ## títulos, ### subtítulos. 
+                                Mantenha parágrafos curtos e use emojis para facilitar a leitura.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </FormLabel>
                       <FormControl>
                         <Textarea 
                           placeholder="Use os templates acima ou escreva seu conteúdo..."
