@@ -28,6 +28,11 @@ export default function Home() {
     queryKey: ["/api/content/blog", "latest"],
   });
 
+  // Buscar conteúdo editável da página inicial
+  const { data: heroContent } = useQuery<Content>({
+    queryKey: ["/api/content/page/homepage-hero"],
+  });
+
   return (
     <div className="pt-20">
       {/* Hero Section */}
@@ -44,13 +49,15 @@ export default function Home() {
               animate={{ y: [-5, 5, -5] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              Você Não Está Sozinha
+              {heroContent?.title || "Você Não Está Sozinha"}
             </motion.h2>
             
-            <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">Sabemos como é correr atrás de três filhos, casa, trabalho... e ainda tentar sobrar um tempinho pra você.</p>
+            <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
+              {heroContent?.description || "Sabemos como é correr atrás de três filhos, casa, trabalho... e ainda tentar sobrar um tempinho pra você."}
+            </p>
             
             <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-              Aqui você encontra produtos que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️
+              {heroContent?.content || "Aqui você encontra produtos que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️"}
             </p>
             
             <motion.div 

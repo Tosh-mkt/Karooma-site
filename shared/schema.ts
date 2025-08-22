@@ -31,7 +31,7 @@ export const content = pgTable("content", {
   title: text("title").notNull(),
   description: text("description"),
   content: text("content"),
-  type: text("type").notNull(), // video, blog, featured
+  type: text("type").notNull(), // video, blog, featured, page
   category: text("category"),
   imageUrl: text("image_url"),
   heroImageUrl: text("hero_image_url"), // Imagem no início do post

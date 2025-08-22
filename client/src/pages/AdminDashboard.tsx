@@ -461,7 +461,7 @@ export function AdminDashboard() {
         </motion.div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 glassmorphism">
+          <TabsList className="grid w-full grid-cols-6 glassmorphism">
             <TabsTrigger value="dashboard" className="flex items-center space-x-2">
               <BarChart3 className="w-4 h-4" />
               <span>Dashboard</span>
@@ -474,12 +474,16 @@ export function AdminDashboard() {
               <Edit className="w-4 h-4" />
               <span>Conteúdo</span>
             </TabsTrigger>
+            <TabsTrigger value="pages" className="flex items-center space-x-2">
+              <Settings className="w-4 h-4" />
+              <span>Páginas</span>
+            </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center space-x-2">
               <TrendingUp className="w-4 h-4" />
               <span>Analytics</span>
             </TabsTrigger>
             <TabsTrigger value="settings" className="flex items-center space-x-2">
-              <Settings className="w-4 h-4" />
+              <Shield className="w-4 h-4" />
               <span>Configurações</span>
             </TabsTrigger>
           </TabsList>
@@ -494,6 +498,10 @@ export function AdminDashboard() {
 
           <TabsContent value="content">
             <ContentManagement />
+          </TabsContent>
+
+          <TabsContent value="pages">
+            <PageManagement />
           </TabsContent>
 
           <TabsContent value="analytics">
@@ -746,6 +754,106 @@ function ContentManagement() {
           </Card>
         </div>
       )}
+    </div>
+  );
+}
+
+// Page Management Component
+function PageManagement() {
+  const { data: heroContent, isLoading } = useQuery<Content>({
+    queryKey: ["/api/content/page/homepage-hero"],
+  });
+
+  if (isLoading) {
+    return (
+      <Card className="glassmorphism border-0">
+        <CardContent className="p-8">
+          <div className="flex items-center justify-center">
+            <RefreshCw className="w-6 h-6 animate-spin mr-2" />
+            <span>Carregando conteúdo...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card className="glassmorphism border-0">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="w-5 h-5" />
+                Gestão de Páginas Estáticas
+              </CardTitle>
+              <CardDescription>
+                Edite textos e conteúdos das páginas principais do site
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <Card className="border border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <span>Página Inicial - Hero</span>
+                  <Badge variant="secondary">homepage-hero</Badge>
+                </CardTitle>
+                <CardDescription>
+                  Texto principal que aparece no topo da página inicial
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {heroContent ? (
+                  <>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-gray-700">Título Principal:</Label>
+                      <p className="text-lg font-bold text-gray-900 bg-white/50 p-3 rounded-lg">
+                        {heroContent.title}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-gray-700">Subtítulo:</Label>
+                      <p className="text-base text-gray-800 bg-white/50 p-3 rounded-lg">
+                        {heroContent.description}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-gray-700">Texto de Apoio:</Label>
+                      <p className="text-base text-gray-700 bg-white/50 p-3 rounded-lg">
+                        {heroContent.content}
+                      </p>
+                    </div>
+                    <div className="flex justify-end pt-2">
+                      <EditPageContentModal 
+                        pageContent={heroContent}
+                        trigger={
+                          <Button variant="default" size="sm">
+                            <Edit className="w-4 h-4 mr-2" />
+                            Editar Textos
+                          </Button>
+                        }
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-center py-8">
+                    <Settings className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                      Conteúdo não encontrado
+                    </h3>
+                    <p className="text-gray-500 mb-6">
+                      O conteúdo da página inicial ainda não foi criado
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
