@@ -615,7 +615,6 @@ function ContentManagement() {
             </div>
             <div className="flex gap-3">
               <CreatePostModal />
-              <EditPageContentModal />
             </div>
           </div>
         </CardHeader>

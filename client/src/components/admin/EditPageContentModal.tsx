@@ -30,6 +30,11 @@ export function EditPageContentModal({ pageContent, trigger }: EditPageContentMo
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Proteção contra pageContent undefined
+  if (!pageContent) {
+    return null;
+  }
+
   const form = useForm<PageContentForm>({
     resolver: zodResolver(pageContentSchema),
     defaultValues: {
