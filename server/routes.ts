@@ -5,6 +5,7 @@ import { insertContentSchema, insertProductSchema, insertNewsletterSchema, inser
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
+import { setupGoogleAuth } from "./googleAuth";
 import { isSessionAuthenticated, isSessionAdmin } from "./middleware";
 import {
   ObjectStorageService,
@@ -14,6 +15,9 @@ import {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication
   await setupAuth(app);
+  
+  // Setup Google OAuth
+  setupGoogleAuth(app);
 
   // Object Storage routes
   app.get("/objects/:objectPath(*)", async (req, res) => {

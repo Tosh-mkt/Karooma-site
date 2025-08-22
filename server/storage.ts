@@ -26,6 +26,9 @@ import { eq, desc, and } from "drizzle-orm";
 export interface IStorage {
   // User methods
   getUser(id: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: string, data: Partial<InsertUser>): Promise<User>;
   upsertUser(user: UpsertUser): Promise<User>;
   makeUserAdmin(userId: string): Promise<User>;
   
@@ -88,6 +91,38 @@ export class MemStorage implements IStorage {
   // User methods
   async getUser(id: string): Promise<User | undefined> {
     return this.users.get(id);
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    for (const user of this.users.values()) {
+      if (user.email === email) {
+        return user;
+      }
+    }
+    return undefined;
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const id = userData.id || randomUUID();
+    const user: User = {
+      ...userData,
+      id,
+      isAdmin: userData.isAdmin || false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.users.set(id, user);
+    return user;
+  }
+
+  async updateUser(id: string, data: Partial<InsertUser>): Promise<User> {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const updatedUser = { ...user, ...data, updatedAt: new Date() };
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
@@ -304,6 +339,28 @@ export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async createUser(userData: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(userData)
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: string, data: Partial<InsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(users.id, id))
+      .returning();
     return user;
   }
 
