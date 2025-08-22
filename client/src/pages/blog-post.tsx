@@ -155,9 +155,13 @@ export default function BlogPost() {
             className="mb-12"
           >
             <img
-              src={post.heroImageUrl || post.imageUrl}
+              src={post.heroImageUrl || post.imageUrl || ""}
               alt={post.title}
               className="w-full h-64 lg:h-96 object-cover rounded-2xl shadow-2xl"
+              onError={(e) => {
+                console.error("Erro ao carregar imagem hero:", e);
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
           </motion.div>
         )}
@@ -186,9 +190,13 @@ export default function BlogPost() {
             className="mb-12"
           >
             <img
-              src={post.footerImageUrl}
+              src={post.footerImageUrl || ""}
               alt="Imagem de fechamento do post"
               className="w-full h-64 lg:h-80 object-cover rounded-2xl shadow-2xl"
+              onError={(e) => {
+                console.error("Erro ao carregar imagem footer:", e);
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
           </motion.div>
         )}
@@ -237,9 +245,13 @@ export default function BlogPost() {
                   <Card className="glassmorphism border-0 hover:scale-105 transition-all duration-300 cursor-pointer">
                     <CardContent className="p-0">
                       <img
-                        src={relatedPost.imageUrl || "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200"}
+                        src={relatedPost.heroImageUrl || relatedPost.imageUrl || "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200"}
                         alt={relatedPost.title}
                         className="w-full h-40 object-cover rounded-t-xl"
+                        onError={(e) => {
+                          console.error("Erro ao carregar imagem do post relacionado:", relatedPost.id);
+                          (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=200";
+                        }}
                       />
                       <div className="p-4">
                         <Badge className="bg-blue-100 text-blue-700 text-xs mb-2">
