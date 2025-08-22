@@ -153,6 +153,7 @@ export function EditPostModal({ postId, trigger }: EditPostModalProps) {
         description: "As alterações foram salvas com sucesso.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/content/blog"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/content/featured"] });
       queryClient.invalidateQueries({ queryKey: [`/api/content/${postId}`] });
       setOpen(false);
       setPreviewMode(false);

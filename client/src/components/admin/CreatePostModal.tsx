@@ -133,6 +133,7 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
         description: "Post foi publicado com sucesso.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/content/blog"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/content/featured"] });
       setOpen(false);
       form.reset();
       setPreviewMode(false);
