@@ -4,6 +4,7 @@ Karooma is a modern, full-stack content and affiliate website built with React, 
 # User Preferences
 Preferred communication style: Simple, everyday language.
 Target persona: Cláudia - 39-year-old working mom of three (ages 10, 6, 2), seeks practical solutions for daily chaos, values empathetic and solution-focused content that helps simplify family life and allows moments for self-care.
+Image management: Two independent image fields per blog post - Hero (beginning) and Footer (end) images only, no third general image field needed.
 
 # System Architecture
 
@@ -30,10 +31,10 @@ Target persona: Cláudia - 39-year-old working mom of three (ages 10, 6, 2), see
 - **Migrations**: Drizzle Kit
 
 ## Key Components
-- **Content Management System**: Supports videos, blog posts, featured content. Includes an administrative panel, LLM integration for automated content generation (ChatGPT, Claude, Gemini), a 5-part template system for content structure, a prompt generator, and compartmentalized LLM output. Features category-based organization, YouTube embedding, Unsplash image integration, view tracking, real-time preview, and tooltip guidance. **NEW**: Direct image upload system integrated with Google Cloud Storage for blog posts.
+- **Content Management System**: Supports videos, blog posts, featured content. Includes an administrative panel, LLM integration for automated content generation (ChatGPT, Claude, Gemini), a 5-part template system for content structure, a prompt generator, and compartmentalized LLM output. Features category-based organization, YouTube embedding, Unsplash image integration, view tracking, real-time preview, and tooltip guidance. **UPDATED**: Two-image system for blog posts with heroImageUrl (beginning) and footerImageUrl (end) fields, each with independent upload and URL options.
 - **Affiliate Product System**: Dynamic product cards with pricing, ratings, discounts. Organized categorization, external link tracking for affiliate commissions, and featured product promotion.
 - **Newsletter System**: Email capture and toast notifications for user feedback.
-- **Image Upload System**: Google Cloud Storage integration with direct upload functionality. Features file validation (5MB max, images only), automatic markdown insertion into blog content, and public ACL configuration for web serving.
+- **Image Upload System**: Google Cloud Storage integration with direct upload functionality. Features file validation (5MB max, images only), automatic markdown insertion into blog content, and public ACL configuration for web serving. **REFINED**: Blog posts now support exactly two independent image fields - Hero image (displays at post beginning) and Footer image (displays at post end), each with separate upload/URL options for enhanced visual storytelling.
 
 # External Dependencies
 
