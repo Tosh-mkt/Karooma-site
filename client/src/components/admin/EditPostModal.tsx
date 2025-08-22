@@ -97,7 +97,7 @@ export function EditPostModal({ postId, trigger }: EditPostModalProps) {
   const { data: post, isLoading } = useQuery({
     queryKey: [`/api/content/${postId}`],
     enabled: open,
-  });
+  }) as { data: any, isLoading: boolean };
 
   const form = useForm<EditPostForm>({
     resolver: zodResolver(editPostSchema),

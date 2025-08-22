@@ -87,7 +87,7 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
 
       const aclData = await aclResponse.json();
 
-      // Criar markdown da imagem
+      // Criar markdown da imagem usando a URL correta
       const imageMarkdown = `![${file.name}](${aclData.imageURL})`;
       
       // Inserir no editor
