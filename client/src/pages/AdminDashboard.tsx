@@ -16,7 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { isForbiddenError, isUnauthorizedError } from "@/lib/authUtils";
 import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
-  Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn
+  Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
