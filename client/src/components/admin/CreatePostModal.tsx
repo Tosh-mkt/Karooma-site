@@ -64,7 +64,6 @@ const createPostSchema = z.object({
   description: z.string().min(20, "Descrição deve ter pelo menos 20 caracteres"),
   content: z.string().min(100, "Conteúdo deve ter pelo menos 100 caracteres"),
   category: z.string().min(1, "Categoria é obrigatória"),
-  imageUrl: z.string().url("URL da imagem deve ser válida").optional().or(z.literal("")),
   heroImageUrl: z.string().url("URL da imagem deve ser válida").optional().or(z.literal("")),
   footerImageUrl: z.string().url("URL da imagem deve ser válida").optional().or(z.literal("")),
   featured: z.boolean().default(false),
@@ -109,7 +108,6 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
       description: "",
       content: "",
       category: "",
-      imageUrl: "",
       heroImageUrl: "",
       footerImageUrl: "",
       featured: false,
@@ -122,7 +120,7 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
       const response = await apiRequest("POST", "/api/content", {
         ...data,
         type: "blog",
-        imageUrl: data.imageUrl || null,
+        imageUrl: null, // Manter compatibilidade
         heroImageUrl: data.heroImageUrl || null,
         footerImageUrl: data.footerImageUrl || null,
       });
@@ -451,37 +449,6 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                     </TooltipProvider>
                   </div>
                 </div>
-
-                {/* URL da Imagem */}
-                <FormField
-                  control={form.control}
-                  name="imageUrl"
-                  render={({ field }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between mb-2">
-                        <FormLabel className="flex items-center gap-2">
-                          <Image className="w-4 h-4" />
-                          URL da Imagem
-                        </FormLabel>
-                        
-                        <ImageUploader 
-                          onImageInserted={(markdown) => {
-                            const currentContent = form.getValues("content") || "";
-                            const newContent = currentContent + "\n\n" + markdown;
-                            form.setValue("content", newContent);
-                          }}
-                        />
-                      </div>
-                      <FormControl>
-                        <Input
-                          placeholder="https://images.unsplash.com/photo-... ou faça upload"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 {/* Imagem Hero */}
                 <FormField
