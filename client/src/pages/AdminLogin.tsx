@@ -13,13 +13,11 @@ import {
   Eye, 
   EyeOff, 
   ArrowLeft, 
-  Shield, 
-  User,
-  Chrome
+  Shield
 } from "lucide-react";
 import { FaGoogle } from "react-icons/fa";
 
-export function Login() {
+export function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -27,13 +25,13 @@ export function Login() {
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
-    mutationFn: async ({ email, password, type }: { email: string; password: string; type: string }) => {
+    mutationFn: async ({ email, password }: { email: string; password: string }) => {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, loginType: type }),
+        body: JSON.stringify({ email, password, loginType: 'admin' }),
       });
       
       if (!response.ok) {
@@ -45,21 +43,21 @@ export function Login() {
     },
     onSuccess: (data: any) => {
       toast({
-        title: "Login realizado com sucesso!",
-        description: `Bem-vinda${data.user?.firstName ? `, ${data.user.firstName}` : ''}!`,
+        title: "Login administrativo realizado com sucesso!",
+        description: `Bem-vindo, ${data.user?.firstName || 'Admin'}!`,
       });
       
       queryClient.invalidateQueries({ queryKey: ["/api/auth/session-user"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       
       setTimeout(() => {
-        window.location.href = data.isAdmin ? "/admin/dashboard" : "/";
+        window.location.href = "/admin/dashboard";
       }, 1000);
     },
     onError: (error: any) => {
       toast({
-        title: "Erro no login",
-        description: error.message || "Verifique suas credenciais e tente novamente.",
+        title: "Erro no login administrativo",
+        description: error.message || "Verifique suas credenciais de administrador.",
         variant: "destructive",
       });
     },
@@ -76,23 +74,21 @@ export function Login() {
       return;
     }
     
-    // Detectar automaticamente se é admin baseado no email
-    const isAdminEmail = email === 'admin@karooma.com';
-    loginMutation.mutate({ email, password, type: isAdminEmail ? 'admin' : 'user' });
+    loginMutation.mutate({ email, password });
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `/api/auth/google?type=user`;
+    window.location.href = `/api/auth/google?type=admin`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-md"
       >
-        <Card className="glassmorphism border-0 shadow-xl">
+        <Card className="glassmorphism border-0 shadow-xl border-red-200">
           <CardHeader className="text-center pb-6">
             <Link href="/">
               <Button variant="ghost" size="sm" className="absolute top-4 left-4">
@@ -102,22 +98,20 @@ export function Login() {
             </Link>
             
             <div className="flex justify-center mb-4">
-              <div className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-full">
-                <User className="w-8 h-8 text-white" />
+              <div className="bg-gradient-to-r from-red-500 to-orange-600 p-3 rounded-full">
+                <Shield className="w-8 h-8 text-white" />
               </div>
             </div>
             
-            <CardTitle className="text-2xl font-outfit font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Entrar na Karooma
+            <CardTitle className="text-2xl font-outfit font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+              Painel Administrativo
             </CardTitle>
             <CardDescription className="text-gray-600">
-              Acesse sua conta para continuar
+              Acesso restrito para administradores
             </CardDescription>
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Removido seletor de tipo - detecção automática */}
-
             {/* Google Login */}
             <Button
               onClick={handleGoogleLogin}
@@ -138,41 +132,41 @@ export function Login() {
               </div>
             </div>
 
-            {/* Email/Password Login */}
+            {/* Login Form */}
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="admin-email" className="text-gray-700">Email</Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
-                    id="email"
+                    id="admin-email"
                     type="email"
-                    placeholder="seu@email.com"
+                    placeholder="admin@karooma.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
-                    data-testid="input-email"
+                    className="pl-10 border-2 focus:border-red-300"
+                    required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
+                <Label htmlFor="admin-password" className="text-gray-700">Senha</Label>
                 <div className="relative">
                   <Input
-                    id="password"
+                    id="admin-password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Sua senha"
+                    placeholder="admin123"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pr-10"
-                    data-testid="input-password"
+                    className="pr-10 border-2 focus:border-red-300"
+                    required
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-auto p-1"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -186,61 +180,22 @@ export function Login() {
 
               <Button
                 type="submit"
-                className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                className="w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white font-semibold py-3 rounded-lg transition-all duration-200"
                 disabled={loginMutation.isPending}
-                data-testid="button-login"
               >
                 {loginMutation.isPending ? "Entrando..." : "Entrar"}
               </Button>
             </form>
-
-            {/* Desenvolvimento - Login Rápido */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="pt-4 border-t">
-                <p className="text-xs text-gray-500 mb-3 text-center">
-                  Desenvolvimento - Login Rápido
-                </p>
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => {
-                      setEmail("admin@karooma.com");
-                      setPassword("admin123");
-                      setLoginType('admin');
-                    }}
-                  >
-                    Admin Demo (admin@karooma.com)
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => {
-                      setEmail("user@karooma.com");
-                      setPassword("user123");
-                      setLoginType('user');
-                    }}
-                  >
-                    Usuário Demo (user@karooma.com)
-                  </Button>
-                </div>
-              </div>
-            )}
-
-            <div className="text-center text-sm text-gray-500">
-              <p>
-                Não tem uma conta? {" "}
-                <Link href="/register">
-                  <span className="text-pink-600 hover:text-pink-700 font-medium cursor-pointer">
-                    Criar conta
-                  </span>
-                </Link>
-              </p>
-            </div>
           </CardContent>
         </Card>
+
+        {/* Dica de acesso */}
+        <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h3 className="text-sm font-semibold text-red-800 mb-1">🔐 Acesso Administrativo</h3>
+          <p className="text-xs text-red-600">
+            Esta página é exclusiva para administradores do sistema Karooma.
+          </p>
+        </div>
       </motion.div>
     </div>
   );

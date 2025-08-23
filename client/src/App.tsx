@@ -13,6 +13,7 @@ import Products from "./pages/products";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
 import { Login } from "./pages/Login";
+import { AdminLogin } from "./pages/AdminLogin";
 import { Register } from "./pages/Register";
 import Favorites from "./pages/Favorites";
 import { PageManager } from "./pages/PageManager";
@@ -45,6 +46,7 @@ function Router() {
           <Route path="/admin/pages/:id/edit" component={PageBuilder} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
+          <Route path="/admin/login" component={AdminLogin} />
           <Route path="/admin/temp-login" component={TempLogin} />
           <Route component={NotFound} />
         </Switch>
