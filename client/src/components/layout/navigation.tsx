@@ -17,9 +17,9 @@ export default function Navigation() {
 
   const navItems = [
     { href: "/", label: "Início", id: "home" },
-    { href: "/videos", label: "Sobre", id: "videos" },
-    { href: "/blog", label: "Momentos Meus", id: "blog" },
-    { href: "/products", label: "Facilita a Vida", id: "products" },
+    { href: "/sobre", label: "Sobre", id: "about" },
+    { href: "/momentos-meus", label: "Momentos Meus", id: "moments" },
+    { href: "/facilita-a-vida", label: "Facilita a Vida", id: "life-hacks" },
   ];
 
   const isActive = (href: string) => location === href;

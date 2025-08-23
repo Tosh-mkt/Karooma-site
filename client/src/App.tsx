@@ -18,6 +18,7 @@ import { Register } from "./pages/Register";
 import Favorites from "./pages/Favorites";
 import { PageManager } from "./pages/PageManager";
 import { PageBuilder } from "./pages/PageBuilder";
+import { PageRenderer } from "./components/PageRenderer";
 
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
@@ -48,6 +49,9 @@ function Router() {
           <Route path="/register" component={Register} />
           <Route path="/admin/login" component={AdminLogin} />
           <Route path="/admin/temp-login" component={TempLogin} />
+          
+          {/* Dynamic Page Routes - must be last before NotFound */}
+          <Route path="/:slug" component={PageRenderer} />
           <Route component={NotFound} />
         </Switch>
       </main>
