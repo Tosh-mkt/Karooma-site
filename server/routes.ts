@@ -118,6 +118,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Login route for email/password authentication
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password, loginType } = req.body;
+
+      // For admin login
+      if (loginType === 'admin') {
+        if (email === 'admin@karooma.com' && password === 'admin123') {
+          const user = await storage.getUser('admin-karooma');
+          if (!user) {
+            return res.status(404).json({ message: "Admin user not found" });
+          }
+          
+          (req.session as any).user = user;
+          return res.json({ 
+            message: "Logged in successfully", 
+            user,
+            isAdmin: true 
+          });
+        } else {
+          return res.status(401).json({ message: "Invalid admin credentials" });
+        }
+      }
+      
+      // For regular user login (can be extended later)
+      return res.status(401).json({ message: "User login not implemented yet" });
+      
+    } catch (error) {
+      console.error("Error in login:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
   // Get current session user
   app.get('/api/auth/session-user', async (req, res) => {
     try {
