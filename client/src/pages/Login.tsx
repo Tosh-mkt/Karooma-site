@@ -208,7 +208,7 @@ export function Login() {
                     className="w-full text-xs"
                     onClick={() => {
                       setEmail("admin@karooma.com");
-                      setPassword("Karo0ma@2025!SecureP4ss");
+                      setPassword("Karo0maSecure2025#6gu5xk");
                       setLoginType('admin');
                     }}
                   >
