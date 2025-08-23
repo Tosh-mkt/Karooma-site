@@ -23,35 +23,47 @@ interface HeroSectionProps {
 
 function HeroSection({ data }: HeroSectionProps) {
   return (
-    <section className={`relative py-20 bg-gradient-to-br ${data.backgroundGradient || 'from-purple-100 via-pink-50 to-indigo-100'}`}>
-      <div className="container mx-auto px-4 text-center">
-        <motion.div
+    <section className="pb-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <motion.div 
+          className="text-center mb-16"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8 }}
         >
-          <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
+          <motion.h2 
+            className="font-outfit font-bold text-5xl md:text-7xl gradient-text mt-[54px] mb-[54px]"
+            animate={{ y: [-5, 5, -5] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
             {data.title}
-          </h1>
+          </motion.h2>
+          
           {data.subtitle && (
-            <h2 className="text-xl md:text-2xl text-gray-600 mb-4 font-medium">
+            <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
               {data.subtitle}
-            </h2>
+            </p>
           )}
+          
           {data.description && (
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
               {data.description}
             </p>
           )}
+          
           {data.ctaText && data.ctaLink && (
-            <motion.a
-              href={data.ctaLink}
-              className="inline-block bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <motion.div 
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
             >
-              {data.ctaText}
-            </motion.a>
+              <a href={data.ctaLink}>
+                <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 px-8 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center">
+                  {data.ctaText}
+                </button>
+              </a>
+            </motion.div>
           )}
         </motion.div>
       </div>
@@ -75,42 +87,47 @@ interface CardsSectionProps {
 
 function CardsSection({ data }: CardsSectionProps) {
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+    <section className="py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        <motion.div 
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="font-outfit font-bold text-4xl md:text-5xl gradient-text mb-6">
             {data.title}
           </h2>
           {data.subtitle && (
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="font-poppins text-xl text-gray-600 max-w-3xl mx-auto">
               {data.subtitle}
             </p>
           )}
-        </div>
+        </motion.div>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {data.cards.map((card, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="group"
+              className="group h-full"
             >
-              <div className={`h-full p-6 rounded-2xl bg-gradient-to-br ${card.gradient || 'from-gray-50 to-gray-100'} border border-gray-200 hover:shadow-lg transition-all`}>
+              <div className="glassmorphism p-8 rounded-3xl h-full hover:shadow-xl transition-all duration-300 border border-white/20">
                 {card.icon && (
-                  <div className="text-4xl mb-4">{card.icon}</div>
+                  <div className="text-5xl mb-6">{card.icon}</div>
                 )}
-                <h3 className="text-xl font-semibold text-gray-800 mb-3">
+                <h3 className="font-outfit font-bold text-2xl text-gray-800 mb-4">
                   {card.title}
                 </h3>
-                <p className="text-gray-600 mb-4">
+                <p className="font-poppins text-gray-600 leading-relaxed mb-6">
                   {card.description}
                 </p>
                 {card.link && (
                   <a
                     href={card.link}
-                    className="inline-flex items-center text-purple-600 font-medium hover:text-purple-700 transition-colors"
+                    className="inline-flex items-center font-poppins font-semibold text-purple-600 hover:text-purple-700 transition-colors"
                   >
                     Saiba mais →
                   </a>
@@ -133,19 +150,19 @@ interface ContentSectionProps {
 
 function ContentSection({ data }: ContentSectionProps) {
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
+    <section className="py-16">
+      <div className="max-w-7xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto"
+          className="max-w-5xl mx-auto"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-8 text-center">
+          <h2 className="font-outfit font-bold text-4xl md:text-5xl gradient-text text-center mb-12">
             {data.title}
           </h2>
           <div
-            className="prose prose-lg max-w-none text-gray-700"
+            className="font-poppins text-lg text-gray-700 leading-relaxed prose prose-xl max-w-none"
             dangerouslySetInnerHTML={{ __html: data.content }}
           />
         </motion.div>
@@ -269,11 +286,7 @@ export function PageRenderer() {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
+    <div className="pt-20">
       {/* SEO Meta Tags */}
       <title>{page.title}</title>
       {page.metaDescription && (
@@ -282,6 +295,6 @@ export function PageRenderer() {
       
       {/* Render Page Sections */}
       {sections.map(renderSection)}
-    </motion.div>
+    </div>
   );
 }
