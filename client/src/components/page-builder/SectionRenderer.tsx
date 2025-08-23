@@ -110,12 +110,265 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
 function ContentSection({ section, isEditing }: SectionRendererProps) {
   const { data } = section;
 
+  // Check if this is one of our special styled sections
+  if (data.title === "Nossa Missão" && data.content?.includes('Empatia Genuína')) {
+    return (
+      <section className="py-16 bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 relative">
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.h2 
+            className="font-outfit text-4xl text-center gradient-text mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {data.title}
+          </motion.h2>
+          
+          <motion.div 
+            className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-12 rounded-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="font-outfit text-3xl gradient-text text-center mb-6">Empatia Genuína</h3>
+            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center">
+              Acreditamos que toda mãe merece sentir-se apoiada e confiante. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano familiar.
+            </p>
+            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mt-4">
+              Sabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas e estratégias que funcionam.
+            </p>
+          </motion.div>
+        </div>
+        
+        {isEditing && (
+          <div className="absolute top-4 left-4">
+            <Badge variant="secondary">Content Section</Badge>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // Nossos Valores section
+  if (data.title === "Nossos Valores") {
+    return (
+      <section className="py-16 bg-white relative">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.h2 
+            className="font-outfit text-4xl text-center gradient-text mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {data.title}
+          </motion.h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <motion.div 
+              className="glassmorphism p-8 text-center rounded-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <div className="text-4xl mb-4">💜</div>
+              <h4 className="font-outfit text-xl gradient-text mb-4">Empatia Genuína</h4>
+              <p className="font-poppins text-gray-600">
+                Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              className="glassmorphism p-8 text-center rounded-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="text-4xl mb-4">✨</div>
+              <h4 className="font-outfit text-xl gradient-text mb-4">Soluções Práticas</h4>
+              <p className="font-poppins text-gray-600">
+                Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              className="glassmorphism p-8 text-center rounded-2xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="text-4xl mb-4">🎯</div>
+              <h4 className="font-outfit text-xl gradient-text mb-4">Objetivos Claros</h4>
+              <p className="font-poppins text-gray-600">
+                Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.
+              </p>
+            </motion.div>
+          </div>
+        </div>
+        
+        {isEditing && (
+          <div className="absolute top-4 left-4">
+            <Badge variant="secondary">Content Section</Badge>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // Mensagem Final section
+  if (data.title === "Você Não Está Sozinha") {
+    return (
+      <section className="py-16 bg-white relative">
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.h2 
+            className="font-outfit text-4xl text-center gradient-text mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {data.title}
+          </motion.h2>
+          
+          <motion.div 
+            className="bg-gradient-to-r from-purple-600 to-pink-600 p-12 rounded-3xl text-white text-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <h3 className="font-outfit text-3xl mb-6">Sua família tem sorte de ter você</h3>
+            <p className="font-poppins text-xl leading-relaxed mb-8">
+              Esta é nossa mensagem principal: reconhecer o trabalho incrível que você faz todos os dias, mesmo nos momentos quando tudo parece caótico.
+            </p>
+            <p className="font-outfit text-lg">
+              Com carinho,<br/>Equipe Karooma 💜
+            </p>
+          </motion.div>
+        </div>
+        
+        {isEditing && (
+          <div className="absolute top-4 left-4">
+            <Badge variant="secondary">Content Section</Badge>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // Tempo para Você section (Momentos Meus)
+  if (data.title === "Tempo para Você") {
+    return (
+      <section className="py-16 bg-white relative">
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.h2 
+            className="font-outfit text-4xl text-center gradient-text mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {data.title}
+          </motion.h2>
+          
+          <motion.div 
+            className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-12 rounded-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-6">
+              Aqui você encontra dicas práticas, momentos de reflexão e lembranças gentis de que cuidar de você é cuidar de toda a família.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">🌸</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">5 Minutos Contam</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Pequenos momentos de autocuidado que cabem na rotina mais corrida
+                </p>
+              </div>
+              
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">💆‍♀️</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Bem-estar Real</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Estratégias práticas para reduzir o estresse e encontrar equilíbrio
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        
+        {isEditing && (
+          <div className="absolute top-4 left-4">
+            <Badge variant="secondary">Content Section</Badge>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // Como Te Auxiliamos section (Facilita a Vida)
+  if (data.title === "Como Te Auxiliamos") {
+    return (
+      <section className="py-16 bg-white relative">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.h2 
+            className="font-outfit text-4xl text-center gradient-text mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {data.title}
+          </motion.h2>
+          
+          <motion.div 
+            className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-12 rounded-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-8">
+              Porque o seu tempo é precioso demais para ser desperdiçado com coisas que não funcionam.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">🔍</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Testados por Mães</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Cada produto é testado na vida real, por mães reais
+                </p>
+              </div>
+              
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">⭐</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Qualidade Garantida</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Só recomendamos o que realmente vale a pena
+                </p>
+              </div>
+              
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">💝</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Preço Justo</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Produtos que cabem no orçamento familiar
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+        
+        {isEditing && (
+          <div className="absolute top-4 left-4">
+            <Badge variant="secondary">Content Section</Badge>
+          </div>
+        )}
+      </section>
+    );
+  }
+
+  // Default content section fallback
   return (
     <section className="py-16 bg-white relative">
       <div className="max-w-4xl mx-auto px-4">
         {data.title && (
           <motion.h2 
-            className="font-fredoka text-4xl text-center gradient-text mb-8"
+            className="font-outfit text-4xl text-center gradient-text mb-8"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
           >
