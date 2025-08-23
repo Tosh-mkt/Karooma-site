@@ -141,7 +141,7 @@ export function AdminLogin() {
                   <Input
                     id="admin-email"
                     type="email"
-                    placeholder="admin@karooma.com"
+                    placeholder="seu.email@karooma.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 border-2 focus:border-red-300"
@@ -156,7 +156,7 @@ export function AdminLogin() {
                   <Input
                     id="admin-password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="admin123"
+                    placeholder="Digite sua senha"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="pr-10 border-2 focus:border-red-300"

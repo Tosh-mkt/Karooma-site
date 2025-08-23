@@ -23,6 +23,7 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loginType, setLoginType] = useState("user");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -77,7 +78,7 @@ export function Login() {
     }
     
     // Detectar automaticamente se é admin baseado no email
-    const isAdminEmail = email === 'admin@karooma.com';
+    const isAdminEmail = email.includes('@karooma.com') || email.includes('admin');
     loginMutation.mutate({ email, password, type: isAdminEmail ? 'admin' : 'user' });
   };
 
@@ -207,11 +208,11 @@ export function Login() {
                     className="w-full text-xs"
                     onClick={() => {
                       setEmail("admin@karooma.com");
-                      setPassword("admin123");
+                      setPassword("Karo0ma@2025!SecureP4ss");
                       setLoginType('admin');
                     }}
                   >
-                    Admin Demo (admin@karooma.com)
+                    Admin Demo
                   </Button>
                   <Button
                     variant="outline"

@@ -125,21 +125,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // For admin login
       if (loginType === 'admin') {
-        if (email === 'admin@karooma.com' && password === 'admin123') {
-          const user = await storage.getUser('admin-karooma');
-          if (!user) {
-            return res.status(404).json({ message: "Admin user not found" });
-          }
-          
-          (req.session as any).user = user;
-          return res.json({ 
-            message: "Logged in successfully", 
-            user,
-            isAdmin: true 
-          });
-        } else {
+        // Find user by email
+        const user = await storage.getUserByEmail(email);
+        if (!user || !user.isAdmin) {
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
+        
+        // Verify password
+        const bcrypt = require('bcryptjs');
+        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+        
+        if (!passwordMatch) {
+          return res.status(401).json({ message: "Invalid admin credentials" });
+        }
+          
+        (req.session as any).user = user;
+        return res.json({ 
+          message: "Logged in successfully", 
+          user,
+          isAdmin: true 
+        });
       }
       
       // For regular user login (can be extended later)
@@ -405,8 +410,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Extrair preços com MÚLTIPLOS FORMATOS suportados
       const priceInfo = extractPrice(data["Preço"]);
       productData.currentPrice = priceInfo.current;
-      if (priceInfo.original) productData.originalPrice = priceInfo.original;
-      if (priceInfo.discount) productData.discount = priceInfo.discount;
+      if (priceInfo.original) productData.originalPrice = priceInfo.original as any;
+      if (priceInfo.discount) productData.discount = priceInfo.discount as any;
 
       const product = await storage.createProduct(productData);
       res.status(201).json({ 

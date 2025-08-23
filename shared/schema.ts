@@ -23,6 +23,7 @@ export const users = pgTable("users", {
   profileImageUrl: varchar("profile_image_url"),
   provider: varchar("provider"), // google, email, replit
   providerId: varchar("provider_id"), // ID no provedor (Google ID, etc)
+  passwordHash: varchar("password_hash"), // Hash bcrypt da senha (para login email)
   isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
