@@ -362,8 +362,8 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
     );
   }
 
-  // 🌈 Nossa Jornada de Empatia section (Enhanced UX)
-  if (data.title === "🌈 Nossa Jornada de Empatia") {
+  // 🌈 Nossa Jornada de Cuidado section (Enhanced UX)
+  if (data.title === "🌈 Nossa Jornada de Cuidado") {
     return (
       <section className="py-16 bg-gradient-to-br from-white via-purple-50/30 to-pink-50/30 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-purple-100/20 to-pink-100/20 animate-pulse"></div>
@@ -398,7 +398,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   <h3 className="font-outfit text-2xl gradient-text ml-4 group-hover:scale-105 transition-transform">Nossa Essência</h3>
                 </div>
                 <p className="font-poppins text-gray-700 leading-relaxed">
-                  Acreditamos que toda mãe merece sentir-se apoiada e confiante. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano familiar.
+                  Acreditamos que todos que dedicam tempo e energia cuidando da casa e família merecem sentir-se apoiados e confiantes. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano doméstico.
                 </p>
               </motion.div>
               
@@ -420,7 +420,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   <h3 className="font-outfit text-2xl gradient-text ml-4 group-hover:scale-105 transition-transform">Entendemos Você</h3>
                 </div>
                 <p className="font-poppins text-gray-700 leading-relaxed">
-                  Sabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas e estratégias que funcionam.
+                  Sabemos que você carrega uma carga mental imensa - desde organizar a agenda familiar até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas, estratégias práticas e produtos que realmente funcionam para simplificar sua rotina.
                 </p>
               </motion.div>
             </div>
@@ -444,22 +444,22 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                 >
                   🤗
                 </motion.div>
-                <h4 className="font-outfit text-3xl gradient-text mb-4 group-hover:scale-110 transition-transform">Você não está sozinha</h4>
-                <p className="font-poppins text-lg text-gray-600 mb-6">Mais de 10.000 mães já encontraram apoio e soluções práticas conosco</p>
+                <h4 className="font-outfit text-3xl gradient-text mb-4 group-hover:scale-110 transition-transform">Você não está sozinho</h4>
+                <p className="font-poppins text-lg text-gray-600 mb-6">Milhares de pessoas já encontraram apoio e soluções práticas para cuidar melhor da família</p>
                 <div className="flex justify-center space-x-4">
                   <motion.div 
                     className="bg-white rounded-full px-6 py-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="font-outfit font-bold text-purple-600">⭐ 4.9/5</span>
+                    <span className="font-outfit font-bold text-purple-600">⭐ Produtos Testados</span>
                   </motion.div>
                   <motion.div 
                     className="bg-white rounded-full px-6 py-2 shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <span className="font-outfit font-bold text-pink-600">💬 +500 depoimentos</span>
+                    <span className="font-outfit font-bold text-pink-600">💬 Dicas Práticas</span>
                   </motion.div>
                 </div>
               </motion.div>
@@ -526,7 +526,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   />
                 </div>
                 <h4 className="font-outfit text-2xl gradient-text mb-4 transform transition-all duration-300 group-hover:text-purple-600">Empatia Genuína</h4>
-                <p className="font-poppins text-gray-600 mb-4">Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.</p>
+                <p className="font-poppins text-gray-600 mb-4">Entendemos que cuidar da casa e família é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não precisa enfrentar isso sozinho.</p>
                 <motion.div 
                   className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   initial={{ y: 20 }}
@@ -559,7 +559,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   />
                 </div>
                 <h4 className="font-outfit text-2xl gradient-text mb-4 transform transition-all duration-300 group-hover:text-pink-600">Soluções Práticas</h4>
-                <p className="font-poppins text-gray-600 mb-4">Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.</p>
+                <p className="font-poppins text-gray-600 mb-4">Oferecemos estratégias testadas na vida real, produtos que realmente funcionam e conteúdo que facilita o dia a dia de quem cuida da família.</p>
                 <motion.div 
                   className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   initial={{ y: 20 }}
@@ -592,7 +592,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   />
                 </div>
                 <h4 className="font-outfit text-2xl gradient-text mb-4 transform transition-all duration-300 group-hover:text-indigo-600">Objetivos Claros</h4>
-                <p className="font-poppins text-gray-600 mb-4">Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.</p>
+                <p className="font-poppins text-gray-600 mb-4">Nosso foco é simplificar sua rotina doméstica para que você tenha mais tempo para o que realmente importa: momentos especiais com sua família.</p>
                 <motion.div 
                   className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                   initial={{ y: 20 }}
@@ -614,8 +614,8 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
     );
   }
 
-  // 🌟 Nosso Impacto na Vida Real section (Enhanced UX)
-  if (data.title === "🌟 Nosso Impacto na Vida Real") {
+  // 🌟 Nossa Missão Diária section (Enhanced UX)
+  if (data.title === "🌟 Nossa Missão Diária") {
     return (
       <section className="py-16 bg-white relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-purple-50/50 to-pink-50/50"></div>
@@ -643,9 +643,10 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  10.000+
+                  🔍
                 </motion.div>
-                <p className="font-poppins text-gray-600 group-hover:text-purple-600 transition-colors">Mães Apoiadas</p>
+                <p className="font-poppins text-gray-600 font-semibold mb-2 group-hover:text-purple-600 transition-colors">Produtos Testados</p>
+                <p className="font-poppins text-sm text-gray-500">Avaliamos cada item na vida real</p>
               </motion.div>
               
               <motion.div 
@@ -660,9 +661,10 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
                 >
-                  500+
+                  📚
                 </motion.div>
-                <p className="font-poppins text-gray-600 group-hover:text-pink-600 transition-colors">Produtos Testados</p>
+                <p className="font-poppins text-gray-600 font-semibold mb-2 group-hover:text-pink-600 transition-colors">Conteúdo Útil</p>
+                <p className="font-poppins text-sm text-gray-500">Dicas práticas para o dia a dia</p>
               </motion.div>
               
               <motion.div 
@@ -677,9 +679,10 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 2, repeat: Infinity, delay: 1 }}
                 >
-                  4.9⭐
+                  💝
                 </motion.div>
-                <p className="font-poppins text-gray-600 group-hover:text-indigo-600 transition-colors">Avaliação Média</p>
+                <p className="font-poppins text-gray-600 font-semibold mb-2 group-hover:text-indigo-600 transition-colors">Preço Justo</p>
+                <p className="font-poppins text-sm text-gray-500">Produtos que cabem no orçamento</p>
               </motion.div>
             </div>
             
@@ -689,15 +692,15 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <h4 className="font-outfit text-2xl gradient-text mb-4">"A Karooma mudou minha rotina!"</h4>
-              <p className="font-poppins text-lg text-gray-700 italic mb-4">"Finalmente encontrei um lugar que entende as demandas de ser mãe. Os produtos recomendados realmente funcionam e o conteúdo me ajuda todos os dias."</p>
+              <h4 className="font-outfit text-2xl gradient-text mb-4">"A Karooma facilitou minha rotina!"</h4>
+              <p className="font-poppins text-lg text-gray-700 italic mb-4">"Finalmente encontrei um lugar que entende as demandas de cuidar da família. Os produtos recomendados realmente funcionam e o conteúdo me ajuda no dia a dia."</p>
               <div className="flex items-center justify-center space-x-2">
                 <motion.div 
                   className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 3, repeat: Infinity }}
                 />
-                <span className="font-outfit text-sm text-gray-600">Marina, mãe de 2</span>
+                <span className="font-outfit text-sm text-gray-600">Ana, cuidadora da família</span>
               </div>
             </motion.div>
           </div>
@@ -712,8 +715,8 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
     );
   }
 
-  // 💜 Faça Parte da Nossa Comunidade section (Enhanced UX)
-  if (data.title === "💜 Faça Parte da Nossa Comunidade") {
+  // 💜 Nosso Compromisso Com Você section (Enhanced UX)
+  if (data.title === "💜 Nosso Compromisso Com Você") {
     return (
       <section className="py-20 bg-gradient-to-br from-white via-purple-50 to-pink-50 relative overflow-hidden">
         <div className="absolute inset-0">
@@ -757,7 +760,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                 </motion.h3>
                 
                 <p className="font-poppins text-xl leading-relaxed mb-8">
-                  Esta é nossa mensagem principal: reconhecer o trabalho incrível que você faz todos os dias, mesmo nos momentos quando tudo parece caótico.
+                  Esta é nossa mensagem principal: reconhecer o trabalho incrível que você faz todos os dias cuidando da casa e família, mesmo nos momentos quando tudo parece caótico.
                 </p>
                 
                 <div className="space-y-4 mb-8">
@@ -772,14 +775,14 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                       whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.3)" }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span className="font-outfit">📬 Newsletter Semanal</span>
+                      <span className="font-outfit">📬 Dicas Semanais</span>
                     </motion.div>
                     <motion.div 
                       className="bg-white bg-opacity-20 rounded-full px-6 py-3 backdrop-blur-sm cursor-pointer"
                       whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.3)" }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span className="font-outfit">🎁 Dicas Exclusivas</span>
+                      <span className="font-outfit">🎁 Conteúdo Exclusivo</span>
                     </motion.div>
                   </motion.div>
                   
@@ -794,7 +797,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                       whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.3)" }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <span className="font-outfit">👥 Comunidade Ativa</span>
+                      <span className="font-outfit">✨ Produtos Testados</span>
                     </motion.div>
                     <motion.div 
                       className="bg-white bg-opacity-20 rounded-full px-6 py-3 backdrop-blur-sm cursor-pointer"
@@ -817,7 +820,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    🚀 Quero Fazer Parte!
+                    🚀 Explorar Produtos
                   </motion.button>
                   <br />
                   <motion.button 
@@ -825,7 +828,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    📱 Seguir no Instagram
+                    📱 Ver Conteúdos
                   </motion.button>
                 </motion.div>
                 
