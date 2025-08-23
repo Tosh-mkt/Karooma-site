@@ -128,24 +128,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (loginType === 'admin') {
         // Find user by email
         const user = await storage.getUserByEmail(email);
-        console.log('DEBUG - User found:', user ? 'YES' : 'NO');
-        console.log('DEBUG - User isAdmin:', user?.isAdmin);
-        console.log('DEBUG - User has passwordHash:', !!user?.passwordHash);
         
-        if (!user || !user.isAdmin) {
-          console.log('DEBUG - User validation failed:', { found: !!user, isAdmin: user?.isAdmin });
-          return res.status(401).json({ message: "Invalid admin credentials" });
-        }
-        
-        if (!user.passwordHash) {
-          console.log('DEBUG - No password hash found for user');
+        if (!user || !user.isAdmin || !user.passwordHash) {
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
         
         // Verify password
-        console.log('DEBUG - Comparing:', { password, hash: user.passwordHash });
         const passwordMatch = await bcrypt.compare(password, user.passwordHash);
-        console.log('DEBUG - Password match:', passwordMatch);
         
         if (!passwordMatch) {
           return res.status(401).json({ message: "Invalid admin credentials" });
