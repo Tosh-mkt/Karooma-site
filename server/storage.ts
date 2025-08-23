@@ -77,12 +77,14 @@ export class MemStorage implements IStorage {
   private content: Map<string, Content>;
   private products: Map<string, Product>;
   private newsletters: Map<string, NewsletterSubscription>;
+  private pages: Map<string, Page>;
 
   constructor() {
     this.users = new Map();
     this.content = new Map();
     this.products = new Map();
     this.newsletters = new Map();
+    this.pages = new Map();
     
     // Initialize with empty state - no mock data
     // Real data will be added through API calls or String.com integration
@@ -94,7 +96,7 @@ export class MemStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    for (const user of this.users.values()) {
+    for (const user of Array.from(this.users.values())) {
       if (user.email === email) {
         return user;
       }
@@ -103,11 +105,17 @@ export class MemStorage implements IStorage {
   }
 
   async createUser(userData: InsertUser): Promise<User> {
-    const id = userData.id || randomUUID();
+    const id = randomUUID();
     const user: User = {
-      ...userData,
       id,
-      isAdmin: userData.isAdmin || false,
+      email: userData.email || null,
+      firstName: userData.firstName || null,
+      lastName: userData.lastName || null,
+      profileImageUrl: userData.profileImageUrl || null,
+      provider: null,
+      providerId: null,
+      passwordHash: null,
+      isAdmin: false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -133,6 +141,9 @@ export class MemStorage implements IStorage {
       firstName: userData.firstName || null,
       lastName: userData.lastName || null,
       profileImageUrl: userData.profileImageUrl || null,
+      provider: userData.provider || null,
+      providerId: userData.providerId || null,
+      passwordHash: userData.passwordHash || null,
       isAdmin: userData.isAdmin || false,
       createdAt: new Date(),
       updatedAt: new Date()
@@ -194,10 +205,12 @@ export class MemStorage implements IStorage {
       type: insertContent.type,
       category: insertContent.category || null,
       imageUrl: insertContent.imageUrl || null,
+      heroImageUrl: insertContent.heroImageUrl || null,
+      footerImageUrl: insertContent.footerImageUrl || null,
       videoUrl: insertContent.videoUrl || null,
       youtubeId: insertContent.youtubeId || null,
       views: 0,
-      featured: insertContent.featured || null,
+      featured: insertContent.featured || false,
       createdAt: new Date(),
     };
     this.content.set(id, content);
@@ -276,9 +289,16 @@ export class MemStorage implements IStorage {
       currentPrice: insertProduct.currentPrice || null,
       originalPrice: insertProduct.originalPrice || null,
       affiliateLink: insertProduct.affiliateLink,
+      productLink: insertProduct.productLink || null,
       rating: insertProduct.rating || null,
       discount: insertProduct.discount || null,
-      featured: insertProduct.featured || null,
+      featured: insertProduct.featured || false,
+      expertReview: insertProduct.expertReview || null,
+      teamEvaluation: insertProduct.teamEvaluation || null,
+      benefits: insertProduct.benefits || null,
+      tags: insertProduct.tags || null,
+      evaluators: insertProduct.evaluators || null,
+      introduction: insertProduct.introduction || null,
       createdAt: new Date(),
     };
     this.products.set(id, product);
@@ -332,6 +352,71 @@ export class MemStorage implements IStorage {
 
   async isFavorite(userId: string, productId: string): Promise<boolean> {
     return false; // Simplified implementation for memory storage
+  }
+
+  // Pages methods - Add implementation for MemStorage
+  async getAllPages(): Promise<Page[]> {
+    return Array.from(this.pages.values()).sort((a, b) => 
+      new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+    );
+  }
+
+  async getPageById(id: string): Promise<Page | undefined> {
+    return this.pages.get(id);
+  }
+
+  async getPageBySlug(slug: string): Promise<Page | undefined> {
+    for (const page of Array.from(this.pages.values())) {
+      if (page.slug === slug) {
+        return page;
+      }
+    }
+    return undefined;
+  }
+
+  async createPage(pageData: InsertPage): Promise<Page> {
+    const id = randomUUID();
+    const page: Page = {
+      id,
+      slug: pageData.slug,
+      title: pageData.title,
+      metaDescription: pageData.metaDescription || null,
+      layout: pageData.layout || "default",
+      sections: pageData.sections || "[]",
+      isPublished: pageData.isPublished || false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.pages.set(id, page);
+    return page;
+  }
+
+  async updatePage(id: string, pageData: Partial<InsertPage>): Promise<Page | undefined> {
+    const existingPage = this.pages.get(id);
+    if (!existingPage) {
+      return undefined;
+    }
+    
+    const updatedPage: Page = {
+      ...existingPage,
+      ...pageData,
+      updatedAt: new Date()
+    };
+    
+    this.pages.set(id, updatedPage);
+    return updatedPage;
+  }
+
+  async deletePage(id: string): Promise<void> {
+    this.pages.delete(id);
+  }
+
+  async getPublishedPages(): Promise<Page[]> {
+    return Array.from(this.pages.values())
+      .filter(page => page.isPublished)
+      .sort((a, b) => 
+        new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
+      );
   }
 }
 
