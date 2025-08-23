@@ -51,6 +51,7 @@ function Router() {
           
           {/* Dynamic Page Routes - specific slugs */}
           <Route path="/sobre" component={PageRenderer} />
+          <Route path="/sobre2" component={PageRenderer} />
           <Route path="/momentos-meus" component={PageRenderer} />
           <Route path="/facilita-a-vida" component={PageRenderer} />
           <Route path="/inicio" component={PageRenderer} />
