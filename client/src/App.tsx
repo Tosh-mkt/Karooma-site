@@ -40,7 +40,6 @@ function Router() {
           <Route path="/products" component={Products} />
           <Route path="/favoritos" component={Favorites} />
 
-
           <Route path="/admin/dashboard" component={AdminDashboard} />
           <Route path="/admin/pages" component={PageManager} />
           <Route path="/admin/pages/new" component={PageBuilder} />
@@ -50,8 +49,12 @@ function Router() {
           <Route path="/admin/login" component={AdminLogin} />
           <Route path="/admin/temp-login" component={TempLogin} />
           
-          {/* Dynamic Page Routes - must be last before NotFound */}
-          <Route path="/:slug" component={PageRenderer} />
+          {/* Dynamic Page Routes - specific slugs */}
+          <Route path="/sobre" component={PageRenderer} />
+          <Route path="/momentos-meus" component={PageRenderer} />
+          <Route path="/facilita-a-vida" component={PageRenderer} />
+          <Route path="/inicio" component={PageRenderer} />
+          
           <Route component={NotFound} />
         </Switch>
       </main>
