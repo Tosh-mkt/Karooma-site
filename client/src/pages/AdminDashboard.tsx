@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
+import { EditProductModal } from "@/components/admin/EditProductModal";
 import { CreatePostModal } from "@/components/admin/CreatePostModal";
 import { EditPostModal } from "@/components/admin/EditPostModal";
 import { EditPageContentModal } from "@/components/admin/EditPageContentModal";
@@ -252,6 +253,12 @@ function ProductsManagement() {
       <NewProductModal 
         open={newProductModalOpen}
         onOpenChange={setNewProductModalOpen}
+      />
+
+      <EditProductModal 
+        product={editingProduct}
+        open={!!editingProduct}
+        onOpenChange={(open) => !open && setEditingProduct(null)}
       />
 
       <div className="grid gap-4">
