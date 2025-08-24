@@ -67,7 +67,7 @@ export default function Products() {
           >
             <h1 className="font-fredoka text-5xl gradient-text mb-4">Facilitam a Vida</h1>
             <p className="font-poppins text-xl text-gray-600">
-              Produtos testados e aprovados que realmente fazem diferença no seu dia a dia
+              Cada produto que recomendamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma mãe? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar.
             </p>
           </motion.div>
 
