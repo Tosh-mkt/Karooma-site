@@ -9,7 +9,7 @@ import About from "./pages/About";
 import Blog from "./pages/blog";
 import BlogPost from "./pages/blog-post";
 import Products from "./pages/products";
-import TestFilters from "./pages/test-filters";
+import TestFiltersClean from "./pages/test-filters-clean";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
@@ -39,7 +39,7 @@ function Router() {
           <Route path="/blog" component={Blog} />
           <Route path="/blog/:id" component={BlogPost} />
           <Route path="/products" component={Products} />
-          <Route path="/test-filters" component={TestFilters} />
+          <Route path="/filtros-hierarquia" component={TestFiltersClean} />
           <Route path="/favoritos" component={Favorites} />
 
           <Route path="/admin/dashboard" component={AdminDashboard} />

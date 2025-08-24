@@ -44,52 +44,52 @@ export default function TestFilters() {
     enabled: isAuthenticated && showFavorites,
   });
 
-  // Filtros emocionais/contextuais - baseados na nossa conversa
+  // Filtros emocionais/contextuais - HIERARQUIA PRINCIPAL
   const moodFilters = [
-    { id: "urgent", label: "🚨 Socorro, preciso urgente!", emoji: "😰", color: "bg-red-100 text-red-700" },
-    { id: "simplify", label: "😌 Quero facilitar minha vida", emoji: "😌", color: "bg-green-100 text-green-700" },
-    { id: "gift", label: "🎁 Presentear sem erro", emoji: "🎁", color: "bg-purple-100 text-purple-700" },
-    { id: "discover", label: "💡 Descobrir algo novo", emoji: "💡", color: "bg-yellow-100 text-yellow-700" },
+    { id: "urgent", label: "Socorro, preciso urgente!", emoji: "🚨", color: "bg-red-500 text-white shadow-lg", priority: "primary" },
+    { id: "simplify", label: "Quero facilitar minha vida", emoji: "😌", color: "bg-green-500 text-white shadow-lg", priority: "primary" },
+    { id: "gift", label: "Presentear sem erro", emoji: "🎁", color: "bg-purple-500 text-white shadow-lg", priority: "primary" },
+    { id: "discover", label: "Descobrir algo novo", emoji: "💡", color: "bg-blue-500 text-white shadow-lg", priority: "primary" },
   ];
 
-  // Grupos por idade - mais intuitivos
+  // Grupos por idade - HIERARQUIA SECUNDÁRIA
   const ageGroups = [
-    { id: "newborn", label: "Recém-nascidos (0-6m)", icon: "👶" },
-    { id: "baby", label: "Bebês (6m-2 anos)", icon: "🍼" },
-    { id: "toddler", label: "Crianças pequenas (2-5 anos)", icon: "🧸" },
-    { id: "school", label: "Idade escolar (6-12 anos)", icon: "🎒" },
-    { id: "teen", label: "Adolescentes (13+ anos)", icon: "📱" },
-    { id: "parents", label: "Para os pais", icon: "☕" },
+    { id: "newborn", label: "Recém-nascidos (0-6m)", icon: "👶", priority: "secondary" },
+    { id: "baby", label: "Bebês (6m-2 anos)", icon: "🍼", priority: "secondary" },
+    { id: "toddler", label: "Crianças pequenas (2-5 anos)", icon: "🧸", priority: "secondary" },
+    { id: "school", label: "Idade escolar (6-12 anos)", icon: "🎒", priority: "secondary" },
+    { id: "teen", label: "Adolescentes (13+ anos)", icon: "📱", priority: "secondary" },
+    { id: "parents", label: "Para os pais", icon: "☕", priority: "secondary" },
   ];
 
-  // Contextos de uso - baseados em momentos do dia
+  // Contextos de uso - HIERARQUIA SECUNDÁRIA
   const contexts = [
-    { id: "morning", label: "⏰ Manhãs corridas", icon: "🌅" },
-    { id: "mealtime", label: "🍽️ Hora das refeições", icon: "🍽️" },
-    { id: "sleep", label: "🌙 Noites tranquilas", icon: "🌙" },
-    { id: "travel", label: "🚗 Na correria com filhos", icon: "🚗" },
-    { id: "organization", label: "📦 Organização da casa", icon: "🏠" },
-    { id: "selfcare", label: "💆‍♀️ Cuidado próprio", icon: "💆‍♀️" },
+    { id: "morning", label: "Manhãs corridas", icon: "⏰", priority: "secondary" },
+    { id: "mealtime", label: "Hora das refeições", icon: "🍽️", priority: "secondary" },
+    { id: "sleep", label: "Noites tranquilas", icon: "🌙", priority: "secondary" },
+    { id: "travel", label: "Na correria com filhos", icon: "🚗", priority: "secondary" },
+    { id: "organization", label: "Organização da casa", icon: "📦", priority: "secondary" },
+    { id: "selfcare", label: "Cuidado próprio", icon: "💆‍♀️", priority: "secondary" },
   ];
 
-  // Necessidades rápidas
+  // Necessidades rápidas - HIERARQUIA TERCIÁRIA
   const quickNeedOptions = [
-    { id: "prime", label: "📦 Entrega rápida" },
-    { id: "budget", label: "💰 Cabe no bolso" },
-    { id: "tested", label: "✅ Testado por mães" },
-    { id: "bestseller", label: "🔥 Mais vendido" },
-    { id: "innovative", label: "⚡ Inovador" },
+    { id: "prime", label: "Entrega rápida", icon: "📦", priority: "tertiary" },
+    { id: "budget", label: "Cabe no bolso", icon: "💰", priority: "tertiary" },
+    { id: "tested", label: "Testado por mães", icon: "✅", priority: "tertiary" },
+    { id: "bestseller", label: "Mais vendido", icon: "🔥", priority: "tertiary" },
+    { id: "innovative", label: "Inovador", icon: "⚡", priority: "tertiary" },
   ];
 
-  // Categorias melhoradas - estilo de vida
+  // Categorias melhoradas - HIERARQUIA QUATERNÁRIA
   const categories = [
-    { id: "all", label: "Todos", icon: "🛍️" },
-    { id: "sleep", label: "Sono & Relaxamento", icon: "😴", color: "bg-blue-100" },
-    { id: "meals", label: "Refeições Práticas", icon: "🍽️", color: "bg-orange-100" },
-    { id: "travel", label: "Mobilidade Familiar", icon: "🚗", color: "bg-green-100" },
-    { id: "learning", label: "Aprender & Brincar", icon: "🎨", color: "bg-purple-100" },
-    { id: "selfcare", label: "Cuidado dos Pais", icon: "💆‍♀️", color: "bg-pink-100" },
-    { id: "organization", label: "Organização", icon: "📦", color: "bg-yellow-100" },
+    { id: "all", label: "Todos", icon: "🛍️", priority: "quaternary", color: "bg-gray-100 text-gray-700" },
+    { id: "sleep", label: "Sono & Relaxamento", icon: "😴", priority: "quaternary", color: "bg-blue-50 text-blue-700 border-blue-200" },
+    { id: "meals", label: "Refeições Práticas", icon: "🍽️", priority: "quaternary", color: "bg-orange-50 text-orange-700 border-orange-200" },
+    { id: "travel", label: "Mobilidade Familiar", icon: "🚗", priority: "quaternary", color: "bg-green-50 text-green-700 border-green-200" },
+    { id: "learning", label: "Aprender & Brincar", icon: "🎨", priority: "quaternary", color: "bg-purple-50 text-purple-700 border-purple-200" },
+    { id: "selfcare", label: "Cuidado dos Pais", icon: "💆‍♀️", priority: "quaternary", color: "bg-pink-50 text-pink-700 border-pink-200" },
+    { id: "organization", label: "Organização", icon: "📦", priority: "quaternary", color: "bg-yellow-50 text-yellow-700 border-yellow-200" },
   ];
 
   const sourceProducts = showFavorites ? favorites : products;
@@ -232,111 +232,183 @@ export default function TestFilters() {
                 exit={{ opacity: 0, height: 0 }}
                 className="glassmorphism p-6 rounded-3xl mb-8 space-y-8"
               >
-                {/* Mood/Emotional Filters */}
-                <div>
-                  <h3 className="font-outfit text-lg gradient-text mb-4">🎭 Como você está se sentindo hoje?</h3>
-                  <div className="flex flex-wrap gap-3">
+                {/* FILTROS PRINCIPAIS - HIERARQUIA VISUAL PRIMÁRIA */}
+                <div className="border-l-4 border-indigo-500 pl-6 bg-gradient-to-r from-indigo-50/50 to-transparent p-6 -mx-6 mb-8">
+                  <div className="flex items-center mb-6">
+                    <div className="w-3 h-3 bg-indigo-500 rounded-full mr-3"></div>
+                    <h2 className="font-fredoka text-2xl text-gray-800">🎭 Como você está se sentindo hoje?</h2>
+                  </div>
+                  <p className="text-gray-600 mb-6 font-poppins">Escolha o que mais combina com seu momento atual:</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {moodFilters.map((mood) => (
-                      <Button
+                      <button
                         key={mood.id}
-                        variant={selectedMood === mood.id ? "default" : "outline"}
                         onClick={() => setSelectedMood(selectedMood === mood.id ? "" : mood.id)}
-                        className={`${mood.color} ${selectedMood === mood.id ? 'ring-2 ring-purple-500' : ''}`}
+                        className={`
+                          group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300
+                          ${selectedMood === mood.id 
+                            ? `${mood.color} transform scale-105 shadow-2xl ring-4 ring-white/50` 
+                            : 'bg-white/80 hover:bg-white border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg'
+                          }
+                        `}
                       >
-                        <span className="mr-2">{mood.emoji}</span>
-                        {mood.label}
-                      </Button>
+                        <div className="flex items-center">
+                          <span className="text-3xl mr-4 group-hover:scale-110 transition-transform">{mood.emoji}</span>
+                          <div>
+                            <div className={`font-outfit font-semibold text-lg ${
+                              selectedMood === mood.id ? 'text-white' : 'text-gray-800'
+                            }`}>
+                              {mood.label}
+                            </div>
+                            {selectedMood === mood.id && (
+                              <div className="text-white/90 text-sm mt-1 font-poppins">
+                                ✓ Selecionado
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        {selectedMood === mood.id && (
+                          <div className="absolute top-4 right-4 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        )}
+                      </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Context Filters */}
-                <div>
-                  <h3 className="font-outfit text-lg gradient-text mb-4">📅 Em que momento você precisa de ajuda?</h3>
+                {/* FILTROS SECUNDÁRIOS - HIERARQUIA VISUAL SECUNDÁRIA */}
+                <div className="border-l-4 border-purple-400 pl-6 bg-gradient-to-r from-purple-50/30 to-transparent p-4 -mx-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>
+                    <h3 className="font-outfit text-xl text-gray-700">📅 Em que momento você precisa de ajuda?</h3>
+                  </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {contexts.map((context) => (
-                      <Button
+                      <button
                         key={context.id}
-                        variant={selectedContext === context.id ? "default" : "outline"}
                         onClick={() => setSelectedContext(selectedContext === context.id ? "" : context.id)}
-                        className="flex items-center justify-start p-4 h-auto"
+                        className={`
+                          flex items-center justify-start p-4 rounded-xl text-left transition-all duration-200
+                          ${selectedContext === context.id 
+                            ? 'bg-purple-500 text-white shadow-lg transform scale-105' 
+                            : 'bg-white/60 text-gray-700 hover:bg-white hover:shadow-md border border-gray-200'
+                          }
+                        `}
                       >
-                        <span className="mr-3 text-2xl">{context.icon}</span>
-                        <span className="text-sm">{context.label}</span>
-                      </Button>
+                        <span className="mr-3 text-xl">{context.icon}</span>
+                        <span className="text-sm font-medium">{context.label}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Age Group */}
-                <div>
-                  <h3 className="font-outfit text-lg gradient-text mb-4">👨‍👩‍👧‍👦 Para qual idade?</h3>
+                {/* GRUPO IDADE - HIERARQUIA VISUAL SECUNDÁRIA */}
+                <div className="border-l-4 border-blue-400 pl-6 bg-gradient-to-r from-blue-50/30 to-transparent p-4 -mx-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full mr-3"></div>
+                    <h3 className="font-outfit text-xl text-gray-700">👨‍👩‍👧‍👦 Para qual faixa etária?</h3>
+                  </div>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {ageGroups.map((age) => (
-                      <Button
+                      <button
                         key={age.id}
-                        variant={selectedAgeGroup === age.id ? "default" : "outline"}
                         onClick={() => setSelectedAgeGroup(selectedAgeGroup === age.id ? "" : age.id)}
-                        className="flex items-center justify-start p-3 h-auto text-sm"
+                        className={`
+                          flex items-center justify-start p-3 rounded-xl text-sm transition-all duration-200
+                          ${selectedAgeGroup === age.id 
+                            ? 'bg-blue-500 text-white shadow-lg' 
+                            : 'bg-white/60 text-gray-600 hover:bg-white hover:text-gray-800 border border-gray-200'
+                          }
+                        `}
                       >
                         <span className="mr-2 text-lg">{age.icon}</span>
-                        {age.label}
-                      </Button>
+                        <span className="font-medium">{age.label}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Quick Needs */}
-                <div>
-                  <h3 className="font-outfit text-lg gradient-text mb-4">⚡ Necessidades especiais?</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {quickNeedOptions.map((need) => (
-                      <Button
-                        key={need.id}
-                        variant={quickNeeds.includes(need.id) ? "default" : "outline"}
-                        onClick={() => toggleQuickNeed(need.id)}
-                        size="sm"
-                      >
-                        {need.label}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Price Range */}
-                <div>
-                  <h3 className="font-outfit text-lg gradient-text mb-4">💰 Faixa de preço</h3>
-                  <div className="px-4">
-                    <Slider
-                      value={selectedPriceRange}
-                      onValueChange={setSelectedPriceRange}
-                      max={1000}
-                      min={0}
-                      step={10}
-                      className="mb-4"
-                    />
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>R$ {selectedPriceRange[0]}</span>
-                      <span>R$ {selectedPriceRange[1]}{selectedPriceRange[1] >= 1000 ? "+" : ""}</span>
+                {/* FILTROS AVANÇADOS - HIERARQUIA VISUAL TERCIÁRIA */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100/50 p-4 rounded-2xl border border-gray-200">
+                  <details className="group">
+                    <summary className="cursor-pointer list-none">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center">
+                          <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-3"></div>
+                          <h4 className="font-outfit text-lg text-gray-600">⚡ Filtros Avançados</h4>
+                        </div>
+                        <ChevronDown className="w-5 h-5 text-gray-400 group-open:rotate-180 transition-transform" />
+                      </div>
+                    </summary>
+                    
+                    <div className="mt-6 space-y-6">
+                      {/* Quick Needs */}
+                      <div>
+                        <h5 className="font-poppins text-sm font-semibold text-gray-700 mb-3">Necessidades Especiais:</h5>
+                        <div className="flex flex-wrap gap-2">
+                          {quickNeedOptions.map((need) => (
+                            <button
+                              key={need.id}
+                              onClick={() => toggleQuickNeed(need.id)}
+                              className={`
+                                inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium transition-all
+                                ${quickNeeds.includes(need.id) 
+                                  ? 'bg-gray-700 text-white shadow-md' 
+                                  : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+                                }
+                              `}
+                            >
+                              <span className="mr-1.5 text-xs">{need.icon}</span>
+                              {need.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  </details>
                 </div>
 
-                {/* Rating Filter */}
-                <div>
-                  <h3 className="font-outfit text-lg gradient-text mb-4">⭐ Avaliação mínima</h3>
-                  <div className="flex gap-2">
-                    {[0, 3, 4, 5].map((rating) => (
-                      <Button
-                        key={rating}
-                        variant={selectedRating === rating ? "default" : "outline"}
-                        onClick={() => setSelectedRating(rating)}
-                        size="sm"
-                      >
-                        {rating === 0 ? "Todas" : `${rating}+ ⭐`}
-                      </Button>
-                    ))}
-                  </div>
+                      {/* Price Range - dentro do painel avançado */}
+                      <div>
+                        <h5 className="font-poppins text-sm font-semibold text-gray-700 mb-3">Faixa de Preço:</h5>
+                        <div className="px-4">
+                          <Slider
+                            value={selectedPriceRange}
+                            onValueChange={setSelectedPriceRange}
+                            max={1000}
+                            min={0}
+                            step={10}
+                            className="mb-4"
+                          />
+                          <div className="flex justify-between text-sm text-gray-600">
+                            <span className="font-medium">R$ {selectedPriceRange[0]}</span>
+                            <span className="font-medium">R$ {selectedPriceRange[1]}{selectedPriceRange[1] >= 1000 ? "+" : ""}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Rating Filter - dentro do painel avançado */}
+                      <div>
+                        <h5 className="font-poppins text-sm font-semibold text-gray-700 mb-3">Avaliação Mínima:</h5>
+                        <div className="flex gap-2">
+                          {[0, 3, 4, 5].map((rating) => (
+                            <button
+                              key={rating}
+                              onClick={() => setSelectedRating(rating)}
+                              className={`
+                                px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+                                ${selectedRating === rating 
+                                  ? 'bg-yellow-500 text-white shadow-md' 
+                                  : 'bg-white text-gray-600 border border-gray-300 hover:bg-yellow-50'
+                                }
+                              `}
+                            >
+                              {rating === 0 ? "Todas" : `${rating}+ ⭐`}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </details>
                 </div>
               </motion.div>
             )}

@@ -1,0 +1,578 @@
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, ShoppingBag, ChevronDown, Heart, Filter, X, Clock, Star, DollarSign } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { GradientButton } from "@/components/ui/gradient-button";
+import { ProductCard } from "@/components/content/product-card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { useQuery } from "@tanstack/react-query";
+import { Product } from "@shared/schema";
+import { staggerContainer, staggerItem } from "@/lib/animations";
+import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/useAuth";
+
+export default function TestFiltersClean() {
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFavorites, setShowFavorites] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  
+  // Advanced filters
+  const [selectedMood, setSelectedMood] = useState("");
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
+  const [selectedPriceRange, setSelectedPriceRange] = useState([0, 1000]);
+  const [selectedRating, setSelectedRating] = useState(0);
+  const [quickNeeds, setQuickNeeds] = useState<string[]>([]);
+  const [selectedContext, setSelectedContext] = useState("");
+
+  const { isAuthenticated } = useAuth();
+
+  // Invalidate cache on component mount to ensure fresh data
+  useEffect(() => {
+    queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+  }, []);
+
+  const { data: products, isLoading } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
+    staleTime: 0,
+  });
+
+  const { data: favorites, isLoading: favoritesLoading } = useQuery<Product[]>({
+    queryKey: ["/api/favorites"],
+    enabled: isAuthenticated && showFavorites,
+  });
+
+  // HIERARQUIA PRIMÁRIA - Filtros emocionais principais
+  const moodFilters = [
+    { 
+      id: "urgent", 
+      label: "Socorro, preciso urgente!", 
+      emoji: "🚨", 
+      color: "bg-red-500 hover:bg-red-600 text-white shadow-lg",
+      description: "Soluções rápidas para emergências"
+    },
+    { 
+      id: "simplify", 
+      label: "Quero facilitar minha vida", 
+      emoji: "😌", 
+      color: "bg-green-500 hover:bg-green-600 text-white shadow-lg",
+      description: "Produtos que simplificam o dia a dia"
+    },
+    { 
+      id: "gift", 
+      label: "Presentear sem erro", 
+      emoji: "🎁", 
+      color: "bg-purple-500 hover:bg-purple-600 text-white shadow-lg",
+      description: "Presentes que fazem sucesso"
+    },
+    { 
+      id: "discover", 
+      label: "Descobrir algo novo", 
+      emoji: "💡", 
+      color: "bg-blue-500 hover:bg-blue-600 text-white shadow-lg",
+      description: "Inovações e novidades"
+    },
+  ];
+
+  // HIERARQUIA SECUNDÁRIA - Contextos e idades
+  const contexts = [
+    { id: "morning", label: "Manhãs corridas", icon: "⏰" },
+    { id: "mealtime", label: "Hora das refeições", icon: "🍽️" },
+    { id: "sleep", label: "Noites tranquilas", icon: "🌙" },
+    { id: "travel", label: "Na correria com filhos", icon: "🚗" },
+    { id: "organization", label: "Organização da casa", icon: "📦" },
+    { id: "selfcare", label: "Cuidado próprio", icon: "💆‍♀️" },
+  ];
+
+  const ageGroups = [
+    { id: "newborn", label: "Recém-nascidos (0-6m)", icon: "👶" },
+    { id: "baby", label: "Bebês (6m-2 anos)", icon: "🍼" },
+    { id: "toddler", label: "Crianças pequenas (2-5 anos)", icon: "🧸" },
+    { id: "school", label: "Idade escolar (6-12 anos)", icon: "🎒" },
+    { id: "teen", label: "Adolescentes (13+ anos)", icon: "📱" },
+    { id: "parents", label: "Para os pais", icon: "☕" },
+  ];
+
+  // HIERARQUIA TERCIÁRIA - Necessidades específicas
+  const quickNeedOptions = [
+    { id: "prime", label: "Entrega rápida", icon: "📦" },
+    { id: "budget", label: "Cabe no bolso", icon: "💰" },
+    { id: "tested", label: "Testado por mães", icon: "✅" },
+    { id: "bestseller", label: "Mais vendido", icon: "🔥" },
+    { id: "innovative", label: "Inovador", icon: "⚡" },
+  ];
+
+  // HIERARQUIA QUATERNÁRIA - Categorias tradicionais
+  const categories = [
+    { id: "all", label: "Todos", icon: "🛍️", color: "bg-gray-100 hover:bg-gray-200 text-gray-700" },
+    { id: "sleep", label: "Sono & Relaxamento", icon: "😴", color: "bg-blue-100 hover:bg-blue-200 text-blue-700" },
+    { id: "meals", label: "Refeições Práticas", icon: "🍽️", color: "bg-orange-100 hover:bg-orange-200 text-orange-700" },
+    { id: "travel", label: "Mobilidade", icon: "🚗", color: "bg-green-100 hover:bg-green-200 text-green-700" },
+    { id: "learning", label: "Aprender & Brincar", icon: "🎨", color: "bg-purple-100 hover:bg-purple-200 text-purple-700" },
+    { id: "selfcare", label: "Cuidado dos Pais", icon: "💆‍♀️", color: "bg-pink-100 hover:bg-pink-200 text-pink-700" },
+  ];
+
+  const sourceProducts = showFavorites ? favorites : products;
+  
+  const filteredProducts = sourceProducts?.filter(product => {
+    const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+    const matchesSearch = !searchQuery || 
+      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Price range filter - convert decimal to number for comparison
+    const currentPrice = product.currentPrice ? parseFloat(product.currentPrice.toString()) : 0;
+    const matchesPrice = currentPrice >= selectedPriceRange[0] && currentPrice <= selectedPriceRange[1];
+    
+    // Rating filter - convert decimal to number for comparison
+    const productRating = product.rating ? parseFloat(product.rating.toString()) : 0;
+    const matchesRating = selectedRating === 0 || productRating >= selectedRating;
+    
+    return matchesCategory && matchesSearch && matchesPrice && matchesRating;
+  }) || [];
+
+  const currentLoading = showFavorites ? favoritesLoading : isLoading;
+
+  const activeFiltersCount = [selectedMood, selectedAgeGroup, selectedContext].filter(Boolean).length + 
+                           quickNeeds.length + (selectedRating > 0 ? 1 : 0) + 
+                           (selectedPriceRange[1] < 1000 ? 1 : 0);
+
+  const clearAllFilters = () => {
+    setSelectedMood("");
+    setSelectedAgeGroup("");
+    setSelectedContext("");
+    setQuickNeeds([]);
+    setSelectedRating(0);
+    setSelectedPriceRange([0, 1000]);
+    setSelectedCategory("all");
+    setSearchQuery("");
+  };
+
+  const toggleQuickNeed = (needId: string) => {
+    setQuickNeeds(prev => 
+      prev.includes(needId) 
+        ? prev.filter(id => id !== needId)
+        : [...prev, needId]
+    );
+  };
+
+  return (
+    <div className="pt-20">
+      <section className="py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Header */}
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="font-fredoka text-5xl gradient-text mb-4">
+              🧪 Hierarquia Visual Melhorada
+            </h1>
+            <p className="font-poppins text-xl text-gray-600">
+              Interface organizada por níveis de importância visual e contraste otimizado
+            </p>
+          </motion.div>
+
+          {/* Search and Filter Toggle - SEMPRE VISÍVEL */}
+          <motion.div 
+            className="mb-8 space-y-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            {/* Search Bar - Máxima prioridade visual */}
+            <div className="relative max-w-lg mx-auto">
+              <Input
+                type="text"
+                placeholder="Que produto você precisa?"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 py-4 text-lg rounded-2xl bg-white shadow-lg border-2 border-white/50 focus:border-purple-400 transition-all"
+              />
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 w-6 h-6" />
+            </div>
+
+            {/* Quick Actions - Alta prioridade */}
+            <div className="flex flex-wrap justify-center gap-4 mb-6">
+              <GradientButton
+                variant={showFilters ? "primary" : "glass"}
+                onClick={() => setShowFilters(!showFilters)}
+                className="relative text-lg px-6 py-3"
+                size="lg"
+              >
+                <Filter className="w-5 h-5 mr-2" />
+                Filtros Inteligentes
+                {activeFiltersCount > 0 && (
+                  <Badge className="absolute -top-2 -right-2 bg-red-500 text-white font-bold text-sm px-2 py-1">
+                    {activeFiltersCount}
+                  </Badge>
+                )}
+              </GradientButton>
+
+              {activeFiltersCount > 0 && (
+                <Button variant="outline" onClick={clearAllFilters} size="lg" className="text-lg px-6 py-3">
+                  <X className="w-5 h-5 mr-2" />
+                  Limpar Todos
+                </Button>
+              )}
+            </div>
+          </motion.div>
+
+          {/* Advanced Filters Panel */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mb-8"
+              >
+                <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
+                  
+                  {/* NÍVEL 1: FILTROS EMOCIONAIS PRINCIPAIS */}
+                  <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8">
+                    <div className="flex items-center mb-6">
+                      <div className="w-4 h-4 bg-white rounded-full mr-4 animate-pulse"></div>
+                      <h2 className="font-fredoka text-3xl text-white">🎭 Como você está se sentindo hoje?</h2>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {moodFilters.map((mood) => (
+                        <button
+                          key={mood.id}
+                          onClick={() => setSelectedMood(selectedMood === mood.id ? "" : mood.id)}
+                          className={`
+                            group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 transform
+                            ${selectedMood === mood.id 
+                              ? `${mood.color} scale-105 shadow-2xl ring-4 ring-white/30` 
+                              : 'bg-white/20 backdrop-blur-sm hover:bg-white/30 border-2 border-white/30 hover:shadow-xl hover:scale-102'
+                            }
+                          `}
+                        >
+                          <div className="flex items-center">
+                            <span className="text-4xl mr-4 group-hover:scale-110 transition-transform">
+                              {mood.emoji}
+                            </span>
+                            <div>
+                              <div className={`font-outfit font-bold text-xl mb-2 ${
+                                selectedMood === mood.id ? 'text-white' : 'text-white'
+                              }`}>
+                                {mood.label}
+                              </div>
+                              <div className={`text-sm ${
+                                selectedMood === mood.id ? 'text-white/90' : 'text-white/80'
+                              }`}>
+                                {mood.description}
+                              </div>
+                            </div>
+                          </div>
+                          {selectedMood === mood.id && (
+                            <div className="absolute top-4 right-4 w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* NÍVEL 2: FILTROS SECUNDÁRIOS */}
+                  <div className="p-6 bg-gray-50 space-y-8">
+                    
+                    {/* Contextos */}
+                    <div className="border-l-4 border-purple-400 pl-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-3 h-3 bg-purple-400 rounded-full mr-3"></div>
+                        <h3 className="font-outfit text-2xl text-gray-800">📅 Em que momento você precisa?</h3>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {contexts.map((context) => (
+                          <button
+                            key={context.id}
+                            onClick={() => setSelectedContext(selectedContext === context.id ? "" : context.id)}
+                            className={`
+                              flex items-center p-4 rounded-xl text-left transition-all duration-200
+                              ${selectedContext === context.id 
+                                ? 'bg-purple-500 text-white shadow-lg transform scale-105' 
+                                : 'bg-white text-gray-700 hover:bg-purple-50 hover:shadow-md border border-gray-200'
+                              }
+                            `}
+                          >
+                            <span className="mr-3 text-xl">{context.icon}</span>
+                            <span className="font-medium">{context.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Idades */}
+                    <div className="border-l-4 border-blue-400 pl-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
+                        <h3 className="font-outfit text-2xl text-gray-800">👨‍👩‍👧‍👦 Para qual faixa etária?</h3>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {ageGroups.map((age) => (
+                          <button
+                            key={age.id}
+                            onClick={() => setSelectedAgeGroup(selectedAgeGroup === age.id ? "" : age.id)}
+                            className={`
+                              flex items-center p-3 rounded-xl text-sm transition-all duration-200
+                              ${selectedAgeGroup === age.id 
+                                ? 'bg-blue-500 text-white shadow-lg' 
+                                : 'bg-white text-gray-600 hover:bg-blue-50 hover:text-gray-800 border border-gray-200'
+                              }
+                            `}
+                          >
+                            <span className="mr-2 text-lg">{age.icon}</span>
+                            <span className="font-medium">{age.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* NÍVEL 3: FILTROS AVANÇADOS (COLAPSÁVEIS) */}
+                  <div className="bg-gray-100 border-t border-gray-200">
+                    <details className="group">
+                      <summary className="cursor-pointer p-6 hover:bg-gray-50 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full mr-3"></div>
+                            <h4 className="font-outfit text-xl text-gray-600">⚙️ Filtros Avançados</h4>
+                          </div>
+                          <ChevronDown className="w-6 h-6 text-gray-400 group-open:rotate-180 transition-transform" />
+                        </div>
+                      </summary>
+                      
+                      <div className="px-6 pb-6 space-y-6">
+                        {/* Quick Needs */}
+                        <div>
+                          <h5 className="font-poppins text-lg font-semibold text-gray-700 mb-3">Necessidades Especiais:</h5>
+                          <div className="flex flex-wrap gap-2">
+                            {quickNeedOptions.map((need) => (
+                              <button
+                                key={need.id}
+                                onClick={() => toggleQuickNeed(need.id)}
+                                className={`
+                                  inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all
+                                  ${quickNeeds.includes(need.id) 
+                                    ? 'bg-gray-700 text-white shadow-md' 
+                                    : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
+                                  }
+                                `}
+                              >
+                                <span className="mr-2">{need.icon}</span>
+                                {need.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Price Range */}
+                        <div>
+                          <h5 className="font-poppins text-lg font-semibold text-gray-700 mb-3">Faixa de Preço:</h5>
+                          <div className="px-4">
+                            <Slider
+                              value={selectedPriceRange}
+                              onValueChange={setSelectedPriceRange}
+                              max={1000}
+                              min={0}
+                              step={10}
+                              className="mb-4"
+                            />
+                            <div className="flex justify-between text-sm text-gray-600">
+                              <span className="font-medium">R$ {selectedPriceRange[0]}</span>
+                              <span className="font-medium">R$ {selectedPriceRange[1]}{selectedPriceRange[1] >= 1000 ? "+" : ""}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Rating Filter */}
+                        <div>
+                          <h5 className="font-poppins text-lg font-semibold text-gray-700 mb-3">Avaliação Mínima:</h5>
+                          <div className="flex gap-2">
+                            {[0, 3, 4, 5].map((rating) => (
+                              <button
+                                key={rating}
+                                onClick={() => setSelectedRating(rating)}
+                                className={`
+                                  px-4 py-2 rounded-lg text-sm font-medium transition-all
+                                  ${selectedRating === rating 
+                                    ? 'bg-yellow-500 text-white shadow-md' 
+                                    : 'bg-white text-gray-600 border border-gray-300 hover:bg-yellow-50'
+                                  }
+                                `}
+                              >
+                                {rating === 0 ? "Todas" : `${rating}+ ⭐`}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </details>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* NÍVEL 4: CATEGORIAS TRADICIONAIS - Menor importância visual */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="text-center mb-4">
+              <h4 className="font-poppins text-lg text-gray-500">Ou procure por categoria:</h4>
+            </div>
+            <div className="flex flex-wrap justify-center gap-3">
+              {categories.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  className={`
+                    flex items-center px-4 py-2 rounded-xl text-sm font-medium transition-all border
+                    ${selectedCategory === category.id 
+                      ? `${category.color} border-current shadow-md` 
+                      : `${category.color} border-gray-200 hover:shadow-sm`
+                    }
+                  `}
+                >
+                  <span className="mr-2 text-base">{category.icon}</span>
+                  {category.label}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* CONTADOR DE RESULTADOS - Feedback visual importante */}
+          <motion.div 
+            className="text-center mb-8 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-white/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <div className="text-3xl font-fredoka gradient-text mb-2">
+              {filteredProducts.length} produtos encontrados
+            </div>
+            {activeFiltersCount > 0 && (
+              <div className="text-gray-600 font-poppins">
+                com <strong>{activeFiltersCount}</strong> filtros ativos
+                <button 
+                  onClick={clearAllFilters}
+                  className="ml-4 text-purple-600 hover:text-purple-800 underline font-medium"
+                >
+                  Limpar filtros
+                </button>
+              </div>
+            )}
+          </motion.div>
+
+          {/* Products Grid */}
+          {currentLoading ? (
+            <div className="flex flex-wrap justify-center gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse" style={{ width: '264px', height: '450px' }}>
+                  <div className="bg-gray-200 rounded-3xl h-full w-full"></div>
+                </div>
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
+            <motion.div 
+              className="flex flex-wrap justify-center gap-6"
+              variants={staggerContainer}
+              initial="initial"
+              animate="animate"
+            >
+              {filteredProducts.map((product, index) => (
+                <motion.div key={product.id} variants={staggerItem}>
+                  <ProductCard product={product} index={index} />
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div 
+              className="text-center py-16"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <div className="bg-white/80 backdrop-blur-sm p-12 rounded-3xl max-w-md mx-auto shadow-lg">
+                <ShoppingBag className="w-20 h-20 text-gray-400 mx-auto mb-6" />
+                <h3 className="font-fredoka text-3xl text-gray-600 mb-4">
+                  Nenhum produto encontrado
+                </h3>
+                <p className="text-gray-500 mb-6 font-poppins text-lg">
+                  Tente ajustar os filtros ou termo de busca
+                </p>
+                <Button onClick={clearAllFilters} variant="outline" size="lg" className="text-lg px-8 py-3">
+                  Limpar todos os filtros
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+      </section>
+
+      {/* Como Te Auxiliamos section */}
+      <section className="py-16 bg-white relative">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.h2 
+            className="font-fredoka text-4xl text-center gradient-text mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            🎨 Hierarquia Visual Aplicada
+          </motion.h2>
+          
+          <motion.div 
+            className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-12 rounded-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-8">
+              Interface organizada por níveis de importância: Emoções (primário), Contexto (secundário), 
+              Filtros avançados (terciário), Categorias (quaternário). Contraste otimizado para WCAG AA.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-indigo-500 text-white p-6 text-center rounded-2xl">
+                <div className="w-4 h-4 bg-white rounded-full mx-auto mb-4"></div>
+                <h4 className="font-outfit text-lg font-bold mb-3">Nível 1 - Primário</h4>
+                <p className="text-sm opacity-90">
+                  Filtros emocionais - máxima prioridade visual
+                </p>
+              </div>
+              
+              <div className="bg-purple-400 text-white p-6 text-center rounded-2xl">
+                <div className="w-3 h-3 bg-white rounded-full mx-auto mb-4"></div>
+                <h4 className="font-outfit text-lg font-bold mb-3">Nível 2 - Secundário</h4>
+                <p className="text-sm opacity-90">
+                  Contextos e idades - alta importância
+                </p>
+              </div>
+              
+              <div className="bg-gray-500 text-white p-6 text-center rounded-2xl">
+                <div className="w-2 h-2 bg-white rounded-full mx-auto mb-4"></div>
+                <h4 className="font-outfit text-lg font-bold mb-3">Nível 3 - Terciário</h4>
+                <p className="text-sm opacity-90">
+                  Filtros avançados - colapsáveis
+                </p>
+              </div>
+              
+              <div className="bg-gray-300 text-gray-700 p-6 text-center rounded-2xl">
+                <div className="w-1 h-1 bg-gray-600 rounded-full mx-auto mb-4"></div>
+                <h4 className="font-outfit text-lg font-bold mb-3">Nível 4 - Quaternário</h4>
+                <p className="text-sm opacity-75">
+                  Categorias tradicionais - menor destaque
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </div>
+  );
+}
