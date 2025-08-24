@@ -344,7 +344,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
               
               <div className="glassmorphism p-6 text-center rounded-2xl">
                 <div className="text-3xl mb-4">💝</div>
-                <h4 className="font-outfit text-lg gradient-text mb-3">Preço Justo</h4>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Preço Coerente</h4>
                 <p className="font-poppins text-sm text-gray-600">
                   Produtos que cabem no orçamento familiar
                 </p>
