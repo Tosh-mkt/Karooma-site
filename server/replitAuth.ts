@@ -158,15 +158,29 @@ export const isAuthenticated: RequestHandler = async (req, res, next) => {
 };
 
 export const isAdmin: RequestHandler = async (req, res, next) => {
-  // First check if user is authenticated
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
+  let userId: string | null = null;
+  let isAuthenticatedUser = false;
 
-  const user = req.user as any;
-  const userId = user?.claims?.sub;
+  // Check for session-based authentication (email/password login)
+  if ((req.session as any)?.user) {
+    const sessionUser = (req.session as any).user;
+    userId = sessionUser.id;
+    isAuthenticatedUser = true;
+    
+    // If user is already marked as admin in session, allow access
+    if (sessionUser.isAdmin) {
+      return next();
+    }
+  }
   
-  if (!userId) {
+  // Check for OAuth authentication (Replit/Google login)  
+  if (!isAuthenticatedUser && req.isAuthenticated?.()) {
+    const user = req.user as any;
+    userId = user?.claims?.sub;
+    isAuthenticatedUser = true;
+  }
+  
+  if (!isAuthenticatedUser || !userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
 

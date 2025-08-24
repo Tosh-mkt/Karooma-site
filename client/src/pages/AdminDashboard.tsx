@@ -24,6 +24,7 @@ import { EditProductModal } from "@/components/admin/EditProductModal";
 import { CreatePostModal } from "@/components/admin/CreatePostModal";
 import { EditPostModal } from "@/components/admin/EditPostModal";
 import { EditPageContentModal } from "@/components/admin/EditPageContentModal";
+import { AdminLogin } from "@/components/AdminLogin";
 
 // Dashboard Overview Component
 function DashboardOverview() {
@@ -342,35 +343,7 @@ export function AdminDashboard() {
   const { user, isLoading, isAuthenticated, isAdmin } = useAuth();
   const { toast } = useToast();
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      toast({
-        title: "Acesso Restrito",
-        description: "Você precisa fazer login para acessar o painel administrativo.",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 2000);
-      return;
-    }
-  }, [isAuthenticated, isLoading, toast]);
-
-  // Redirect if not admin
-  useEffect(() => {
-    if (!isLoading && isAuthenticated && !isAdmin) {
-      toast({
-        title: "Acesso Negado",
-        description: "Apenas administradores podem acessar este painel.",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-      return;
-    }
-  }, [isAuthenticated, isAdmin, isLoading, toast]);
+  // No automatic redirects - show login form instead
 
   if (isLoading) {
     return (
@@ -383,48 +356,9 @@ export function AdminDashboard() {
     );
   }
 
-  if (!isAuthenticated) {
-    return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
-        <Card className="glassmorphism border-0 max-w-md">
-          <CardContent className="p-8 text-center">
-            <LogIn className="w-12 h-12 mx-auto mb-4 text-purple-600" />
-            <h2 className="text-xl font-outfit font-bold mb-2">Login Necessário</h2>
-            <p className="text-gray-600 mb-4">
-              Você será redirecionado para o login em instantes...
-            </p>
-            <Button 
-              onClick={() => window.location.href = "/api/login"}
-              className="bg-gradient-to-r from-purple-500 to-pink-500"
-            >
-              Fazer Login
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="pt-20 min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center">
-        <Card className="glassmorphism border-0 max-w-md">
-          <CardContent className="p-8 text-center">
-            <Shield className="w-12 h-12 mx-auto mb-4 text-red-500" />
-            <h2 className="text-xl font-outfit font-bold mb-2">Acesso Restrito</h2>
-            <p className="text-gray-600 mb-4">
-              Apenas administradores podem acessar este painel.
-            </p>
-            <Button 
-              onClick={() => window.location.href = "/"}
-              variant="outline"
-            >
-              Voltar ao Início
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
+  // Show login screen if not authenticated or not admin
+  if (!isAuthenticated || !isAdmin) {
+    return <AdminLogin onLoginSuccess={() => window.location.reload()} />;
   }
 
   return (
