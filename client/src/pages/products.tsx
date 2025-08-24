@@ -200,6 +200,56 @@ export default function Products() {
           )}
         </div>
       </section>
+
+      {/* Como Te Auxiliamos section */}
+      <section className="py-16 bg-white relative">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.h2 
+            className="font-outfit text-4xl text-center gradient-text mb-8"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            Como Te Auxiliamos
+          </motion.h2>
+          
+          <motion.div 
+            className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 p-12 rounded-3xl mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-8">
+              Porque o seu tempo é precioso demais para ser desperdiçado com coisas que não funcionam.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">🔍</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Testados por Mães</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Cada produto é testado na vida real, por mães reais
+                </p>
+              </div>
+              
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">⭐</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Qualidade Garantida</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Só recomendamos o que realmente vale a pena
+                </p>
+              </div>
+              
+              <div className="glassmorphism p-6 text-center rounded-2xl">
+                <div className="text-3xl mb-4">💝</div>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Preço Coerente</h4>
+                <p className="font-poppins text-sm text-gray-600">
+                  Produtos que cabem no orçamento familiar
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
     </div>
   );
 }
