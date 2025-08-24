@@ -1,0 +1,67 @@
+🔹 Melhores formas de criar filtros para produtos da Amazon no seu site
+1. Usar a PA-API (Product Advertising API) da Amazon
+
+Você pode puxar dados de produtos (título, preço, marca, categoria, avaliação, etc.) diretamente da Amazon.
+
+Armazene essas informações no seu banco de dados e crie filtros (navegação facetada).
+
+Exemplos de filtros: ✅ faixa de preço, ✅ avaliação em estrelas, ✅ elegível para Prime, ✅ marca, ✅ categoria.
+
+2. Criar Filtros Personalizados Baseados nas Necessidades do Seu Público
+
+Como seu segmento é pais ocupados, pense menos como a Amazon e mais em soluções para as dores deles:
+
+⏱ Economia de tempo → refeições rápidas, processadores de alimentos, aspiradores robôs.
+
+🎒 Por idade da criança → recém-nascidos, bebês, crianças em idade escolar, adolescentes.
+
+🏡 Por ambiente da casa → cozinha, quarto, sala, área externa.
+
+💸 Amigável ao bolso → até R$200, até R$500, produtos premium.
+
+⭐ Escolha dos especialistas / recomendação da equipe → destaque as análises feitas pela sua equipe.
+
+3. Combinar Categorias da Amazon com Categorias de Estilo de Vida
+
+As categorias padrão da Amazon ajudam, mas são muito genéricas. Melhor reorganizá-las para o contexto de pais ocupados.
+
+Categorias oficiais da Amazon (via PA-API):
+
+Bebês
+
+Brinquedos e Jogos
+
+Livros para pais e crianças
+
+Eletrônicos (babás eletrônicas, tablets infantis)
+
+Casa e Cozinha (eletrodomésticos, organizadores)
+
+Saúde e Cuidados Pessoais
+
+Esportes e Lazer (carrinhos, mochilas, acessórios para passeios)
+
+Categorias de estilo de vida (personalizadas, melhores para experiência do usuário):
+
+“Sono & Relaxamento” (máquinas de ruído branco, cortinas blackout, berços)
+
+“Refeições rápidas & práticas” (air fryers, liquidificadores, potes para marmita)
+
+“Na correria com os filhos” (cadeirinhas de carro, bolsas de fralda, carrinhos de viagem)
+
+“Aprender & Brincar” (brinquedos educativos, livros, tablets infantis)
+
+“Cuidado dos pais” (massageadores, cafeteiras, planners)
+
+4. Implementação Técnica
+
+Frontend: use sistema de filtros facetados (checkboxes, sliders, menus suspensos).
+
+Backend: busque os produtos pela PA-API → salve atributos relevantes (categoria, preço, marca, avaliação, tags) → permita que os usuários filtrem pela combinação.
+
+Busca: combine palavra-chave + filtros (exemplo: “carrinho até R$1.000, 4+ estrelas, Prime elegível”).
+
+✅ Estratégia de Categorias Recomendada
+
+👉 Use as categorias oficiais da Amazon para ter precisão nos dados, mas reorganize em categorias de estilo de vida voltadas para pais.
+Assim você tem o melhor dos dois mundos: dados confiáveis da Amazon + experiência de navegação personalizada para o seu público.
