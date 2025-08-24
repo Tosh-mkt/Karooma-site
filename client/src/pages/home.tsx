@@ -53,7 +53,7 @@ export default function Home() {
             </motion.h2>
             
             <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
-              {heroContent?.description || "Sabemos como é correr atrás de filhos, casa, trabalho... e ainda tentar sobrar um tempinho pra você."}
+              {heroContent?.description || "Sabemos como é correr atrás de filhos, cuidar da casa, dar conta do trabalho... e ainda tentar sobrar um tempinho pra você."}
             </p>
             
             <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
