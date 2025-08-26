@@ -7,7 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { useQuery } from "@tanstack/react-query";
 import type { Product } from "@shared/schema";
 
-// Dados dos filtros hierárquicos
+// Dados dos filtros hierárquicos baseados no mapa fornecido
 const primaryCategories = [
   {
     id: "comer-preparar",
@@ -17,144 +17,147 @@ const primaryCategories = [
     color: "from-purple-500 to-pink-500"
   },
   {
-    id: "limpar-organizar", 
-    title: "Limpar e Organizar",
-    icon: "🧹",
-    description: "Limpeza e organização da casa",
+    id: "apresentar", 
+    title: "Apresentar",
+    icon: "🎁",
+    description: "Presentes e apresentações",
     color: "from-blue-500 to-cyan-500"
   },
   {
-    id: "brincar-aprender",
-    title: "Brincar e Aprender", 
-    icon: "🎨",
-    description: "Diversão e desenvolvimento",
+    id: "saude-seguranca",
+    title: "Saúde e Segurança", 
+    icon: "🛡️",
+    description: "Cuidados de saúde e segurança",
     color: "from-green-500 to-emerald-500"
   },
   {
-    id: "cuidar-proteger",
-    title: "Cuidar e Proteger",
-    icon: "🛡️", 
-    description: "Cuidados e proteção",
+    id: "decorar-brilhar",
+    title: "Decorar e Brilhar",
+    icon: "✨", 
+    description: "Decoração e beleza",
     color: "from-orange-500 to-red-500"
   },
   {
-    id: "dormir-descansar",
-    title: "Dormir e Descansar",
+    id: "sono-relaxamento",
+    title: "Sono e Relaxamento",
     icon: "😴",
-    description: "Sono e relaxamento",
+    description: "Descanso e relaxamento",
     color: "from-indigo-500 to-purple-500"
   },
   {
-    id: "passear-viajar",
-    title: "Passear e Viajar", 
-    icon: "✈️",
-    description: "Mobilidade e viagens",
+    id: "aprender-brincar",
+    title: "Aprender e Brincar", 
+    icon: "🎨",
+    description: "Educação e diversão",
     color: "from-pink-500 to-rose-500"
   },
   {
-    id: "vestir-trocar",
-    title: "Vestir e Trocar",
-    icon: "👕",
-    description: "Roupas e acessórios", 
+    id: "sair-viajar",
+    title: "Sair e Viajar",
+    icon: "✈️",
+    description: "Viagens e passeios", 
     color: "from-yellow-500 to-orange-500"
   },
   {
-    id: "tecnologia-conectar",
-    title: "Tecnologia e Conectar",
-    icon: "📱",
-    description: "Tecnologia e comunicação",
+    id: "organizacao",
+    title: "Organização",
+    icon: "📦",
+    description: "Organização e arrumação",
     color: "from-teal-500 to-blue-500"
   }
 ];
 
+// Público-alvo por categoria principal (do mapa)
 const audienceOptions = {
   "comer-preparar": [
+    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
+    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
+    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
+  ],
+  "apresentar": [
+    { id: "presente-para-ocasioes", label: "Presente para Ocasiões", icon: "🎁", color: "bg-pink-100 text-pink-800" },
+    { id: "presente-por-idade", label: "Presente por Idade", icon: "🎂", color: "bg-blue-100 text-blue-800" }
+  ],
+  "saude-seguranca": [
+    { id: "primeiros-socorros", label: "Primeiros Socorros", icon: "🏥", color: "bg-red-100 text-red-800" }
+  ],
+  "decorar-brilhar": [
+    // Sem subcategorias específicas no mapa fornecido
+  ],
+  "sono-relaxamento": [
+    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
+    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
+    { id: "pais-cuidadores", label: "Pais e Cuidadores", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
+  ],
+  "aprender-brincar": [
     { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
     { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
     { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
   ],
-  "limpar-organizar": [
+  "sair-viajar": [
+    { id: "primeiros-socorros", label: "Primeiros Socorros", icon: "🏥", color: "bg-red-100 text-red-800" },
     { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
     { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
     { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
   ],
-  "brincar-aprender": [
-    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
-    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
-    { id: "adolescente", label: "Adolescente", icon: "🧑‍🎓", color: "bg-blue-100 text-blue-800" }
-  ],
-  "cuidar-proteger": [
-    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
-    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
-    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
-  ],
-  "dormir-descansar": [
-    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
-    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
-    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
-  ],
-  "passear-viajar": [
-    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
-    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
-    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
-  ],
-  "vestir-trocar": [
-    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-800" },
-    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
-    { id: "adolescente", label: "Adolescente", icon: "🧑‍🎓", color: "bg-blue-100 text-blue-800" }
-  ],
-  "tecnologia-conectar": [
-    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
-    { id: "adolescente", label: "Adolescente", icon: "🧑‍🎓", color: "bg-blue-100 text-blue-800" },
-    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" }
+  "organizacao": [
+    // Sem subcategorias de público específicas no mapa fornecido
   ]
 };
 
+// Ambientes por categoria principal (do mapa)
 const environmentOptions = {
-  "comer-preparar": {
-    "bebe": [
-      { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
-      { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" }
-    ],
-    "crianca": [
-      { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
-      { id: "escola", label: "Escola", icon: "🏫", color: "bg-blue-100 text-blue-700" },
-      { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" }
-    ],
-    "familia": [
-      { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
-      { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" },
-      { id: "restaurante", label: "Restaurante", icon: "🍽️", color: "bg-red-100 text-red-700" }
-    ]
-  },
-  "limpar-organizar": {
-    "bebe": [
-      { id: "quarto", label: "Quarto", icon: "🛏️", color: "bg-purple-100 text-purple-700" },
-      { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" }
-    ],
-    "crianca": [
-      { id: "quarto", label: "Quarto", icon: "🛏️", color: "bg-purple-100 text-purple-700" },
-      { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
-      { id: "escola", label: "Escola", icon: "🏫", color: "bg-blue-100 text-blue-700" }
-    ],
-    "familia": [
-      { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
-      { id: "garagem", label: "Garagem", icon: "🚗", color: "bg-gray-100 text-gray-700" }
-    ]
-  }
-};
-
-const occasionOptions = {
   "comer-preparar": [
-    { id: "cafe-manha", label: "Café da Manhã", icon: "☀️", color: "bg-yellow-100 text-yellow-700" },
-    { id: "almoco", label: "Almoço", icon: "🌞", color: "bg-orange-100 text-orange-700" },
-    { id: "jantar", label: "Jantar", icon: "🌙", color: "bg-blue-100 text-blue-700" },
-    { id: "lanche", label: "Lanche", icon: "🍎", color: "bg-green-100 text-green-700" }
+    { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
+    { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" },
+    { id: "area-servico", label: "Área de Serviço", icon: "🧽", color: "bg-blue-100 text-blue-700" },
+    { id: "quarto-bebe", label: "Quarto do Bebê", icon: "🍼", color: "bg-yellow-100 text-yellow-700" },
+    { id: "quarto-crianca", label: "Quarto da Criança", icon: "🧸", color: "bg-purple-100 text-purple-700" }
   ],
-  "limpar-organizar": [
-    { id: "diario", label: "Limpeza Diária", icon: "📅", color: "bg-blue-100 text-blue-700" },
-    { id: "semanal", label: "Limpeza Semanal", icon: "🗓️", color: "bg-purple-100 text-purple-700" },
-    { id: "organizacao", label: "Organização", icon: "📦", color: "bg-green-100 text-green-700" }
+  "apresentar": [
+    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-700" },
+    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-700" },
+    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-700" }
+  ],
+  "saude-seguranca": [
+    { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
+    { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" },
+    { id: "area-servico", label: "Área de Serviço", icon: "🧽", color: "bg-blue-100 text-blue-700" },
+    { id: "quarto-bebe", label: "Quarto do Bebê", icon: "🍼", color: "bg-yellow-100 text-yellow-700" },
+    { id: "quarto-crianca", label: "Quarto da Criança", icon: "🧸", color: "bg-purple-100 text-purple-700" }
+  ],
+  "decorar-brilhar": [
+    { id: "carro", label: "Carro", icon: "🚗", color: "bg-gray-100 text-gray-700" },
+    { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
+    { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" },
+    { id: "area-servico", label: "Área de Serviço", icon: "🧽", color: "bg-blue-100 text-blue-700" },
+    { id: "quarto-bebe", label: "Quarto do Bebê", icon: "🍼", color: "bg-yellow-100 text-yellow-700" },
+    { id: "quarto-crianca", label: "Quarto da Criança", icon: "🧸", color: "bg-purple-100 text-purple-700" }
+  ],
+  "sono-relaxamento": [
+    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-700" },
+    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-700" },
+    { id: "pais-cuidadores", label: "Pais e Cuidadores", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-700" }
+  ],
+  "aprender-brincar": [
+    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-yellow-100 text-yellow-700" },
+    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-700" },
+    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-700" }
+  ],
+  "sair-viajar": [
+    { id: "carro", label: "Carro", icon: "🚗", color: "bg-gray-100 text-gray-700" },
+    { id: "casa", label: "Casa", icon: "🏠", color: "bg-green-100 text-green-700" },
+    { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" },
+    { id: "area-servico", label: "Área de Serviço", icon: "🧽", color: "bg-blue-100 text-blue-700" },
+    { id: "quarto-bebe", label: "Quarto do Bebê", icon: "🍼", color: "bg-yellow-100 text-yellow-700" },
+    { id: "quarto-crianca", label: "Quarto da Criança", icon: "🧸", color: "bg-purple-100 text-purple-700" }
+  ],
+  "organizacao": [
+    { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-700" },
+    { id: "area-servico", label: "Área de Serviço", icon: "🧽", color: "bg-blue-100 text-blue-700" },
+    { id: "quarto-bebe", label: "Quarto do Bebê", icon: "🍼", color: "bg-yellow-100 text-yellow-700" },
+    { id: "quarto-crianca", label: "Quarto da Criança", icon: "🧸", color: "bg-purple-100 text-purple-700" },
+    { id: "carro", label: "Carro", icon: "🚗", color: "bg-gray-100 text-gray-700" }
   ]
 };
 
@@ -162,7 +165,6 @@ export default function TestFiltersVertical() {
   const [selectedPrimary, setSelectedPrimary] = useState<string>("");
   const [selectedAudience, setSelectedAudience] = useState<string>("");
   const [selectedEnvironment, setSelectedEnvironment] = useState<string>("");
-  const [selectedOccasion, setSelectedOccasion] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [showFilters, setShowFilters] = useState(true);
@@ -177,20 +179,12 @@ export default function TestFiltersVertical() {
     setSelectedPrimary(categoryId);
     setSelectedAudience("");
     setSelectedEnvironment("");
-    setSelectedOccasion("");
   };
 
   // Reset níveis inferiores quando muda público
   const handleAudienceSelect = (audienceId: string) => {
     setSelectedAudience(audienceId);
     setSelectedEnvironment("");
-    setSelectedOccasion("");
-  };
-
-  // Reset último nível quando muda ambiente
-  const handleEnvironmentSelect = (environmentId: string) => {
-    setSelectedEnvironment(environmentId);
-    setSelectedOccasion("");
   };
 
   // Produtos filtrados
@@ -207,7 +201,7 @@ export default function TestFiltersVertical() {
   }, [products, searchQuery, priceRange]);
 
   // Contar filtros ativos
-  const activeFiltersCount = [selectedPrimary, selectedAudience, selectedEnvironment, selectedOccasion]
+  const activeFiltersCount = [selectedPrimary, selectedAudience, selectedEnvironment]
     .filter(Boolean).length;
 
   // Reset todos os filtros
@@ -215,7 +209,6 @@ export default function TestFiltersVertical() {
     setSelectedPrimary("");
     setSelectedAudience("");
     setSelectedEnvironment("");
-    setSelectedOccasion("");
     setSearchQuery("");
     setPriceRange([0, 1000]);
   };
@@ -230,7 +223,7 @@ export default function TestFiltersVertical() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Filtros Hierárquicos Verticais
               </h1>
-              <p className="text-gray-600 mt-1">Estrutura em cascata com empilhamento vertical</p>
+              <p className="text-gray-600 mt-1">Baseado no mapa de categorização oficial</p>
             </div>
             
             <div className="flex items-center gap-4">
@@ -308,18 +301,18 @@ export default function TestFiltersVertical() {
             </div>
 
             {/* Etapa 2: Público-Alvo (aparece abaixo da categoria selecionada) */}
-            {selectedPrimary && audienceOptions[selectedPrimary as keyof typeof audienceOptions] && (
-              <div className="mb-8 animate-in slide-in-from-top-4 duration-500 ml-8 border-l-4 border-purple-300 pl-6">
+            {selectedPrimary && audienceOptions[selectedPrimary as keyof typeof audienceOptions] && audienceOptions[selectedPrimary as keyof typeof audienceOptions].length > 0 && (
+              <div className="mb-8 animate-in slide-in-from-top-4 duration-500 ml-8 border-l-4 border-green-300 pl-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
                     2
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">Para quem é este produto?</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Público-Alvo</h3>
                     <p className="text-gray-600">
                       Baseado em <span className="font-semibold text-purple-600">
                         {primaryCategories.find(c => c.id === selectedPrimary)?.title}
-                      </span>, estas são as opções disponíveis
+                      </span>, escolha o público-alvo
                     </p>
                   </div>
                 </div>
@@ -347,23 +340,23 @@ export default function TestFiltersVertical() {
             )}
 
             {/* Etapa 3: Ambiente (aparece abaixo do público selecionado) */}
-            {selectedAudience && environmentOptions[selectedPrimary as keyof typeof environmentOptions]?.[selectedAudience as keyof typeof environmentOptions[keyof typeof environmentOptions]] && (
+            {selectedPrimary && environmentOptions[selectedPrimary as keyof typeof environmentOptions] && (
               <div className="mb-8 animate-in slide-in-from-top-4 duration-500 ml-16 border-l-4 border-orange-300 pl-6">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
                     3
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">Em que ambiente será usado?</h3>
+                    <h3 className="text-xl font-bold text-gray-800">Ambiente</h3>
                     <p className="text-gray-600">Selecione onde o produto será utilizado</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {environmentOptions[selectedPrimary as keyof typeof environmentOptions]?.[selectedAudience as keyof typeof environmentOptions[keyof typeof environmentOptions]]?.map((environment) => (
+                  {environmentOptions[selectedPrimary as keyof typeof environmentOptions]?.map((environment) => (
                     <button
                       key={environment.id}
-                      onClick={() => handleEnvironmentSelect(environment.id)}
+                      onClick={() => setSelectedEnvironment(environment.id)}
                       className={`p-4 rounded-xl transition-all duration-300 border-2 text-left hover:scale-105 ${
                         selectedEnvironment === environment.id
                           ? 'bg-orange-600 text-white border-orange-600 shadow-lg'
@@ -377,38 +370,6 @@ export default function TestFiltersVertical() {
                           <ChevronRight className="w-4 h-4 ml-auto" />
                         )}
                       </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Etapa 4: Ocasião (aparece abaixo do ambiente selecionado) */}
-            {selectedEnvironment && occasionOptions[selectedPrimary as keyof typeof occasionOptions] && (
-              <div className="mb-8 animate-in slide-in-from-top-4 duration-500 ml-24 border-l-4 border-blue-300 pl-6">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
-                    4
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-800">Para qual ocasião?</h3>
-                    <p className="text-gray-600">Quando ou como será usado</p>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap gap-3">
-                  {occasionOptions[selectedPrimary as keyof typeof occasionOptions].map((occasion) => (
-                    <button
-                      key={occasion.id}
-                      onClick={() => setSelectedOccasion(occasion.id)}
-                      className={`px-6 py-3 rounded-full transition-all duration-300 border-2 flex items-center gap-2 hover:scale-105 ${
-                        selectedOccasion === occasion.id
-                          ? 'bg-blue-600 text-white border-blue-600 shadow-lg'
-                          : `${occasion.color} border-transparent hover:shadow-md`
-                      }`}
-                    >
-                      <span className="text-lg">{occasion.icon}</span>
-                      <span className="font-medium">{occasion.label}</span>
                     </button>
                   ))}
                 </div>
@@ -479,12 +440,7 @@ export default function TestFiltersVertical() {
                 )}
                 {selectedEnvironment && (
                   <Badge className="bg-orange-100 text-orange-800">
-                    {environmentOptions[selectedPrimary as keyof typeof environmentOptions]?.[selectedAudience as keyof typeof environmentOptions[keyof typeof environmentOptions]]?.find(e => e.id === selectedEnvironment)?.label}
-                  </Badge>
-                )}
-                {selectedOccasion && (
-                  <Badge className="bg-blue-100 text-blue-800">
-                    {occasionOptions[selectedPrimary as keyof typeof occasionOptions]?.find(o => o.id === selectedOccasion)?.label}
+                    {environmentOptions[selectedPrimary as keyof typeof environmentOptions]?.find(e => e.id === selectedEnvironment)?.label}
                   </Badge>
                 )}
               </div>
