@@ -19,13 +19,13 @@ export default function TestFiltersClean() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   
-  // Advanced filters
-  const [selectedMood, setSelectedMood] = useState("");
-  const [selectedAgeGroup, setSelectedAgeGroup] = useState("");
+  // Advanced filters baseado no mapa
+  const [selectedPrimaryTag, setSelectedPrimaryTag] = useState("");
+  const [selectedTargetAudience, setSelectedTargetAudience] = useState<string[]>([]);
+  const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>([]);
+  const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState([0, 1000]);
   const [selectedRating, setSelectedRating] = useState(0);
-  const [quickNeeds, setQuickNeeds] = useState<string[]>([]);
-  const [selectedContext, setSelectedContext] = useState("");
 
   const { isAuthenticated } = useAuth();
 
@@ -44,64 +44,100 @@ export default function TestFiltersClean() {
     enabled: isAuthenticated && showFavorites,
   });
 
-  // HIERARQUIA PRIMÁRIA - Filtros emocionais principais
-  const moodFilters = [
+  // TAGS PRIMÁRIOS - Baseado no mapa de categorização
+  const primaryTags = [
     { 
-      id: "urgent", 
-      label: "Socorro, preciso urgente!", 
-      emoji: "🚨", 
-      color: "bg-red-500 hover:bg-red-600 text-white shadow-lg",
-      description: "Soluções rápidas para emergências"
+      id: "comer-preparar", 
+      label: "Comer e Preparar", 
+      emoji: "🍽️", 
+      color: "bg-orange-500 hover:bg-orange-600 text-white shadow-lg",
+      description: "Alimentação e preparo de refeições",
+      subcategories: ["CRIANÇA", "BEBÊ", "FAMÍLIA"]
     },
     { 
-      id: "simplify", 
-      label: "Quero facilitar minha vida", 
-      emoji: "😌", 
-      color: "bg-green-500 hover:bg-green-600 text-white shadow-lg",
-      description: "Produtos que simplificam o dia a dia"
-    },
-    { 
-      id: "gift", 
-      label: "Presentear sem erro", 
+      id: "presentear", 
+      label: "Presentear", 
       emoji: "🎁", 
       color: "bg-purple-500 hover:bg-purple-600 text-white shadow-lg",
-      description: "Presentes que fazem sucesso"
+      description: "Presentes para ocasiões especiais",
+      subcategories: ["PRESENTE PARA OCASIÕES", "PRESENTE POR IDADE", "BEBÊ", "CRIANÇA", "FAMÍLIA", "PRIMEIROS SOCORROS"]
     },
     { 
-      id: "discover", 
-      label: "Descobrir algo novo", 
-      emoji: "💡", 
+      id: "sono-relaxamento", 
+      label: "Sono e Relaxamento", 
+      emoji: "😴", 
       color: "bg-blue-500 hover:bg-blue-600 text-white shadow-lg",
-      description: "Inovações e novidades"
+      description: "Produtos para dormir e relaxar",
+      subcategories: ["BEBÊ", "CRIANÇA", "PAIS E CUIDADORES"]
     },
+    { 
+      id: "aprender-brincar", 
+      label: "Aprender e Brincar", 
+      emoji: "🎨", 
+      color: "bg-green-500 hover:bg-green-600 text-white shadow-lg",
+      description: "Educação e diversão",
+      subcategories: ["BEBÊ", "CRIANÇA", "FAMÍLIA"]
+    },
+    { 
+      id: "sair-viajar", 
+      label: "Sair e Viajar", 
+      emoji: "🚗", 
+      color: "bg-teal-500 hover:bg-teal-600 text-white shadow-lg",
+      description: "Mobilidade e viagens",
+      subcategories: ["BEBÊ", "CRIANÇA", "FAMÍLIA", "PRIMEIROS SOCORROS", "CARRO"]
+    },
+    { 
+      id: "organizacao", 
+      label: "Organização", 
+      emoji: "📦", 
+      color: "bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg",
+      description: "Organizar casa e espaços",
+      subcategories: ["CASA", "COZINHA", "ÁREA DE SERVIÇO", "QUARTO DO BEBÊ", "QUARTO DA CRIANÇA", "CARRO"]
+    },
+    { 
+      id: "saude-seguranca", 
+      label: "Saúde e Segurança", 
+      emoji: "🏥", 
+      color: "bg-red-500 hover:bg-red-600 text-white shadow-lg",
+      description: "Cuidados médicos e segurança",
+      subcategories: ["CASA", "COZINHA", "ÁREA DE SERVIÇO", "QUARTO DO BEBÊ", "QUARTO DA CRIANÇA", "CARRO"]
+    },
+    { 
+      id: "decorar-brilhar", 
+      label: "Decorar e Brilhar", 
+      emoji: "✨", 
+      color: "bg-pink-500 hover:bg-pink-600 text-white shadow-lg",
+      description: "Decoração e estética",
+      subcategories: ["CASA", "COZINHA", "ÁREA DE SERVIÇO", "QUARTO DO BEBÊ", "QUARTO DA CRIANÇA", "CARRO"]
+    }
   ];
 
-  // HIERARQUIA SECUNDÁRIA - Contextos e idades
-  const contexts = [
-    { id: "morning", label: "Manhãs corridas", icon: "⏰" },
-    { id: "mealtime", label: "Hora das refeições", icon: "🍽️" },
-    { id: "sleep", label: "Noites tranquilas", icon: "🌙" },
-    { id: "travel", label: "Na correria com filhos", icon: "🚗" },
-    { id: "organization", label: "Organização da casa", icon: "📦" },
-    { id: "selfcare", label: "Cuidado próprio", icon: "💆‍♀️" },
+  // SUBCATEGORIAS POR PÚBLICO-ALVO
+  const targetAudience = [
+    { id: "bebe", label: "Bebê", icon: "👶", color: "bg-blue-100 text-blue-800" },
+    { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
+    { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" },
+    { id: "pais-cuidadores", label: "Pais e Cuidadores", icon: "👥", color: "bg-orange-100 text-orange-800" },
   ];
 
-  const ageGroups = [
-    { id: "newborn", label: "Recém-nascidos (0-6m)", icon: "👶" },
-    { id: "baby", label: "Bebês (6m-2 anos)", icon: "🍼" },
-    { id: "toddler", label: "Crianças pequenas (2-5 anos)", icon: "🧸" },
-    { id: "school", label: "Idade escolar (6-12 anos)", icon: "🎒" },
-    { id: "teen", label: "Adolescentes (13+ anos)", icon: "📱" },
-    { id: "parents", label: "Para os pais", icon: "☕" },
+  // AMBIENTES E LOCAIS
+  const environments = [
+    { id: "casa", label: "Casa", icon: "🏠", color: "bg-yellow-100 text-yellow-800" },
+    { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-800" },
+    { id: "area-servico", label: "Área de Serviço", icon: "🧺", color: "bg-blue-100 text-blue-800" },
+    { id: "quarto-bebe", label: "Quarto do Bebê", icon: "🛏️", color: "bg-pink-100 text-pink-800" },
+    { id: "quarto-crianca", label: "Quarto da Criança", icon: "🎪", color: "bg-green-100 text-green-800" },
+    { id: "carro", label: "Carro", icon: "🚗", color: "bg-gray-100 text-gray-800" },
+    { id: "primeiros-socorros", label: "Primeiros Socorros", icon: "🏥", color: "bg-red-100 text-red-800" },
   ];
 
-  // HIERARQUIA TERCIÁRIA - Necessidades específicas
-  const quickNeedOptions = [
-    { id: "prime", label: "Entrega rápida", icon: "📦" },
-    { id: "budget", label: "Cabe no bolso", icon: "💰" },
-    { id: "tested", label: "Testado por mães", icon: "✅" },
-    { id: "bestseller", label: "Mais vendido", icon: "🔥" },
-    { id: "innovative", label: "Inovador", icon: "⚡" },
+  // OCASIÕES ESPECIAIS
+  const specialOccasions = [
+    { id: "presente-ocasioes", label: "Presente para Ocasiões", icon: "🎉" },
+    { id: "presente-idade", label: "Presente por Idade", icon: "🎂" },
+    { id: "emergencia", label: "Emergência", icon: "🚨" },
+    { id: "dia-dia", label: "Uso Diário", icon: "📅" },
+    { id: "viagem", label: "Viagem", icon: "✈️" },
   ];
 
   // HIERARQUIA QUATERNÁRIA - Categorias tradicionais
@@ -135,26 +171,42 @@ export default function TestFiltersClean() {
 
   const currentLoading = showFavorites ? favoritesLoading : isLoading;
 
-  const activeFiltersCount = [selectedMood, selectedAgeGroup, selectedContext].filter(Boolean).length + 
-                           quickNeeds.length + (selectedRating > 0 ? 1 : 0) + 
-                           (selectedPriceRange[1] < 1000 ? 1 : 0);
+  const activeFiltersCount = [selectedPrimaryTag].filter(Boolean).length + 
+                           selectedTargetAudience.length + selectedEnvironments.length + selectedOccasions.length +
+                           (selectedRating > 0 ? 1 : 0) + (selectedPriceRange[1] < 1000 ? 1 : 0);
 
   const clearAllFilters = () => {
-    setSelectedMood("");
-    setSelectedAgeGroup("");
-    setSelectedContext("");
-    setQuickNeeds([]);
+    setSelectedPrimaryTag("");
+    setSelectedTargetAudience([]);
+    setSelectedEnvironments([]);
+    setSelectedOccasions([]);
     setSelectedRating(0);
     setSelectedPriceRange([0, 1000]);
     setSelectedCategory("all");
     setSearchQuery("");
   };
 
-  const toggleQuickNeed = (needId: string) => {
-    setQuickNeeds(prev => 
-      prev.includes(needId) 
-        ? prev.filter(id => id !== needId)
-        : [...prev, needId]
+  const toggleTargetAudience = (audienceId: string) => {
+    setSelectedTargetAudience(prev => 
+      prev.includes(audienceId) 
+        ? prev.filter(id => id !== audienceId)
+        : [...prev, audienceId]
+    );
+  };
+
+  const toggleEnvironment = (envId: string) => {
+    setSelectedEnvironments(prev => 
+      prev.includes(envId) 
+        ? prev.filter(id => id !== envId)
+        : [...prev, envId]
+    );
+  };
+
+  const toggleOccasion = (occasionId: string) => {
+    setSelectedOccasions(prev => 
+      prev.includes(occasionId) 
+        ? prev.filter(id => id !== occasionId)
+        : [...prev, occasionId]
     );
   };
 
@@ -347,28 +399,42 @@ export default function TestFiltersClean() {
                       </summary>
                       
                       <div className="px-6 pb-6 space-y-6">
-                        {/* Quick Needs */}
-                        <div>
-                          <h5 className="font-poppins text-lg font-semibold text-gray-700 mb-3">Necessidades Especiais:</h5>
-                          <div className="flex flex-wrap gap-2">
-                            {quickNeedOptions.map((need) => (
-                              <button
-                                key={need.id}
-                                onClick={() => toggleQuickNeed(need.id)}
-                                className={`
-                                  inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all
-                                  ${quickNeeds.includes(need.id) 
-                                    ? 'bg-gray-700 text-white shadow-md' 
-                                    : 'bg-white text-gray-600 border border-gray-300 hover:bg-gray-50'
-                                  }
-                                `}
-                              >
-                                <span className="mr-2">{need.icon}</span>
-                                {need.label}
-                              </button>
-                            ))}
+                        {/* Resumo de Filtros Ativos */}
+                        {(selectedPrimaryTag || selectedTargetAudience.length > 0 || selectedEnvironments.length > 0 || selectedOccasions.length > 0) && (
+                          <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                            <h5 className="font-poppins text-sm font-semibold text-blue-800 mb-3">Filtros Selecionados:</h5>
+                            <div className="space-y-2 text-sm">
+                              {selectedPrimaryTag && (
+                                <div className="flex items-center text-blue-700">
+                                  <span className="mr-2">🏷️</span>
+                                  <span className="font-medium">Tag Principal:</span>
+                                  <span className="ml-2">{primaryTags.find(t => t.id === selectedPrimaryTag)?.label}</span>
+                                </div>
+                              )}
+                              {selectedTargetAudience.length > 0 && (
+                                <div className="flex items-center text-blue-700">
+                                  <span className="mr-2">👥</span>
+                                  <span className="font-medium">Público:</span>
+                                  <span className="ml-2">{selectedTargetAudience.map(id => targetAudience.find(t => t.id === id)?.label).join(", ")}</span>
+                                </div>
+                              )}
+                              {selectedEnvironments.length > 0 && (
+                                <div className="flex items-center text-blue-700">
+                                  <span className="mr-2">🏠</span>
+                                  <span className="font-medium">Ambientes:</span>
+                                  <span className="ml-2">{selectedEnvironments.map(id => environments.find(e => e.id === id)?.label).join(", ")}</span>
+                                </div>
+                              )}
+                              {selectedOccasions.length > 0 && (
+                                <div className="flex items-center text-blue-700">
+                                  <span className="mr-2">🎉</span>
+                                  <span className="font-medium">Ocasiões:</span>
+                                  <span className="ml-2">{selectedOccasions.map(id => specialOccasions.find(o => o.id === id)?.label).join(", ")}</span>
+                                </div>
+                              )}
+                            </div>
                           </div>
-                        </div>
+                        )}
 
                         {/* Price Range */}
                         <div>
