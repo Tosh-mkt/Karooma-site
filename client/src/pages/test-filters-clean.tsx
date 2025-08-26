@@ -19,13 +19,32 @@ export default function TestFiltersClean() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   
-  // Advanced filters baseado no mapa
+  // Estados do filtro hierárquico
   const [selectedPrimaryTag, setSelectedPrimaryTag] = useState("");
   const [selectedTargetAudience, setSelectedTargetAudience] = useState<string[]>([]);
   const [selectedEnvironments, setSelectedEnvironments] = useState<string[]>([]);
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
   const [selectedPriceRange, setSelectedPriceRange] = useState([0, 1000]);
   const [selectedRating, setSelectedRating] = useState(0);
+
+  // Funções para obter opções disponíveis baseadas na hierarquia
+  const getAvailableAudience = () => {
+    if (!selectedPrimaryTag) return [];
+    const allowed = categoryHierarchy[selectedPrimaryTag]?.allowedAudience || [];
+    return allTargetAudience.filter(item => allowed.includes(item.id));
+  };
+
+  const getAvailableEnvironments = () => {
+    if (!selectedPrimaryTag) return [];
+    const allowed = categoryHierarchy[selectedPrimaryTag]?.allowedEnvironments || [];
+    return allEnvironments.filter(item => allowed.includes(item.id));
+  };
+
+  const getAvailableOccasions = () => {
+    if (!selectedPrimaryTag) return [];
+    const allowed = categoryHierarchy[selectedPrimaryTag]?.allowedOccasions || [];
+    return allSpecialOccasions.filter(item => allowed.includes(item.id));
+  };
 
   const { isAuthenticated } = useAuth();
 
@@ -44,95 +63,106 @@ export default function TestFiltersClean() {
     enabled: isAuthenticated && showFavorites,
   });
 
-  // TAGS PRIMÁRIOS - Baseado no mapa de categorização
-  const primaryTags = [
-    { 
-      id: "comer-preparar", 
-      label: "Comer e Preparar", 
-      emoji: "🍽️", 
+  // MAPEAMENTO HIERÁRQUICO BASEADO NO MAPA MENTAL
+  const categoryHierarchy = {
+    "comer-preparar": {
+      label: "Comer e Preparar",
+      emoji: "🍽️",
       color: "bg-orange-500 hover:bg-orange-600 text-white shadow-lg",
       description: "Alimentação e preparo de refeições",
-      subcategories: ["CRIANÇA", "BEBÊ", "FAMÍLIA"]
+      allowedAudience: ["bebe", "crianca", "familia"],
+      allowedEnvironments: ["casa", "cozinha"],
+      allowedOccasions: ["dia-dia", "emergencia"]
     },
-    { 
-      id: "presentear", 
-      label: "Presentear", 
-      emoji: "🎁", 
+    "presentear": {
+      label: "Presentear",
+      emoji: "🎁",
       color: "bg-purple-500 hover:bg-purple-600 text-white shadow-lg",
       description: "Presentes para ocasiões especiais",
-      subcategories: ["PRESENTE PARA OCASIÕES", "PRESENTE POR IDADE", "BEBÊ", "CRIANÇA", "FAMÍLIA", "PRIMEIROS SOCORROS"]
+      allowedAudience: ["bebe", "crianca", "familia"],
+      allowedEnvironments: ["casa", "quarto-bebe", "quarto-crianca"],
+      allowedOccasions: ["presente-ocasioes", "presente-idade"]
     },
-    { 
-      id: "sono-relaxamento", 
-      label: "Sono e Relaxamento", 
-      emoji: "😴", 
+    "sono-relaxamento": {
+      label: "Sono e Relaxamento",
+      emoji: "😴",
       color: "bg-blue-500 hover:bg-blue-600 text-white shadow-lg",
       description: "Produtos para dormir e relaxar",
-      subcategories: ["BEBÊ", "CRIANÇA", "PAIS E CUIDADORES"]
+      allowedAudience: ["bebe", "crianca", "pais-cuidadores"],
+      allowedEnvironments: ["casa", "quarto-bebe", "quarto-crianca"],
+      allowedOccasions: ["dia-dia", "viagem"]
     },
-    { 
-      id: "aprender-brincar", 
-      label: "Aprender e Brincar", 
-      emoji: "🎨", 
+    "aprender-brincar": {
+      label: "Aprender e Brincar",
+      emoji: "🎨",
       color: "bg-green-500 hover:bg-green-600 text-white shadow-lg",
       description: "Educação e diversão",
-      subcategories: ["BEBÊ", "CRIANÇA", "FAMÍLIA"]
+      allowedAudience: ["bebe", "crianca", "familia"],
+      allowedEnvironments: ["casa", "quarto-bebe", "quarto-crianca"],
+      allowedOccasions: ["dia-dia", "presente-idade"]
     },
-    { 
-      id: "sair-viajar", 
-      label: "Sair e Viajar", 
-      emoji: "🚗", 
+    "sair-viajar": {
+      label: "Sair e Viajar",
+      emoji: "🚗",
       color: "bg-teal-500 hover:bg-teal-600 text-white shadow-lg",
       description: "Mobilidade e viagens",
-      subcategories: ["BEBÊ", "CRIANÇA", "FAMÍLIA", "PRIMEIROS SOCORROS", "CARRO"]
+      allowedAudience: ["bebe", "crianca", "familia"],
+      allowedEnvironments: ["carro", "casa"],
+      allowedOccasions: ["viagem", "emergencia", "dia-dia"]
     },
-    { 
-      id: "organizacao", 
-      label: "Organização", 
-      emoji: "📦", 
+    "organizacao": {
+      label: "Organização",
+      emoji: "📦",
       color: "bg-indigo-500 hover:bg-indigo-600 text-white shadow-lg",
       description: "Organizar casa e espaços",
-      subcategories: ["CASA", "COZINHA", "ÁREA DE SERVIÇO", "QUARTO DO BEBÊ", "QUARTO DA CRIANÇA", "CARRO"]
+      allowedAudience: ["bebe", "crianca", "familia", "pais-cuidadores"],
+      allowedEnvironments: ["casa", "cozinha", "area-servico", "quarto-bebe", "quarto-crianca", "carro"],
+      allowedOccasions: ["dia-dia"]
     },
-    { 
-      id: "saude-seguranca", 
-      label: "Saúde e Segurança", 
-      emoji: "🏥", 
+    "saude-seguranca": {
+      label: "Saúde e Segurança",
+      emoji: "🏥",
       color: "bg-red-500 hover:bg-red-600 text-white shadow-lg",
       description: "Cuidados médicos e segurança",
-      subcategories: ["CASA", "COZINHA", "ÁREA DE SERVIÇO", "QUARTO DO BEBÊ", "QUARTO DA CRIANÇA", "CARRO"]
+      allowedAudience: ["bebe", "crianca", "familia", "pais-cuidadores"],
+      allowedEnvironments: ["casa", "cozinha", "area-servico", "quarto-bebe", "quarto-crianca", "carro"],
+      allowedOccasions: ["emergencia", "dia-dia", "primeiros-socorros"]
     },
-    { 
-      id: "decorar-brilhar", 
-      label: "Decorar e Brilhar", 
-      emoji: "✨", 
+    "decorar-brilhar": {
+      label: "Decorar e Brilhar",
+      emoji: "✨",
       color: "bg-pink-500 hover:bg-pink-600 text-white shadow-lg",
       description: "Decoração e estética",
-      subcategories: ["CASA", "COZINHA", "ÁREA DE SERVIÇO", "QUARTO DO BEBÊ", "QUARTO DA CRIANÇA", "CARRO"]
+      allowedAudience: ["familia", "pais-cuidadores"],
+      allowedEnvironments: ["casa", "quarto-bebe", "quarto-crianca"],
+      allowedOccasions: ["dia-dia", "presente-ocasioes"]
     }
-  ];
+  };
 
-  // SUBCATEGORIAS POR PÚBLICO-ALVO
-  const targetAudience = [
+  // Converter para array para o map
+  const primaryTags = Object.entries(categoryHierarchy).map(([id, data]) => ({
+    id,
+    ...data
+  }));
+
+  // TODAS AS OPÇÕES POSSÍVEIS (para referência)
+  const allTargetAudience = [
     { id: "bebe", label: "Bebê", icon: "👶", color: "bg-blue-100 text-blue-800" },
     { id: "crianca", label: "Criança", icon: "🧒", color: "bg-green-100 text-green-800" },
     { id: "familia", label: "Família", icon: "👨‍👩‍👧‍👦", color: "bg-purple-100 text-purple-800" },
     { id: "pais-cuidadores", label: "Pais e Cuidadores", icon: "👥", color: "bg-orange-100 text-orange-800" },
   ];
 
-  // AMBIENTES E LOCAIS
-  const environments = [
+  const allEnvironments = [
     { id: "casa", label: "Casa", icon: "🏠", color: "bg-yellow-100 text-yellow-800" },
     { id: "cozinha", label: "Cozinha", icon: "🍳", color: "bg-orange-100 text-orange-800" },
     { id: "area-servico", label: "Área de Serviço", icon: "🧺", color: "bg-blue-100 text-blue-800" },
     { id: "quarto-bebe", label: "Quarto do Bebê", icon: "🛏️", color: "bg-pink-100 text-pink-800" },
     { id: "quarto-crianca", label: "Quarto da Criança", icon: "🎪", color: "bg-green-100 text-green-800" },
     { id: "carro", label: "Carro", icon: "🚗", color: "bg-gray-100 text-gray-800" },
-    { id: "primeiros-socorros", label: "Primeiros Socorros", icon: "🏥", color: "bg-red-100 text-red-800" },
   ];
 
-  // OCASIÕES ESPECIAIS
-  const specialOccasions = [
+  const allSpecialOccasions = [
     { id: "presente-ocasioes", label: "Presente para Ocasiões", icon: "🎉" },
     { id: "presente-idade", label: "Presente por Idade", icon: "🎂" },
     { id: "emergencia", label: "Emergência", icon: "🚨" },
@@ -186,6 +216,16 @@ export default function TestFiltersClean() {
     setSearchQuery("");
   };
 
+  // Função para resetar subcategorias quando mudar tag primário
+  const handlePrimaryTagChange = (tagId: string) => {
+    const newTag = selectedPrimaryTag === tagId ? "" : tagId;
+    setSelectedPrimaryTag(newTag);
+    // Limpar subcategorias quando mudar tag primário
+    setSelectedTargetAudience([]);
+    setSelectedEnvironments([]);
+    setSelectedOccasions([]);
+  };
+
   const toggleTargetAudience = (audienceId: string) => {
     setSelectedTargetAudience(prev => 
       prev.includes(audienceId) 
@@ -210,6 +250,11 @@ export default function TestFiltersClean() {
     );
   };
 
+  // Obter opções filtradas dinamicamente
+  const availableAudience = getAvailableAudience();
+  const availableEnvironments = getAvailableEnvironments();
+  const availableOccasions = getAvailableOccasions();
+
   return (
     <div className="pt-20">
       <section className="py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -221,11 +266,42 @@ export default function TestFiltersClean() {
             animate={{ opacity: 1, y: 0 }}
           >
             <h1 className="font-fredoka text-5xl gradient-text mb-4">
-              🧪 Hierarquia Visual Melhorada
+              🏷️ Sistema Hierárquico de Filtros
             </h1>
             <p className="font-poppins text-xl text-gray-600">
-              Interface organizada por níveis de importância visual e contraste otimizado
+              Navegação em cascata: Categoria → Público → Ambiente → Ocasião
             </p>
+            
+            {/* Indicador de Progresso */}
+            <div className="mt-6 flex items-center justify-center space-x-2 md:space-x-4 flex-wrap">
+              <div className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                selectedPrimaryTag ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+              }`}>
+                <span className="mr-2">🏷️</span>
+                Categoria {selectedPrimaryTag && '✓'}
+              </div>
+              <div className="w-4 h-0.5 bg-gray-300 hidden md:block"></div>
+              <div className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                selectedTargetAudience.length > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+              }`}>
+                <span className="mr-2">👥</span>
+                Público {selectedTargetAudience.length > 0 && '✓'}
+              </div>
+              <div className="w-4 h-0.5 bg-gray-300 hidden md:block"></div>
+              <div className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                selectedEnvironments.length > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+              }`}>
+                <span className="mr-2">🏠</span>
+                Ambiente {selectedEnvironments.length > 0 && '✓'}
+              </div>
+              <div className="w-4 h-0.5 bg-gray-300 hidden md:block"></div>
+              <div className={`flex items-center px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                selectedOccasions.length > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+              }`}>
+                <span className="mr-2">🎉</span>
+                Ocasião {selectedOccasions.length > 0 && '✓'}
+              </div>
+            </div>
           </motion.div>
 
           {/* Search and Filter Toggle - SEMPRE VISÍVEL */}
@@ -295,7 +371,7 @@ export default function TestFiltersClean() {
                       {primaryTags.map((tag) => (
                         <button
                           key={tag.id}
-                          onClick={() => setSelectedPrimaryTag(selectedPrimaryTag === tag.id ? "" : tag.id)}
+                          onClick={() => handlePrimaryTagChange(tag.id)}
                           className={`
                             group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 transform
                             ${selectedPrimaryTag === tag.id 
@@ -318,9 +394,9 @@ export default function TestFiltersClean() {
                             }`}>
                               {tag.description}
                             </div>
-                            {selectedPrimaryTag === tag.id && tag.subcategories && (
+                            {selectedPrimaryTag === tag.id && (
                               <div className="mt-3 text-xs text-white/70">
-                                Incluindo: {tag.subcategories.slice(0, 2).join(", ")}...
+                                Próximo: Escolher público-alvo
                               </div>
                             )}
                           </div>
@@ -335,92 +411,98 @@ export default function TestFiltersClean() {
                   {/* NÍVEL 2: FILTROS SECUNDÁRIOS */}
                   <div className="p-6 bg-gray-50 space-y-8">
                     
-                    {/* Público-Alvo */}
-                    <div className="border-l-4 border-purple-400 pl-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-3 h-3 bg-purple-400 rounded-full mr-3"></div>
-                        <h3 className="font-outfit text-2xl text-gray-800">👥 Para quem é o produto?</h3>
+                    {/* Público-Alvo - Apenas se tag primário estiver selecionado */}
+                    {selectedPrimaryTag && availableAudience.length > 0 && (
+                      <div className="border-l-4 border-purple-400 pl-6">
+                        <div className="flex items-center mb-4">
+                          <div className="w-3 h-3 bg-purple-400 rounded-full mr-3"></div>
+                          <h3 className="font-outfit text-2xl text-gray-800">👥 Para quem é este produto de {categoryHierarchy[selectedPrimaryTag]?.label}?</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          {availableAudience.map((audience) => (
+                            <button
+                              key={audience.id}
+                              onClick={() => toggleTargetAudience(audience.id)}
+                              className={`
+                                flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+                                ${selectedTargetAudience.includes(audience.id) 
+                                  ? `${audience.color} shadow-lg transform scale-105 ring-2 ring-purple-300` 
+                                  : `${audience.color} hover:shadow-md border border-gray-200`
+                                }
+                              `}
+                            >
+                              <span className="mr-2 text-lg">{audience.icon}</span>
+                              <span>{audience.label}</span>
+                              {selectedTargetAudience.includes(audience.id) && (
+                                <span className="ml-2 text-xs">✓</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-3">
-                        {targetAudience.map((audience) => (
-                          <button
-                            key={audience.id}
-                            onClick={() => toggleTargetAudience(audience.id)}
-                            className={`
-                              flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                              ${selectedTargetAudience.includes(audience.id) 
-                                ? `${audience.color} shadow-lg transform scale-105 ring-2 ring-purple-300` 
-                                : `${audience.color} hover:shadow-md border border-gray-200`
-                              }
-                            `}
-                          >
-                            <span className="mr-2 text-lg">{audience.icon}</span>
-                            <span>{audience.label}</span>
-                            {selectedTargetAudience.includes(audience.id) && (
-                              <span className="ml-2 text-xs">✓</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    )}
 
-                    {/* Ambientes */}
-                    <div className="border-l-4 border-blue-400 pl-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
-                        <h3 className="font-outfit text-2xl text-gray-800">🏠 Em que ambiente será usado?</h3>
+                    {/* Ambientes - Apenas se público estiver selecionado */}
+                    {selectedTargetAudience.length > 0 && availableEnvironments.length > 0 && (
+                      <div className="border-l-4 border-blue-400 pl-6">
+                        <div className="flex items-center mb-4">
+                          <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
+                          <h3 className="font-outfit text-2xl text-gray-800">🏠 Em que ambiente será usado?</h3>
+                        </div>
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {availableEnvironments.map((env) => (
+                            <button
+                              key={env.id}
+                              onClick={() => toggleEnvironment(env.id)}
+                              className={`
+                                flex items-center p-3 rounded-xl text-sm transition-all duration-200
+                                ${selectedEnvironments.includes(env.id) 
+                                  ? `${env.color} shadow-lg transform scale-105 ring-2 ring-blue-300` 
+                                  : `${env.color} hover:shadow-md border border-gray-200`
+                                }
+                              `}
+                            >
+                              <span className="mr-2">{env.icon}</span>
+                              <span className="font-medium">{env.label}</span>
+                              {selectedEnvironments.includes(env.id) && (
+                                <span className="ml-auto text-xs">✓</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                        {environments.map((env) => (
-                          <button
-                            key={env.id}
-                            onClick={() => toggleEnvironment(env.id)}
-                            className={`
-                              flex items-center p-3 rounded-xl text-sm transition-all duration-200
-                              ${selectedEnvironments.includes(env.id) 
-                                ? `${env.color} shadow-lg transform scale-105 ring-2 ring-blue-300` 
-                                : `${env.color} hover:shadow-md border border-gray-200`
-                              }
-                            `}
-                          >
-                            <span className="mr-2">{env.icon}</span>
-                            <span className="font-medium">{env.label}</span>
-                            {selectedEnvironments.includes(env.id) && (
-                              <span className="ml-auto text-xs">✓</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    )}
 
-                    {/* Ocasiões */}
-                    <div className="border-l-4 border-green-400 pl-6">
-                      <div className="flex items-center mb-4">
-                        <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
-                        <h3 className="font-outfit text-2xl text-gray-800">🎉 Para qual ocasião?</h3>
+                    {/* Ocasiões - Opcional após ambiente */}
+                    {selectedEnvironments.length > 0 && availableOccasions.length > 0 && (
+                      <div className="border-l-4 border-green-400 pl-6">
+                        <div className="flex items-center mb-4">
+                          <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                          <h3 className="font-outfit text-2xl text-gray-800">🎉 Para qual ocasião?</h3>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          {availableOccasions.map((occasion) => (
+                            <button
+                              key={occasion.id}
+                              onClick={() => toggleOccasion(occasion.id)}
+                              className={`
+                                flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+                                ${selectedOccasions.includes(occasion.id) 
+                                  ? 'bg-green-500 text-white shadow-lg transform scale-105' 
+                                  : 'bg-green-100 text-green-800 hover:bg-green-200 border border-green-300'
+                                }
+                              `}
+                            >
+                              <span className="mr-2">{occasion.icon}</span>
+                              <span>{occasion.label}</span>
+                              {selectedOccasions.includes(occasion.id) && (
+                                <span className="ml-2 text-xs">✓</span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-3">
-                        {specialOccasions.map((occasion) => (
-                          <button
-                            key={occasion.id}
-                            onClick={() => toggleOccasion(occasion.id)}
-                            className={`
-                              flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
-                              ${selectedOccasions.includes(occasion.id) 
-                                ? 'bg-green-500 text-white shadow-lg transform scale-105' 
-                                : 'bg-green-100 text-green-800 hover:bg-green-200 border border-green-300'
-                              }
-                            `}
-                          >
-                            <span className="mr-2">{occasion.icon}</span>
-                            <span>{occasion.label}</span>
-                            {selectedOccasions.includes(occasion.id) && (
-                              <span className="ml-2 text-xs">✓</span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
+                    )}
                   </div>
 
                   {/* NÍVEL 3: FILTROS AVANÇADOS (COLAPSÁVEIS) */}
@@ -446,28 +528,28 @@ export default function TestFiltersClean() {
                                 <div className="flex items-center text-blue-700">
                                   <span className="mr-2">🏷️</span>
                                   <span className="font-medium">Tag Principal:</span>
-                                  <span className="ml-2">{primaryTags.find(t => t.id === selectedPrimaryTag)?.label}</span>
+                                  <span className="ml-2">{categoryHierarchy[selectedPrimaryTag]?.label}</span>
                                 </div>
                               )}
                               {selectedTargetAudience.length > 0 && (
                                 <div className="flex items-center text-blue-700">
                                   <span className="mr-2">👥</span>
                                   <span className="font-medium">Público:</span>
-                                  <span className="ml-2">{selectedTargetAudience.map(id => targetAudience.find(t => t.id === id)?.label).join(", ")}</span>
+                                  <span className="ml-2">{selectedTargetAudience.map(id => allTargetAudience.find(t => t.id === id)?.label).join(", ")}</span>
                                 </div>
                               )}
                               {selectedEnvironments.length > 0 && (
                                 <div className="flex items-center text-blue-700">
                                   <span className="mr-2">🏠</span>
                                   <span className="font-medium">Ambientes:</span>
-                                  <span className="ml-2">{selectedEnvironments.map(id => environments.find(e => e.id === id)?.label).join(", ")}</span>
+                                  <span className="ml-2">{selectedEnvironments.map(id => allEnvironments.find(e => e.id === id)?.label).join(", ")}</span>
                                 </div>
                               )}
                               {selectedOccasions.length > 0 && (
                                 <div className="flex items-center text-blue-700">
                                   <span className="mr-2">🎉</span>
                                   <span className="font-medium">Ocasiões:</span>
-                                  <span className="ml-2">{selectedOccasions.map(id => specialOccasions.find(o => o.id === id)?.label).join(", ")}</span>
+                                  <span className="ml-2">{selectedOccasions.map(id => allSpecialOccasions.find(o => o.id === id)?.label).join(", ")}</span>
                                 </div>
                               )}
                             </div>
