@@ -284,45 +284,48 @@ export default function TestFiltersClean() {
               >
                 <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/50 overflow-hidden">
                   
-                  {/* NÍVEL 1: FILTROS EMOCIONAIS PRINCIPAIS */}
+                  {/* NÍVEL 1: TAGS PRIMÁRIOS PRINCIPAIS */}
                   <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-8">
                     <div className="flex items-center mb-6">
                       <div className="w-4 h-4 bg-white rounded-full mr-4 animate-pulse"></div>
-                      <h2 className="font-fredoka text-3xl text-white">🎭 Como você está se sentindo hoje?</h2>
+                      <h2 className="font-fredoka text-3xl text-white">🏷️ Escolha a categoria principal:</h2>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {moodFilters.map((mood) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {primaryTags.map((tag) => (
                         <button
-                          key={mood.id}
-                          onClick={() => setSelectedMood(selectedMood === mood.id ? "" : mood.id)}
+                          key={tag.id}
+                          onClick={() => setSelectedPrimaryTag(selectedPrimaryTag === tag.id ? "" : tag.id)}
                           className={`
                             group relative overflow-hidden rounded-2xl p-6 text-left transition-all duration-300 transform
-                            ${selectedMood === mood.id 
-                              ? `${mood.color} scale-105 shadow-2xl ring-4 ring-white/30` 
+                            ${selectedPrimaryTag === tag.id 
+                              ? `${tag.color} scale-105 shadow-2xl ring-4 ring-white/30` 
                               : 'bg-white/20 backdrop-blur-sm hover:bg-white/30 border-2 border-white/30 hover:shadow-xl hover:scale-102'
                             }
                           `}
                         >
-                          <div className="flex items-center">
-                            <span className="text-4xl mr-4 group-hover:scale-110 transition-transform">
-                              {mood.emoji}
+                          <div className="text-center">
+                            <span className="text-3xl mb-3 block group-hover:scale-110 transition-transform">
+                              {tag.emoji}
                             </span>
-                            <div>
-                              <div className={`font-outfit font-bold text-xl mb-2 ${
-                                selectedMood === mood.id ? 'text-white' : 'text-white'
-                              }`}>
-                                {mood.label}
-                              </div>
-                              <div className={`text-sm ${
-                                selectedMood === mood.id ? 'text-white/90' : 'text-white/80'
-                              }`}>
-                                {mood.description}
-                              </div>
+                            <div className={`font-outfit font-bold text-lg mb-2 ${
+                              selectedPrimaryTag === tag.id ? 'text-white' : 'text-white'
+                            }`}>
+                              {tag.label}
                             </div>
+                            <div className={`text-xs ${
+                              selectedPrimaryTag === tag.id ? 'text-white/90' : 'text-white/80'
+                            }`}>
+                              {tag.description}
+                            </div>
+                            {selectedPrimaryTag === tag.id && tag.subcategories && (
+                              <div className="mt-3 text-xs text-white/70">
+                                Incluindo: {tag.subcategories.slice(0, 2).join(", ")}...
+                              </div>
+                            )}
                           </div>
-                          {selectedMood === mood.id && (
-                            <div className="absolute top-4 right-4 w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                          {selectedPrimaryTag === tag.id && (
+                            <div className="absolute top-2 right-2 w-3 h-3 bg-white rounded-full animate-pulse"></div>
                           )}
                         </button>
                       ))}
@@ -332,53 +335,88 @@ export default function TestFiltersClean() {
                   {/* NÍVEL 2: FILTROS SECUNDÁRIOS */}
                   <div className="p-6 bg-gray-50 space-y-8">
                     
-                    {/* Contextos */}
+                    {/* Público-Alvo */}
                     <div className="border-l-4 border-purple-400 pl-6">
                       <div className="flex items-center mb-4">
                         <div className="w-3 h-3 bg-purple-400 rounded-full mr-3"></div>
-                        <h3 className="font-outfit text-2xl text-gray-800">📅 Em que momento você precisa?</h3>
+                        <h3 className="font-outfit text-2xl text-gray-800">👥 Para quem é o produto?</h3>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {contexts.map((context) => (
+                      <div className="flex flex-wrap gap-3">
+                        {targetAudience.map((audience) => (
                           <button
-                            key={context.id}
-                            onClick={() => setSelectedContext(selectedContext === context.id ? "" : context.id)}
+                            key={audience.id}
+                            onClick={() => toggleTargetAudience(audience.id)}
                             className={`
-                              flex items-center p-4 rounded-xl text-left transition-all duration-200
-                              ${selectedContext === context.id 
-                                ? 'bg-purple-500 text-white shadow-lg transform scale-105' 
-                                : 'bg-white text-gray-700 hover:bg-purple-50 hover:shadow-md border border-gray-200'
+                              flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+                              ${selectedTargetAudience.includes(audience.id) 
+                                ? `${audience.color} shadow-lg transform scale-105 ring-2 ring-purple-300` 
+                                : `${audience.color} hover:shadow-md border border-gray-200`
                               }
                             `}
                           >
-                            <span className="mr-3 text-xl">{context.icon}</span>
-                            <span className="font-medium">{context.label}</span>
+                            <span className="mr-2 text-lg">{audience.icon}</span>
+                            <span>{audience.label}</span>
+                            {selectedTargetAudience.includes(audience.id) && (
+                              <span className="ml-2 text-xs">✓</span>
+                            )}
                           </button>
                         ))}
                       </div>
                     </div>
 
-                    {/* Idades */}
+                    {/* Ambientes */}
                     <div className="border-l-4 border-blue-400 pl-6">
                       <div className="flex items-center mb-4">
                         <div className="w-3 h-3 bg-blue-400 rounded-full mr-3"></div>
-                        <h3 className="font-outfit text-2xl text-gray-800">👨‍👩‍👧‍👦 Para qual faixa etária?</h3>
+                        <h3 className="font-outfit text-2xl text-gray-800">🏠 Em que ambiente será usado?</h3>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {ageGroups.map((age) => (
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                        {environments.map((env) => (
                           <button
-                            key={age.id}
-                            onClick={() => setSelectedAgeGroup(selectedAgeGroup === age.id ? "" : age.id)}
+                            key={env.id}
+                            onClick={() => toggleEnvironment(env.id)}
                             className={`
                               flex items-center p-3 rounded-xl text-sm transition-all duration-200
-                              ${selectedAgeGroup === age.id 
-                                ? 'bg-blue-500 text-white shadow-lg' 
-                                : 'bg-white text-gray-600 hover:bg-blue-50 hover:text-gray-800 border border-gray-200'
+                              ${selectedEnvironments.includes(env.id) 
+                                ? `${env.color} shadow-lg transform scale-105 ring-2 ring-blue-300` 
+                                : `${env.color} hover:shadow-md border border-gray-200`
                               }
                             `}
                           >
-                            <span className="mr-2 text-lg">{age.icon}</span>
-                            <span className="font-medium">{age.label}</span>
+                            <span className="mr-2">{env.icon}</span>
+                            <span className="font-medium">{env.label}</span>
+                            {selectedEnvironments.includes(env.id) && (
+                              <span className="ml-auto text-xs">✓</span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Ocasiões */}
+                    <div className="border-l-4 border-green-400 pl-6">
+                      <div className="flex items-center mb-4">
+                        <div className="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                        <h3 className="font-outfit text-2xl text-gray-800">🎉 Para qual ocasião?</h3>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
+                        {specialOccasions.map((occasion) => (
+                          <button
+                            key={occasion.id}
+                            onClick={() => toggleOccasion(occasion.id)}
+                            className={`
+                              flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+                              ${selectedOccasions.includes(occasion.id) 
+                                ? 'bg-green-500 text-white shadow-lg transform scale-105' 
+                                : 'bg-green-100 text-green-800 hover:bg-green-200 border border-green-300'
+                              }
+                            `}
+                          >
+                            <span className="mr-2">{occasion.icon}</span>
+                            <span>{occasion.label}</span>
+                            {selectedOccasions.includes(occasion.id) && (
+                              <span className="ml-2 text-xs">✓</span>
+                            )}
                           </button>
                         ))}
                       </div>
