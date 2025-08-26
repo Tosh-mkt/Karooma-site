@@ -11,6 +11,7 @@ import BlogPost from "./pages/blog-post";
 import Products from "./pages/products";
 import TestFiltersClean from "./pages/test-filters-clean";
 import TestFiltersHierarchical from "./pages/test-filters-hierarchical";
+import TestFiltersVertical from "./pages/test-filters-vertical";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
@@ -42,6 +43,7 @@ function Router() {
           <Route path="/products" component={Products} />
           <Route path="/filtros-hierarquia" component={TestFiltersClean} />
           <Route path="/filtros-cascata" component={TestFiltersHierarchical} />
+          <Route path="/filtros-vertical" component={TestFiltersVertical} />
           <Route path="/favoritos" component={Favorites} />
 
           <Route path="/admin/dashboard" component={AdminDashboard} />
