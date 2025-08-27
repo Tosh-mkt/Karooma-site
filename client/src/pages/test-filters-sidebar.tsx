@@ -369,7 +369,7 @@ export default function TestFiltersSidebar() {
                       ))}
 
                       {/* Ambientes da subcategoria */}
-                      {expandedSubcategories[`${categoryId}-${subcategoryId}`] && subcategory.environments.map((env: string) => (
+                      {expandedSubcategories[`${categoryId}-${subcategoryId}`] && subcategory.environments && subcategory.environments.map((env: string) => (
                         <div key={env} className="ml-6">
                           <div className="flex items-center justify-between p-1 rounded hover:bg-gray-50">
                             <span className="text-xs text-gray-500">{env}</span>
