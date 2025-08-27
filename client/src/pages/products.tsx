@@ -203,14 +203,6 @@ export default function Products() {
     }));
   };
 
-  const categories = [
-    { id: "all", label: "Todos" },
-    { id: "casa", label: "Casa & Organização" },
-    { id: "autocuidado", label: "Autocuidado" },
-    { id: "familia", label: "Família" },
-    { id: "saude", label: "Saúde & Bem-estar" },
-    { id: "tecnologia", label: "Tecnologia" },
-  ];
 
   // Use favorites or all products based on toggle
   const sourceProducts = showFavorites ? favorites : products;
@@ -428,25 +420,6 @@ export default function Products() {
       <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-80' : 'ml-0'}`}>
         <section className="py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
           <div className="max-w-7xl mx-auto px-4">
-            {/* Botão de toggle do sidebar */}
-            {!sidebarOpen && (
-              <div className="mb-6">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSidebarOpen(true)}
-                  className="flex items-center gap-2"
-                >
-                  <Menu className="w-4 h-4" />
-                  Filtros
-                  {activeFiltersCount > 0 && (
-                    <Badge className="bg-purple-600 text-white text-xs">
-                      {activeFiltersCount}
-                    </Badge>
-                  )}
-                </Button>
-              </div>
-            )}
 
             {/* Header */}
             <motion.div 
@@ -507,19 +480,26 @@ export default function Products() {
                 )}
               </div>
 
-              {/* Category Filters */}
-              <div className="flex flex-wrap justify-center gap-4">
-                {categories.map((category) => (
-                  <GradientButton
-                    key={category.id}
-                    variant={selectedCategory === category.id ? "primary" : "glass"}
-                    onClick={() => setSelectedCategory(category.id)}
+              {/* Botão de Filtros de Pesquisa */}
+              {!sidebarOpen && (
+                <div className="flex justify-center mb-6">
+                  <Button
+                    variant="outline"
                     size="sm"
+                    onClick={() => setSidebarOpen(true)}
+                    className="flex items-center gap-2"
                   >
-                    {category.label}
-                  </GradientButton>
-                ))}
-              </div>
+                    <Menu className="w-4 h-4" />
+                    Filtros de Pesquisa
+                    {activeFiltersCount > 0 && (
+                      <Badge className="bg-purple-600 text-white text-xs">
+                        {activeFiltersCount}
+                      </Badge>
+                    )}
+                  </Button>
+                </div>
+              )}
+
             </motion.div>
 
             {/* Products Grid - Adjusted for new card dimensions */}
