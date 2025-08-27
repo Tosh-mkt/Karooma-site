@@ -69,30 +69,6 @@ function Router() {
       </main>
       <Footer />
       
-      {/* Floating Action Buttons */}
-      <motion.div 
-        className="fixed bottom-8 right-8 z-50"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-      >
-        <button className="bg-gradient-to-r from-pink-500 to-purple-600 text-white w-16 h-16 rounded-full shadow-2xl animate-pulse-slow">
-          <i className="fas fa-comments text-xl"></i>
-        </button>
-      </motion.div>
-
-      <motion.div 
-        className="fixed bottom-8 left-8 z-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        whileHover={{ scale: 1.1 }}
-      >
-        <button 
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          className="glassmorphism text-gray-700 w-12 h-12 rounded-full"
-        >
-          <i className="fas fa-arrow-up"></i>
-        </button>
-      </motion.div>
     </div>
   );
 }
