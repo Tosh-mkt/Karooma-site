@@ -482,22 +482,32 @@ export default function Products() {
 
               {/* Botão de Filtros de Pesquisa */}
               {!sidebarOpen && (
-                <div className="flex justify-center mb-6">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setSidebarOpen(true)}
-                    className="flex items-center gap-2"
-                  >
-                    <Menu className="w-4 h-4" />
-                    Filtros de Pesquisa
-                    {activeFiltersCount > 0 && (
-                      <Badge className="bg-purple-600 text-white text-xs">
-                        {activeFiltersCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </div>
+                <motion.div 
+                  className="flex justify-center mb-8"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="relative">
+                    <GradientButton
+                      variant="primary"
+                      size="lg"
+                      onClick={() => setSidebarOpen(true)}
+                      className="flex items-center gap-3 px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300"
+                    >
+                      <Filter className="w-5 h-5" />
+                      <span className="font-semibold">Filtros de Pesquisa</span>
+                      {activeFiltersCount > 0 && (
+                        <Badge className="bg-white text-purple-600 font-bold text-sm px-2 py-1 ml-2">
+                          {activeFiltersCount}
+                        </Badge>
+                      )}
+                    </GradientButton>
+                    
+                    {/* Indicador visual de importância */}
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
+                  </div>
+                </motion.div>
               )}
 
             </motion.div>
