@@ -12,6 +12,7 @@ import Products from "./pages/products";
 import TestFiltersClean from "./pages/test-filters-clean";
 import TestFiltersHierarchical from "./pages/test-filters-hierarchical";
 import TestFiltersVertical from "./pages/test-filters-vertical";
+import TestFiltersSidebar from "./pages/test-filters-sidebar";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { TempLogin } from "./pages/TempLogin";
@@ -44,6 +45,7 @@ function Router() {
           <Route path="/filtros-hierarquia" component={TestFiltersClean} />
           <Route path="/filtros-cascata" component={TestFiltersHierarchical} />
           <Route path="/filtros-vertical" component={TestFiltersVertical} />
+          <Route path="/filtros-sidebar" component={TestFiltersSidebar} />
           <Route path="/favoritos" component={Favorites} />
 
           <Route path="/admin/dashboard" component={AdminDashboard} />
