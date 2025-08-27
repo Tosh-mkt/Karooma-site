@@ -35,7 +35,7 @@ const filterHierarchy = {
     }
   },
   "apresentar": {
-    title: "Apresentar",
+    title: "Presentear",
     icon: "🎁", 
     color: "text-blue-600",
     subcategories: {
