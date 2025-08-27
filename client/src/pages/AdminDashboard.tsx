@@ -16,7 +16,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { isForbiddenError, isUnauthorizedError } from "@/lib/authUtils";
 import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
-  Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout
+  Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
+  Bell, Mail, Clock, Filter, Download
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -402,10 +403,14 @@ export function AdminDashboard() {
         </motion.div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 glassmorphism">
+          <TabsList className="grid w-full grid-cols-7 glassmorphism">
             <TabsTrigger value="dashboard" className="flex items-center space-x-2">
               <BarChart3 className="w-4 h-4" />
               <span>Dashboard</span>
+            </TabsTrigger>
+            <TabsTrigger value="newsletter" className="flex items-center space-x-2">
+              <Mail className="w-4 h-4" />
+              <span>Newsletter</span>
             </TabsTrigger>
             <TabsTrigger value="products" className="flex items-center space-x-2">
               <Database className="w-4 h-4" />
@@ -431,6 +436,10 @@ export function AdminDashboard() {
 
           <TabsContent value="dashboard">
             <DashboardOverview />
+          </TabsContent>
+
+          <TabsContent value="newsletter">
+            <NewsletterManagement />
           </TabsContent>
 
           <TabsContent value="products">
@@ -506,6 +515,238 @@ export function AdminDashboard() {
           </TabsContent>
         </Tabs>
       </div>
+    </div>
+  );
+}
+
+// Newsletter Management Component
+function NewsletterManagement() {
+  const { events, isConnected } = useSSE();
+  const [newsletters, setNewsletters] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalToday: 0,
+    totalWeek: 0,
+    totalMonth: 0,
+    averagePerDay: 0
+  });
+
+  // Filter newsletter events from SSE
+  useEffect(() => {
+    const newsletterEvents = events.filter(event => event.type === 'newsletter-subscription');
+    setNewsletters(newsletterEvents.slice(-50)); // Keep last 50
+    
+    // Update stats
+    const now = new Date();
+    const todayCount = newsletterEvents.filter(event => {
+      const eventDate = new Date(event.timestamp);
+      return eventDate.toDateString() === now.toDateString();
+    }).length;
+    
+    const weekCount = newsletterEvents.filter(event => {
+      const eventDate = new Date(event.timestamp);
+      return (now.getTime() - eventDate.getTime()) < (7 * 24 * 60 * 60 * 1000);
+    }).length;
+    
+    const monthCount = newsletterEvents.filter(event => {
+      const eventDate = new Date(event.timestamp);
+      return eventDate.getMonth() === now.getMonth() && 
+             eventDate.getFullYear() === now.getFullYear();
+    }).length;
+    
+    setStats({
+      totalToday: todayCount,
+      totalWeek: weekCount,
+      totalMonth: monthCount,
+      averagePerDay: weekCount / 7
+    });
+  }, [events]);
+
+  const formatTimeAgo = (timestamp: string) => {
+    const now = new Date();
+    const past = new Date(timestamp);
+    const diffInMinutes = Math.floor((now.getTime() - past.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) return 'Agora mesmo';
+    if (diffInMinutes < 60) return `${diffInMinutes}m atrás`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h atrás`;
+    return `${Math.floor(diffInMinutes / 1440)}d atrás`;
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card className="glassmorphism border-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <Users className="w-4 h-4 mr-2 text-blue-500" />
+              Hoje
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalToday}</div>
+            <p className="text-xs text-muted-foreground">inscrições</p>
+          </CardContent>
+        </Card>
+
+        <Card className="glassmorphism border-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <TrendingUp className="w-4 h-4 mr-2 text-green-500" />
+              Esta Semana
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalWeek}</div>
+            <p className="text-xs text-muted-foreground">inscrições</p>
+          </CardContent>
+        </Card>
+
+        <Card className="glassmorphism border-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center">
+              <Mail className="w-4 h-4 mr-2 text-purple-500" />
+              Este Mês
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats.totalMonth}</div>
+            <p className="text-xs text-muted-foreground">inscrições</p>
+          </CardContent>
+        </Card>
+
+        <Card className="glassmorphism border-0">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium flex items-center">
+              {isConnected ? (
+                <Wifi className="w-4 h-4 mr-2 text-green-500" />
+              ) : (
+                <WifiOff className="w-4 h-4 mr-2 text-red-500" />
+              )}
+              Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {isConnected ? "ONLINE" : "OFFLINE"}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Monitoramento em tempo real
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Live Notifications */}
+      <Card className="glassmorphism border-0">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-5 h-5" />
+              <CardTitle>Inscrições em Tempo Real</CardTitle>
+              {newsletters.length > 0 && (
+                <Badge variant="secondary">{newsletters.length}</Badge>
+              )}
+            </div>
+            
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm">
+                <Filter className="w-4 h-4 mr-2" />
+                Filtrar
+              </Button>
+              <Button variant="outline" size="sm">
+                <Download className="w-4 h-4 mr-2" />
+                Exportar
+              </Button>
+            </div>
+          </div>
+          <CardDescription>
+            Últimas {newsletters.length} inscrições na newsletter
+          </CardDescription>
+        </CardHeader>
+        
+        <CardContent>
+          <div className="max-h-[500px] overflow-y-auto space-y-4">
+            {newsletters.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+                <Mail className="w-12 h-12 mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-2">Aguardando inscrições...</p>
+                <p className="text-sm text-center">
+                  As novas inscrições aparecerão aqui em tempo real
+                </p>
+              </div>
+            ) : (
+              newsletters.map((newsletter, index) => (
+                <motion.div
+                  key={`${newsletter.data?.email}-${newsletter.timestamp}`}
+                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-bold">
+                          {newsletter.data?.name ? newsletter.data.name.charAt(0).toUpperCase() : newsletter.data?.email?.charAt(0).toUpperCase()}
+                        </div>
+                        
+                        <div>
+                          <h4 className="font-semibold text-gray-900">
+                            {newsletter.data?.name || 'Usuário Anônimo'}
+                          </h4>
+                          <p className="text-sm text-gray-600">{newsletter.data?.email}</p>
+                        </div>
+                      </div>
+                      
+                      {newsletter.data?.categories?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {newsletter.data.categories.slice(0, 3).map((category: string) => (
+                            <Badge key={category} variant="secondary" className="text-xs">
+                              {category}
+                            </Badge>
+                          ))}
+                          {newsletter.data.categories.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{newsletter.data.categories.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center gap-4 text-xs text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {formatTimeAgo(newsletter.timestamp)}
+                        </div>
+                        
+                        {newsletter.data?.source && (
+                          <div className="flex items-center gap-1">
+                            <Eye className="w-3 h-3" />
+                            {newsletter.data.source}
+                          </div>
+                        )}
+                        
+                        {newsletter.data?.leadMagnet && (
+                          <Badge variant="outline" className="text-xs">
+                            {newsletter.data.leadMagnet}
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                    
+                    {index === 0 && (
+                      <Badge className="bg-green-100 text-green-800 border-green-200">
+                        Novo
+                      </Badge>
+                    )}
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

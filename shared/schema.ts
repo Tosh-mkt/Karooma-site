@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, decimal, index } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, decimal, index, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -106,7 +106,22 @@ export const products = pgTable("products", {
 export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").notNull().unique(),
+  name: text("name"),
+  // Preferências de interesse baseadas nas categorias dos produtos
+  interests: json("interests"), // {categories: string[], audience: string[], environments: string[], occasions: string[]}
+  keywords: text("keywords").array(), // palavras-chave específicas
+  frequency: varchar("frequency", { length: 50 }).default("weekly"), // daily, weekly, monthly
+  contentTypes: text("content_types").array(), // tipos de conteúdo preferidos
+  // Metadados de captação
+  source: varchar("source", { length: 100 }), // página de origem
+  leadMagnet: varchar("lead_magnet", { length: 100 }), // qual oferta captou o lead
+  status: varchar("status", { length: 20 }).default("active"), // active, paused, unsubscribed
+  preferences: json("preferences"), // configurações adicionais personalizáveis
+  // Analytics de engajamento
+  lastInteraction: timestamp("last_interaction"),
+  engagementScore: decimal("engagement_score", { precision: 3, scale: 1 }).default("0"),
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Favorites table for user-product relationships
@@ -154,8 +169,35 @@ export const insertProductSchema = createInsertSchema(products).omit({
   createdAt: true,
 });
 
-export const insertNewsletterSchema = createInsertSchema(newsletterSubscriptions).pick({
+// Schema para newsletter básico (apenas email)
+export const insertNewsletterSchema = createInsertSchema(newsletterSubscriptions, {
+  email: z.string().email(),
+}).pick({
   email: true,
+});
+
+// Schema para newsletter expandido com preferências
+export const insertNewsletterAdvancedSchema = createInsertSchema(newsletterSubscriptions, {
+  email: z.string().email(),
+  interests: z.any().optional(),
+  keywords: z.any().optional(),
+  preferences: z.any().optional(),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+  lastInteraction: true,
+  engagementScore: true,
+}).extend({
+  interests: z.object({
+    categories: z.array(z.string()).optional(),
+    audience: z.array(z.string()).optional(),
+    environments: z.array(z.string()).optional(),
+    occasions: z.array(z.string()).optional(),
+  }).optional(),
+  keywords: z.array(z.string()).optional(),
+  contentTypes: z.array(z.string()).optional(),
+  preferences: z.record(z.any()).optional(),
 });
 
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
@@ -171,6 +213,7 @@ export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSchema>;
+export type InsertNewsletterAdvanced = z.infer<typeof insertNewsletterAdvancedSchema>;
 
 // Favorites types
 export type Favorite = typeof favorites.$inferSelect;

@@ -1,11 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertPageSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
 import { setupGoogleAuth } from "./googleAuth";
+import { sendNewsletterNotification, logNewsletterSubscription } from "./emailService";
 import { isSessionAuthenticated, isSessionAdmin } from "./middleware";
 import {
   ObjectStorageService,
@@ -541,6 +542,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({ error: "Invalid email address", details: error.errors });
       } else {
         res.status(500).json({ error: "Failed to subscribe to newsletter" });
+      }
+    }
+  });
+
+  // Newsletter subscription with advanced preferences
+  app.post("/api/newsletter/subscribe-advanced", async (req, res) => {
+    try {
+      const validatedData = insertNewsletterAdvancedSchema.parse(req.body);
+      const subscription = await storage.createNewsletterAdvanced(validatedData);
+      
+      // Prepare notification data
+      const notificationData = {
+        email: subscription.email,
+        name: subscription.name || null,
+        categories: (subscription.interests as any)?.categories || [],
+        source: subscription.source,
+        leadMagnet: subscription.leadMagnet,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Broadcast to admin dashboard for real-time notifications
+      sseManager.broadcast('newsletter-subscription', notificationData);
+      
+      // Send email notification to admin (async, non-blocking)
+      sendNewsletterNotification(notificationData).catch(error => {
+        console.error('Failed to send email notification:', error);
+      });
+      
+      // Log to console as fallback
+      logNewsletterSubscription(notificationData);
+      
+      res.status(201).json(subscription);
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      if (error instanceof z.ZodError) {
+        res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      } else {
+        res.status(500).json({ error: "Falha ao se inscrever na newsletter" });
       }
     }
   });

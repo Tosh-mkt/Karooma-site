@@ -3,6 +3,8 @@ import { VideoCard } from "@/components/content/video-card";
 import { BlogCard } from "@/components/content/blog-card";
 import { ProductCard } from "@/components/content/product-card";
 import { Newsletter } from "@/components/content/newsletter";
+import { NewsletterModal } from "@/components/newsletter/NewsletterModal";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Content, Product } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
@@ -52,6 +54,15 @@ export default function Home() {
             <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
               Sabemos como é correr atrás dos filhos, lidar com casa, dar conta do trabalho... e ainda tentar sobrar um tempinho pra você.
             </p>
+            
+            {/* Botão de teste para modal de newsletter */}
+            <NewsletterModal
+              trigger={
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                  📧 Teste Newsletter Avançada
+                </Button>
+              }
+            />
             
             <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
               {heroContent?.content || "Aqui você encontra produtos que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️"}

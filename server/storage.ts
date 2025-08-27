@@ -55,6 +55,7 @@ export interface IStorage {
   
   // Newsletter methods
   createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
+  createNewsletterAdvanced(subscription: any): Promise<NewsletterSubscription>;
   
   // Favorites methods
   getUserFavorites(userId: string): Promise<(Favorite & { product: Product })[]>;
@@ -331,6 +332,18 @@ export class MemStorage implements IStorage {
     return subscription;
   }
 
+  async createNewsletterAdvanced(insertSubscription: any): Promise<NewsletterSubscription> {
+    const id = randomUUID();
+    const subscription: NewsletterSubscription = {
+      ...insertSubscription,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.newsletters.set(id, subscription);
+    return subscription;
+  }
+
   // Favorites methods for MemStorage (simplified in-memory implementation)
   async getUserFavorites(userId: string): Promise<(Favorite & { product: Product })[]> {
     return []; // Simplified implementation for memory storage
@@ -588,6 +601,17 @@ export class DatabaseStorage implements IStorage {
     const [subscription] = await db
       .insert(newsletterSubscriptions)
       .values(insertSubscription)
+      .returning();
+    return subscription;
+  }
+
+  async createNewsletterAdvanced(insertSubscription: any): Promise<NewsletterSubscription> {
+    const [subscription] = await db
+      .insert(newsletterSubscriptions)
+      .values({
+        ...insertSubscription,
+        updatedAt: new Date(),
+      })
       .returning();
     return subscription;
   }
