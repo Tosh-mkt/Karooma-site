@@ -136,10 +136,6 @@ export default function About() {
           </motion.div>
         </div>
         
-        {/* Background Elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-pink-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-32 h-32 bg-purple-200 rounded-full opacity-20 animate-pulse delay-700"></div>
-        <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-indigo-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
       </motion.section>
 
       {/* Mission Section */}
