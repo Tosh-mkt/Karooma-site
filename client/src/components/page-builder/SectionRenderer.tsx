@@ -58,7 +58,7 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
         transition={{ duration: 0.8 }}
       >
         <h1 className="font-fredoka text-5xl md:text-7xl text-white mb-6 drop-shadow-lg">
-          {data.title || 'Título Principal'}
+          {data.title || 'Karooma?'}
         </h1>
         
         <p className="font-poppins text-xl md:text-2xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto">
