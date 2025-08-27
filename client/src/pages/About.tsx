@@ -63,7 +63,7 @@ interface PageContent {
 // Conteúdo padrão caso não haja dados no CMS
 const defaultContent: PageContent = {
   heroTitle: "Juntas, Sempre Encontramos um Jeito",
-  heroSubtitle: "A Karooma nasceu da compreensão profunda de que ser mãe é uma das experiências mais transformadoras e desafiadoras da vida. Estamos aqui para simplificar seu dia a dia e fortalecer sua confiança como mãe.",
+  heroSubtitle: "A Karooma nasceu da compreensão profunda de que cuidar da casa e da família é uma das experiências mais transformadoras e desafiadoras da vida. Estamos aqui para trazer conhecimento, simplificar seu dia a dia e fortalecer sua confiança neste processo.",
   missionTitle: "Nossa Missão",
   missionContent: "Acreditamos que toda mãe merece sentir-se apoiada e confiante. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano familiar.\n\nSabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas e estratégias que funcionam.\n\nNão somos apenas mais um site. Somos uma comunidade que entende que por trás de cada mãe existe uma mulher que também precisa de cuidado, compreensão e momentos para si mesma.",
   valuesTitle: "Nossos Valores",
