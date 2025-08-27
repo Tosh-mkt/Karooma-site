@@ -93,6 +93,13 @@ export const products = pgTable("products", {
   tags: text("tags"),
   evaluators: text("evaluators"),
   introduction: text("introduction"),
+  // Novos campos baseados no formato fornecido
+  nutritionistEvaluation: text("nutritionist_evaluation"),
+  organizerEvaluation: text("organizer_evaluation"),
+  designEvaluation: text("design_evaluation"),
+  karoomaTeamEvaluation: text("karooma_team_evaluation"),
+  categoryTags: text("category_tags"),
+  searchTags: text("search_tags"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

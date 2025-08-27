@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Check, Star, Heart, ShoppingBag, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Check, Star, Heart, ShoppingBag, ChevronDown, ChevronUp, Users, Award, Shield, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 interface Product {
@@ -17,12 +18,19 @@ interface Product {
   discount: number | null;
   featured: boolean | null;
   createdAt: Date;
-  // Novos campos para avaliações
+  // Novos campos para avaliações estruturadas
   teamEvaluation?: string | null;
   benefits?: string | null;
   evaluators?: string | null;
   introduction?: string | null;
   tags?: string | null;
+  // Novos campos baseados no formato fornecido
+  nutritionistEvaluation?: string | null;
+  organizerEvaluation?: string | null;
+  designEvaluation?: string | null;
+  karoomaTeamEvaluation?: string | null;
+  categoryTags?: string | null;
+  searchTags?: string | null;
 }
 
 interface RecommendationModalProps {
@@ -31,103 +39,68 @@ interface RecommendationModalProps {
   onClose: () => void;
 }
 
-// Função para gerar recomendações baseadas nos dados reais dos especialistas
-const generateRecommendations = (product: Product) => {
-  const recommendations = [];
-  
-  // Seção de Especialistas movida para dentro do scroll
-  if (product.evaluators) {
-    recommendations.push({
-      icon: <div className="w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
-        <span className="text-white text-xs">👥</span>
-      </div>,
-      title: "Equipe de Especialistas",
-      description: product.evaluators.replace(/<br>/g, '\n'),
-      fullText: true
+// Interface para estruturar as avaliações dos especialistas
+interface SpecialistEvaluation {
+  title: string;
+  icon: React.ReactNode;
+  color: string;
+  pros?: string;
+  cons?: string;
+  content?: string;
+}
+
+// Função para extrair avaliações dos especialistas baseada no novo formato
+const parseSpecialistEvaluations = (product: Product): SpecialistEvaluation[] => {
+  const evaluations: SpecialistEvaluation[] = [];
+
+  // Avaliação da Nutricionista
+  if (product.nutritionistEvaluation) {
+    evaluations.push({
+      title: "Nutricionista",
+      icon: <Heart className="w-4 h-4" />,
+      color: "bg-pink-500",
+      content: product.nutritionistEvaluation
     });
   }
 
-  // Se tem avaliação da equipe Karooma, usa como principal recomendação
-  if (product.teamEvaluation) {
-    recommendations.push({
-      icon: <Star className="w-5 h-5 text-purple-500" />,
-      title: "Avaliação Equipe KAROOMA",
-      description: product.teamEvaluation, // Texto completo
-      fullText: true
+  // Avaliação da Organizadora Doméstica
+  if (product.organizerEvaluation) {
+    evaluations.push({
+      title: "Organização Doméstica",
+      icon: <Target className="w-4 h-4" />,
+      color: "bg-blue-500",
+      content: product.organizerEvaluation
     });
   }
 
-  // Se tem benefícios por avaliador, mostra completo
-  if (product.benefits) {
-    const benefitsText = product.benefits.replace(/<br>/g, '\n');
-    recommendations.push({
-      icon: <Check className="w-5 h-5 text-green-500" />,
-      title: "Benefícios Validados",
-      description: benefitsText, // Texto completo
-      fullText: true
+  // Avaliação de Design e Usabilidade
+  if (product.designEvaluation) {
+    evaluations.push({
+      title: "Design e Usabilidade",
+      icon: <Award className="w-4 h-4" />,
+      color: "bg-purple-500",
+      content: product.designEvaluation
     });
   }
 
-  // Rating dos usuários
-  if (product.rating && parseFloat(product.rating) >= 4.0) {
-    recommendations.push({
-      icon: <Star className="w-5 h-5 text-yellow-500" />,
-      title: "Avaliação Excelente",
-      description: `Nota ${product.rating} de 5.0 estrelas, confirmando a satisfação dos usuários.`,
-      fullText: false
-    });
-  }
-
-  // Tags como seção separada
-  if (product.tags) {
-    const tagsFormatted = product.tags.replace(/<br>/g, '\n');
-    recommendations.push({
-      icon: <Heart className="w-5 h-5 text-pink-500" />,
-      title: "Tags e Benefícios",
-      description: tagsFormatted, // Tags completas
-      fullText: true
-    });
-  }
-
-  // Fallback para produtos sem dados de especialistas
-  if (recommendations.length === 0) {
-    recommendations.push(
-      {
-        icon: <Check className="w-5 h-5 text-blue-500" />,
-        title: "Produto Selecionado",
-        description: "Escolhido pela nossa equipe para facilitar o seu dia a dia.",
-        fullText: false
-      },
-      {
-        icon: <Heart className="w-5 h-5 text-pink-500" />,
-        title: "Recomendado por Mães",
-        description: "Testado e aprovado por mães reais que compartilham experiências similares.",
-        fullText: false
-      }
-    );
-  }
-
-  return recommendations.slice(0, 5); // Máximo 5 seções incluindo especialistas
+  return evaluations;
 };
 
-// Componente para texto expansível
-function ExpandableText({ text, title }: { text: string; title: string }) {
+// Componente para texto expansível melhorado
+function ExpandableText({ text, title, maxLength = 200 }: { text: string; title: string; maxLength?: number }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isLong = text.length > 120;
-  const displayText = isExpanded || !isLong ? text : text.substring(0, 120) + "...";
+  const isLong = text.length > maxLength;
+  const displayText = isExpanded || !isLong ? text : text.substring(0, maxLength) + "...";
 
   return (
     <div>
-      <h4 className="font-medium text-gray-900 text-base mb-2">
-        {title}
-      </h4>
       <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
         {displayText}
       </p>
       {isLong && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="text-blue-600 hover:text-blue-700 text-sm mt-2 flex items-center gap-1 transition-colors"
+          className="text-blue-600 hover:text-blue-700 text-sm mt-2 flex items-center gap-1 transition-colors font-medium"
         >
           {isExpanded ? (
             <>
@@ -144,9 +117,57 @@ function ExpandableText({ text, title }: { text: string; title: string }) {
   );
 }
 
+// Componente para seção de especialista individual
+function SpecialistSection({ evaluation }: { evaluation: SpecialistEvaluation }) {
+  return (
+    <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm">
+      <div className="flex items-center gap-3 mb-3">
+        <div className={`w-8 h-8 ${evaluation.color} rounded-lg flex items-center justify-center text-white`}>
+          {evaluation.icon}
+        </div>
+        <h4 className="font-semibold text-gray-900 text-sm">
+          {evaluation.title}
+        </h4>
+      </div>
+      
+      {evaluation.content && (
+        <ExpandableText text={evaluation.content} title={evaluation.title} maxLength={180} />
+      )}
+      
+      {(evaluation.pros || evaluation.cons) && (
+        <div className="mt-3 space-y-2">
+          {evaluation.pros && (
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <Check className="w-3 h-3 text-green-500" />
+                <span className="text-xs font-medium text-green-700">Prós</span>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {evaluation.pros}
+              </p>
+            </div>
+          )}
+          
+          {evaluation.cons && (
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <X className="w-3 h-3 text-orange-500" />
+                <span className="text-xs font-medium text-orange-700">Contras</span>
+              </div>
+              <p className="text-xs text-gray-600 leading-relaxed">
+                {evaluation.cons}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function RecommendationModal({ product, isOpen, onClose }: RecommendationModalProps) {
-  const recommendations = generateRecommendations(product);
   const { toast } = useToast();
+  const specialistEvaluations = parseSpecialistEvaluations(product);
 
   const handleAmazonClick = () => {
     if (!product.affiliateLink) {
@@ -161,6 +182,10 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
     window.open(product.affiliateLink, '_blank');
     onClose();
   };
+
+  // Parse das tags de categoria e pesquisa
+  const categoryTags = product.categoryTags ? product.categoryTags.split(' ').filter(tag => tag.startsWith('#')) : [];
+  const searchTags = product.searchTags ? product.searchTags.split(' ').filter(tag => tag.startsWith('#')) : [];
 
   return (
     <AnimatePresence>
@@ -183,9 +208,9 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[95vh] overflow-hidden">
               {/* Header */}
-              <div className="relative p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
+              <div className="relative p-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 text-white">
                 <button
                   onClick={onClose}
                   className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-full transition-colors"
@@ -194,9 +219,9 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                   <X className="w-5 h-5" />
                 </button>
                 
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    💡
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center">
+                    <span className="text-2xl">💡</span>
                   </div>
                   <div>
                     <h2 className="text-xl font-bold">Porque Indicamos?</h2>
@@ -206,28 +231,35 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
               </div>
 
               {/* Product Info */}
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
                 <div className="flex gap-4">
                   {product.imageUrl && (
-                    <img
-                      src={product.imageUrl}
-                      alt={product.title}
-                      className="w-16 h-16 object-contain rounded-lg bg-gray-50"
-                    />
+                    <div className="w-20 h-20 bg-white rounded-xl p-2 shadow-sm flex-shrink-0">
+                      <img
+                        src={product.imageUrl}
+                        alt={product.title}
+                        className="w-full h-full object-contain rounded-lg"
+                      />
+                    </div>
                   )}
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">
+                    <h3 className="font-bold text-gray-900 text-base leading-tight mb-2">
                       {product.title}
                     </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded-full">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
                         {product.category}
-                      </span>
+                      </Badge>
                       {product.rating && (
                         <div className="flex items-center gap-1">
                           <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                          <span className="text-xs text-gray-600">{product.rating}</span>
+                          <span className="text-xs text-gray-600 font-medium">{product.rating}</span>
                         </div>
+                      )}
+                      {product.currentPrice && (
+                        <span className="text-sm font-bold text-green-600">
+                          R$ {product.currentPrice}
+                        </span>
                       )}
                     </div>
                   </div>
@@ -236,55 +268,103 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
 
               {/* Introduction Section */}
               {product.introduction && (
-                <div className="p-6 border-b border-gray-100 bg-blue-50/50">
-                  <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
-                    {product.introduction}
-                  </p>
+                <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 bg-green-500 rounded-lg flex items-center justify-center">
+                      <Shield className="w-3 h-3 text-white" />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 text-sm">Análise da Curadoria KAROOMA</h4>
+                  </div>
+                  <ExpandableText text={product.introduction} title="Introdução" maxLength={150} />
                 </div>
               )}
 
-              {/* Recommendations */}
-              <div className="p-6 space-y-4 max-h-80 overflow-y-auto">
-                {recommendations.map((reason, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex gap-3 p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex-shrink-0 mt-0.5">
-                      {reason.icon}
+              {/* Specialist Evaluations */}
+              {specialistEvaluations.length > 0 && (
+                <div className="p-6 border-b border-gray-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center">
+                      <Users className="w-3 h-3 text-white" />
                     </div>
-                    <div className="flex-1">
-                      {reason.fullText ? (
-                        <ExpandableText text={reason.description} title={reason.title} />
-                      ) : (
-                        <div>
-                          <h4 className="font-medium text-gray-900 text-base mb-2">
-                            {reason.title}
-                          </h4>
-                          <p className="text-gray-600 text-sm leading-relaxed">
-                            {reason.description}
-                          </p>
+                    <h4 className="font-semibold text-gray-900 text-sm">Equipe de Especialistas</h4>
+                  </div>
+                  <div className="space-y-3 max-h-60 overflow-y-auto">
+                    {specialistEvaluations.map((evaluation, index) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                      >
+                        <SpecialistSection evaluation={evaluation} />
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Karooma Team Evaluation */}
+              {(product.karoomaTeamEvaluation || product.teamEvaluation) && (
+                <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-yellow-50 to-orange-50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-6 h-6 bg-orange-500 rounded-lg flex items-center justify-center">
+                      <Star className="w-3 h-3 text-white" />
+                    </div>
+                    <h4 className="font-semibold text-gray-900 text-sm">Avaliação Final KAROOMA</h4>
+                  </div>
+                  <ExpandableText 
+                    text={product.karoomaTeamEvaluation || product.teamEvaluation || ""} 
+                    title="Avaliação da Equipe" 
+                    maxLength={200} 
+                  />
+                </div>
+              )}
+
+              {/* Tags Section */}
+              {(categoryTags.length > 0 || searchTags.length > 0) && (
+                <div className="p-6 border-b border-gray-100">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-3">Tags e Categorias</h4>
+                  <div className="space-y-3">
+                    {categoryTags.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Benefícios:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {categoryTags.map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs bg-green-50 text-green-700 border-green-200">
+                              {tag}
+                            </Badge>
+                          ))}
                         </div>
-                      )}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+                      </div>
+                    )}
+                    
+                    {searchTags.length > 0 && (
+                      <div>
+                        <p className="text-xs text-gray-500 mb-2">Categorias:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {searchTags.map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Footer */}
-              <div className="p-6 bg-gray-50 border-t border-gray-100">
-                <p className="text-xs text-gray-500 text-center mb-4">
-                  Nossas recomendações são baseadas em análise de qualidade, custo-benefício e experiência de usuários reais.
+              <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50">
+                <p className="text-xs text-gray-500 text-center mb-4 leading-relaxed">
+                  Nossas recomendações são baseadas em análise rigorosa de qualidade, custo-benefício e experiência de mães reais.
                 </p>
                 <div className="flex gap-3">
                   <Button
                     onClick={onClose}
                     variant="outline"
                     size="sm"
-                    className="flex-1"
+                    className="flex-1 hover:bg-gray-100"
                     data-testid="button-close-recommendation"
                   >
                     Entendi
@@ -292,9 +372,10 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                   <Button
                     onClick={handleAmazonClick}
                     size="sm"
-                    className="flex-1 bg-orange-500 hover:bg-orange-600"
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg"
                     data-testid="button-buy-from-modal"
                   >
+                    <ShoppingBag className="w-4 h-4 mr-1" />
                     Ver na Amazon
                   </Button>
                 </div>
