@@ -19,7 +19,7 @@ export default function Navigation() {
     { href: "/", label: "Início", id: "home" },
     { href: "/sobre", label: "Sobre", id: "about" },
     { href: "/momentos-meus", label: "Momentos Meus", id: "moments" },
-    { href: "/products", label: "Facilita a Vida", id: "life-hacks" },
+    { href: "/products", label: "Facilitam a Vida", id: "life-hacks" },
   ];
 
   const isActive = (href: string) => location === href;

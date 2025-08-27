@@ -258,7 +258,7 @@ export default function About() {
               <CardContent className="p-8 text-center">
                 <Star className="w-16 h-16 mx-auto mb-6 text-blue-600" />
                 <h3 className="text-2xl font-bold text-gray-800 mb-4 font-fredoka">
-                  {content.facilitaVidaTitle || "Facilita a Vida"}
+                  {content.facilitaVidaTitle || "Facilitam a Vida"}
                 </h3>
                 <p className="text-gray-600 leading-relaxed font-poppins">
                   {content.facilitaVidaContent || "Produtos cuidadosamente avaliados que realmente facilitam o dia a dia familiar. Cada recomendação é testada e aprovada por especialistas e mães."}

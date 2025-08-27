@@ -302,7 +302,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
     );
   }
 
-  // Como Te Auxiliamos section (Facilita a Vida)
+  // Como Te Auxiliamos section (Facilitam a Vida)
   if (data.title === "Como Te Auxiliamos") {
     return (
       <section className="py-16 bg-white relative">
