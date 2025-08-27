@@ -62,7 +62,7 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
         </h1>
         
         <p className="font-poppins text-xl md:text-2xl text-white/90 mb-8 leading-relaxed max-w-3xl mx-auto">
-          {data.subtitle || 'A Karooma nasceu da compreensão profunda de que cuidar da família é uma das experiências mais transformadoras e desafiadoras da vida. Estamos aqui para trazer parâmetros, simplificar seu dia a dia e fortalecer sua confiança como mãe.'}
+          {data.subtitle || 'A Karooma nasceu da compreensão profunda de que cuidar da casa e da família é uma das experiências mais transformadoras e desafiadoras da vida. Estamos aqui para trazer conhecimento, simplificar seu dia a dia e fortalecer sua confiança neste processo.'}
         </p>
         
         <motion.div 
