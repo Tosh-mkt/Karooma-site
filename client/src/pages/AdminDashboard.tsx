@@ -52,22 +52,23 @@ function DashboardOverview() {
   return (
     <div className="space-y-6">
       {/* Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
           <Card className="glassmorphism border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Database className="w-4 h-4 mr-2 text-blue-500" />
-                Total de Produtos
+            <CardHeader className="pb-1 md:pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium flex items-center">
+                <Database className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-blue-500" />
+                <span className="hidden sm:inline">Total de Produtos</span>
+                <span className="sm:hidden">Produtos</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalProducts}</div>
-              <p className="text-xs text-muted-foreground">Todos os produtos</p>
+            <CardContent className="pt-0">
+              <div className="text-xl md:text-2xl font-bold">{stats.totalProducts}</div>
+              <p className="text-xs text-muted-foreground hidden sm:block">Todos os produtos</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -78,15 +79,16 @@ function DashboardOverview() {
           transition={{ delay: 0.2 }}
         >
           <Card className="glassmorphism border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <Star className="w-4 h-4 mr-2 text-yellow-500" />
-                Em Destaque
+            <CardHeader className="pb-1 md:pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium flex items-center">
+                <Star className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-yellow-500" />
+                <span className="hidden sm:inline">Em Destaque</span>
+                <span className="sm:hidden">Destaque</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.featuredProducts}</div>
-              <p className="text-xs text-muted-foreground">Produtos destacados</p>
+            <CardContent className="pt-0">
+              <div className="text-xl md:text-2xl font-bold">{stats.featuredProducts}</div>
+              <p className="text-xs text-muted-foreground hidden sm:block">Produtos destacados</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -97,15 +99,16 @@ function DashboardOverview() {
           transition={{ delay: 0.3 }}
         >
           <Card className="glassmorphism border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
-                <TrendingUp className="w-4 h-4 mr-2 text-green-500" />
-                Recentes (24h)
+            <CardHeader className="pb-1 md:pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium flex items-center">
+                <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-green-500" />
+                <span className="hidden sm:inline">Recentes (24h)</span>
+                <span className="sm:hidden">Novos</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.recentProducts}</div>
-              <p className="text-xs text-muted-foreground">Novos produtos</p>
+            <CardContent className="pt-0">
+              <div className="text-xl md:text-2xl font-bold">{stats.recentProducts}</div>
+              <p className="text-xs text-muted-foreground hidden sm:block">Novos produtos</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -116,21 +119,24 @@ function DashboardOverview() {
           transition={{ delay: 0.4 }}
         >
           <Card className="glassmorphism border-0">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium flex items-center">
+            <CardHeader className="pb-1 md:pb-2">
+              <CardTitle className="text-xs md:text-sm font-medium flex items-center">
                 {stats.systemStatus ? (
-                  <Wifi className="w-4 h-4 mr-2 text-green-500" />
+                  <Wifi className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-green-500" />
                 ) : (
-                  <WifiOff className="w-4 h-4 mr-2 text-red-500" />
+                  <WifiOff className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-red-500" />
                 )}
                 Sistema
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {stats.systemStatus ? "ONLINE" : "OFFLINE"}
+            <CardContent className="pt-0">
+              <div className="text-lg md:text-2xl font-bold">
+                {stats.systemStatus ? "ON" : "OFF"}
+                <span className="hidden sm:inline">
+                  {stats.systemStatus ? "LINE" : "LINE"}
+                </span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground hidden sm:block">
                 Status em tempo real
               </p>
             </CardContent>
@@ -241,10 +247,10 @@ function ProductsManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Gerenciar Produtos</h3>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h3 className="text-base md:text-lg font-semibold">Gerenciar Produtos</h3>
         <Button 
-          className="bg-gradient-to-r from-purple-500 to-pink-500"
+          className="bg-gradient-to-r from-purple-500 to-pink-500 text-sm w-full sm:w-auto"
           onClick={() => setNewProductModalOpen(true)}
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -364,75 +370,112 @@ export function AdminDashboard() {
 
   return (
     <div className="pt-20 min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-2 md:px-4 py-4 md:py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
             <div className="flex items-center space-x-3">
-              <Shield className="w-8 h-8 text-purple-600" />
-              <h1 className="font-outfit font-bold text-4xl gradient-text">
+              <Shield className="w-6 h-6 md:w-8 md:h-8 text-purple-600" />
+              <h1 className="font-outfit font-bold text-2xl md:text-4xl gradient-text">
                 Painel Administrativo
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="text-right">
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <div className="text-right hidden sm:block">
                 <p className="text-sm text-gray-500">Bem-vinda,</p>
-                <p className="font-semibold">{user?.firstName || user?.email}</p>
+                <p className="font-semibold text-sm md:text-base">{user?.firstName || user?.email}</p>
               </div>
               {user?.profileImageUrl && (
                 <img 
                   src={user.profileImageUrl} 
                   alt="Profile" 
-                  className="w-10 h-10 rounded-full"
+                  className="w-8 h-8 md:w-10 md:h-10 rounded-full"
                 />
               )}
               <Button
                 variant="outline"
+                size="sm"
                 onClick={() => window.location.href = "/api/logout"}
+                className="text-xs md:text-sm"
               >
                 Sair
               </Button>
             </div>
           </div>
-          <p className="text-gray-600 font-poppins text-lg">
+          <p className="text-gray-600 font-poppins text-sm md:text-lg">
             Gerencie todo o conteúdo e configurações do site Karooma
           </p>
         </motion.div>
 
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 glassmorphism">
-            <TabsTrigger value="dashboard" className="flex items-center space-x-2">
-              <BarChart3 className="w-4 h-4" />
-              <span>Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger value="newsletter" className="flex items-center space-x-2">
-              <Mail className="w-4 h-4" />
-              <span>Newsletter</span>
-            </TabsTrigger>
-            <TabsTrigger value="products" className="flex items-center space-x-2">
-              <Database className="w-4 h-4" />
-              <span>Produtos</span>
-            </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center space-x-2">
-              <Edit className="w-4 h-4" />
-              <span>Conteúdo</span>
-            </TabsTrigger>
-            <TabsTrigger value="pages" className="flex items-center space-x-2">
-              <Settings className="w-4 h-4" />
-              <span>Páginas</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center space-x-2">
-              <TrendingUp className="w-4 h-4" />
-              <span>Analytics</span>
-            </TabsTrigger>
-            <TabsTrigger value="settings" className="flex items-center space-x-2">
-              <Shield className="w-4 h-4" />
-              <span>Configurações</span>
-            </TabsTrigger>
-          </TabsList>
+          {/* Mobile: Dropdown style tabs */}
+          <div className="md:hidden">
+            <TabsList className="grid w-full grid-cols-2 glassmorphism">
+              <TabsTrigger value="dashboard" className="flex items-center justify-center space-x-1 text-xs">
+                <BarChart3 className="w-3 h-3" />
+                <span className="hidden xs:inline">Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger value="newsletter" className="flex items-center justify-center space-x-1 text-xs">
+                <Mail className="w-3 h-3" />
+                <span className="hidden xs:inline">Newsletter</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            {/* Secondary row for mobile */}
+            <div className="mt-2">
+              <TabsList className="grid w-full grid-cols-3 glassmorphism">
+                <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs">
+                  <Database className="w-3 h-3" />
+                  <span className="hidden xs:inline">Produtos</span>
+                </TabsTrigger>
+                <TabsTrigger value="content" className="flex items-center justify-center space-x-1 text-xs">
+                  <Edit className="w-3 h-3" />
+                  <span className="hidden xs:inline">Conteúdo</span>
+                </TabsTrigger>
+                <TabsTrigger value="settings" className="flex items-center justify-center space-x-1 text-xs">
+                  <Shield className="w-3 h-3" />
+                  <span className="hidden xs:inline">Config</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
+          </div>
+          
+          {/* Desktop: Original layout */}
+          <div className="hidden md:block">
+            <TabsList className="grid w-full grid-cols-7 glassmorphism">
+              <TabsTrigger value="dashboard" className="flex items-center space-x-2">
+                <BarChart3 className="w-4 h-4" />
+                <span>Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger value="newsletter" className="flex items-center space-x-2">
+                <Mail className="w-4 h-4" />
+                <span>Newsletter</span>
+              </TabsTrigger>
+              <TabsTrigger value="products" className="flex items-center space-x-2">
+                <Database className="w-4 h-4" />
+                <span>Produtos</span>
+              </TabsTrigger>
+              <TabsTrigger value="content" className="flex items-center space-x-2">
+                <Edit className="w-4 h-4" />
+                <span>Conteúdo</span>
+              </TabsTrigger>
+              <TabsTrigger value="pages" className="flex items-center space-x-2">
+                <Settings className="w-4 h-4" />
+                <span>Páginas</span>
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center space-x-2">
+                <TrendingUp className="w-4 h-4" />
+                <span>Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger value="settings" className="flex items-center space-x-2">
+                <Shield className="w-4 h-4" />
+                <span>Configurações</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="dashboard">
             <DashboardOverview />
@@ -575,62 +618,67 @@ function NewsletterManagement() {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
         <Card className="glassmorphism border-0">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Users className="w-4 h-4 mr-2 text-blue-500" />
+          <CardHeader className="pb-1 md:pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium flex items-center">
+              <Users className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-blue-500" />
               Hoje
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalToday}</div>
-            <p className="text-xs text-muted-foreground">inscrições</p>
+          <CardContent className="pt-0">
+            <div className="text-xl md:text-2xl font-bold">{stats.totalToday}</div>
+            <p className="text-xs text-muted-foreground hidden sm:block">inscrições</p>
           </CardContent>
         </Card>
 
         <Card className="glassmorphism border-0">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <TrendingUp className="w-4 h-4 mr-2 text-green-500" />
-              Esta Semana
+          <CardHeader className="pb-1 md:pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium flex items-center">
+              <TrendingUp className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-green-500" />
+              <span className="hidden sm:inline">Esta Semana</span>
+              <span className="sm:hidden">Semana</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalWeek}</div>
-            <p className="text-xs text-muted-foreground">inscrições</p>
+          <CardContent className="pt-0">
+            <div className="text-xl md:text-2xl font-bold">{stats.totalWeek}</div>
+            <p className="text-xs text-muted-foreground hidden sm:block">inscrições</p>
           </CardContent>
         </Card>
 
         <Card className="glassmorphism border-0">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
-              <Mail className="w-4 h-4 mr-2 text-purple-500" />
-              Este Mês
+          <CardHeader className="pb-1 md:pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium flex items-center">
+              <Mail className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-purple-500" />
+              <span className="hidden sm:inline">Este Mês</span>
+              <span className="sm:hidden">Mês</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{stats.totalMonth}</div>
-            <p className="text-xs text-muted-foreground">inscrições</p>
+          <CardContent className="pt-0">
+            <div className="text-xl md:text-2xl font-bold">{stats.totalMonth}</div>
+            <p className="text-xs text-muted-foreground hidden sm:block">inscrições</p>
           </CardContent>
         </Card>
 
         <Card className="glassmorphism border-0">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center">
+          <CardHeader className="pb-1 md:pb-2">
+            <CardTitle className="text-xs md:text-sm font-medium flex items-center">
               {isConnected ? (
-                <Wifi className="w-4 h-4 mr-2 text-green-500" />
+                <Wifi className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-green-500" />
               ) : (
-                <WifiOff className="w-4 h-4 mr-2 text-red-500" />
+                <WifiOff className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2 text-red-500" />
               )}
               Status
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isConnected ? "ONLINE" : "OFFLINE"}
+          <CardContent className="pt-0">
+            <div className="text-lg md:text-2xl font-bold">
+              {isConnected ? "ON" : "OFF"}
+              <span className="hidden sm:inline">
+                {isConnected ? "LINE" : "LINE"}
+              </span>
             </div>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground hidden sm:block">
               Monitoramento em tempo real
             </p>
           </CardContent>
@@ -640,33 +688,33 @@ function NewsletterManagement() {
       {/* Live Notifications */}
       <Card className="glassmorphism border-0">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2">
-              <Bell className="w-5 h-5" />
-              <CardTitle>Inscrições em Tempo Real</CardTitle>
+              <Bell className="w-4 h-4 md:w-5 md:h-5" />
+              <CardTitle className="text-sm md:text-base">Inscrições em Tempo Real</CardTitle>
               {newsletters.length > 0 && (
-                <Badge variant="secondary">{newsletters.length}</Badge>
+                <Badge variant="secondary" className="text-xs">{newsletters.length}</Badge>
               )}
             </div>
             
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Filter className="w-4 h-4 mr-2" />
-                Filtrar
+              <Button variant="outline" size="sm" className="text-xs">
+                <Filter className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Filtrar</span>
               </Button>
-              <Button variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Exportar
+              <Button variant="outline" size="sm" className="text-xs">
+                <Download className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                <span className="hidden sm:inline">Exportar</span>
               </Button>
             </div>
           </div>
-          <CardDescription>
+          <CardDescription className="text-xs md:text-sm">
             Últimas {newsletters.length} inscrições na newsletter
           </CardDescription>
         </CardHeader>
         
         <CardContent>
-          <div className="max-h-[500px] overflow-y-auto space-y-4">
+          <div className="max-h-[400px] md:max-h-[500px] overflow-y-auto space-y-3 md:space-y-4">
             {newsletters.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 text-gray-500">
                 <Mail className="w-12 h-12 mb-4 opacity-50" />
