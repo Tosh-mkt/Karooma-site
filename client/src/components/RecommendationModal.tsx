@@ -242,7 +242,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                       <div className="w-6 h-6 bg-purple-500 rounded-lg flex items-center justify-center">
                         <Users className="w-3 h-3 text-white" />
                       </div>
-                      <h4 className="font-semibold text-gray-900 text-sm">Equipe de Especialistas</h4>
+                      <h4 className="font-semibold text-gray-900 text-sm">Avaliação da Equipe de Especialistas</h4>
                     </div>
                     <div className="space-y-2">
                       {specialistEvaluations.map((evaluation, index) => (
