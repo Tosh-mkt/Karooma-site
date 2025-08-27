@@ -415,7 +415,6 @@ export default function Products() {
           </div>
         </div>
       </div>
-
       {/* Conteúdo Principal */}
       <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-80' : 'ml-0'}`}>
         <section className="py-16 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
@@ -428,9 +427,7 @@ export default function Products() {
               animate={{ opacity: 1, y: 0 }}
             >
               <h1 className="font-fredoka text-5xl gradient-text mb-4">Facilitam a Vida</h1>
-              <p className="font-poppins text-xl text-gray-600">
-                Cada produto que recomendamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma mãe? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar.
-              </p>
+              <p className="font-poppins text-xl text-gray-600">Cada produto que selecionamos e avaliamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar.</p>
             </motion.div>
 
             {/* Search and Filters */}
