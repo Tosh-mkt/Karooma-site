@@ -1,7 +1,4 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Play, Rocket } from "lucide-react";
-import { Link } from "wouter";
-import { GradientButton } from "@/components/ui/gradient-button";
 import { VideoCard } from "@/components/content/video-card";
 import { BlogCard } from "@/components/content/blog-card";
 import { ProductCard } from "@/components/content/product-card";
@@ -60,26 +57,6 @@ export default function Home() {
               {heroContent?.content || "Aqui você encontra produtos que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️"}
             </p>
             
-            <motion.div 
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-            >
-              <Link href="/products">
-                <GradientButton size="lg">
-                  Produtos que Salvam o Dia
-                  <ArrowRight className="ml-2 w-5 h-5" />
-                </GradientButton>
-              </Link>
-              
-              <Link href="/videos">
-                <GradientButton variant="glass" size="lg">
-                  Momentos pra Respirar
-                  <Play className="ml-2 w-5 h-5" />
-                </GradientButton>
-              </Link>
-            </motion.div>
           </motion.div>
 
           {/* Featured Content Grid */}
