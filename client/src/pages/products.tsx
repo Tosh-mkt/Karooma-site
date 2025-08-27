@@ -123,10 +123,6 @@ const filterHierarchy = {
     icon: "✈️",
     color: "text-yellow-600",
     subcategories: {
-      "primeiros-socorros": {
-        title: "Primeiros Socorros",
-        environments: []
-      },
       "bebe": {
         title: "Bebê",
         environments: []
@@ -138,16 +134,49 @@ const filterHierarchy = {
       "familia": {
         title: "Família", 
         environments: []
+      },
+      "primeiros-socorros": {
+        title: "Primeiros Socorros",
+        environments: []
+      },
+      "carro": {
+        title: "Carro",
+        environments: []
       }
     },
-    environments: ["Carro", "Casa", "Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança"]
+    environments: []
   },
   "organizacao": {
     title: "Organização",
     icon: "📦",
     color: "text-teal-600",
-    subcategories: {},
-    environments: ["Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança", "Carro"]
+    subcategories: {
+      "casa": {
+        title: "Casa",
+        environments: []
+      },
+      "cozinha": {
+        title: "Cozinha",
+        environments: []
+      },
+      "area-de-servico": {
+        title: "Área de Serviço",
+        environments: []
+      },
+      "quarto-do-bebe": {
+        title: "Quarto do Bebê",
+        environments: []
+      },
+      "quarto-da-crianca": {
+        title: "Quarto da Criança",
+        environments: []
+      },
+      "carro": {
+        title: "Carro",
+        environments: []
+      }
+    },
+    environments: []
   }
 };
 
