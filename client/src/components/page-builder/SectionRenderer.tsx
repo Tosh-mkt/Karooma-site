@@ -131,9 +131,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
           >
             <h3 className="font-outfit text-3xl gradient-text text-center mb-6">Empatia Genuína</h3>
             <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center">Acreditamos que toda família precisa sentir-se apoiada e confiante. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano familiar.</p>
-            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mt-4">
-              Sabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas e estratégias que funcionam.
-            </p>
+            <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mt-4">Sabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções, produtos avaliados e estratégias que funcionam.</p>
           </motion.div>
         </div>
         {isEditing && (
