@@ -197,7 +197,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col">
               {/* Header */}
               <div className="relative p-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 text-white">
                 <button
@@ -219,7 +219,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                 </div>
               </div>
 
-              <div className="overflow-y-auto max-h-[calc(90vh-200px)]">
+              <div className="flex-1 overflow-y-auto">
                 {/* Introduction Section */}
                 {product.introduction && (
                   <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">
@@ -314,7 +314,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
               </div>
 
               {/* Footer */}
-              <div className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-100">
+              <div className="flex-shrink-0 p-6 bg-gradient-to-r from-gray-50 to-blue-50 border-t border-gray-100">
                 <p className="text-xs text-gray-500 text-center mb-4 leading-relaxed">
                   Nossas recomendações são baseadas em análise rigorosa de qualidade, custo-benefício e experiência de mães reais.
                 </p>
