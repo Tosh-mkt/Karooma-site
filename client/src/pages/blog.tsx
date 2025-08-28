@@ -35,11 +35,11 @@ export default function Blog() {
     },
     {
       title: "Tecnologia e Educação",
-      tags: ["Crianças e Telas", "Ferramentas e Apps", "Projetos Criativos em Família"]
+      tags: ["Crianças e Telas", "Ferramentas e Apps", "Projetos Criativos em Família", "Segurança Online"]
     },
     {
       title: "Segurança",
-      tags: ["Segurança Online", "Segurança física", "Manutenção doméstica"]
+      tags: ["Segurança física", "Manutenção doméstica"]
     }
   ];
 
