@@ -94,13 +94,31 @@ export function Newsletter() {
                 </motion.div>
               ) : (
                 <>
-                  Quero Receber
+                  Me Avise de Novidades
                   <Send className="ml-2 w-4 h-4" />
                 </>
               )}
             </GradientButton>
           </motion.form>
           
+          {/* Botão de newsletter avançada */}
+          <motion.div
+            className="mt-6"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            <button 
+              className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-full text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 backdrop-blur-sm border border-white/30"
+              onClick={() => {
+                // Disparar evento para abrir modal no componente pai
+                window.dispatchEvent(new CustomEvent('openAdvancedNewsletter'));
+              }}
+            >
+              ⚙️ Quero Conteúdo Específico
+            </button>
+          </motion.div>
+
           <motion.p 
             className="text-white/70 text-sm mt-4 font-inter flex items-center justify-center gap-2"
             initial={{ opacity: 0 }}

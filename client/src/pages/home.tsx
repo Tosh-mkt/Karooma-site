@@ -4,7 +4,7 @@ import { BlogCard } from "@/components/content/blog-card";
 import { ProductCard } from "@/components/content/product-card";
 import { Newsletter } from "@/components/content/newsletter";
 import { NewsletterModal } from "@/components/newsletter/NewsletterModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Content, Product } from "@shared/schema";
@@ -13,6 +13,19 @@ import equilibristaImage from "@assets/generated_images/woman_balancing_life_pla
 
 export default function Home() {
   const [showNewsletterModal, setShowNewsletterModal] = useState(false);
+  
+  // Listener para o evento do botão de newsletter avançada
+  useEffect(() => {
+    const handleOpenAdvancedNewsletter = () => {
+      setShowNewsletterModal(true);
+    };
+    
+    window.addEventListener('openAdvancedNewsletter', handleOpenAdvancedNewsletter);
+    
+    return () => {
+      window.removeEventListener('openAdvancedNewsletter', handleOpenAdvancedNewsletter);
+    };
+  }, []);
   const { data: featuredContent } = useQuery<Content[]>({
     queryKey: ["/api/content/featured"],
   });
@@ -56,21 +69,6 @@ export default function Home() {
             <p className="font-poppins text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
               Sabemos como é correr atrás dos filhos, lidar com casa, dar conta do trabalho... e ainda tentar sobrar um tempinho pra você.
             </p>
-            
-            {/* Botão de teste para modal de newsletter */}
-            <Button 
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-              onClick={() => setShowNewsletterModal(true)}
-            >
-              📧 Teste Newsletter Avançada
-            </Button>
-            
-            <NewsletterModal 
-              isOpen={showNewsletterModal}
-              onClose={() => setShowNewsletterModal(false)}
-              source="homepage-hero"
-              leadMagnet="newsletter-test-button"
-            />
             
             <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
               {heroContent?.content || "Aqui você encontra produtos e soluções que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️"}
@@ -284,6 +282,14 @@ export default function Home() {
       )}
       {/* Newsletter Section */}
       <Newsletter />
+      
+      {/* Modal de Newsletter Avançada */}
+      <NewsletterModal 
+        isOpen={showNewsletterModal}
+        onClose={() => setShowNewsletterModal(false)}
+        source="newsletter-section"
+        leadMagnet="advanced-newsletter-button"
+      />
     </div>
   );
 }
