@@ -15,7 +15,7 @@ export function useAuth() {
     enabled: !session, // Only try legacy if no NextAuth session
   });
 
-  const user = session?.user || sessionUser;
+  const user = (session as any)?.user || sessionUser;
   const isLoading = sessionLoading || legacyLoading;
 
   return {
