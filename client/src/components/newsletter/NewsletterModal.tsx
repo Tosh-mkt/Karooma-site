@@ -194,7 +194,7 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.9, y: 20 }}
-          className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+          className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden"
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6 text-white relative">
@@ -226,7 +226,7 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
           </div>
 
           {/* Content */}
-          <div className="p-6 overflow-y-auto max-h-[60vh]">
+          <div className="flex-1 p-6 overflow-y-auto min-h-0">
             <AnimatePresence mode="wait">
               {/* Step 1: Informações Básicas */}
               {step === 1 && (
@@ -438,23 +438,25 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t bg-gray-50">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex-shrink-0 p-4 sm:p-6 border-t bg-gray-50">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-sm text-gray-600 order-2 sm:order-1">
                 <Shield className="w-4 h-4" />
-                <span>Seus dados estão seguros</span>
+                <span className="hidden sm:inline">Seus dados estão seguros</span>
+                <span className="sm:hidden">Dados seguros</span>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3 order-1 sm:order-2 w-full sm:w-auto justify-center sm:justify-end">
                 {step > 1 && (
                   <Button
                     variant="outline"
                     onClick={() => setStep(step - 1)}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 px-4 py-2 text-sm"
                     data-testid="button-previous"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    Voltar
+                    <span className="hidden sm:inline">Voltar</span>
+                    <span className="sm:hidden">Anterior</span>
                   </Button>
                 )}
                 
@@ -462,7 +464,7 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
                   <Button
                     onClick={() => setStep(step + 1)}
                     disabled={step === 1 ? !canProceedToStep2 : !canProceedToStep3}
-                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 text-sm min-w-0"
                     data-testid="button-next"
                   >
                     Próximo
@@ -472,18 +474,20 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
                   <Button
                     onClick={handleSubmit}
                     disabled={subscribeMutation.isPending}
-                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                    className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-4 py-2 text-sm min-w-0"
                     data-testid="button-submit"
                   >
                     {subscribeMutation.isPending ? (
                       <>
                         <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Inscrevendo...
+                        <span className="hidden sm:inline">Inscrevendo...</span>
+                        <span className="sm:hidden">...</span>
                       </>
                     ) : (
                       <>
                         <Mail className="w-4 h-4" />
-                        Finalizar Inscrição
+                        <span className="hidden sm:inline">Finalizar Inscrição</span>
+                        <span className="sm:hidden">Finalizar</span>
                       </>
                     )}
                   </Button>
