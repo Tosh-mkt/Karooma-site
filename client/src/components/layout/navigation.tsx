@@ -13,7 +13,7 @@ export default function Navigation() {
   const [location] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const { isAdmin } = useAuth();
+  const { isAdmin, isAuthenticated } = useAuth();
 
   const navItems = [
     { href: "/", label: "Início", id: "home" },
@@ -77,30 +77,41 @@ export default function Navigation() {
           ))}
         </div>
         
-        {/* Admin Button (conditional) - Desktop only */}
+        {/* Auth Button (conditional) - Desktop only */}
         <div className="hidden md:block">
-          {isAdmin ? (
-            <Link href="/admin/dashboard">
+          {isAuthenticated ? (
+            <div className="flex items-center space-x-2">
+              {isAdmin && (
+                <Link href="/admin/dashboard">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:scale-105 transition-all duration-300"
+                  >
+                    <Shield className="w-4 h-4 mr-2" />
+                    Admin
+                  </Button>
+                </Link>
+              )}
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:scale-105 transition-all duration-300"
+                className="border-gray-300 hover:bg-gray-50"
+                onClick={() => window.location.href = '/api/auth/signout'}
               >
-                <Shield className="w-4 h-4 mr-2" />
-                Admin
+                Sair
               </Button>
-            </Link>
+            </div>
           ) : (
-            <Link href="/login">
-              <Button
-                variant="outline"
-                size="sm"
-                className="border-purple-200 hover:bg-purple-50"
-              >
-                <Shield className="w-4 h-4 mr-2" />
-                Login
-              </Button>
-            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-purple-200 hover:bg-purple-50"
+              onClick={() => window.location.href = '/api/auth/signin'}
+            >
+              <Shield className="w-4 h-4 mr-2" />
+              Entrar
+            </Button>
           )}
         </div>
 
@@ -157,29 +168,44 @@ export default function Navigation() {
                   </Link>
                 ))}
                 
-                {/* Login/Admin button in mobile menu */}
-                {isAdmin ? (
-                  <Link href="/admin/dashboard">
+                {/* Auth buttons in mobile menu */}
+                {isAuthenticated ? (
+                  <div className="space-y-2">
+                    {isAdmin && (
+                      <Link href="/admin/dashboard">
+                        <motion.div
+                          className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-3 rounded-lg"
+                          onClick={() => setIsOpen(false)}
+                          whileHover={{ x: 10 }}
+                        >
+                          <Shield className="w-5 h-5" />
+                          <span className="font-poppins text-lg font-medium">Admin</span>
+                        </motion.div>
+                      </Link>
+                    )}
                     <motion.div
-                      className="flex items-center space-x-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-4 py-3 rounded-lg"
-                      onClick={() => setIsOpen(false)}
+                      className="flex items-center space-x-2 border-2 border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer"
+                      onClick={() => {
+                        setIsOpen(false);
+                        window.location.href = '/api/auth/signout';
+                      }}
                       whileHover={{ x: 10 }}
                     >
-                      <Shield className="w-5 h-5" />
-                      <span className="font-poppins text-lg font-medium">Admin</span>
+                      <span className="font-poppins text-lg font-medium">Sair</span>
                     </motion.div>
-                  </Link>
+                  </div>
                 ) : (
-                  <Link href="/login">
-                    <motion.div
-                      className="flex items-center space-x-2 border-2 border-purple-200 text-purple-700 px-4 py-3 rounded-lg hover:bg-purple-50"
-                      onClick={() => setIsOpen(false)}
-                      whileHover={{ x: 10 }}
-                    >
-                      <Shield className="w-5 h-5" />
-                      <span className="font-poppins text-lg font-medium">Login</span>
-                    </motion.div>
-                  </Link>
+                  <motion.div
+                    className="flex items-center space-x-2 border-2 border-purple-200 text-purple-700 px-4 py-3 rounded-lg hover:bg-purple-50 cursor-pointer"
+                    onClick={() => {
+                      setIsOpen(false);
+                      window.location.href = '/api/auth/signin';
+                    }}
+                    whileHover={{ x: 10 }}
+                  >
+                    <Shield className="w-5 h-5" />
+                    <span className="font-poppins text-lg font-medium">Entrar</span>
+                  </motion.div>
                 )}
               </div>
             </SheetContent>

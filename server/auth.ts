@@ -1,17 +1,15 @@
-import type { NextAuthOptions } from "next-auth";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import GoogleProvider from "next-auth/providers/google";
+import Google from "@auth/core/providers/google";
 import { db } from "./db";
-import { users, accounts, sessions, verificationTokens } from "@shared/schema";
 
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
   console.warn("⚠️ Google OAuth não configurado. Defina GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET");
 }
 
-export const authConfig: NextAuthOptions = {
+export const authConfig = {
   adapter: DrizzleAdapter(db),
   providers: [
-    GoogleProvider({
+    Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       profile(profile: any) {

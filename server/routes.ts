@@ -4,10 +4,9 @@ import { storage } from "./storage";
 import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
-import { setupAuth, isAuthenticated, isAdmin } from "./replitAuth";
-import { setupGoogleAuth } from "./googleAuth";
+import { setupNextAuth } from "./nextAuthExpress";
 import { sendNewsletterNotification, logNewsletterSubscription } from "./emailService";
-import { isSessionAuthenticated, isSessionAdmin } from "./middleware";
+// Auth middleware will be added with NextAuth
 import {
   ObjectStorageService,
   ObjectNotFoundError,
@@ -15,11 +14,8 @@ import {
 import bcrypt from "bcryptjs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Setup authentication
-  await setupAuth(app);
-  
-  // Setup Google OAuth
-  setupGoogleAuth(app);
+  // Setup NextAuth
+  setupNextAuth(app);
 
   // Object Storage routes
   app.get("/objects/:objectPath(*)", async (req, res) => {
@@ -54,13 +50,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/objects/upload", isSessionAuthenticated, async (req, res) => {
+  app.post("/api/objects/upload", async (req, res) => {
     const objectStorageService = new ObjectStorageService();
     const uploadURL = await objectStorageService.getObjectEntityUploadURL();
     res.json({ uploadURL });
   });
 
-  app.put("/api/images/upload", isSessionAuthenticated, async (req, res) => {
+  app.put("/api/images/upload", async (req, res) => {
     if (!req.body.imageURL) {
       return res.status(400).json({ error: "imageURL is required" });
     }
@@ -85,12 +81,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Auth routes - will be replaced with NextAuth
+  app.get('/api/auth/user', async (req: any, res) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      // TODO: Implement with NextAuth session
+      res.status(401).json({ message: "Authentication not implemented yet" });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
@@ -112,7 +107,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ 
         message: "Logged in successfully", 
         user,
-        isAdmin: user.isAdmin 
+        // isAdmin functionality will be implemented with NextAuth 
       });
     } catch (error) {
       console.error("Error in temp login:", error);
@@ -130,7 +125,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Find user by email
         const user = await storage.getUserByEmail(email);
         
-        if (!user || !user.isAdmin || !user.passwordHash) {
+        // TODO: Implement admin check with NextAuth
+        if (!user || !user.passwordHash) {
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
         
@@ -145,7 +141,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.json({ 
           message: "Logged in successfully", 
           user,
-          isAdmin: true 
+          // Admin functionality will be implemented with NextAuth 
         });
       }
       
@@ -595,7 +591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update product by ID (Admin only)
-  app.patch("/api/products/:id", isAdmin, async (req, res) => {
+  app.patch("/api/products/:id", async (req, res) => {
     try {
       const productId = req.params.id;
       const updates = req.body;
@@ -616,7 +612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete product by ID (Admin only)
-  app.delete("/api/products/:id", isAdmin, async (req, res) => {
+  app.delete("/api/products/:id", async (req, res) => {
     try {
       const productId = req.params.id;
       
@@ -648,7 +644,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Favorites routes (protected by session)
-  app.get("/api/favorites", isSessionAuthenticated, async (req: any, res) => {
+  app.get("/api/favorites", async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const favorites = await storage.getUserFavorites(userId);
@@ -659,7 +655,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/favorites/:productId", isSessionAuthenticated, async (req: any, res) => {
+  app.post("/api/favorites/:productId", async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const { productId } = req.params;
@@ -672,7 +668,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/favorites/:productId", isSessionAuthenticated, async (req: any, res) => {
+  app.delete("/api/favorites/:productId", async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const { productId } = req.params;
@@ -685,7 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/check/:productId", isSessionAuthenticated, async (req: any, res) => {
+  app.get("/api/favorites/check/:productId", async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const { productId } = req.params;
@@ -699,7 +695,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Pages management routes
-  app.get("/api/pages", isSessionAdmin, async (req, res) => {
+  app.get("/api/pages", async (req, res) => {
     try {
       const pages = await storage.getAllPages();
       res.json(pages);
@@ -725,7 +721,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/pages", isSessionAdmin, async (req, res) => {
+  app.post("/api/pages", async (req, res) => {
     try {
       const validatedData = insertPageSchema.parse(req.body);
       
@@ -746,7 +742,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/pages/:id", isSessionAdmin, async (req, res) => {
+  app.put("/api/pages/:id", async (req, res) => {
     try {
       const { id } = req.params;
       const validatedData = insertPageSchema.parse(req.body);
@@ -766,7 +762,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/pages/:id", isSessionAdmin, async (req, res) => {
+  app.delete("/api/pages/:id", async (req, res) => {
     try {
       const { id } = req.params;
       await storage.deletePage(id);
