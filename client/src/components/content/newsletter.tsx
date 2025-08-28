@@ -6,6 +6,7 @@ import { GradientButton } from "@/components/ui/gradient-button";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
+import origamiBoatImage from "@assets/ORIGAMI_BARCO_1756356087170.png";
 
 export function Newsletter() {
   const [email, setEmail] = useState("");
@@ -38,7 +39,15 @@ export function Newsletter() {
   };
 
   return (
-    <section className="py-16 bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600">
+    <section 
+      className="py-16 bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600 relative overflow-hidden"
+      style={{
+        backgroundImage: `linear-gradient(rgba(219, 39, 119, 0.8), rgba(147, 51, 234, 0.8), rgba(37, 99, 235, 0.8)), url(${origamiBoatImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       <div className="max-w-4xl mx-auto px-4 text-center">
         <motion.div 
           className="glassmorphism rounded-3xl p-8 md:p-12"
