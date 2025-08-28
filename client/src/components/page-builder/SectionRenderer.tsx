@@ -9,7 +9,7 @@ import { Content, Product } from "@shared/schema";
 import { BlogCard } from "@/components/content/blog-card";
 import { ProductCard } from "@/components/content/product-card";
 import { VideoCard } from "@/components/content/video-card";
-import origamiBoatImage from "@assets/ORIGAMI_BARCO_1756356626065.png";
+import origamiBoatImage from "../../assets/ORIGAMI_BARCO_1756356626065.png";
 
 interface SectionRendererProps {
   section: PageSection;
@@ -42,7 +42,7 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
   const { data } = section;
   
   // Debug: verificar se a imagem está sendo carregada
-  console.log('Background image path:', origamiBoatImage);
+  console.log('New background image path:', origamiBoatImage);
 
   return (
     <section 
