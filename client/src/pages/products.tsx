@@ -624,7 +624,7 @@ export default function Products() {
               transition={{ delay: 0.2 }}
             >
               <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-8">
-                Cada produto que recomendamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma mãe? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar. Não funciona ou é mal avaliado, não se encontra aqui.
+                Cada produto que recomendamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar. Não funciona ou é mal avaliado, não se encontra aqui.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
