@@ -84,9 +84,7 @@ export default function Blog() {
             <h1 className="font-fredoka text-5xl gradient-text mb-4">
               Blog & Artigos
             </h1>
-            <p className="font-poppins text-xl text-gray-600">
-              Insights e tendências do mundo digital
-            </p>
+            <p className="font-poppins text-xl text-gray-600">Conversas e soluções para problemas do dia a dia</p>
           </motion.div>
 
           {/* Search and Filters */}
