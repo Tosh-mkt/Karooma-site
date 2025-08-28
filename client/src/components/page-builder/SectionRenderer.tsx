@@ -45,12 +45,12 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : `linear-gradient(rgba(147, 51, 234, 0.3), rgba(219, 39, 119, 0.3)), url(${origamiBoatImage})`,
+        backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : `url(${origamiBoatImage})`,  
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/40 via-pink-800/30 to-blue-900/40"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-pink-800/15 to-blue-900/20"></div>
       
       <motion.div 
         className="relative z-10 text-center px-4 max-w-6xl mx-auto"
