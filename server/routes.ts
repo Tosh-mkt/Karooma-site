@@ -118,10 +118,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Login route for email/password authentication
   app.post('/api/auth/login', async (req, res) => {
     try {
-      const { email, password, loginType } = req.body;
+      const { email, password, type } = req.body;
 
       // For admin login
-      if (loginType === 'admin') {
+      if (type === 'admin') {
         // Find user by email
         const user = await storage.getUserByEmail(email);
         
