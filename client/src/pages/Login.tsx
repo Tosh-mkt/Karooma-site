@@ -184,104 +184,36 @@ export function Login() {
                 <Separator />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">ou</span>
+                <span className="bg-white px-2 text-gray-500">ou continue com</span>
               </div>
             </div>
 
-            {/* Formulário Unificado com Detecção Automática */}
-            <div className="text-center pb-2">
-              <p className="text-sm text-gray-600 mb-4">
-                Login automático - Digite suas credenciais abaixo
-              </p>
-            </div>
-
-            {/* Toggle entre Login e Cadastro */}
-            <div className="flex justify-center space-x-4 py-2">
-              <Button
-                variant={!isSignUp ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setIsSignUp(false)}
-                className="text-xs"
-                data-testid="button-login-mode"
-              >
-                Entrar
-              </Button>
-              <Button
-                variant={isSignUp ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setIsSignUp(true)}
-                className="text-xs"
-                data-testid="button-signup-mode"
-              >
-                Criar conta
-              </Button>
-            </div>
-
-            {/* Formulário Principal */}
-            <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
-              {isSignUp && (
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nome completo</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Seu nome completo"
-                      value={userName}
-                      onChange={(e) => setUserName(e.target.value)}
-                      className="pl-10"
-                      required={isSignUp}
-                      data-testid="input-name"
-                    />
-                  </div>
-                </div>
-              )}
-
+            {/* Formulário Principal - Estilo Toolify.ai */}
+            <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="seu@email.com"
-                    value={adminEmail}
-                    onChange={(e) => setAdminEmail(e.target.value)}
-                    className="pl-10"
-                    required
-                    data-testid="input-email"
-                  />
-                </div>
-                {/* Indicador visual do tipo de conta */}
-                {adminEmail && (
-                  <div className="text-xs text-center">
-                    {adminEmail.includes('@karooma.com') || adminEmail.includes('admin') ? (
-                      <span className="text-purple-600 flex items-center justify-center gap-1">
-                        <Shield className="w-3 h-3" />
-                        Detectado: Conta de Administrador
-                      </span>
-                    ) : (
-                      <span className="text-pink-600 flex items-center justify-center gap-1">
-                        <User className="w-3 h-3" />
-                        Detectado: Conta de Usuário
-                      </span>
-                    )}
-                  </div>
-                )}
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Digite seu endereço de email"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="h-12"
+                  required
+                  data-testid="input-email"
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password">Senha</Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                   <Input
                     id="password"
                     type={showAdminPassword ? "text" : "password"}
-                    placeholder="••••••••"
+                    placeholder="Digite sua senha"
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
-                    className="pl-10 pr-10"
+                    className="h-12 pr-10"
                     required
                     data-testid="input-password"
                   />
@@ -302,66 +234,32 @@ export function Login() {
                 </div>
               </div>
 
+              <div className="flex items-center justify-between">
+                <label className="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" className="rounded" />
+                  <span className="text-gray-600">Lembrar de mim</span>
+                </label>
+                <a href="#" className="text-sm text-purple-600 hover:underline">
+                  Esqueceu sua senha?
+                </a>
+              </div>
+
               <Button
                 type="submit"
-                className={`w-full ${
-                  adminEmail.includes('@karooma.com') || adminEmail.includes('admin')
-                    ? 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700'
-                    : 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700'
-                }`}
+                className="w-full bg-purple-600 hover:bg-purple-700 h-12"
                 disabled={loginMutation.isPending}
                 data-testid="button-submit"
               >
-                {loginMutation.isPending ? "Processando..." : isSignUp ? (
-                  <>
-                    <UserPlus className="w-4 h-4 mr-2" />
-                    Criar conta
-                  </>
-                ) : adminEmail.includes('@karooma.com') || adminEmail.includes('admin') ? (
-                  <>
-                    <Shield className="w-4 h-4 mr-2" />
-                    Entrar como Admin
-                  </>
-                ) : "Entrar"}
+                {loginMutation.isPending ? "Entrando..." : "Entrar"}
               </Button>
             </form>
 
-            {/* Demo para Desenvolvimento */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="pt-4 border-t">
-                <p className="text-xs text-gray-500 mb-3 text-center">
-                  Desenvolvimento - Login Demo
-                </p>
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => {
-                      setAdminEmail("admin@karooma.com");
-                      setAdminPassword("Karo0maSecure2025#6gu5xk");
-                    }}
-                    data-testid="button-admin-demo"
-                  >
-                    <Shield className="w-3 h-3 mr-1" />
-                    Preencher Admin Demo
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full text-xs"
-                    onClick={() => {
-                      setAdminEmail("user@example.com");
-                      setAdminPassword("user123");
-                    }}
-                    data-testid="button-user-demo"
-                  >
-                    <User className="w-3 h-3 mr-1" />
-                    Preencher Usuário Demo
-                  </Button>
-                </div>
-              </div>
-            )}
+            <div className="text-center text-sm text-gray-600">
+              Não tem uma conta?{" "}
+              <a href="#" className="text-purple-600 hover:underline">
+                Criar conta
+              </a>
+            </div>
           </CardContent>
         </Card>
 
