@@ -53,11 +53,15 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
     >
       {/* Imagem de fundo - sempre usar nossa imagem para seção Karooma */}
       {(data.title === 'Karooma?' || !data.backgroundImage) && (
-        <img 
-          src={origamiBoatImage}
-          alt="Barco de origami navegando"
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        />
+        <>
+          <img 
+            src={origamiBoatImage}
+            alt="Barco de origami navegando"
+            className="absolute inset-0 w-full h-full object-cover z-0"
+          />
+          {/* Overlay de transparência para melhor legibilidade */}
+          <div className="absolute inset-0 bg-purple-900/40 z-0" />
+        </>
       )}
       {data.backgroundImage && data.title !== 'Karooma?' && (
         <div 
