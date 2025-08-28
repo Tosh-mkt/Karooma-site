@@ -40,6 +40,7 @@ interface NewsletterPreferences {
     occasions: string[];
   };
   keywords: string[];
+  keywordsText: string;
   frequency: string;
   contentTypes: string[];
   source?: string;
@@ -58,6 +59,7 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
       occasions: [],
     },
     keywords: [],
+    keywordsText: "",
     frequency: "weekly",
     contentTypes: [],
     source,
@@ -81,6 +83,7 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
         name: "",
         interests: { categories: [], audience: [], environments: [], occasions: [] },
         keywords: [],
+        keywordsText: "",
         frequency: "weekly",
         contentTypes: [],
         source,
@@ -179,7 +182,17 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
       return;
     }
 
-    subscribeMutation.mutate(preferences);
+    // Process keywords from text before submitting
+    const keywords = preferences.keywordsText 
+      ? preferences.keywordsText.split(',').map(k => k.trim()).filter(k => k)
+      : [];
+    
+    const dataToSubmit = {
+      ...preferences,
+      keywords,
+    };
+    
+    subscribeMutation.mutate(dataToSubmit);
   };
 
   const canProceedToStep2 = preferences.email.length > 0;
@@ -358,10 +371,10 @@ export function NewsletterModal({ isOpen, onClose, source = "modal", leadMagnet 
                       <Textarea
                         id="keywords"
                         placeholder="Ex: Montessori, organização infantil, receitas práticas..."
-                        value={preferences.keywords.join(', ')}
+                        value={preferences.keywordsText}
                         onChange={(e) => setPreferences(prev => ({
                           ...prev,
-                          keywords: e.target.value.split(',').map(k => k.trim()).filter(k => k)
+                          keywordsText: e.target.value
                         }))}
                         className="mt-1"
                         data-testid="textarea-keywords"
