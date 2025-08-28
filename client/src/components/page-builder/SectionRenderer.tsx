@@ -166,7 +166,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
               <div className="text-4xl mb-4">💜</div>
               <h4 className="font-outfit text-xl gradient-text mb-4">Empatia Genuína</h4>
               <p className="font-poppins text-gray-600">
-                Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.
+                Entendemos que gestão familiar é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e vocês não estão sozinhos nisso.
               </p>
             </motion.div>
             
@@ -179,7 +179,7 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
               <div className="text-4xl mb-4">✨</div>
               <h4 className="font-outfit text-xl gradient-text mb-4">Soluções Práticas</h4>
               <p className="font-poppins text-gray-600">
-                Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.
+                Oferecemos estratégias testadas por famílias reais através de produtos que realmente funcionam e conteúdo que facilita o dia a dia.
               </p>
             </motion.div>
             
@@ -323,9 +323,9 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="glassmorphism p-6 text-center rounded-2xl">
                 <div className="text-3xl mb-4">🔍</div>
-                <h4 className="font-outfit text-lg gradient-text mb-3">Testados por Mães</h4>
+                <h4 className="font-outfit text-lg gradient-text mb-3">Testados por Famílias</h4>
                 <p className="font-poppins text-sm text-gray-600">
-                  Cada produto é testado na vida real, por mães reais
+                  Cada produto é testado na vida real, por famílias reais
                 </p>
               </div>
               

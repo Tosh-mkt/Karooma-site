@@ -9,13 +9,13 @@ const getDefaultValues = (content: PageContent) => [
   {
     icon: Heart,
     title: content.valor1Title || "Empatia Genuína",
-    description: content.valor1Description || "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
+    description: content.valor1Description || "Entendemos que gestão familiar é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e vocês não estão sozinhos nisso.",
     color: "from-pink-500 to-rose-500"
   },
   {
     icon: Lightbulb,
     title: content.valor2Title || "Soluções Práticas",
-    description: content.valor2Description || "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
+    description: content.valor2Description || "Oferecemos estratégias testadas por famílias reais através de produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
     color: "from-purple-500 to-indigo-500"
   },
   {
@@ -27,7 +27,7 @@ const getDefaultValues = (content: PageContent) => [
 ];
 
 const defaultStats = [
-  { number: "1000+", label: "Mães Ajudadas", icon: Users },
+  { number: "1000+", label: "Famílias Ajudadas", icon: Users },
   { number: "500+", label: "Produtos Avaliados", icon: Star },
   { number: "200+", label: "Artigos Publicados", icon: Coffee },
   { number: "95%", label: "Satisfação", icon: Heart }
@@ -68,9 +68,9 @@ const defaultContent: PageContent = {
   missionContent: "Acreditamos que toda mãe merece sentir-se apoiada e confiante. Nossa missão é fornecer recursos práticos, produtos cuidadosamente selecionados e conteúdo empático que realmente fazem a diferença no cotidiano familiar.\n\nSabemos que você carrega uma carga mental imensa - desde lembrar dos compromissos médicos das crianças até planejar as refeições da semana. Por isso, criamos um espaço onde você encontra soluções testadas e estratégias que funcionam.\n\nNão somos apenas mais um site. Somos uma comunidade que entende que por trás de cada mãe existe uma mulher que também precisa de cuidado, compreensão e momentos para si mesma.",
   valuesTitle: "Nossos Valores",
   valor1Title: "Empatia Genuína",
-  valor1Description: "Entendemos que ser mãe é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e você não está sozinha nisso.",
+  valor1Description: "Entendemos que gestão familiar é uma jornada cheia de desafios únicos. Cada dia traz novas situações, e vocês não estão sozinhos nisso.",
   valor2Title: "Soluções Práticas", 
-  valor2Description: "Oferecemos estratégias testadas por mães reais, produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
+  valor2Description: "Oferecemos estratégias testadas por famílias reais através de produtos que realmente funcionam e conteúdo que facilita o dia a dia.",
   valor3Title: "Objetivos Claros",
   valor3Description: "Nosso foco é simplificar sua rotina familiar para que você tenha mais tempo para o que realmente importa: momentos especiais.",
   closingTitle: "Você Não Está Sozinha",
