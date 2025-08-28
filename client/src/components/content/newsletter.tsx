@@ -42,7 +42,7 @@ export function Newsletter() {
     <section 
       className="py-16 bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600 relative overflow-hidden"
       style={{
-        backgroundImage: `linear-gradient(rgba(219, 39, 119, 0.8), rgba(147, 51, 234, 0.8), rgba(37, 99, 235, 0.8)), url(${origamiBoatImage})`,
+        backgroundImage: `linear-gradient(rgba(219, 39, 119, 0.2), rgba(147, 51, 234, 0.2), rgba(37, 99, 235, 0.2)), url(${origamiBoatImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
@@ -50,7 +50,7 @@ export function Newsletter() {
     >
       <div className="max-w-4xl mx-auto px-4 text-center">
         <motion.div 
-          className="glassmorphism rounded-3xl p-8 md:p-12"
+          className="glassmorphism rounded-3xl p-8 md:p-12 backdrop-blur-lg bg-white/10 border border-white/20"
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
