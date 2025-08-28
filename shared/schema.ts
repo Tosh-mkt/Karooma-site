@@ -3,31 +3,52 @@ import { pgTable, text, varchar, timestamp, integer, boolean, decimal, index, js
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth
-export const sessions = pgTable(
-  "sessions",
-  {
-    sid: varchar("sid").primaryKey(),
-    sess: text("sess").notNull(), // JSON data
-    expire: timestamp("expire").notNull(),
-  },
-  (table) => [index("IDX_session_expire").on(table.expire)],
-);
-
-// User storage table for Replit Auth
+// NextAuth tables
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name"),
   email: varchar("email").unique(),
+  emailVerified: timestamp("emailVerified"),
+  image: varchar("image"),
+  // Custom fields
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
-  profileImageUrl: varchar("profile_image_url"),
-  provider: varchar("provider"), // google, email, replit
-  providerId: varchar("provider_id"), // ID no provedor (Google ID, etc)
-  passwordHash: varchar("password_hash"), // Hash bcrypt da senha (para login email)
   isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+export const accounts = pgTable("accounts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: varchar("type").notNull(),
+  provider: varchar("provider").notNull(),
+  providerAccountId: varchar("providerAccountId").notNull(),
+  refresh_token: text("refresh_token"),
+  access_token: text("access_token"),
+  expires_at: integer("expires_at"),
+  token_type: varchar("token_type"),
+  scope: varchar("scope"),
+  id_token: text("id_token"),
+  session_state: varchar("session_state"),
+}, (account) => ({
+  compoundKey: index().on(account.provider, account.providerAccountId),
+}));
+
+export const sessions = pgTable("sessions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionToken: varchar("sessionToken").notNull().unique(),
+  userId: varchar("userId").notNull().references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires").notNull(),
+});
+
+export const verificationTokens = pgTable("verificationToken", {
+  identifier: varchar("identifier").notNull(),
+  token: varchar("token").notNull().unique(),
+  expires: timestamp("expires").notNull(),
+}, (vt) => ({
+  compoundKey: index().on(vt.identifier, vt.token),
+}));
 
 export const content = pgTable("content", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -144,7 +165,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   firstName: true,
   lastName: true,
-  profileImageUrl: true,
+  image: true,
 });
 
 export const insertContentSchema = createInsertSchema(content).omit({
