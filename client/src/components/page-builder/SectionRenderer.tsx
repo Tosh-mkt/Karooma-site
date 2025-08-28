@@ -51,15 +51,15 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
         backgroundColor: '#6b46c1' // fallback cor para debug
       }}
     >
-      {/* Imagem de fundo usando elemento img */}
-      {!data.backgroundImage && (
+      {/* Imagem de fundo - sempre usar nossa imagem para seção Karooma */}
+      {(data.title === 'Karooma?' || !data.backgroundImage) && (
         <img 
           src={origamiBoatImage}
           alt="Barco de origami navegando"
           className="absolute inset-0 w-full h-full object-cover z-0"
         />
       )}
-      {data.backgroundImage && (
+      {data.backgroundImage && data.title !== 'Karooma?' && (
         <div 
           className="absolute inset-0 z-0"
           style={{
