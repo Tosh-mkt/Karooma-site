@@ -20,8 +20,6 @@ import { Login } from "./pages/Login";
 import { AdminLogin } from "./pages/AdminLogin";
 import { Register } from "./pages/Register";
 import Favorites from "./pages/Favorites";
-import { PageManager } from "./pages/PageManager";
-import { PageBuilder } from "./pages/PageBuilder";
 import { PageRenderer } from "./components/PageRenderer";
 
 import NotFound from "./pages/not-found";
@@ -49,9 +47,6 @@ function Router() {
           <Route path="/favoritos" component={Favorites} />
 
           <Route path="/admin/dashboard" component={AdminDashboard} />
-          <Route path="/admin/pages" component={PageManager} />
-          <Route path="/admin/pages/new" component={PageBuilder} />
-          <Route path="/admin/pages/:id/edit" component={PageBuilder} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/admin/login" component={AdminLogin} />
