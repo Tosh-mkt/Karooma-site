@@ -37,12 +37,12 @@ export function Login() {
 
   const loginMutation = useMutation({
     mutationFn: async ({ email, password, type }: { email: string; password: string; type: string }) => {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, loginType: type }),
+        body: JSON.stringify({ email, password, type }),
       });
       
       if (!response.ok) {

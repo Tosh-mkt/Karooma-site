@@ -13,6 +13,7 @@ export const users = pgTable("users", {
   // Custom fields
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
+  passwordHash: varchar("password_hash"), // Para login com senha
   isAdmin: boolean("is_admin").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),

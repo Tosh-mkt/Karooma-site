@@ -103,7 +103,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Set a simple session cookie for testing
-      (req.session as any).user = user;
+      if (req.session) {
+        (req.session as any).user = user;
+      }
       res.json({ 
         message: "Logged in successfully", 
         user,
@@ -116,7 +118,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Login route for email/password authentication
-  app.post('/api/auth/login', async (req, res) => {
+  app.post('/api/login', async (req, res) => {
     try {
       const { email, password, type } = req.body;
 
@@ -137,11 +139,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
           
-        (req.session as any).user = user;
+        // Login bem-sucedido - por enquanto só retorna sucesso
+        // TODO: Implementar session management com NextAuth
         return res.json({ 
           message: "Logged in successfully", 
-          user,
-          // Admin functionality will be implemented with NextAuth 
+          user: {
+            id: user.id,
+            email: user.email,
+            firstName: user.firstName,
+            isAdmin: user.isAdmin
+          },
+          success: true
         });
       }
       
@@ -157,7 +165,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get current session user
   app.get('/api/auth/session-user', async (req, res) => {
     try {
-      const sessionUser = (req.session as any).user;
+      const sessionUser = req.session ? (req.session as any).user : null;
       if (!sessionUser) {
         return res.status(401).json({ message: "Not logged in" });
       }
