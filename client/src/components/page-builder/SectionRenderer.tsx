@@ -51,16 +51,25 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
         backgroundColor: '#6b46c1' // fallback cor para debug
       }}
     >
-      {/* Imagem de fundo usando div absoluto */}
-      <div 
-        className="absolute inset-0 z-0"
-        style={{
-          backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : `url(${origamiBoatImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      />
+      {/* Imagem de fundo usando elemento img */}
+      {!data.backgroundImage && (
+        <img 
+          src={origamiBoatImage}
+          alt="Barco de origami navegando"
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        />
+      )}
+      {data.backgroundImage && (
+        <div 
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `url(${data.backgroundImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+      )}
       
       <motion.div 
         className="relative z-10 text-center px-4 max-w-6xl mx-auto"
