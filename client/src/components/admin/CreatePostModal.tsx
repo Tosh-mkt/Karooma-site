@@ -72,15 +72,27 @@ const createPostSchema = z.object({
 type CreatePostForm = z.infer<typeof createPostSchema>;
 
 const categories = [
-  "Organização Familiar",
-  "Produtividade",
-  "Cuidados Pessoais", 
-  "Família",
-  "Saúde e Bem-estar",
-  "Casa e Decoração",
-  "Tecnologia para Mães",
-  "Alimentação",
-  "Economia Doméstica"
+  "Produtividade Doméstica",
+  "Métodos e Ferramentas",
+  "Automação do Lar",
+  "Organização e Limpeza",
+  "Finanças Familiares",
+  "Orçamento e Controle",
+  "Economia e Investimentos",
+  "Renda Extra",
+  "Gestão de Dívidas",
+  "Bem-Estar Familiar",
+  "Educação Parental",
+  "Saúde e Alimentação",
+  "Lazer e Conexão",
+  "Saúde Mental",
+  "Tecnologia e Educação",
+  "Crianças e Telas",
+  "Ferramentas e Apps",
+  "Projetos Criativos em Família",
+  "Segurança Online",
+  "Segurança física",
+  "Manutenção doméstica"
 ];
 
 const contentTemplates = {
