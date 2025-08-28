@@ -9,6 +9,7 @@ import { Content, Product } from "@shared/schema";
 import { BlogCard } from "@/components/content/blog-card";
 import { ProductCard } from "@/components/content/product-card";
 import { VideoCard } from "@/components/content/video-card";
+import origamiBoatImage from "@assets/ORIGAMI_BARCO_1756356626065.png";
 
 interface SectionRendererProps {
   section: PageSection;
@@ -44,7 +45,7 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : undefined,
+        backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : `linear-gradient(rgba(147, 51, 234, 0.3), rgba(219, 39, 119, 0.3)), url(${origamiBoatImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center'
       }}
