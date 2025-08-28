@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, BookOpen } from "lucide-react";
+import { Search, BookOpen, Filter, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { BlogCard } from "@/components/content/blog-card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { Content } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
@@ -11,6 +14,7 @@ import { staggerContainer, staggerItem } from "@/lib/animations";
 export default function Blog() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const { data: articles, isLoading } = useQuery<Content[]>({
     queryKey: ["/api/content/blog"],
@@ -24,13 +28,53 @@ export default function Blog() {
     { id: "estrategia", label: "Estratégia" },
   ];
 
+  const tagGroups = [
+    {
+      title: "Produtividade Doméstica",
+      tags: ["Métodos e Ferramentas", "Automação do Lar", "Organização e Limpeza"]
+    },
+    {
+      title: "Finanças Familiares", 
+      tags: ["Orçamento e Controle", "Economia e Investimentos", "Renda Extra", "Gestão de Dívidas"]
+    },
+    {
+      title: "Bem-Estar Familiar",
+      tags: ["Educação Parental", "Saúde e Alimentação", "Lazer e Conexão", "Saúde Mental"]
+    },
+    {
+      title: "Tecnologia e Educação",
+      tags: ["Crianças e Telas", "Ferramentas e Apps", "Projetos Criativos em Família"]
+    },
+    {
+      title: "Segurança",
+      tags: ["Segurança Online", "Segurança física", "Manutenção doméstica"]
+    }
+  ];
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const clearAllTags = () => {
+    setSelectedTags([]);
+  };
+
   const filteredArticles = articles?.filter(article => {
     const matchesCategory = selectedCategory === "all" || article.category === selectedCategory;
     const matchesSearch = !searchQuery || 
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.description?.toLowerCase().includes(searchQuery.toLowerCase());
     
-    return matchesCategory && matchesSearch;
+    const matchesTags = selectedTags.length === 0 || selectedTags.some(tag =>
+      article.title.toLowerCase().includes(tag.toLowerCase()) ||
+      article.description?.toLowerCase().includes(tag.toLowerCase())
+    );
+    
+    return matchesCategory && matchesSearch && matchesTags;
   }) || [];
 
   const featuredArticle = filteredArticles.find(article => article.featured) || filteredArticles[0];
@@ -61,17 +105,105 @@ export default function Blog() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
           >
-            {/* Search Bar */}
-            <div className="relative max-w-md mx-auto">
-              <Input
-                type="text"
-                placeholder="Buscar artigos..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-3 rounded-full bg-white/70 backdrop-blur-sm border border-white/30"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+            {/* Search Bar with Filter Button */}
+            <div className="flex items-center justify-center gap-3 max-w-lg mx-auto">
+              <div className="relative flex-1">
+                <Input
+                  type="text"
+                  placeholder="Buscar artigos..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 pr-4 py-3 rounded-full bg-white/70 backdrop-blur-sm border border-white/30"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
+              </div>
+              
+              {/* Filter Button */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className={`rounded-full px-4 py-3 bg-white/70 backdrop-blur-sm border border-white/30 hover:bg-white/90 transition-all duration-300 ${
+                      selectedTags.length > 0 ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0" : ""
+                    }`}
+                  >
+                    <Filter className="w-5 h-5 mr-2" />
+                    Filtros
+                    {selectedTags.length > 0 && (
+                      <Badge className="ml-2 bg-white text-purple-600 min-w-[20px] h-5 flex items-center justify-center">
+                        {selectedTags.length}
+                      </Badge>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-96 p-6 bg-white/95 backdrop-blur-md border border-white/30 shadow-xl rounded-2xl" align="end">
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-poppins font-semibold text-lg text-gray-800">
+                        Filtros de Conteúdo
+                      </h3>
+                      {selectedTags.length > 0 && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={clearAllTags}
+                          className="text-gray-500 hover:text-red-500"
+                        >
+                          <X className="w-4 h-4 mr-1" />
+                          Limpar
+                        </Button>
+                      )}
+                    </div>
+                    
+                    {tagGroups.map((group, groupIndex) => (
+                      <div key={groupIndex} className="space-y-2">
+                        <h4 className="font-poppins font-medium text-purple-700 text-sm">
+                          {group.title}
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {group.tags.map((tag, tagIndex) => (
+                            <Badge
+                              key={tagIndex}
+                              variant={selectedTags.includes(tag) ? "default" : "outline"}
+                              className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
+                                selectedTags.includes(tag)
+                                  ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+                                  : "bg-white/50 hover:bg-white/80 text-gray-700"
+                              }`}
+                              onClick={() => toggleTag(tag)}
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
+
+            {/* Selected Tags Display */}
+            {selectedTags.length > 0 && (
+              <motion.div 
+                className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                {selectedTags.map((tag, index) => (
+                  <Badge
+                    key={index}
+                    variant="default"
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white pr-1 cursor-pointer hover:scale-105 transition-all duration-200"
+                    onClick={() => toggleTag(tag)}
+                  >
+                    {tag}
+                    <X className="w-3 h-3 ml-1" />
+                  </Badge>
+                ))}
+              </motion.div>
+            )}
 
             {/* Category Filters */}
             <div className="flex flex-wrap justify-center gap-4">
