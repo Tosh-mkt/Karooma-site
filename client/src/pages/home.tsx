@@ -65,7 +65,7 @@ export default function Home() {
             />
             
             <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
-              {heroContent?.content || "Aqui você encontra produtos que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️"}
+              {heroContent?.content || "Aqui você encontra produtos e soluções que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️"}
             </p>
             
           </motion.div>
