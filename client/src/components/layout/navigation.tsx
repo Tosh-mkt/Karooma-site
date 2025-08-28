@@ -18,6 +18,7 @@ export default function Navigation() {
   const navItems = [
     { href: "/", label: "Início", id: "home" },
     { href: "/sobre", label: "Sobre", id: "about" },
+    { href: "/blog", label: "Blog", id: "blog" },
     { href: "/momentos-meus", label: "Momentos Meus", id: "moments" },
     { href: "/products", label: "Facilitam a Vida", id: "life-hacks" },
   ];
