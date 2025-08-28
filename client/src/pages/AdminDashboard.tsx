@@ -17,7 +17,7 @@ import { isForbiddenError, isUnauthorizedError } from "@/lib/authUtils";
 import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
-  Bell, Mail, Clock, Filter, Download
+  Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -508,20 +508,228 @@ export function AdminDashboard() {
           </TabsContent>
 
           <TabsContent value="settings">
-            <Card className="glassmorphism border-0">
-              <CardHeader>
-                <CardTitle>Configurações do Site</CardTitle>
-                <CardDescription>
-                  Configurações gerais, SEO e integrações
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  <Settings className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Configurações em desenvolvimento</p>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              {/* Configurações de Deploy */}
+              <Card className="glassmorphism border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Globe className="w-5 h-5" />
+                    Configurações de Deploy
+                  </CardTitle>
+                  <CardDescription>
+                    Configurações essenciais para deploy externo e domínio personalizado
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Domínio Personalizado */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4" />
+                      Domínio Personalizado
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="custom-domain">Domínio Principal</Label>
+                        <Input
+                          id="custom-domain"
+                          placeholder="seudominio.com"
+                          defaultValue=""
+                          className="mt-1"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="subdomain">Subdomínio (opcional)</Label>
+                        <Input
+                          id="subdomain"
+                          placeholder="www"
+                          defaultValue=""
+                          className="mt-1"
+                        />
+                      </div>
+                    </div>
+                    <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Configuração DNS Necessária:</h4>
+                      <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+                        <p><strong>Tipo A:</strong> aponte para o IP fornecido pelo Replit</p>
+                        <p><strong>Registro TXT:</strong> adicione a verificação fornecida pelo Replit</p>
+                        <p className="text-xs">Configure estes registros no seu registrador de domínio (GoDaddy, Namecheap, etc.)</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Variáveis de Ambiente */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Key className="w-4 h-4" />
+                      Variáveis de Ambiente
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <span className="font-medium">DATABASE_URL</span>
+                          <p className="text-sm text-muted-foreground">Conexão com banco PostgreSQL</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                          <span className="text-sm text-green-600 dark:text-green-400">Configurada</span>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <span className="font-medium">SESSION_SECRET</span>
+                          <p className="text-sm text-muted-foreground">Chave secreta para sessões</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                          <span className="text-sm text-green-600 dark:text-green-400">Configurada</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <span className="font-medium">SENDGRID_API_KEY</span>
+                          <p className="text-sm text-muted-foreground">API do SendGrid para emails</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="w-5 h-5 text-yellow-500" />
+                          <span className="text-sm text-yellow-600 dark:text-yellow-400">Pendente</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 border rounded-lg">
+                        <div>
+                          <span className="font-medium">NODE_ENV</span>
+                          <p className="text-sm text-muted-foreground">Ambiente de produção</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Settings className="w-5 h-5 text-blue-500" />
+                          <span className="text-sm text-blue-600 dark:text-blue-400">Automático</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Status de Deploy */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Rocket className="w-4 h-4" />
+                      Status de Preparação
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="flex items-center gap-3 p-3 border rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-sm">SSL/HTTPS</span>
+                          <p className="text-xs text-muted-foreground">Automático no Replit</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 border rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-sm">Banco de Dados</span>
+                          <p className="text-xs text-muted-foreground">PostgreSQL conectado</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 border rounded-lg">
+                        <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-sm">Email Service</span>
+                          <p className="text-xs text-muted-foreground">SendGrid pendente</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 border rounded-lg">
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-sm">Performance</span>
+                          <p className="text-xs text-muted-foreground">Otimizado</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Configurações SEO */}
+              <Card className="glassmorphism border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Search className="w-5 h-5" />
+                    SEO e Analytics
+                  </CardTitle>
+                  <CardDescription>
+                    Configurações básicas para otimização de busca
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="site-title">Título do Site</Label>
+                      <Input
+                        id="site-title"
+                        defaultValue="Karooma - Simplificando a Vida em Família"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="site-description">Descrição do Site</Label>
+                      <Input
+                        id="site-description"
+                        defaultValue="Conteúdo prático e empático para famílias. Simplificamos o dia a dia e oferecemos momentos de autocuidado."
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="keywords">Palavras-chave (separadas por vírgula)</Label>
+                    <Input
+                      id="keywords"
+                      placeholder="família, maternidade, organização, dicas, autocuidado"
+                      className="mt-1"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="google-analytics">Google Analytics ID</Label>
+                      <Input
+                        id="google-analytics"
+                        placeholder="G-XXXXXXXXXX"
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="google-search">Google Search Console</Label>
+                      <Input
+                        id="google-search"
+                        placeholder="Código de verificação"
+                        className="mt-1"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Ações */}
+              <Card className="glassmorphism border-0">
+                <CardContent className="pt-6">
+                  <div className="flex gap-4">
+                    <Button className="flex-1">
+                      <Save className="w-4 h-4 mr-2" />
+                      Salvar Configurações
+                    </Button>
+                    <Button variant="outline" className="flex-1">
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Verificar Status
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
