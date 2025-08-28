@@ -77,7 +77,7 @@ export function Newsletter() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-1 px-6 py-4 rounded-2xl bg-white/30 backdrop-blur-sm border border-white/40 text-white placeholder-white/90 focus:outline-none focus:ring-2 focus:ring-white/50 font-poppins font-medium"
+              className="flex-1 px-6 py-4 rounded-2xl bg-white/50 backdrop-blur-sm border border-white/60 text-white placeholder-white/95 focus:outline-none focus:ring-2 focus:ring-white/70 font-poppins font-medium"
             />
             
             <GradientButton 
