@@ -40,6 +40,9 @@ export function SectionRenderer({ section, isEditing = false }: SectionRendererP
 // Seção Hero
 function HeroSection({ section, isEditing }: SectionRendererProps) {
   const { data } = section;
+  
+  // Debug: verificar se a imagem está sendo carregada
+  console.log('Background image path:', origamiBoatImage);
 
   return (
     <section 
@@ -47,10 +50,11 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
       style={{
         backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : `url(${origamiBoatImage})`,  
         backgroundSize: 'cover',
-        backgroundPosition: 'center'
+        backgroundPosition: 'center',
+        backgroundColor: '#6b46c1' // fallback cor para debug
       }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-pink-800/15 to-blue-900/20"></div>
+      {/* Overlay removido temporariamente para testar visibilidade da imagem */}
       
       <motion.div 
         className="relative z-10 text-center px-4 max-w-6xl mx-auto"
