@@ -627,31 +627,6 @@ export default function Products() {
                 Cada produto que recomendamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar. Não funciona ou é mal avaliado, não se encontra aqui.
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="glassmorphism p-6 text-center rounded-2xl">
-                  <div className="text-3xl mb-4">🔍</div>
-                  <h4 className="font-outfit text-lg gradient-text mb-3">Testados por Mães</h4>
-                  <p className="font-poppins text-sm text-gray-600">
-                    Cada produto é testado na vida real, por mães reais
-                  </p>
-                </div>
-                
-                <div className="glassmorphism p-6 text-center rounded-2xl">
-                  <div className="text-3xl mb-4">⭐</div>
-                  <h4 className="font-outfit text-lg gradient-text mb-3">Qualidade Garantida</h4>
-                  <p className="font-poppins text-sm text-gray-600">
-                    Só recomendamos o que realmente vale a pena
-                  </p>
-                </div>
-                
-                <div className="glassmorphism p-6 text-center rounded-2xl">
-                  <div className="text-3xl mb-4">💝</div>
-                  <h4 className="font-outfit text-lg gradient-text mb-3">Preço Coerente</h4>
-                  <p className="font-poppins text-sm text-gray-600">
-                    Produtos que cabem no orçamento familiar
-                  </p>
-                </div>
-              </div>
             </motion.div>
           </div>
         </section>
