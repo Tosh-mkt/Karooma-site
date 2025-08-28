@@ -107,7 +107,7 @@ export default function Navigation() {
               variant="outline"
               size="sm"
               className="border-purple-200 hover:bg-purple-50"
-              onClick={() => window.location.href = '/api/auth/signin'}
+              onClick={() => window.location.href = '/login'}
             >
               <Shield className="w-4 h-4 mr-2" />
               Entrar
@@ -199,7 +199,7 @@ export default function Navigation() {
                     className="flex items-center space-x-2 border-2 border-purple-200 text-purple-700 px-4 py-3 rounded-lg hover:bg-purple-50 cursor-pointer"
                     onClick={() => {
                       setIsOpen(false);
-                      window.location.href = '/api/auth/signin';
+                      window.location.href = '/login';
                     }}
                     whileHover={{ x: 10 }}
                   >
