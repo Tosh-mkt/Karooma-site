@@ -48,13 +48,19 @@ function HeroSection({ section, isEditing }: SectionRendererProps) {
     <section 
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
       style={{
-        backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : `url(${origamiBoatImage})`,  
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
         backgroundColor: '#6b46c1' // fallback cor para debug
       }}
     >
-      {/* Overlay removido temporariamente para testar visibilidade da imagem */}
+      {/* Imagem de fundo usando div absoluto */}
+      <div 
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: data.backgroundImage ? `url(${data.backgroundImage})` : `url(${origamiBoatImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      />
       
       <motion.div 
         className="relative z-10 text-center px-4 max-w-6xl mx-auto"
