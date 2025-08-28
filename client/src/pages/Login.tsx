@@ -74,23 +74,9 @@ export function Login() {
     },
   });
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminEmail.trim() || !adminPassword.trim()) {
-      toast({
-        title: "Campos obrigatórios",
-        description: "Por favor, preencha email e senha de administrador.",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    loginMutation.mutate({ email: adminEmail, password: adminPassword, type: 'admin' });
-  };
-
-  const handleUserLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userEmail.trim() || !userPassword.trim()) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha email e senha.",
@@ -99,10 +85,16 @@ export function Login() {
       return;
     }
     
-    loginMutation.mutate({ email: userEmail, password: userPassword, type: 'user' });
+    // Detecta automaticamente se é admin baseado no email
+    const isAdmin = adminEmail.includes('@karooma.com') || adminEmail.includes('admin');
+    loginMutation.mutate({ 
+      email: adminEmail, 
+      password: adminPassword, 
+      type: isAdmin ? 'admin' : 'user' 
+    });
   };
 
-  const handleUserSignUp = (e: React.FormEvent) => {
+  const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
       title: "Funcionalidade em desenvolvimento",
@@ -170,7 +162,7 @@ export function Login() {
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Google Login */}
+            {/* Google Login Principal */}
             <motion.div
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -196,251 +188,180 @@ export function Login() {
               </div>
             </div>
 
-            {/* Tabs para diferentes tipos de login */}
-            <Tabs defaultValue="user" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="user" className="flex items-center gap-2" data-testid="tab-user">
-                  <User className="w-4 h-4" />
-                  Usuário
-                </TabsTrigger>
-                <TabsTrigger value="admin" className="flex items-center gap-2" data-testid="tab-admin">
-                  <Shield className="w-4 h-4" />
-                  Admin
-                </TabsTrigger>
-              </TabsList>
+            {/* Formulário Unificado com Detecção Automática */}
+            <div className="text-center pb-2">
+              <p className="text-sm text-gray-600 mb-4">
+                Login automático - Digite suas credenciais abaixo
+              </p>
+            </div>
 
-              {/* Tab Usuário */}
-              <TabsContent value="user" className="space-y-4 mt-6">
-                <div className="text-center pb-2">
-                  <p className="text-sm text-gray-600 mb-4">
-                    Para membros da comunidade Karooma
-                  </p>
-                </div>
+            {/* Toggle entre Login e Cadastro */}
+            <div className="flex justify-center space-x-4 py-2">
+              <Button
+                variant={!isSignUp ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setIsSignUp(false)}
+                className="text-xs"
+                data-testid="button-login-mode"
+              >
+                Entrar
+              </Button>
+              <Button
+                variant={isSignUp ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setIsSignUp(true)}
+                className="text-xs"
+                data-testid="button-signup-mode"
+              >
+                Criar conta
+              </Button>
+            </div>
 
-                <div className="space-y-3">
-                  <Button
-                    onClick={handleGoogleLogin}
-                    variant="outline"
-                    className="w-full border-2 hover:bg-gray-50"
-                    disabled={loginMutation.isPending}
-                    data-testid="button-user-google"
-                  >
-                    <Chrome className="w-4 h-4 mr-2" />
-                    Entrar com Google
-                  </Button>
-
+            {/* Formulário Principal */}
+            <form onSubmit={isSignUp ? handleSignUp : handleLogin} className="space-y-4">
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome completo</Label>
                   <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-gray-200" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-2 text-gray-500">ou</span>
-                    </div>
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                      id="name"
+                      type="text"
+                      placeholder="Seu nome completo"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      className="pl-10"
+                      required={isSignUp}
+                      data-testid="input-name"
+                    />
                   </div>
-
-                  {/* Toggle entre Login e Cadastro */}
-                  <div className="flex justify-center space-x-4 py-2">
-                    <Button
-                      variant={!isSignUp ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setIsSignUp(false)}
-                      className="text-xs"
-                      data-testid="button-login-mode"
-                    >
-                      Entrar
-                    </Button>
-                    <Button
-                      variant={isSignUp ? "default" : "ghost"}
-                      size="sm"
-                      onClick={() => setIsSignUp(true)}
-                      className="text-xs"
-                      data-testid="button-signup-mode"
-                    >
-                      Criar conta
-                    </Button>
-                  </div>
-
-                  {/* Formulário de Login/Cadastro */}
-                  <form onSubmit={isSignUp ? handleUserSignUp : handleUserLogin} className="space-y-4">
-                    {isSignUp && (
-                      <div className="space-y-2">
-                        <Label htmlFor="user-name">Nome completo</Label>
-                        <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                          <Input
-                            id="user-name"
-                            type="text"
-                            placeholder="Seu nome completo"
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            className="pl-10"
-                            required={isSignUp}
-                            data-testid="input-user-name"
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="space-y-2">
-                      <Label htmlFor="user-email">Email</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          id="user-email"
-                          type="email"
-                          placeholder="seu@email.com"
-                          value={userEmail}
-                          onChange={(e) => setUserEmail(e.target.value)}
-                          className="pl-10"
-                          required
-                          data-testid="input-user-email"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="user-password">Senha</Label>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                        <Input
-                          id="user-password"
-                          type={showUserPassword ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={userPassword}
-                          onChange={(e) => setUserPassword(e.target.value)}
-                          className="pl-10 pr-10"
-                          required
-                          data-testid="input-user-password"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          className="absolute right-0 top-0 h-full px-3"
-                          onClick={() => setShowUserPassword(!showUserPassword)}
-                          data-testid="button-toggle-user-password"
-                        >
-                          {showUserPassword ? (
-                            <EyeOff className="w-4 h-4 text-gray-400" />
-                          ) : (
-                            <Eye className="w-4 h-4 text-gray-400" />
-                          )}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
-                      disabled={loginMutation.isPending}
-                      data-testid="button-user-submit"
-                    >
-                      {loginMutation.isPending ? "Processando..." : isSignUp ? (
-                        <>
-                          <UserPlus className="w-4 h-4 mr-2" />
-                          Criar conta
-                        </>
-                      ) : "Entrar"}
-                    </Button>
-                  </form>
                 </div>
-              </TabsContent>
+              )}
 
-              {/* Tab Admin */}
-              <TabsContent value="admin" className="space-y-4 mt-6">
-                <div className="text-center pb-2">
-                  <p className="text-sm text-gray-600 mb-4">
-                    Acesso restrito para administradores
-                  </p>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                    data-testid="input-email"
+                  />
                 </div>
-
-                <form onSubmit={handleAdminLogin} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="admin-email">Email do Administrador</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        id="admin-email"
-                        type="email"
-                        placeholder="admin@karooma.com"
-                        value={adminEmail}
-                        onChange={(e) => setAdminEmail(e.target.value)}
-                        className="pl-10"
-                        required
-                        data-testid="input-admin-email"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="admin-password">Senha</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                      <Input
-                        id="admin-password"
-                        type={showAdminPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={adminPassword}
-                        onChange={(e) => setAdminPassword(e.target.value)}
-                        className="pl-10 pr-10"
-                        required
-                        data-testid="input-admin-password"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3"
-                        onClick={() => setShowAdminPassword(!showAdminPassword)}
-                        data-testid="button-toggle-admin-password"
-                      >
-                        {showAdminPassword ? (
-                          <EyeOff className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <Eye className="w-4 h-4 text-gray-400" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700"
-                    disabled={loginMutation.isPending}
-                    data-testid="button-admin-submit"
-                  >
-                    {loginMutation.isPending ? "Entrando..." : (
-                      <>
-                        <Shield className="w-4 h-4 mr-2" />
-                        Entrar como Admin
-                      </>
+                {/* Indicador visual do tipo de conta */}
+                {adminEmail && (
+                  <div className="text-xs text-center">
+                    {adminEmail.includes('@karooma.com') || adminEmail.includes('admin') ? (
+                      <span className="text-purple-600 flex items-center justify-center gap-1">
+                        <Shield className="w-3 h-3" />
+                        Detectado: Conta de Administrador
+                      </span>
+                    ) : (
+                      <span className="text-pink-600 flex items-center justify-center gap-1">
+                        <User className="w-3 h-3" />
+                        Detectado: Conta de Usuário
+                      </span>
                     )}
-                  </Button>
-                </form>
-
-                {/* Demo Admin para Desenvolvimento */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div className="pt-4 border-t">
-                    <p className="text-xs text-gray-500 mb-3 text-center">
-                      Desenvolvimento - Login Demo
-                    </p>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full text-xs"
-                      onClick={() => {
-                        setAdminEmail("admin@karooma.com");
-                        setAdminPassword("Karo0maSecure2025#6gu5xk");
-                      }}
-                      data-testid="button-admin-demo"
-                    >
-                      <Shield className="w-3 h-3 mr-1" />
-                      Preencher credenciais demo
-                    </Button>
                   </div>
                 )}
-              </TabsContent>
-            </Tabs>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Senha</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Input
+                    id="password"
+                    type={showAdminPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    className="pl-10 pr-10"
+                    required
+                    data-testid="input-password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowAdminPassword(!showAdminPassword)}
+                    data-testid="button-toggle-password"
+                  >
+                    {showAdminPassword ? (
+                      <EyeOff className="w-4 h-4 text-gray-400" />
+                    ) : (
+                      <Eye className="w-4 h-4 text-gray-400" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className={`w-full ${
+                  adminEmail.includes('@karooma.com') || adminEmail.includes('admin')
+                    ? 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700'
+                    : 'bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700'
+                }`}
+                disabled={loginMutation.isPending}
+                data-testid="button-submit"
+              >
+                {loginMutation.isPending ? "Processando..." : isSignUp ? (
+                  <>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Criar conta
+                  </>
+                ) : adminEmail.includes('@karooma.com') || adminEmail.includes('admin') ? (
+                  <>
+                    <Shield className="w-4 h-4 mr-2" />
+                    Entrar como Admin
+                  </>
+                ) : "Entrar"}
+              </Button>
+            </form>
+
+            {/* Demo para Desenvolvimento */}
+            {process.env.NODE_ENV === 'development' && (
+              <div className="pt-4 border-t">
+                <p className="text-xs text-gray-500 mb-3 text-center">
+                  Desenvolvimento - Login Demo
+                </p>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => {
+                      setAdminEmail("admin@karooma.com");
+                      setAdminPassword("Karo0maSecure2025#6gu5xk");
+                    }}
+                    data-testid="button-admin-demo"
+                  >
+                    <Shield className="w-3 h-3 mr-1" />
+                    Preencher Admin Demo
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs"
+                    onClick={() => {
+                      setAdminEmail("user@example.com");
+                      setAdminPassword("user123");
+                    }}
+                    data-testid="button-user-demo"
+                  >
+                    <User className="w-3 h-3 mr-1" />
+                    Preencher Usuário Demo
+                  </Button>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
