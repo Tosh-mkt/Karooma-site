@@ -56,13 +56,12 @@ export default function Home() {
             </p>
             
             {/* Botão de teste para modal de newsletter */}
-            <NewsletterModal
-              trigger={
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                  📧 Teste Newsletter Avançada
-                </Button>
-              }
-            />
+            <Button 
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+              onClick={() => {}}
+            >
+              📧 Teste Newsletter Avançada
+            </Button>
             
             <p className="font-poppins text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
               {heroContent?.content || "Aqui você encontra produtos e soluções que realmente facilitam a vida e dicas de quem entende essa correria toda ❤️"}
