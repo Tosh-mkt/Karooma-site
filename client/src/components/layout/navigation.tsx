@@ -13,7 +13,7 @@ export default function Navigation() {
   const [location] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const { isAdmin, isAuthenticated } = useAuth();
+  const { isAdmin, isAuthenticated, user, setUser } = useAuth();
 
   const navItems = [
     { href: "/", label: "Início", id: "home" },
@@ -80,7 +80,20 @@ export default function Navigation() {
         {/* Auth Button (conditional) - Desktop only */}
         <div className="hidden md:block">
           {isAuthenticated ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
+              {/* User Info */}
+              <div className="text-sm">
+                <span className="text-gray-600">Olá, </span>
+                <span className="font-medium text-purple-600">
+                  {user?.firstName || user?.email || 'Usuário'}
+                </span>
+                {isAdmin && (
+                  <span className="ml-2 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                    Admin
+                  </span>
+                )}
+              </div>
+              
               {isAdmin && (
                 <Link href="/admin/dashboard">
                   <Button
@@ -89,7 +102,7 @@ export default function Navigation() {
                     className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 hover:scale-105 transition-all duration-300"
                   >
                     <Shield className="w-4 h-4 mr-2" />
-                    Admin
+                    Painel
                   </Button>
                 </Link>
               )}
@@ -97,7 +110,10 @@ export default function Navigation() {
                 variant="outline"
                 size="sm"
                 className="border-gray-300 hover:bg-gray-50"
-                onClick={() => window.location.href = '/api/auth/signout'}
+                onClick={() => {
+                  setUser(null); // Clear user data
+                  window.location.href = '/';
+                }}
               >
                 Sair
               </Button>
@@ -170,7 +186,20 @@ export default function Navigation() {
                 
                 {/* Auth buttons in mobile menu */}
                 {isAuthenticated ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
+                    {/* User Info Mobile */}
+                    <div className="p-3 bg-purple-50 rounded-lg">
+                      <div className="text-sm text-gray-600">Conectado como:</div>
+                      <div className="font-medium text-purple-600">
+                        {user?.firstName || user?.email || 'Usuário'}
+                      </div>
+                      {isAdmin && (
+                        <span className="inline-block mt-1 px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                          Administrador
+                        </span>
+                      )}
+                    </div>
+                    
                     {isAdmin && (
                       <Link href="/admin/dashboard">
                         <motion.div
@@ -179,7 +208,7 @@ export default function Navigation() {
                           whileHover={{ x: 10 }}
                         >
                           <Shield className="w-5 h-5" />
-                          <span className="font-poppins text-lg font-medium">Admin</span>
+                          <span className="font-poppins text-lg font-medium">Painel Admin</span>
                         </motion.div>
                       </Link>
                     )}
@@ -187,7 +216,8 @@ export default function Navigation() {
                       className="flex items-center space-x-2 border-2 border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer"
                       onClick={() => {
                         setIsOpen(false);
-                        window.location.href = '/api/auth/signout';
+                        setUser(null); // Clear user data
+                        window.location.href = '/';
                       }}
                       whileHover={{ x: 10 }}
                     >

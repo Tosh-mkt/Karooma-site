@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
 import { 
   Mail, 
@@ -33,6 +34,7 @@ export function Login() {
   const [showUserPassword, setShowUserPassword] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const { toast } = useToast();
+  const { setUser } = useAuth();
   const queryClient = useQueryClient();
 
   const loginMutation = useMutation({
@@ -58,11 +60,12 @@ export function Login() {
         description: `Bem-vinda${data.user?.firstName ? `, ${data.user.firstName}` : ''}!`,
       });
       
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/session-user"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
+      // Save user data to localStorage through useAuth
+      setUser(data.user);
       
+      // Redirect based on admin status
       setTimeout(() => {
-        window.location.href = data.isAdmin ? "/admin/dashboard" : "/";
+        window.location.href = data.user?.isAdmin ? "/admin/dashboard" : "/";
       }, 1000);
     },
     onError: (error: any) => {
