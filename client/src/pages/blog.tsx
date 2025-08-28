@@ -12,7 +12,6 @@ import { Content } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
 
 export default function Blog() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
@@ -20,13 +19,6 @@ export default function Blog() {
     queryKey: ["/api/content/blog"],
   });
 
-  const categories = [
-    { id: "all", label: "Todos" },
-    { id: "tendencias", label: "Tendências" },
-    { id: "produtividade", label: "Produtividade" },
-    { id: "analytics", label: "Analytics" },
-    { id: "estrategia", label: "Estratégia" },
-  ];
 
   const tagGroups = [
     {
@@ -64,7 +56,6 @@ export default function Blog() {
   };
 
   const filteredArticles = articles?.filter(article => {
-    const matchesCategory = selectedCategory === "all" || article.category === selectedCategory;
     const matchesSearch = !searchQuery || 
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.description?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -74,7 +65,7 @@ export default function Blog() {
       article.description?.toLowerCase().includes(tag.toLowerCase())
     );
     
-    return matchesCategory && matchesSearch && matchesTags;
+    return matchesSearch && matchesTags;
   }) || [];
 
   const featuredArticle = filteredArticles.find(article => article.featured) || filteredArticles[0];
@@ -205,19 +196,6 @@ export default function Blog() {
               </motion.div>
             )}
 
-            {/* Category Filters */}
-            <div className="flex flex-wrap justify-center gap-4">
-              {categories.map((category) => (
-                <GradientButton
-                  key={category.id}
-                  variant={selectedCategory === category.id ? "primary" : "glass"}
-                  onClick={() => setSelectedCategory(category.id)}
-                  size="sm"
-                >
-                  {category.label}
-                </GradientButton>
-              ))}
-            </div>
           </motion.div>
 
           {/* Articles Layout */}
