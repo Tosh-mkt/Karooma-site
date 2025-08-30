@@ -211,7 +211,7 @@ export default function Home() {
             transition={{ delay: 0.5 }}
           >
             <p className="font-poppins text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-              <strong>Você chegou no lugar certo.</strong> Aqui não tem julgamento, só soluções práticas e a certeza de que você não precisa ser perfeita para ser uma mãe incrível.
+              <strong>Você chegou no lugar certo.</strong> Aqui não tem julgamento, só soluções práticas e a certeza de que você não precisa de perfeição para ter uma casa funcionando e ter momentos incríveis em família.
             </p>
           </motion.div>
         </div>
