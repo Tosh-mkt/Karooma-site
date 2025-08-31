@@ -112,43 +112,45 @@ export function ProductMonitoring() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Monitoramento de Produtos</h2>
-          <p className="text-gray-600">Status da PA API da Amazon e atualizações automáticas</p>
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900">Monitoramento de Produtos</h2>
+          <p className="text-sm md:text-base text-gray-600">Status da PA API da Amazon e atualizações automáticas</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/admin/product-updates/status'] })}
+            className="w-full sm:w-auto"
           >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Atualizar
+            <RefreshCw className="w-3 h-3 md:w-4 md:h-4 mr-2" />
+            <span className="text-xs md:text-sm">Atualizar</span>
           </Button>
           <Button
             onClick={() => runUpdateMutation.mutate()}
             disabled={runUpdateMutation.isPending}
-            className="bg-gradient-to-r from-purple-600 to-pink-600"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 w-full sm:w-auto"
+            size="sm"
           >
             {runUpdateMutation.isPending ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+              <RefreshCw className="w-3 h-3 md:w-4 md:h-4 mr-2 animate-spin" />
             ) : (
-              <Play className="w-4 h-4 mr-2" />
+              <Play className="w-3 h-3 md:w-4 md:h-4 mr-2" />
             )}
-            Executar Atualização
+            <span className="text-xs md:text-sm">Executar Atualização</span>
           </Button>
         </div>
       </div>
 
       {/* Status Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">API Amazon</p>
-                <p className="text-2xl font-bold">
+                <p className="text-xs md:text-sm font-medium text-gray-600">API Amazon</p>
+                <p className="text-lg md:text-2xl font-bold">
                   {monitoringStatus?.apiConfigured ? (
                     <span className="text-green-600">Ativa</span>
                   ) : (
@@ -156,13 +158,13 @@ export function ProductMonitoring() {
                   )}
                 </p>
               </div>
-              <div className={`p-2 rounded-full ${
+              <div className={`p-1.5 md:p-2 rounded-full ${
                 monitoringStatus?.apiConfigured ? 'bg-green-100' : 'bg-red-100'
               }`}>
                 {monitoringStatus?.apiConfigured ? (
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
                 ) : (
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                  <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-red-600" />
                 )}
               </div>
             </div>
@@ -170,46 +172,46 @@ export function ProductMonitoring() {
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Taxa de Sucesso</p>
-                <p className="text-2xl font-bold text-blue-600">{successRate}%</p>
+                <p className="text-xs md:text-sm font-medium text-gray-600">Taxa de Sucesso</p>
+                <p className="text-lg md:text-2xl font-bold text-blue-600">{successRate}%</p>
               </div>
-              <div className="p-2 rounded-full bg-blue-100">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+              <div className="p-1.5 md:p-2 rounded-full bg-blue-100">
+                <TrendingUp className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Produtos Ativos</p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-xs md:text-sm font-medium text-gray-600">Produtos Ativos</p>
+                <p className="text-lg md:text-2xl font-bold text-green-600">
                   {activeProducts?.length || 0}
                 </p>
               </div>
-              <div className="p-2 rounded-full bg-green-100">
-                <Package className="w-5 h-5 text-green-600" />
+              <div className="p-1.5 md:p-2 rounded-full bg-green-100">
+                <Package className="w-4 h-4 md:w-5 md:h-5 text-green-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
         <Card>
-          <CardContent className="p-4">
+          <CardContent className="p-3 md:p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Indisponíveis</p>
-                <p className="text-2xl font-bold text-red-600">
+                <p className="text-xs md:text-sm font-medium text-gray-600">Indisponíveis</p>
+                <p className="text-lg md:text-2xl font-bold text-red-600">
                   {inactiveProducts?.length || 0}
                 </p>
               </div>
-              <div className="p-2 rounded-full bg-red-100">
-                <AlertTriangle className="w-5 h-5 text-red-600" />
+              <div className="p-1.5 md:p-2 rounded-full bg-red-100">
+                <AlertTriangle className="w-4 h-4 md:w-5 md:h-5 text-red-600" />
               </div>
             </div>
           </CardContent>
@@ -228,20 +230,28 @@ export function ProductMonitoring() {
       )}
 
       <Tabs defaultValue="jobs" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="jobs">Jobs de Atualização</TabsTrigger>
-          <TabsTrigger value="statistics">Estatísticas</TabsTrigger>
-          <TabsTrigger value="products">Produtos</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-auto">
+          <TabsTrigger value="jobs" className="text-xs md:text-sm px-2 py-2">
+            <span className="hidden sm:inline">Jobs de Atualização</span>
+            <span className="sm:hidden">Jobs</span>
+          </TabsTrigger>
+          <TabsTrigger value="statistics" className="text-xs md:text-sm px-2 py-2">
+            <span className="hidden sm:inline">Estatísticas</span>
+            <span className="sm:hidden">Stats</span>
+          </TabsTrigger>
+          <TabsTrigger value="products" className="text-xs md:text-sm px-2 py-2">
+            Produtos
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="jobs" className="space-y-4">
+        <TabsContent value="jobs" className="space-y-3 md:space-y-4">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Activity className="w-5 h-5" />
+            <CardHeader className="px-3 py-3 md:px-6 md:py-6">
+              <CardTitle className="flex items-center gap-2 text-sm md:text-base">
+                <Activity className="w-4 h-4 md:w-5 md:h-5" />
                 Status dos Jobs Automáticos
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs md:text-sm">
                 Jobs executam automaticamente em intervalos definidos
               </CardDescription>
             </CardHeader>
