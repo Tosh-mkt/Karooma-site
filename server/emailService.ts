@@ -139,3 +139,28 @@ export function logNewsletterSubscription(data: NewsletterNotificationData): voi
   console.log(`⏰ Data/Hora: ${new Date(data.timestamp).toLocaleString('pt-BR')}`);
   console.log('========================================\n');
 }
+
+// Função genérica para envio de emails
+interface EmailData {
+  to: string;
+  from: string;
+  subject: string;
+  text?: string;
+  html?: string;
+}
+
+export async function sendEmail(data: EmailData): Promise<boolean> {
+  if (!mailService) {
+    console.log('SendGrid não configurado. Email não enviado:', data.subject);
+    return false;
+  }
+
+  try {
+    await mailService.send(data);
+    console.log(`✅ Email enviado: ${data.subject} para ${data.to}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Erro ao enviar email:', error);
+    return false;
+  }
+}

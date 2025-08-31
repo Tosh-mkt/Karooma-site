@@ -25,6 +25,7 @@ import { EditProductModal } from "@/components/admin/EditProductModal";
 import { CreatePostModal } from "@/components/admin/CreatePostModal";
 import { EditPostModal } from "@/components/admin/EditPostModal";
 import { EditPageContentModal } from "@/components/admin/EditPageContentModal";
+import { ProductMonitoring } from "@/components/admin/ProductMonitoring";
 import { AdminLogin } from "@/components/AdminLogin";
 
 // Dashboard Overview Component
@@ -426,10 +427,14 @@ export function AdminDashboard() {
             
             {/* Secondary row for mobile */}
             <div className="mt-2">
-              <TabsList className="grid w-full grid-cols-3 glassmorphism">
+              <TabsList className="grid w-full grid-cols-4 glassmorphism">
                 <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs">
                   <Database className="w-3 h-3" />
                   <span className="hidden xs:inline">Produtos</span>
+                </TabsTrigger>
+                <TabsTrigger value="monitoring" className="flex items-center justify-center space-x-1 text-xs">
+                  <Activity className="w-3 h-3" />
+                  <span className="hidden xs:inline">Monitor</span>
                 </TabsTrigger>
                 <TabsTrigger value="content" className="flex items-center justify-center space-x-1 text-xs">
                   <Edit className="w-3 h-3" />
@@ -445,7 +450,7 @@ export function AdminDashboard() {
           
           {/* Desktop: Original layout */}
           <div className="hidden md:block">
-            <TabsList className="grid w-full grid-cols-6 glassmorphism">
+            <TabsList className="grid w-full grid-cols-7 glassmorphism">
               <TabsTrigger value="dashboard" className="flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -457,6 +462,10 @@ export function AdminDashboard() {
               <TabsTrigger value="products" className="flex items-center space-x-2">
                 <Database className="w-4 h-4" />
                 <span>Produtos</span>
+              </TabsTrigger>
+              <TabsTrigger value="monitoring" className="flex items-center space-x-2">
+                <Activity className="w-4 h-4" />
+                <span>Monitoramento</span>
               </TabsTrigger>
               <TabsTrigger value="content" className="flex items-center space-x-2">
                 <Edit className="w-4 h-4" />
@@ -483,6 +492,10 @@ export function AdminDashboard() {
 
           <TabsContent value="products">
             <ProductsManagement />
+          </TabsContent>
+
+          <TabsContent value="monitoring">
+            <ProductMonitoring />
           </TabsContent>
 
           <TabsContent value="content">

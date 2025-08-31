@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 
 const app = express();
 app.use(express.json());
@@ -67,5 +68,14 @@ app.use((req, res, next) => {
     reusePort: true,
   }, () => {
     log(`serving on port ${port}`);
+    
+    // Inicializar jobs de atualização de produtos
+    try {
+      const productJobs = getProductUpdateJobs();
+      productJobs.startAllJobs();
+      log('Product update jobs initialized successfully');
+    } catch (error) {
+      log('Failed to initialize product update jobs:', String(error));
+    }
   });
 })();

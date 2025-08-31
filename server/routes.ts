@@ -12,6 +12,8 @@ import {
   ObjectNotFoundError,
 } from "./objectStorage";
 import bcrypt from "bcryptjs";
+import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
+import AmazonPAAPIService from "./services/amazonApi";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
@@ -778,6 +780,99 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error deleting page:", error);
       res.status(500).json({ message: "Failed to delete page" });
+    }
+  });
+
+  // Amazon PA API routes
+  const jobsManager = getProductUpdateJobs();
+  const amazonService = new AmazonPAAPIService();
+
+  // Rota para verificar status dos jobs de atualização
+  app.get("/api/admin/product-updates/status", async (req, res) => {
+    try {
+      const jobsStatus = jobsManager.getJobsStatus();
+      const stats = await jobsManager.getUpdateStats();
+      
+      res.json({
+        jobs: jobsStatus,
+        statistics: stats,
+        apiConfigured: amazonService.isConfigured()
+      });
+    } catch (error) {
+      console.error("Error getting update status:", error);
+      res.status(500).json({ message: "Failed to get update status" });
+    }
+  });
+
+  // Rota para executar atualização manual
+  app.post("/api/admin/product-updates/run", async (req, res) => {
+    try {
+      const { frequency } = req.body;
+      
+      if (frequency && !['high', 'medium', 'low'].includes(frequency)) {
+        return res.status(400).json({ message: "Invalid frequency. Use: high, medium, or low" });
+      }
+
+      const result = await jobsManager.runManualUpdate(frequency);
+      res.json({
+        message: "Update completed",
+        result
+      });
+    } catch (error) {
+      console.error("Error running manual update:", error);
+      res.status(500).json({ message: "Failed to run update", error: error.message });
+    }
+  });
+
+  // Rota para verificar produto específico pela PA API
+  app.post("/api/admin/products/check-amazon", async (req, res) => {
+    try {
+      const { asin } = req.body;
+      
+      if (!asin) {
+        return res.status(400).json({ message: "ASIN is required" });
+      }
+
+      const result = await amazonService.getProductByASIN(asin);
+      res.json(result);
+    } catch (error) {
+      console.error("Error checking Amazon product:", error);
+      res.status(500).json({ message: "Failed to check product", error: error.message });
+    }
+  });
+
+  // Rota para atualizar configuração de frequência de produtos
+  app.put("/api/admin/products/:id/update-frequency", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { frequency } = req.body;
+      
+      if (!['high', 'medium', 'low'].includes(frequency)) {
+        return res.status(400).json({ message: "Invalid frequency. Use: high, medium, or low" });
+      }
+
+      await storage.updateProductFrequency(id, frequency);
+      res.json({ message: "Product update frequency updated successfully" });
+    } catch (error) {
+      console.error("Error updating product frequency:", error);
+      res.status(500).json({ message: "Failed to update product frequency" });
+    }
+  });
+
+  // Rota para obter produtos por status
+  app.get("/api/admin/products/by-status/:status", async (req, res) => {
+    try {
+      const { status } = req.params;
+      
+      if (!['active', 'inactive', 'discontinued'].includes(status)) {
+        return res.status(400).json({ message: "Invalid status" });
+      }
+
+      const products = await storage.getProductsByStatus(status);
+      res.json(products);
+    } catch (error) {
+      console.error("Error getting products by status:", error);
+      res.status(500).json({ message: "Failed to get products" });
     }
   });
 

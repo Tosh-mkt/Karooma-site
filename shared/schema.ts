@@ -122,7 +122,25 @@ export const products = pgTable("products", {
   karoomaTeamEvaluation: text("karooma_team_evaluation"),
   categoryTags: text("category_tags"),
   searchTags: text("search_tags"),
+  // Campos para integração PA API Amazon
+  asin: varchar("asin", { length: 10 }), // Amazon Standard Identification Number
+  brand: text("brand"), // Marca do produto
+  reviewCount: integer("review_count"), // Número de avaliações
+  isPrime: boolean("is_prime").default(false), // Elegível para Amazon Prime
+  availability: varchar("availability", { length: 50 }).default("available"), // available, unavailable, limited
+  bestSellerRank: integer("best_seller_rank"), // Ranking na categoria
+  // Controle de atualização automática
+  status: varchar("status", { length: 20 }).default("active"), // active, inactive, discontinued
+  lastChecked: timestamp("last_checked"), // Última verificação PA API
+  lastUpdated: timestamp("last_updated"), // Última atualização de dados
+  updateFrequency: varchar("update_frequency", { length: 20 }).default("medium"), // high, medium, low
+  autoCheckEnabled: boolean("auto_check_enabled").default(true),
+  failedChecks: integer("failed_checks").default(0), // Contador de falhas consecutivas
+  unavailableSince: timestamp("unavailable_since"), // Quando ficou indisponível
+  // Cache de dados da API
+  amazonData: json("amazon_data"), // Cache dos dados completos da PA API
   createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {

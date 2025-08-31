@@ -52,6 +52,10 @@ export interface IStorage {
   createProduct(product: InsertProduct): Promise<Product>;
   updateProduct(id: string, updates: Partial<Product>): Promise<Product>;
   deleteProduct(id: string): Promise<void>;
+  updateProductFrequency(id: string, frequency: 'high' | 'medium' | 'low'): Promise<void>;
+  getProductsByStatus(status: string): Promise<Product[]>;
+  getProductsByFrequency(frequency: 'high' | 'medium' | 'low'): Promise<Product[]>;
+  updateProductLastChecked(id: string): Promise<void>;
   
   // Newsletter methods
   createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
@@ -318,6 +322,30 @@ export class MemStorage implements IStorage {
 
   async deleteProduct(id: string): Promise<void> {
     this.products.delete(id);
+  }
+
+  async updateProductFrequency(id: string, frequency: 'high' | 'medium' | 'low'): Promise<void> {
+    const product = this.products.get(id);
+    if (product) {
+      product.updateFrequency = frequency;
+      product.updatedAt = new Date();
+    }
+  }
+
+  async getProductsByStatus(status: string): Promise<Product[]> {
+    return Array.from(this.products.values()).filter(p => p.status === status);
+  }
+
+  async getProductsByFrequency(frequency: 'high' | 'medium' | 'low'): Promise<Product[]> {
+    return Array.from(this.products.values()).filter(p => p.updateFrequency === frequency);
+  }
+
+  async updateProductLastChecked(id: string): Promise<void> {
+    const product = this.products.get(id);
+    if (product) {
+      product.lastChecked = new Date();
+      product.updatedAt = new Date();
+    }
   }
 
   // Newsletter methods
@@ -594,6 +622,36 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProduct(id: string): Promise<void> {
     await db.delete(products).where(eq(products.id, id));
+  }
+
+  async updateProductFrequency(id: string, frequency: 'high' | 'medium' | 'low'): Promise<void> {
+    await db
+      .update(products)
+      .set({ updateFrequency: frequency, updatedAt: new Date() })
+      .where(eq(products.id, id));
+  }
+
+  async getProductsByStatus(status: string): Promise<Product[]> {
+    return await db
+      .select()
+      .from(products)
+      .where(eq(products.status, status))
+      .orderBy(desc(products.updatedAt));
+  }
+
+  async getProductsByFrequency(frequency: 'high' | 'medium' | 'low'): Promise<Product[]> {
+    return await db
+      .select()
+      .from(products)
+      .where(eq(products.updateFrequency, frequency))
+      .orderBy(desc(products.lastChecked));
+  }
+
+  async updateProductLastChecked(id: string): Promise<void> {
+    await db
+      .update(products)
+      .set({ lastChecked: new Date(), updatedAt: new Date() })
+      .where(eq(products.id, id));
   }
 
   // Newsletter methods
