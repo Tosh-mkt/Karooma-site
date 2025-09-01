@@ -17,7 +17,8 @@ import { isForbiddenError, isUnauthorizedError } from "@/lib/authUtils";
 import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
-  Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search
+  Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
+  Terminal, FileText
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -534,7 +535,7 @@ export function AdminDashboard() {
                     Configurações de Deploy
                   </CardTitle>
                   <CardDescription>
-                    Configurações essenciais para deploy externo e domínio personalizado
+                    Configurações para deploy na Hostinger e domínio personalizado
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -565,11 +566,12 @@ export function AdminDashboard() {
                       </div>
                     </div>
                     <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                      <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Configuração DNS Necessária:</h4>
+                      <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Configuração DNS na Hostinger:</h4>
                       <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-                        <p><strong>Tipo A:</strong> aponte para o IP fornecido pelo Replit</p>
-                        <p><strong>Registro TXT:</strong> adicione a verificação fornecida pelo Replit</p>
-                        <p className="text-xs">Configure estes registros no seu registrador de domínio (GoDaddy, Namecheap, etc.)</p>
+                        <p><strong>Tipo A:</strong> aponte para o IP do seu servidor VPS/Cloud</p>
+                        <p><strong>Registro TXT:</strong> adicione verificações se necessário</p>
+                        <p><strong>CNAME:</strong> configure www para apontar para o domínio principal</p>
+                        <p className="text-xs">Configure estes registros no painel DNS da Hostinger</p>
                       </div>
                     </div>
                   </div>
@@ -595,11 +597,11 @@ export function AdminDashboard() {
                       <div className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <span className="font-medium">SESSION_SECRET</span>
-                          <p className="text-sm text-muted-foreground">Chave secreta para sessões</p>
+                          <p className="text-sm text-muted-foreground">Chave secreta para sessões (gere uma chave forte)</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500" />
-                          <span className="text-sm text-green-600 dark:text-green-400">Configurada</span>
+                          <AlertCircle className="w-5 h-5 text-yellow-500" />
+                          <span className="text-sm text-yellow-600 dark:text-yellow-400">Configure no servidor</span>
                         </div>
                       </div>
 
@@ -617,11 +619,11 @@ export function AdminDashboard() {
                       <div className="flex items-center justify-between p-3 border rounded-lg">
                         <div>
                           <span className="font-medium">NODE_ENV</span>
-                          <p className="text-sm text-muted-foreground">Ambiente de produção</p>
+                          <p className="text-sm text-muted-foreground">Definir como 'production' no servidor</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <Settings className="w-5 h-5 text-blue-500" />
-                          <span className="text-sm text-blue-600 dark:text-blue-400">Automático</span>
+                          <span className="text-sm text-blue-600 dark:text-blue-400">Manual</span>
                         </div>
                       </div>
                     </div>
@@ -635,18 +637,18 @@ export function AdminDashboard() {
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="flex items-center gap-3 p-3 border rounded-lg">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
                         <div>
                           <span className="font-medium text-sm">SSL/HTTPS</span>
-                          <p className="text-xs text-muted-foreground">Automático no Replit</p>
+                          <p className="text-xs text-muted-foreground">Configure SSL na Hostinger</p>
                         </div>
                       </div>
                       
                       <div className="flex items-center gap-3 p-3 border rounded-lg">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
                         <div>
                           <span className="font-medium text-sm">Banco de Dados</span>
-                          <p className="text-xs text-muted-foreground">PostgreSQL conectado</p>
+                          <p className="text-xs text-muted-foreground">Configure PostgreSQL na Hostinger</p>
                         </div>
                       </div>
                       
@@ -663,6 +665,62 @@ export function AdminDashboard() {
                         <div>
                           <span className="font-medium text-sm">Performance</span>
                           <p className="text-xs text-muted-foreground">Otimizado</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comandos de Deploy Hostinger */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Terminal className="w-4 h-4" />
+                      Comandos para Deploy na Hostinger
+                    </h3>
+                    <div className="bg-gray-50 dark:bg-gray-900/50 border rounded-lg p-4">
+                      <div className="space-y-3 text-sm">
+                        <div>
+                          <h4 className="font-medium mb-2">1. Build da Aplicação:</h4>
+                          <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-xs">npm run build</code>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">2. Iniciar em Produção:</h4>
+                          <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-xs">npm start</code>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">3. Instalar Dependências:</h4>
+                          <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-xs">npm install</code>
+                        </div>
+                        <div>
+                          <h4 className="font-medium mb-2">4. Configurar PM2 (recomendado):</h4>
+                          <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-xs">pm2 start dist/index.js --name karooma</code>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Arquivos Necessários */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Arquivos e Configurações
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">.env (produção)</h4>
+                        <div className="text-xs space-y-1">
+                          <p>NODE_ENV=production</p>
+                          <p>DATABASE_URL=postgresql://...</p>
+                          <p>SESSION_SECRET=chave_forte</p>
+                          <p>GOOGLE_CLIENT_ID=...</p>
+                          <p>GOOGLE_CLIENT_SECRET=...</p>
+                        </div>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h4 className="font-medium mb-2">package.json scripts</h4>
+                        <div className="text-xs space-y-1">
+                          <p>✅ "build": configurado</p>
+                          <p>✅ "start": configurado</p>
+                          <p>✅ "dev": configurado</p>
                         </div>
                       </div>
                     </div>
