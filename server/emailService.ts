@@ -156,7 +156,15 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
   }
 
   try {
-    await mailService.send(data);
+    const emailData = {
+      to: data.to,
+      from: data.from,
+      subject: data.subject,
+      ...(data.text && { text: data.text }),
+      ...(data.html && { html: data.html })
+    };
+    
+    await mailService.send(emailData);
     console.log(`✅ Email enviado: ${data.subject} para ${data.to}`);
     return true;
   } catch (error) {

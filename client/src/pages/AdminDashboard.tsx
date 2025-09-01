@@ -29,6 +29,64 @@ import { EditPageContentModal } from "@/components/admin/EditPageContentModal";
 import { ProductMonitoring } from "@/components/admin/ProductMonitoring";
 import { AdminLogin } from "@/components/AdminLogin";
 
+// Componente para testar SendGrid
+function TestEmailButton() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  
+  const testEmailMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/admin/test-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Falha ao testar email');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "✅ Teste de Email Bem-sucedido!",
+        description: "O SendGrid está funcionando corretamente. Verifique sua caixa de entrada.",
+        variant: "default",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "❌ Erro no Teste de Email",
+        description: error.message || "Não foi possível enviar o email de teste.",
+        variant: "destructive",
+      });
+    },
+  });
+  
+  return (
+    <Button 
+      onClick={() => testEmailMutation.mutate()}
+      disabled={testEmailMutation.isPending}
+      className="w-full sm:w-auto"
+    >
+      {testEmailMutation.isPending ? (
+        <>
+          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+          Enviando...
+        </>
+      ) : (
+        <>
+          <Mail className="w-4 h-4 mr-2" />
+          Testar SendGrid
+        </>
+      )}
+    </Button>
+  );
+}
+
 // Dashboard Overview Component
 function DashboardOverview() {
   const { events, isConnected } = useSSE();
@@ -611,8 +669,8 @@ export function AdminDashboard() {
                           <p className="text-sm text-muted-foreground">API do SendGrid para emails</p>
                         </div>
                         <div className="flex items-center gap-2">
-                          <AlertCircle className="w-5 h-5 text-yellow-500" />
-                          <span className="text-sm text-yellow-600 dark:text-yellow-400">Pendente</span>
+                          <CheckCircle className="w-5 h-5 text-green-500" />
+                          <span className="text-sm text-green-600 dark:text-green-400">Configurada</span>
                         </div>
                       </div>
 
@@ -653,10 +711,10 @@ export function AdminDashboard() {
                       </div>
                       
                       <div className="flex items-center gap-3 p-3 border rounded-lg">
-                        <AlertCircle className="w-5 h-5 text-yellow-500 flex-shrink-0" />
+                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                         <div>
                           <span className="font-medium text-sm">Email Service</span>
-                          <p className="text-xs text-muted-foreground">SendGrid pendente</p>
+                          <p className="text-xs text-muted-foreground">SendGrid configurado</p>
                         </div>
                       </div>
                       
@@ -667,6 +725,20 @@ export function AdminDashboard() {
                           <p className="text-xs text-muted-foreground">Otimizado</p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Teste de Email */}
+                  <div className="space-y-3">
+                    <h3 className="font-semibold flex items-center gap-2">
+                      <Mail className="w-4 h-4" />
+                      Teste de Email
+                    </h3>
+                    <div className="border rounded-lg p-4">
+                      <p className="text-sm text-muted-foreground mb-3">
+                        Teste se o SendGrid está funcionando corretamente enviando um email de verificação.
+                      </p>
+                      <TestEmailButton />
                     </div>
                   </div>
 

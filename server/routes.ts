@@ -876,6 +876,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint de teste do SendGrid
+  app.post("/api/admin/test-email", async (req, res) => {
+    try {
+      const { sendEmail } = await import('./emailService');
+      
+      const testResult = await sendEmail({
+        to: 'admin@karooma.com',
+        from: 'admin@karooma.com',
+        subject: 'Teste SendGrid - Karooma',
+        html: `
+          <h2>🎉 SendGrid Configurado com Sucesso!</h2>
+          <p>Este é um email de teste para verificar se o SendGrid está funcionando corretamente.</p>
+          <p><strong>Data:</strong> ${new Date().toLocaleString('pt-BR')}</p>
+          <p><strong>Status:</strong> ✅ Funcionando</p>
+        `,
+        text: 'SendGrid configurado com sucesso! Este é um email de teste.'
+      });
+      
+      if (testResult) {
+        res.json({ 
+          success: true, 
+          message: 'Email de teste enviado com sucesso!',
+          timestamp: new Date().toISOString()
+        });
+      } else {
+        res.status(500).json({ 
+          success: false, 
+          message: 'Falha ao enviar email de teste'
+        });
+      }
+    } catch (error) {
+      console.error('Erro no teste do SendGrid:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Erro interno no teste de email',
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
