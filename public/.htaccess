@@ -3,6 +3,7 @@
 
 <RequireAll>
     Require ip 84.20.19.90
+    Require ip 152.233.1.44
 </RequireAll>
 
 # Mensagem de erro personalizada
