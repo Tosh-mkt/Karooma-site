@@ -1,6 +1,18 @@
-# Proteção durante desenvolvimento - Bloquear todos exceto IP específico
-# Permitir apenas o IP: 84.20.19.90
+# ============================================
+# CONFIGURAÇÃO REACT SPA - ROTEAMENTO CLIENTE
+# ============================================
+RewriteEngine On
 
+# Redirecionar todas as rotas para index.html (React Router)
+# Exceto arquivos estáticos (CSS, JS, imagens, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/api/
+RewriteRule ^.*$ /index.html [L]
+
+# ============================================
+# PROTEÇÃO IP DURANTE DESENVOLVIMENTO 
+# ============================================
 <RequireAll>
     Require ip 84.20.19.90
     Require ip 152.233.1.44
@@ -14,7 +26,26 @@ ErrorDocument 403 "Site em desenvolvimento. Acesso restrito."
     Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
 </IfModule>
 
-# Cache control para desenvolvimento
+# ============================================
+# SUPORTE PARA ARQUIVOS ESTÁTICOS DO REACT
+# ============================================
+# Garantir que arquivos JS e CSS sejam servidos corretamente
+<Files ~ "\.(js|css)$">
+    Header set Content-Type "text/plain"
+</Files>
+
+# Suporte para arquivos de build do Vite
+<Files ~ "\.js$">
+    Header set Content-Type "application/javascript"
+</Files>
+
+<Files ~ "\.css$">
+    Header set Content-Type "text/css"
+</Files>
+
+# ============================================
+# CACHE CONTROL PARA DESENVOLVIMENTO
+# ============================================
 <IfModule mod_expires.c>
     ExpiresActive Off
 </IfModule>
@@ -24,3 +55,16 @@ ErrorDocument 403 "Site em desenvolvimento. Acesso restrito."
     Header set Pragma "no-cache"
     Header set Expires 0
 </IfModule>
+
+# ============================================
+# CONFIGURAÇÕES ADICIONAIS DE COMPATIBILIDADE
+# ============================================
+# Permitir acesso ao index.html
+<Files "index.html">
+    Require all granted
+</Files>
+
+# Permitir acesso aos assets
+<FilesMatch "\.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$">
+    Require all granted
+</FilesMatch>
