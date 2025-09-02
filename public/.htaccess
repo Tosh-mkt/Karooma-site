@@ -1,11 +1,8 @@
 # Proteção durante desenvolvimento - Bloquear todos exceto IP específico
-# Substitua SEU_IP_AQUI pelo seu IP atual
+# Permitir apenas o IP: 84.20.19.90
 
 <RequireAll>
-    Require ip SEU_IP_AQUI
-    # Exemplo: Require ip 191.123.45.67
-    # Se quiser permitir múltiplos IPs, adicione linhas extras:
-    # Require ip 192.168.1.100
+    Require ip 84.20.19.90
 </RequireAll>
 
 # Mensagem de erro personalizada
