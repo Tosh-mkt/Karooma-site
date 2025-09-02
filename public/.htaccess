@@ -11,15 +11,15 @@ RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^.*$ /index.html [L]
 
 # ============================================
-# PROTEÇÃO IP DURANTE DESENVOLVIMENTO 
+# PROTEÇÃO IP DURANTE DESENVOLVIMENTO (COMENTADO PARA TESTE LOGIN)
 # ============================================
-<RequireAll>
-    Require ip 84.20.19.90
-    Require ip 152.233.1.44
-</RequireAll>
+# <RequireAll>
+#     Require ip 84.20.19.90
+#     Require ip 152.233.1.44
+# </RequireAll>
 
 # Mensagem de erro personalizada
-ErrorDocument 403 "Site em desenvolvimento. Acesso restrito."
+# ErrorDocument 403 "Site em desenvolvimento. Acesso restrito."
 
 # Headers de segurança adicionais
 <IfModule mod_headers.c>
