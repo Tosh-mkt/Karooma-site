@@ -10,6 +10,11 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^.*$ /index.html [L]
 
+# Garantir que login sempre funcione
+RewriteRule ^login/?$ /index.html [L]
+RewriteRule ^register/?$ /index.html [L]
+RewriteRule ^admin/?(.*)$ /index.html [L]
+
 # ============================================
 # PROTEÇÃO IP DURANTE DESENVOLVIMENTO (COMENTADO PARA TESTE LOGIN)
 # ============================================
@@ -51,12 +56,13 @@ RewriteRule ^.*$ /index.html [L]
 </IfModule>
 
 <IfModule mod_headers.c>
-    # Headers anti-cache mais agressivos
-    Header always set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    # Headers anti-cache mais agressivos + timestamp
+    Header always set Cache-Control "no-cache, no-store, must-revalidate, max-age=0, private"
     Header always set Pragma "no-cache"
     Header always set Expires "0"
     Header always unset ETag
     Header always set Last-Modified "Thu, 01 Jan 1970 00:00:00 GMT"
+    Header always set X-Cache-Bust "2025-01-02-19:30"
     
     # Headers específicos para HTML
     <FilesMatch "\.(html|htm)$">
