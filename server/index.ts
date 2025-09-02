@@ -7,6 +7,21 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Anti-cache headers para forçar atualização do browser
+app.use((req, res, next) => {
+  // Forçar no-cache para HTML e arquivos principais
+  if (req.path.endsWith('.html') || req.path === '/' || req.path.startsWith('/api/')) {
+    res.set({
+      'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'ETag': 'false',
+      'Last-Modified': new Date().toUTCString()
+    });
+  }
+  next();
+});
+
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;

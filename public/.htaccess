@@ -44,16 +44,31 @@ ErrorDocument 403 "Site em desenvolvimento. Acesso restrito."
 </Files>
 
 # ============================================
-# CACHE CONTROL PARA DESENVOLVIMENTO
+# CACHE CONTROL ANTI-CACHE (FORÇAR ATUALIZAÇÃO)
 # ============================================
 <IfModule mod_expires.c>
     ExpiresActive Off
 </IfModule>
 
 <IfModule mod_headers.c>
-    Header set Cache-Control "no-cache, no-store, must-revalidate"
-    Header set Pragma "no-cache"
-    Header set Expires 0
+    # Headers anti-cache mais agressivos
+    Header always set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+    Header always set Pragma "no-cache"
+    Header always set Expires "0"
+    Header always unset ETag
+    Header always set Last-Modified "Thu, 01 Jan 1970 00:00:00 GMT"
+    
+    # Headers específicos para HTML
+    <FilesMatch "\.(html|htm)$">
+        Header always set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+        Header always set Pragma "no-cache"
+        Header always set Expires "0"
+    </FilesMatch>
+    
+    # Headers para JS e CSS também (versioning)
+    <FilesMatch "\.(js|css)$">
+        Header always set Cache-Control "no-cache, max-age=0"
+    </FilesMatch>
 </IfModule>
 
 # ============================================
