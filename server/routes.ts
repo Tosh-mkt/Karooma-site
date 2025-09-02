@@ -220,6 +220,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Rota específica para latest videos (usada na home)
+  app.get("/api/content/videos/latest", async (req, res) => {
+    try {
+      const videos = await storage.getContentByType("video");
+      // Retornar os 3 vídeos mais recentes
+      const sortedVideos = videos.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      res.json(sortedVideos.slice(0, 3));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch latest videos" });
+    }
+  });
+
   app.get("/api/content/videos/:category", async (req, res) => {
     try {
       const { category } = req.params;
@@ -236,6 +250,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(articles);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch blog articles" });
+    }
+  });
+
+  // Rota específica para latest blog posts (usada na home)
+  app.get("/api/content/blog/latest", async (req, res) => {
+    try {
+      const articles = await storage.getContentByType("blog");
+      // Retornar os 3 posts mais recentes
+      const sortedArticles = articles.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      res.json(sortedArticles.slice(0, 3));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch latest blog articles" });
     }
   });
 
