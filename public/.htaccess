@@ -1,0 +1,28 @@
+# Proteção durante desenvolvimento - Bloquear todos exceto IP específico
+# Substitua SEU_IP_AQUI pelo seu IP atual
+
+<RequireAll>
+    Require ip SEU_IP_AQUI
+    # Exemplo: Require ip 191.123.45.67
+    # Se quiser permitir múltiplos IPs, adicione linhas extras:
+    # Require ip 192.168.1.100
+</RequireAll>
+
+# Mensagem de erro personalizada
+ErrorDocument 403 "Site em desenvolvimento. Acesso restrito."
+
+# Headers de segurança adicionais
+<IfModule mod_headers.c>
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+</IfModule>
+
+# Cache control para desenvolvimento
+<IfModule mod_expires.c>
+    ExpiresActive Off
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+</IfModule>
