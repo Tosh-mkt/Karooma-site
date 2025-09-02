@@ -1,0 +1,26 @@
+# Proteção durante desenvolvimento - Bloquear todos exceto IP específico
+# Permitir apenas o IP: 84.20.19.90
+
+<RequireAll>
+    Require ip 84.20.19.90
+    Require ip 152.233.1.44
+</RequireAll>
+
+# Mensagem de erro personalizada
+ErrorDocument 403 "Site em desenvolvimento. Acesso restrito."
+
+# Headers de segurança adicionais
+<IfModule mod_headers.c>
+    Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+</IfModule>
+
+# Cache control para desenvolvimento
+<IfModule mod_expires.c>
+    ExpiresActive Off
+</IfModule>
+
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+</IfModule>
