@@ -3,17 +3,17 @@
 # ============================================
 RewriteEngine On
 
+# Garantir que login sempre funcione (ANTES das regras gerais)
+RewriteRule ^login/?$ /index.html [L]
+RewriteRule ^register/?$ /index.html [L]
+RewriteRule ^admin/?(.*)$ /index.html [L]
+
 # Redirecionar todas as rotas para index.html (React Router)
 # Exceto arquivos estáticos (CSS, JS, imagens, etc.)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/api/
 RewriteRule ^.*$ /index.html [L]
-
-# Garantir que login sempre funcione
-RewriteRule ^login/?$ /index.html [L]
-RewriteRule ^register/?$ /index.html [L]
-RewriteRule ^admin/?(.*)$ /index.html [L]
 
 # ============================================
 # PROTEÇÃO IP DURANTE DESENVOLVIMENTO (COMENTADO PARA TESTE LOGIN)
@@ -62,7 +62,7 @@ RewriteRule ^admin/?(.*)$ /index.html [L]
     Header always set Expires "0"
     Header always unset ETag
     Header always set Last-Modified "Thu, 01 Jan 1970 00:00:00 GMT"
-    Header always set X-Cache-Bust "2025-01-02-19:30"
+    Header always set X-Cache-Bust "2025-01-02-20:10"
     
     # Headers específicos para HTML
     <FilesMatch "\.(html|htm)$">
