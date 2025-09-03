@@ -39,7 +39,7 @@ function Router() {
       <main className="flex-1">
         <Switch>
           <Route path="/" component={Home} />
-          <Route path="/videos" component={About} />
+          <Route path="/videos" component={Videos} />
           <Route path="/blog" component={Blog} />
           <Route path="/blog/:id" component={BlogPost} />
           <Route path="/products" component={Products} />
