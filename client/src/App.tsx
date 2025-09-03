@@ -56,8 +56,9 @@ function Router() {
           <Route path="/admin/login" component={AdminLogin} />
           <Route path="/admin/temp-login" component={TempLogin} />
           
+          <Route path="/sobre" component={About} />
+          
           {/* Dynamic Page Routes - specific slugs */}
-          <Route path="/sobre" component={PageRenderer} />
           <Route path="/sobre2" component={PageRenderer} />
           <Route path="/facilita-a-vida" component={PageRenderer} />
           <Route path="/inicio" component={PageRenderer} />
