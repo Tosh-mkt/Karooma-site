@@ -18,7 +18,7 @@ import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
   Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
-  Terminal, FileText
+  Terminal, FileText, Upload
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -28,6 +28,7 @@ import { EditPostModal } from "@/components/admin/EditPostModal";
 import { EditPageContentModal } from "@/components/admin/EditPageContentModal";
 import { ProductMonitoring } from "@/components/admin/ProductMonitoring";
 import { AdminLogin } from "@/components/AdminLogin";
+import { AdminProductImport } from "./AdminProductImport";
 
 // Componente para testar SendGrid
 function TestEmailButton() {
@@ -490,10 +491,14 @@ export function AdminDashboard() {
             
             {/* Secondary row for mobile */}
             <div className="mt-2">
-              <TabsList className="grid w-full grid-cols-4 glassmorphism h-10">
+              <TabsList className="grid w-full grid-cols-5 glassmorphism h-10">
                 <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Database className="w-3 h-3" />
                   <span className="hidden sm:inline">Produtos</span>
+                </TabsTrigger>
+                <TabsTrigger value="import" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <Upload className="w-3 h-3" />
+                  <span className="hidden sm:inline">Import</span>
                 </TabsTrigger>
                 <TabsTrigger value="monitoring" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Activity className="w-3 h-3" />
@@ -513,7 +518,7 @@ export function AdminDashboard() {
           
           {/* Desktop: Original layout */}
           <div className="hidden md:block">
-            <TabsList className="grid w-full grid-cols-7 glassmorphism">
+            <TabsList className="grid w-full grid-cols-8 glassmorphism">
               <TabsTrigger value="dashboard" className="flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -525,6 +530,10 @@ export function AdminDashboard() {
               <TabsTrigger value="products" className="flex items-center space-x-2">
                 <Database className="w-4 h-4" />
                 <span>Produtos</span>
+              </TabsTrigger>
+              <TabsTrigger value="import" className="flex items-center space-x-2">
+                <Upload className="w-4 h-4" />
+                <span>Importar</span>
               </TabsTrigger>
               <TabsTrigger value="monitoring" className="flex items-center space-x-2">
                 <Activity className="w-4 h-4" />
@@ -555,6 +564,10 @@ export function AdminDashboard() {
 
           <TabsContent value="products">
             <ProductsManagement />
+          </TabsContent>
+
+          <TabsContent value="import">
+            <AdminProductImport />
           </TabsContent>
 
           <TabsContent value="monitoring">

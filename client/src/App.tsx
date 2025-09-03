@@ -17,6 +17,7 @@ import TestFiltersVertical from "./pages/test-filters-vertical";
 import TestFiltersSidebar from "./pages/test-filters-sidebar";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { AdminProductImport } from "./pages/AdminProductImport";
 import { TempLogin } from "./pages/TempLogin";
 import { Login } from "./pages/Login";
 import { AdminLogin } from "./pages/AdminLogin";
@@ -49,6 +50,7 @@ function Router() {
           <Route path="/favoritos" component={Favorites} />
 
           <Route path="/admin/dashboard" component={AdminDashboard} />
+          <Route path="/admin/import-products" component={AdminProductImport} />
           <Route path="/login" component={Login} />
           <Route path="/register" component={Register} />
           <Route path="/admin/login" component={AdminLogin} />

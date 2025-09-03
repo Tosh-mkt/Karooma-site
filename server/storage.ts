@@ -56,6 +56,7 @@ export interface IStorage {
   getProductsByStatus(status: string): Promise<Product[]>;
   getProductsByFrequency(frequency: 'high' | 'medium' | 'low'): Promise<Product[]>;
   updateProductLastChecked(id: string): Promise<void>;
+  clearProducts(): Promise<void>;
   
   // Newsletter methods
   createNewsletterSubscription(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
@@ -652,6 +653,10 @@ export class DatabaseStorage implements IStorage {
       .update(products)
       .set({ lastChecked: new Date(), updatedAt: new Date() })
       .where(eq(products.id, id));
+  }
+
+  async clearProducts(): Promise<void> {
+    await db.delete(products);
   }
 
   // Newsletter methods

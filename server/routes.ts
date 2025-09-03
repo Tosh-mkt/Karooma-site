@@ -58,6 +58,91 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ uploadURL });
   });
 
+  // Google Sheets Import - Importar produtos do CSV
+  app.post("/api/admin/import-products", async (req, res) => {
+    try {
+      const { csvData, overwrite = false } = req.body;
+      
+      if (!csvData) {
+        return res.status(400).json({ error: "CSV data is required" });
+      }
+
+      // Parse CSV data
+      const lines = csvData.trim().split('\n');
+      const headers = lines[0].split(',').map((h: string) => h.trim().replace(/"/g, ''));
+      
+      const products = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map((v: string) => v.trim().replace(/"/g, ''));
+        
+        if (values.length !== headers.length) continue;
+        
+        const productData: any = {};
+        headers.forEach((header, index) => {
+          productData[header] = values[index] || '';
+        });
+
+        // Mapear campos do CSV para o schema do produto
+        const product = {
+          title: productData['Título'] || productData['Title'] || productData['title'],
+          description: productData['Descrição'] || productData['Description'] || productData['description'],
+          category: productData['Categoria'] || productData['Category'] || productData['category'],
+          imageUrl: productData['Imagem'] || productData['Image'] || productData['imageUrl'],
+          currentPrice: productData['Preço Atual'] || productData['Current Price'] || productData['currentPrice'],
+          originalPrice: productData['Preço Original'] || productData['Original Price'] || productData['originalPrice'],
+          affiliateLink: productData['Link Afiliado'] || productData['Affiliate Link'] || productData['affiliateLink'],
+          rating: productData['Avaliação'] || productData['Rating'] || productData['rating'],
+          discount: productData['Desconto'] || productData['Discount'] || productData['discount'],
+          featured: (productData['Destaque'] || productData['Featured'] || productData['featured'])?.toLowerCase() === 'true',
+          expertReview: productData['Avaliação Especialista'] || productData['Expert Review'] || productData['expertReview'],
+          teamEvaluation: productData['Avaliação Equipe'] || productData['Team Evaluation'] || productData['teamEvaluation'],
+          benefits: productData['Benefícios'] || productData['Benefits'] || productData['benefits'],
+          tags: productData['Tags'] || productData['tags'],
+          introduction: productData['Introdução'] || productData['Introduction'] || productData['introduction'],
+          nutritionistEvaluation: productData['Avaliação Nutricionista'] || productData['Nutritionist Evaluation'],
+          organizerEvaluation: productData['Avaliação Organizadora'] || productData['Organizer Evaluation'],
+          designEvaluation: productData['Avaliação Design'] || productData['Design Evaluation'],
+          karoomaTeamEvaluation: productData['Avaliação Karooma'] || productData['Karooma Team Evaluation'],
+          categoryTags: productData['Tags Categoria'] || productData['Category Tags'],
+          searchTags: productData['Tags Busca'] || productData['Search Tags']
+        };
+
+        // Validar dados essenciais
+        if (product.title && product.category && product.affiliateLink) {
+          products.push(product);
+        }
+      }
+
+      // Limpar produtos existentes se overwrite = true
+      if (overwrite) {
+        await storage.clearProducts();
+      }
+
+      // Inserir produtos no banco
+      const insertedProducts = [];
+      for (const productData of products) {
+        try {
+          const insertedProduct = await storage.createProduct(productData);
+          insertedProducts.push(insertedProduct);
+        } catch (error) {
+          console.error('Error inserting product:', error);
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        imported: insertedProducts.length, 
+        total: products.length,
+        products: insertedProducts 
+      });
+
+    } catch (error) {
+      console.error('Error importing products:', error);
+      res.status(500).json({ error: "Failed to import products" });
+    }
+  });
+
   app.put("/api/images/upload", async (req, res) => {
     if (!req.body.imageURL) {
       return res.status(400).json({ error: "imageURL is required" });
