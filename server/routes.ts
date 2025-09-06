@@ -84,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (values.length !== headers.length) continue;
         
         const productData: any = {};
-        headers.forEach((header, index) => {
+        headers.forEach((header: string, index: number) => {
           productData[header] = values[index] || '';
         });
 
@@ -185,7 +185,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Temporary login route for testing
-  app.post('/api/auth/temp-login', async (req, res) => {
+  app.post('/api/auth/temp-login', async (req: any, res) => {
     try {
       const { userId } = req.body;
       const user = await storage.getUser(userId);
@@ -210,7 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Login route for email/password authentication
-  app.post('/api/login', async (req, res) => {
+  app.post('/api/login', async (req: any, res) => {
     try {
       const { email, password, type } = req.body;
 
@@ -255,7 +255,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current session user
-  app.get('/api/auth/session-user', async (req, res) => {
+  app.get('/api/auth/session-user', async (req: any, res) => {
     try {
       const sessionUser = req.session ? (req.session as any).user : null;
       if (!sessionUser) {
@@ -316,7 +316,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const videos = await storage.getContentByType("video");
       // Retornar os 3 vídeos mais recentes
       const sortedVideos = videos.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.createdAt || new Date()).getTime() - new Date(a.createdAt || new Date()).getTime()
       );
       res.json(sortedVideos.slice(0, 3));
     } catch (error) {
@@ -349,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const articles = await storage.getContentByType("blog");
       // Retornar os 3 posts mais recentes
       const sortedArticles = articles.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        new Date(b.createdAt || new Date()).getTime() - new Date(a.createdAt || new Date()).getTime()
       );
       res.json(sortedArticles.slice(0, 3));
     } catch (error) {
@@ -732,8 +732,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         email: subscription.email,
         name: subscription.name || null,
         categories: (subscription.interests as any)?.categories || [],
-        source: subscription.source,
-        leadMagnet: subscription.leadMagnet,
+        source: subscription.source || undefined,
+        leadMagnet: subscription.leadMagnet || undefined,
         timestamp: new Date().toISOString()
       };
       
@@ -989,7 +989,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error running manual update:", error);
-      res.status(500).json({ message: "Failed to run update", error: error.message });
+      res.status(500).json({ message: "Failed to run update", error: String(error) });
     }
   });
 
@@ -1006,7 +1006,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(result);
     } catch (error) {
       console.error("Error checking Amazon product:", error);
-      res.status(500).json({ message: "Failed to check product", error: error.message });
+      res.status(500).json({ message: "Failed to check product", error: String(error) });
     }
   });
 

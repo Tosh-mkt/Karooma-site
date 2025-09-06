@@ -156,7 +156,7 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
   }
 
   try {
-    const emailData = {
+    const emailData: any = {
       to: data.to,
       from: data.from,
       subject: data.subject,
