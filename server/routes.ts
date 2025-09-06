@@ -14,6 +14,8 @@ import {
 import bcrypt from "bcryptjs";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 import AmazonPAAPIService from "./services/amazonApi";
+import { getBlogTemplate, generateContentSuggestions, type BlogCategory } from "@shared/blog-template";
+import { blogValidator } from "./blog-validator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
@@ -428,6 +430,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Content deleted successfully" });
     } catch (error) {
       res.status(500).json({ error: "Failed to delete content" });
+    }
+  });
+
+  // ===== BLOG TEMPLATE SYSTEM ENDPOINTS =====
+  
+  // Obter template para uma categoria específica
+  app.get("/api/blog/template/:category", async (req, res) => {
+    try {
+      const category = req.params.category as BlogCategory;
+      const template = getBlogTemplate(category);
+      res.json(template);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to get blog template" });
+    }
+  });
+
+  // Gerar sugestões de conteúdo baseadas na categoria e tópico
+  app.post("/api/blog/suggestions", async (req, res) => {
+    try {
+      const { category, topic } = req.body;
+      
+      if (!category || !topic) {
+        return res.status(400).json({ error: "Category and topic are required" });
+      }
+      
+      const suggestions = generateContentSuggestions(category as BlogCategory, topic);
+      res.json(suggestions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate content suggestions" });
+    }
+  });
+
+  // Validar post do blog seguindo padrões Karooma
+  app.post("/api/blog/validate", async (req, res) => {
+    try {
+      const post = req.body;
+      const validation = blogValidator.validatePost(post);
+      res.json(validation);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to validate blog post" });
+    }
+  });
+
+  // Obter sugestões de melhoria para um post
+  app.post("/api/blog/improve", async (req, res) => {
+    try {
+      const post = req.body;
+      const suggestions = blogValidator.generateImprovementSuggestions(post);
+      res.json({ suggestions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to generate improvement suggestions" });
     }
   });
 
