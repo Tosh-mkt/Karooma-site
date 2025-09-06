@@ -201,11 +201,33 @@ export default function BlogPost() {
           </motion.div>
         )}
 
-        {/* Call to Action */}
+        {/* Newsletter Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.6 }}
+        >
+          <Card className="glassmorphism border-0 mb-12 bg-gradient-to-r from-purple-50 to-pink-50">
+            <CardContent className="p-8 text-center">
+              <p className="text-gray-700 mb-4 font-poppins">
+                *Quer receber mais dicas práticas para facilitar sua rotina familiar? 
+                <Link 
+                  href="/newsletter" 
+                  className="text-purple-600 hover:text-purple-800 font-semibold underline decoration-2 decoration-purple-400 underline-offset-2 mx-1"
+                >
+                  Assine nossa newsletter
+                </Link> 
+                e receba conteúdos exclusivos toda semana!* 📧
+              </p>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Call to Action */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.7 }}
         >
           <Card className="glassmorphism border-0 mb-12">
             <CardContent className="p-8 text-center">
