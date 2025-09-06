@@ -20,34 +20,54 @@ export default function Blog() {
   });
 
 
+  // Mapeamento das tags para categorias reais dos posts
   const tagGroups = [
     {
       title: "Produtividade Doméstica",
-      tags: ["Métodos e Ferramentas", "Automação do Lar", "Organização e Limpeza"]
-    },
-    {
-      title: "Finanças Familiares", 
-      tags: ["Orçamento e Controle", "Economia e Investimentos", "Renda Extra", "Gestão de Dívidas"]
+      tags: [
+        { label: "Organização e Limpeza", category: "organizacao" },
+        { label: "Organização", category: "Organização" },
+        { label: "Organização Familiar", category: "Organização Familiar" },
+        { label: "Produtividade", category: "Produtividade" }
+      ]
     },
     {
       title: "Bem-Estar Familiar",
-      tags: ["Educação Parental", "Saúde e Alimentação", "Lazer e Conexão", "Saúde Mental"]
+      tags: [
+        { label: "Saúde e Alimentação", category: "saude-seguranca" },
+        { label: "Alimentação", category: "Alimentação" },
+        { label: "Sono e Relaxamento", category: "sono-relaxamento" },
+        { label: "Bem-estar", category: "Bem-estar" },
+        { label: "Maternidade", category: "Maternidade" }
+      ]
     },
     {
-      title: "Tecnologia e Educação",
-      tags: ["Crianças e Telas", "Ferramentas e Apps", "Projetos Criativos em Família", "Segurança Online"]
+      title: "Educação e Desenvolvimento",
+      tags: [
+        { label: "Educação Parental", category: "aprender-brincar" },
+        { label: "Lazer e Conexão", category: "aprender-brincar" }
+      ]
     },
     {
-      title: "Segurança",
-      tags: ["Segurança física", "Manutenção doméstica"]
+      title: "Casa e Decoração",
+      tags: [
+        { label: "Decorar e Brilhar", category: "decorar-brilhar" }
+      ]
+    },
+    {
+      title: "Viagem e Segurança",
+      tags: [
+        { label: "Sair e Viajar", category: "sair-viajar" },
+        { label: "Segurança", category: "saude-seguranca" }
+      ]
     }
   ];
 
-  const toggleTag = (tag: string) => {
+  const toggleTag = (tagObj: { label: string; category: string }) => {
     setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+      prev.includes(tagObj.category) 
+        ? prev.filter(t => t !== tagObj.category)
+        : [...prev, tagObj.category]
     );
   };
 
@@ -58,12 +78,9 @@ export default function Blog() {
   const filteredArticles = articles?.filter(article => {
     const matchesSearch = !searchQuery || 
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      (article.description && article.description.toLowerCase().includes(searchQuery.toLowerCase()));
     
-    const matchesTags = selectedTags.length === 0 || selectedTags.some(tag =>
-      article.title.toLowerCase().includes(tag.toLowerCase()) ||
-      article.description?.toLowerCase().includes(tag.toLowerCase())
-    );
+    const matchesTags = selectedTags.length === 0 || selectedTags.includes(article.category || '');
     
     return matchesSearch && matchesTags;
   }) || [];
@@ -154,15 +171,15 @@ export default function Blog() {
                           {group.tags.map((tag, tagIndex) => (
                             <Badge
                               key={tagIndex}
-                              variant={selectedTags.includes(tag) ? "default" : "outline"}
+                              variant={selectedTags.includes(tag.category) ? "default" : "outline"}
                               className={`cursor-pointer transition-all duration-200 hover:scale-105 ${
-                                selectedTags.includes(tag)
+                                selectedTags.includes(tag.category)
                                   ? "bg-gradient-to-r from-purple-500 to-pink-500 text-white"
                                   : "bg-white/50 hover:bg-white/80 text-gray-700"
                               }`}
                               onClick={() => toggleTag(tag)}
                             >
-                              {tag}
+                              {tag.label}
                             </Badge>
                           ))}
                         </div>
@@ -180,17 +197,21 @@ export default function Blog() {
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                {selectedTags.map((tag, index) => (
-                  <Badge
-                    key={index}
-                    variant="default"
-                    className="bg-gradient-to-r from-purple-500 to-pink-500 text-white pr-1 cursor-pointer hover:scale-105 transition-all duration-200"
-                    onClick={() => toggleTag(tag)}
-                  >
-                    {tag}
-                    <X className="w-3 h-3 ml-1" />
-                  </Badge>
-                ))}
+                {selectedTags.map((categoryTag, index) => {
+                  // Encontrar o label da tag baseado na categoria
+                  const tagObj = tagGroups.flatMap(g => g.tags).find(t => t.category === categoryTag);
+                  return (
+                    <Badge
+                      key={index}
+                      variant="default"
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 text-white pr-1 cursor-pointer hover:scale-105 transition-all duration-200"
+                      onClick={() => setSelectedTags(prev => prev.filter(t => t !== categoryTag))}
+                    >
+                      {tagObj?.label || categoryTag}
+                      <X className="w-3 h-3 ml-1" />
+                    </Badge>
+                  );
+                })}
               </motion.div>
             )}
 
