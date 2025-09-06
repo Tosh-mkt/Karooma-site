@@ -8,18 +8,18 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Anti-cache headers para forçar atualização do browser
+// Anti-cache headers SUPER AGRESSIVO para forçar atualização do browser
 app.use((req, res, next) => {
-  // Forçar no-cache para HTML e arquivos principais, mas não para imagens
-  if ((req.path.endsWith('.html') || req.path === '/' || req.path.startsWith('/api/')) && !req.path.startsWith('/api/images/')) {
-    res.set({
-      'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-      'Pragma': 'no-cache',
-      'Expires': '0',
-      'ETag': 'false',
-      'Last-Modified': new Date().toUTCString()
-    });
-  }
+  // Forçar no-cache para TUDO para garantir atualização
+  res.set({
+    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+    'Pragma': 'no-cache',
+    'Expires': '0',
+    'ETag': 'false',
+    'Last-Modified': new Date().toUTCString(),
+    'Surrogate-Control': 'no-store',
+    'Vary': '*'
+  });
   next();
 });
 
