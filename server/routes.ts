@@ -16,10 +16,13 @@ import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 import AmazonPAAPIService from "./services/amazonApi";
 import { getBlogTemplate, generateContentSuggestions, type BlogCategory } from "@shared/blog-template";
 import { blogValidator } from "./blog-validator";
+import path from "path";
+import express from "express";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
   setupNextAuth(app);
+
 
   // Object Storage routes
   app.get("/objects/:objectPath(*)", async (req, res) => {

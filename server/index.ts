@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
+import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -9,8 +10,8 @@ app.use(express.urlencoded({ extended: false }));
 
 // Anti-cache headers para forçar atualização do browser
 app.use((req, res, next) => {
-  // Forçar no-cache para HTML e arquivos principais
-  if (req.path.endsWith('.html') || req.path === '/' || req.path.startsWith('/api/')) {
+  // Forçar no-cache para HTML e arquivos principais, mas não para imagens
+  if ((req.path.endsWith('.html') || req.path === '/' || req.path.startsWith('/api/')) && !req.path.startsWith('/api/images/')) {
     res.set({
       'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
       'Pragma': 'no-cache',
@@ -50,6 +51,25 @@ app.use((req, res, next) => {
   });
 
   next();
+});
+
+// Serve attached_assets images via API route
+app.get('/api/images/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filepath = path.resolve(process.cwd(), 'attached_assets', filename);
+  
+  // Set proper content type for images
+  if (filename.endsWith('.png')) {
+    res.contentType('image/png');
+  } else if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) {
+    res.contentType('image/jpeg');
+  }
+  
+  res.sendFile(filepath, (err) => {
+    if (err) {
+      res.status(404).json({ error: 'File not found' });
+    }
+  });
 });
 
 (async () => {
