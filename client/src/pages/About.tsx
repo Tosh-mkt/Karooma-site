@@ -26,12 +26,6 @@ const getDefaultValues = (content: PageContent) => [
   }
 ];
 
-const defaultStats = [
-  { number: "1000+", label: "Famílias Ajudadas", icon: Users },
-  { number: "500+", label: "Produtos Avaliados", icon: Star },
-  { number: "200+", label: "Artigos Publicados", icon: Coffee },
-  { number: "95%", label: "Satisfação", icon: Heart }
-];
 
 // Interface para o conteúdo da página
 interface PageContent {
@@ -281,41 +275,6 @@ export default function About() {
         </div>
       </motion.section>
 
-      {/* Stats Section */}
-      <motion.section 
-        className="py-20 px-4 bg-gradient-to-r from-purple-600 to-pink-600"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-16 font-fredoka">
-            Nosso Impacto
-          </h2>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {defaultStats.map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="text-center"
-              >
-                <stat.icon className="w-12 h-12 mx-auto mb-4 text-white/80" />
-                <div className="text-4xl md:text-5xl font-bold text-white mb-2 font-fredoka">
-                  {stat.number}
-                </div>
-                <div className="text-white/80 text-lg font-poppins">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
 
       {/* Call to Action */}
       <motion.section 
