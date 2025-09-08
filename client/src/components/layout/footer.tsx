@@ -121,9 +121,10 @@ export default function Footer() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
         >
-          <p className="text-gray-400 font-inter text-sm">
-            © 2024 Karooma. Todos os direitos reservados.
-          </p>
+          <div className="text-gray-400 font-inter text-sm space-y-1">
+            <p>© 2024 Karooma. Todos os direitos reservados.</p>
+            <p className="text-xs">Como associado da Amazon, eu ganho com compras qualificadas.</p>
+          </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             {["Privacidade", "Termos", "Cookies"].map((item) => (
               <motion.a

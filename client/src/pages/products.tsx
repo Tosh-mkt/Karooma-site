@@ -627,8 +627,12 @@ export default function Products() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-8">
+              <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-6">
                 Cada produto que recomendamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar. Não funciona ou é mal avaliado, não se encontra aqui.
+              </p>
+              
+              <p className="font-inter text-sm text-gray-500 text-center italic">
+                Como associado da Amazon, eu ganho com compras qualificadas.
               </p>
               
             </motion.div>
