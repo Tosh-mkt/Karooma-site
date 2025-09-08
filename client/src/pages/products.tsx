@@ -456,7 +456,12 @@ export default function Products() {
               animate={{ opacity: 1, y: 0 }}
             >
               <h1 className="font-fredoka text-5xl gradient-text mb-4">Facilitam a Vida</h1>
-              <p className="font-poppins text-xl text-gray-600">Cada produto que selecionamos e avaliamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar.</p>
+              <p className="font-poppins text-xl text-gray-600 font-normal">Simplicidade e Foco.
+              Acreditamos que menos é mais. Por isso, nosso catálogo contém apenas o essencial. Evitamos a sobrecarga de opções para que você possa focar no que realmente importa: resolver problemas e viver melhor com sua família, sem perder tempo com escolhas desnecessárias.
+
+              Buscamos sempre o melhor custo-benefício, validando cada recomendação com argumentos teóricos e práticos que comprovam sua eficácia. Leia nossas avaliações de cada produto e entenda nossos pontos de vista sobre cada recomendação.
+
+              Estamos constantemente expandindo nosso catálogo de recomendações, trazendo novas soluções para facilitar a sua rotina</p>
             </motion.div>
 
             {/* Search and Filters */}
