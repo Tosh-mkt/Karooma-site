@@ -67,9 +67,7 @@ export function Newsletter() {
             
             <h2 className="font-fredoka text-4xl md:text-5xl text-white mb-4">Conteúdo Sob Medida</h2>
             
-            <p className="font-poppins text-xl text-white/90 max-w-2xl mx-auto">
-              Dicas práticas que funcionam, produtos testados e momentos para você se reconectar - tudo no seu email, sem spam
-            </p>
+            <p className="font-poppins text-xl text-white/90 max-w-2xl mx-auto">Receba dicas práticas que funcionam, produtos testados e momentos para você se reconectar - tudo no seu email, sem spam</p>
           </div>
           
           <motion.form 
