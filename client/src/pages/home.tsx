@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { Content, Product } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
-import equilibristaImage from "@assets/generated_images/woman_balancing_life_plates_c97c57fa.png";
+import equilibristaImage from "@assets/woman_balancing_life_plates_c97c57fa.png";
 
 export default function Home() {
   const [showNewsletterModal, setShowNewsletterModal] = useState(false);

@@ -53,15 +53,15 @@ app.use((req, res, next) => {
   next();
 });
 
-// Serve attached_assets images via API route
-app.get('/api/images/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filepath = path.resolve(process.cwd(), 'attached_assets', filename);
+// Serve attached_assets images via API route (supports subfolders)
+app.get('/api/images/:filename(*)', (req, res) => {
+  const imagePath = req.params.filename; // Gets the full path including subfolders
+  const filepath = path.resolve(process.cwd(), 'attached_assets', imagePath);
   
   // Set proper content type for images
-  if (filename.endsWith('.png')) {
+  if (imagePath.endsWith('.png')) {
     res.contentType('image/png');
-  } else if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) {
+  } else if (imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg')) {
     res.contentType('image/jpeg');
   }
   
