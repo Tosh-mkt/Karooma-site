@@ -307,7 +307,7 @@ export default function Products() {
               {/* Preço */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preço: R$ {priceRange[0]} - R$ {priceRange[1]}
+                  Preço: até R$ {priceRange[1]}
                 </label>
                 <Slider
                   value={priceRange}
