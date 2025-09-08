@@ -120,9 +120,7 @@ export function Newsletter() {
                 // Disparar evento para abrir modal no componente pai
                 window.dispatchEvent(new CustomEvent('openAdvancedNewsletter'));
               }}
-            >
-              ⚙️ Quero Conteúdo Específico
-            </button>
+            >⚙️ Quero Conteúdo Sob Medida</button>
           </motion.div>
 
           <motion.p 
