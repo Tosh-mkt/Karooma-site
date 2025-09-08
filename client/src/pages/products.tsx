@@ -188,7 +188,7 @@ export default function Products() {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [expandedSubcategories, setExpandedSubcategories] = useState<Record<string, boolean>>({});
   const [selectedFilters, setSelectedFilters] = useState<Record<string, any>>({});
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [priceRange, setPriceRange] = useState([1000]);
   const { isAuthenticated } = useAuth();
 
   // Invalidate cache on component mount to ensure fresh data
@@ -244,8 +244,7 @@ export default function Products() {
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesPrice = product.currentPrice ? 
-        parseFloat(product.currentPrice.toString()) >= priceRange[0] && 
-        parseFloat(product.currentPrice.toString()) <= priceRange[1] : true;
+        parseFloat(product.currentPrice.toString()) <= priceRange[0] : true;
       
       return matchesCategory && matchesSearch && matchesPrice;
     }) || [];
@@ -307,7 +306,7 @@ export default function Products() {
               {/* Preço */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preço: até R$ {priceRange[1]}
+                  Preço: até R$ {priceRange[0]}
                 </label>
                 <Slider
                   value={priceRange}
@@ -425,7 +424,7 @@ export default function Products() {
                   ))}
 
                   {/* Ambientes diretos da categoria */}
-                  {expandedCategories[categoryId] && category.environments && category.environments.map((env: string) => (
+                  {expandedCategories[categoryId] && 'environments' in category && category.environments && category.environments.map((env: string) => (
                     <div key={env} className="ml-6">
                       <div className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
                         <span className="text-sm text-gray-600">{env}</span>
