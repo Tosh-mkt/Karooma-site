@@ -212,7 +212,7 @@ export default function BlogPost() {
               <p className="text-gray-700 mb-4 font-poppins">
                 *Quer receber mais dicas práticas para facilitar sua rotina familiar? 
                 <Link 
-                  href="/newsletter" 
+                  href="/#newsletter-section" 
                   className="text-purple-600 hover:text-purple-800 font-semibold underline decoration-2 decoration-purple-400 underline-offset-2 mx-1"
                 >
                   Assine nossa newsletter

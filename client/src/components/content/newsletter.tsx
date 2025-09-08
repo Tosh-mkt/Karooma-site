@@ -40,6 +40,7 @@ export function Newsletter() {
 
   return (
     <section 
+      id="newsletter-section"
       className="py-16 bg-gradient-to-r from-pink-500 via-purple-600 to-blue-600 relative overflow-hidden"
       style={{
         backgroundImage: `linear-gradient(rgba(219, 39, 119, 0.2), rgba(147, 51, 234, 0.2), rgba(37, 99, 235, 0.2)), url(${origamiBoatImage})`,
