@@ -144,39 +144,39 @@ export function FlipbookCore({ pages, colorScheme, onPageChange }: FlipbookCoreP
       </AnimatePresence>
 
       {/* Navigation Controls */}
-      <div className="absolute inset-y-0 left-0 flex items-center">
+      <div className="absolute inset-y-0 left-0 flex items-center z-20">
         <button
           onClick={prevPage}
           disabled={currentPage === 0}
-          className={`p-4 m-4 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 transition-all ${
+          className={`p-3 m-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/30 transition-all ${
             currentPage === 0 
               ? 'opacity-30 cursor-not-allowed' 
-              : 'hover:bg-white/30 active:scale-95'
+              : 'hover:bg-black/70 active:scale-95'
           }`}
-          style={{ color: colorScheme.text }}
+          style={{ color: 'white' }}
         >
-          <ChevronLeft className="w-6 h-6" />
+          <ChevronLeft className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="absolute inset-y-0 right-0 flex items-center">
+      <div className="absolute inset-y-0 right-0 flex items-center z-20">
         <button
           onClick={nextPage}
           disabled={currentPage === pages.length - 1}
-          className={`p-4 m-4 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 transition-all ${
+          className={`p-3 m-2 rounded-full bg-black/50 backdrop-blur-sm border border-white/30 transition-all ${
             currentPage === pages.length - 1 
               ? 'opacity-30 cursor-not-allowed' 
-              : 'hover:bg-white/30 active:scale-95'
+              : 'hover:bg-black/70 active:scale-95'
           }`}
-          style={{ color: colorScheme.text }}
+          style={{ color: 'white' }}
         >
-          <ChevronRight className="w-6 h-6" />
+          <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
       {/* Page Indicator */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-        <div className="flex space-x-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20">
+        <div className="flex space-x-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-2">
           {pages.map((_, index) => (
             <button
               key={index}
@@ -197,8 +197,8 @@ export function FlipbookCore({ pages, colorScheme, onPageChange }: FlipbookCoreP
       </div>
 
       {/* Page Counter */}
-      <div className="absolute top-6 right-6">
-        <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-poppins" style={{ color: colorScheme.text }}>
+      <div className="absolute top-4 right-4 z-20">
+        <div className="bg-black/50 backdrop-blur-sm rounded-full px-3 py-1 text-sm font-poppins text-white">
           {currentPage + 1} / {pages.length}
         </div>
       </div>

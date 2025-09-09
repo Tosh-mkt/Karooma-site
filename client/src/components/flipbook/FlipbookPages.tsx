@@ -18,7 +18,7 @@ interface FlipbookPageProps {
 export function CoverPage({ colorScheme }: FlipbookPageProps) {
   return (
     <div 
-      className="relative w-full h-full flex items-center justify-center p-6 overflow-hidden"
+      className="relative w-full h-full flex items-center justify-center px-16 py-8 overflow-hidden"
       style={{
         background: `linear-gradient(135deg, ${colorScheme.primary} 0%, ${colorScheme.secondary} 100%)`
       }}
@@ -92,8 +92,8 @@ export function CoverPage({ colorScheme }: FlipbookPageProps) {
 // Welcome Page
 export function WelcomePage({ colorScheme }: FlipbookPageProps) {
   return (
-    <div className="w-full h-full p-6 flex items-center justify-center" style={{ backgroundColor: colorScheme.background }}>
-      <div className="max-w-md text-center space-y-6">
+    <div className="w-full h-full px-16 py-8 flex items-center justify-center" style={{ backgroundColor: colorScheme.background }}>
+      <div className="max-w-sm text-center space-y-6">
         <div className="text-6xl mb-4">💜</div>
         
         <h2 className="font-fredoka text-2xl mb-4" style={{ color: colorScheme.primary }}>
@@ -141,7 +141,7 @@ export function TableOfContentsPage({ colorScheme }: FlipbookPageProps) {
   ];
 
   return (
-    <div className="w-full h-full p-6 overflow-y-auto" style={{ backgroundColor: colorScheme.background }}>
+    <div className="w-full h-full px-16 py-8 overflow-y-auto" style={{ backgroundColor: colorScheme.background }}>
       <h2 className="font-fredoka text-2xl text-center mb-6" style={{ color: colorScheme.primary }}>
         O que você vai aprender
       </h2>
@@ -191,9 +191,9 @@ export function ChapterPage({
   image?: string;
 }) {
   return (
-    <div className="w-full h-full flex flex-col" style={{ backgroundColor: colorScheme.background }}>
+    <div className="w-full h-full flex flex-col px-16 py-8" style={{ backgroundColor: colorScheme.background }}>
       {/* Header */}
-      <div className="p-6 text-center">
+      <div className="text-center mb-4">
         <div className="text-4xl mb-2">{icon}</div>
         <h2 className="font-fredoka text-xl mb-1" style={{ color: colorScheme.primary }}>
           Capítulo {chapterNumber}
@@ -208,7 +208,7 @@ export function ChapterPage({
       </div>
       
       {/* Content */}
-      <div className="flex-1 px-6 pb-6 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto">
         {image && (
           <div className="mb-4">
             <img 
@@ -261,7 +261,7 @@ export function ChecklistPage({
   };
 
   return (
-    <div className="w-full h-full p-6 overflow-y-auto" style={{ backgroundColor: colorScheme.background }}>
+    <div className="w-full h-full px-16 py-8 overflow-y-auto" style={{ backgroundColor: colorScheme.background }}>
       <div className="text-center mb-6">
         <CheckCircle className="w-8 h-8 mx-auto mb-2" style={{ color: colorScheme.primary }} />
         <h2 className="font-fredoka text-xl" style={{ color: colorScheme.primary }}>
