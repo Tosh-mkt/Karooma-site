@@ -29,6 +29,7 @@ export default function Footer() {
       title: "Contato",
       links: [
         { label: "Sobre Nós", href: "/about" },
+        { label: "contato@karooma.life", href: "mailto:contato@karooma.life" },
         { label: "Colaborações", href: "/contact" },
         { label: "Suporte", href: "/support" },
         { label: "Parcerias", href: "/partnerships" },
@@ -123,7 +124,7 @@ export default function Footer() {
         >
           <div className="text-gray-400 font-inter text-sm space-y-1">
             <p>© 2024 Karooma. Todos os direitos reservados.</p>
-            <p className="text-xs">Como associado da Amazon, eu ganho com compras qualificadas.</p>
+            <p className="text-xs">Como associado da Amazon, a Karooma ganha com compras qualificadas.</p>
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             {["Privacidade", "Termos", "Cookies"].map((item) => (
