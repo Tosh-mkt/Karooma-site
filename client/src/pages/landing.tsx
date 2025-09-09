@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import karoomaLogo from "@/assets/LOGO_KAROOMA_TIPO_1753945361411.png";
+import heroBackground from "@assets/generated_images/Papercraft_origami_chaos_to_harmony_4b428ce9.png";
 
 export default function Landing() {
   const [formData, setFormData] = useState({
@@ -106,11 +108,35 @@ export default function Landing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+    <div className="min-h-screen">
       
-      {/* Hero Section */}
-      <section className="pt-16 pb-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
+      {/* Header com Logo */}
+      <header className="absolute top-0 left-0 right-0 z-50 px-4 py-6">
+        <div className="max-w-7xl mx-auto">
+          <motion.img 
+            src={karoomaLogo} 
+            alt="Karooma" 
+            className="h-8 object-contain"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          />
+        </div>
+      </header>
+
+      {/* Hero Section com Background */}
+      <section 
+        className="pt-24 pb-12 px-4 relative min-h-screen flex items-center"
+        style={{
+          backgroundImage: `url(${heroBackground})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+      >
+        {/* Overlay para melhorar legibilidade */}
+        <div className="absolute inset-0 bg-gradient-to-br from-white/90 via-purple-50/80 to-pink-50/90"></div>
+        <div className="max-w-4xl mx-auto text-center relative z-10">
           
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -170,7 +196,7 @@ export default function Landing() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
         <div className="max-w-6xl mx-auto">
           
           <motion.div
