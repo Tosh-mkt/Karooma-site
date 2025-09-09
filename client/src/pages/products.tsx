@@ -455,12 +455,9 @@ export default function Products() {
               animate={{ opacity: 1, y: 0 }}
             >
               <h1 className="font-fredoka text-5xl gradient-text mb-4">Facilitam a Vida</h1>
-              <p className="font-poppins text-xl text-gray-600 font-normal">Simplicidade e Foco.
-              Acreditamos que menos é mais. Por isso, nosso catálogo contém apenas o essencial. Evitamos a sobrecarga de opções para que você possa focar no que realmente importa: resolver problemas e viver melhor com sua família, sem perder tempo com escolhas desnecessárias.
+              <p className="font-poppins text-xl text-gray-600 font-normal">Nós acreditamos que menos é mais. Nosso catálogo contém apenas o essencial para que você se concentre em resolver seus problemas e viver melhor, sem perder tempo com escolhas desnecessárias.
 
-              Buscamos sempre o melhor custo-benefício, validando cada recomendação com argumentos teóricos e práticos que comprovam sua eficácia. Leia nossas avaliações de cada produto e entenda nossos pontos de vista sobre cada recomendação.
-
-              Estamos constantemente expandindo nosso catálogo de recomendações, trazendo novas soluções para facilitar a sua rotina</p>
+              Buscamos sempre o melhor custo-benefício, validando cada recomendação com argumentos teóricos e práticos que comprovam a sua eficácia. Você pode ler nossas avaliações para entender nossos pontos de vista. Estamos sempre expandindo nosso catálogo com novas soluções para facilitar a sua rotina.</p>
             </motion.div>
 
             {/* Search and Filters */}
