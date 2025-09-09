@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Blog from "./pages/blog";
 import BlogPost from "./pages/blog-post";
 import Products from "./pages/products";
+import Landing from "./pages/landing";
 import TestFiltersClean from "./pages/test-filters-clean";
 import TestFiltersHierarchical from "./pages/test-filters-hierarchical";
 import TestFiltersVertical from "./pages/test-filters-vertical";
@@ -39,6 +40,8 @@ function Router() {
       <main className="flex-1">
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/landing" component={Landing} />
+          <Route path="/guia-mae-ocupada" component={Landing} />
           <Route path="/videos" component={Videos} />
           <Route path="/blog" component={Blog} />
           <Route path="/blog/:id" component={BlogPost} />
