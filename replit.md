@@ -143,7 +143,19 @@ All blog posts are automatically validated for:
 - **Actionability**: Every tip must be immediately implementable
 
 ## Technical Implementation
-- **Format**: PDF generation with React components
-- **Template System**: Reusable components for consistent styling
+- **Format**: Interactive flipbook (HTML/CSS/JS) optimized for mobile
+- **Template System**: Reusable React components with variable color schemes  
+- **Layout**: Horizontal mobile-first design with touch gestures
 - **Content Source**: Expandable from existing blog posts
-- **Delivery**: Automated email distribution via newsletter system
+- **Delivery**: Direct web links + optional PDF export
+
+## Flipbook System Standards
+- **Mobile-First**: Horizontal layout optimized for phone screens
+- **Touch Gestures**: Swipe left/right navigation with visual feedback
+- **Consistent Layout**: Same structure across all e-books, only colors vary
+- **Color Schemes**: Variable color system for different topics
+  - Organization: Purple-Pink gradient (#8b5cf6 to #ec4899)
+  - Safety: Red-Orange gradient (to be defined)
+  - Wellbeing: Green-Blue gradient (to be defined)
+- **Page Structure**: Cover → Welcome → ToC → Chapters → Checklists → Testimonials → Final
+- **Interactive Elements**: Page indicators, progress counter, navigation controls

@@ -17,6 +17,7 @@ import TestFiltersHierarchical from "./pages/test-filters-hierarchical";
 import TestFiltersVertical from "./pages/test-filters-vertical";
 import TestFiltersSidebar from "./pages/test-filters-sidebar";
 import EbookTest from "./pages/ebook-test";
+import FlipbookOrganizacao from "./pages/flipbook-organizacao";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProductImport } from "./pages/AdminProductImport";
@@ -76,6 +77,7 @@ function Router() {
               
               <Route path="/sobre" component={About} />
               <Route path="/ebook-test" component={EbookTest} />
+              <Route path="/flipbook-organizacao" component={FlipbookOrganizacao} />
               
               {/* Dynamic Page Routes - specific slugs */}
               <Route path="/sobre2" component={PageRenderer} />
