@@ -356,7 +356,7 @@ export default function Landing() {
             </h2>
             
             <p className="font-poppins text-xl mb-8 opacity-90">
-              Baixe o seu <strong>Guia das 5 Soluções</strong> gratuito agora!
+              Baixe o seu <strong>Guia das 5 Soluções</strong> gratuito agora e vá colecionando os demais guias e conteúdos que a Karooma está preparando para você!
             </p>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20 max-w-2xl mx-auto">
