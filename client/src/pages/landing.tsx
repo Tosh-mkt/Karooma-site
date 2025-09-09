@@ -155,7 +155,7 @@ export default function Landing() {
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border border-white/20 max-w-2xl mx-auto">
               <p className="font-poppins text-gray-600 mb-6">
                 Baixe <strong>grátis</strong> o guia com estratégias testadas por mães como você - 
-                sem complicação, sem teoria, só o que <strong>funciona na prática.</strong>
+                sem complicação, sem teoria, só o que <strong>funciona na prática. E aguarde por mais conteúdos e recomendações!</strong>
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
