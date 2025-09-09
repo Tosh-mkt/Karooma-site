@@ -44,7 +44,7 @@ function Router() {
       </Route>
       <Route path="/guia-mae-ocupada">
         <LandingLayout>
-          <Landing />
+          <PageRenderer />
         </LandingLayout>
       </Route>
 
