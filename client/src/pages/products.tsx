@@ -13,181 +13,63 @@ import { staggerContainer, staggerItem } from "@/lib/animations";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 
-// Dados dos filtros hierárquicos baseados no mapa fornecido
+// Dados dos filtros simplificados - só categorias principais
 const filterHierarchy = {
   "comer-preparar": {
     title: "Comer e Preparar",
     icon: "🍽️",
-    color: "text-purple-600",
-    subcategories: {
-      "crianca": {
-        title: "Criança",
-        environments: []
-      },
-      "bebe": {
-        title: "Bebê", 
-        environments: []
-      },
-      "familia": {
-        title: "Família",
-        environments: []
-      }
-    }
-  },
-  "apresentar": {
-    title: "Presentear",
-    icon: "🎁", 
-    color: "text-blue-600",
-    subcategories: {
-      "presente-para-ocasioes": {
-        title: "Presente para Ocasiões",
-        environments: []
-      },
-      "presente-por-idade": {
-        title: "Presente por Idade",
-        subcategories: {
-          "bebe": {
-            title: "Bebê",
-            environments: []
-          },
-          "crianca": {
-            title: "Criança", 
-            environments: []
-          },
-          "familia": {
-            title: "Família",
-            environments: []
-          }
-        }
-      }
-    }
+    color: "text-purple-600"
   },
   "saude-seguranca": {
     title: "Saúde e Segurança",
     icon: "🛡️",
-    color: "text-red-600", 
-    subcategories: {
-      "primeiros-socorros": {
-        title: "Primeiros Socorros",
-        environments: ["Casa", "Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança"]
-      }
-    }
+    color: "text-red-600"
   },
   "decorar-brilhar": {
     title: "Decorar e Brilhar", 
     icon: "✨",
-    color: "text-pink-600",
-    subcategories: {},
-    environments: ["Carro", "Casa", "Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança"]
+    color: "text-pink-600"
   },
   "sono-relaxamento": {
     title: "Sono e Relaxamento",
     icon: "😴",
-    color: "text-indigo-600",
-    subcategories: {
-      "bebe": {
-        title: "Bebê",
-        environments: []
-      },
-      "crianca": {
-        title: "Criança",
-        environments: []
-      },
-      "pais-cuidadores": {
-        title: "Pais e Cuidadores", 
-        environments: []
-      }
-    }
+    color: "text-indigo-600"
   },
   "aprender-brincar": {
     title: "Aprender e Brincar",
     icon: "🎨",
-    color: "text-green-600",
-    subcategories: {
-      "bebe": {
-        title: "Bebê",
-        environments: []
-      },
-      "crianca": {
-        title: "Criança", 
-        environments: []
-      },
-      "familia": {
-        title: "Família",
-        environments: []
-      }
-    }
+    color: "text-green-600"
   },
   "sair-viajar": {
     title: "Sair e Viajar",
     icon: "✈️",
-    color: "text-yellow-600",
-    subcategories: {
-      "bebe": {
-        title: "Bebê",
-        environments: []
-      },
-      "crianca": {
-        title: "Criança",
-        environments: []
-      },
-      "familia": {
-        title: "Família", 
-        environments: []
-      },
-      "primeiros-socorros": {
-        title: "Primeiros Socorros",
-        environments: []
-      },
-      "carro": {
-        title: "Carro",
-        environments: []
-      }
-    },
-    environments: []
+    color: "text-yellow-600"
   },
   "organizacao": {
     title: "Organização",
     icon: "📦",
-    color: "text-teal-600",
-    subcategories: {
-      "casa": {
-        title: "Casa",
-        environments: []
-      },
-      "cozinha": {
-        title: "Cozinha",
-        environments: []
-      },
-      "area-de-servico": {
-        title: "Área de Serviço",
-        environments: []
-      },
-      "quarto-do-bebe": {
-        title: "Quarto do Bebê",
-        environments: []
-      },
-      "quarto-da-crianca": {
-        title: "Quarto da Criança",
-        environments: []
-      },
-      "carro": {
-        title: "Carro",
-        environments: []
-      }
-    },
-    environments: []
+    color: "text-teal-600"
   }
 };
+
+// Filtros de idade
+const ageFilters = [
+  { value: "0-1", label: "0-1 ano" },
+  { value: "1-3", label: "1-3 anos" },
+  { value: "3-6", label: "3-6 anos" },
+  { value: "6-10", label: "6-10 anos" },
+  { value: "11-15", label: "11-15 anos" },
+  { value: "15-20", label: "15-20 anos" },
+  { value: "20+", label: "Acima de 20 anos" }
+];
 
 export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [showFavorites, setShowFavorites] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
-  const [expandedSubcategories, setExpandedSubcategories] = useState<Record<string, boolean>>({});
   const [selectedFilters, setSelectedFilters] = useState<Record<string, any>>({});
+  const [selectedAgeFilters, setSelectedAgeFilters] = useState<Record<string, boolean>>({});
   const { isAuthenticated } = useAuth();
 
   // Invalidate cache on component mount to ensure fresh data
@@ -224,28 +106,20 @@ export default function Products() {
     enabled: isAuthenticated && showFavorites,
   });
 
-  // Toggle expansão das categorias
-  const toggleCategory = (categoryId: string) => {
-    setExpandedCategories(prev => ({
+
+  // Selecionar filtro de categoria
+  const toggleFilter = (categoryId: string) => {
+    setSelectedFilters(prev => ({
       ...prev,
       [categoryId]: !prev[categoryId]
     }));
   };
 
-  // Toggle expansão das subcategorias
-  const toggleSubcategory = (subcategoryId: string) => {
-    setExpandedSubcategories(prev => ({
+  // Selecionar filtro de idade
+  const toggleAgeFilter = (ageRange: string) => {
+    setSelectedAgeFilters(prev => ({
       ...prev,
-      [subcategoryId]: !prev[subcategoryId]
-    }));
-  };
-
-  // Selecionar filtro
-  const toggleFilter = (categoryId: string, subcategoryId: string | null, environmentId: string | null) => {
-    const filterId = `${categoryId}${subcategoryId ? `-${subcategoryId}` : ''}${environmentId ? `-${environmentId}` : ''}`;
-    setSelectedFilters(prev => ({
-      ...prev,
-      [filterId]: !prev[filterId]
+      [ageRange]: !prev[ageRange]
     }));
   };
 
@@ -263,16 +137,27 @@ export default function Products() {
       const matchesPrice = product.currentPrice && priceRange.length > 0 ? 
         parseFloat(product.currentPrice.toString()) <= priceRange[0] : true;
       
-      return matchesCategory && matchesSearch && matchesPrice;
+      // Verificar se algum filtro de categoria está ativo
+      const hasActiveCategoryFilters = Object.values(selectedFilters).some(Boolean);
+      const matchesCategoryFilters = !hasActiveCategoryFilters || Object.keys(selectedFilters).some(filterId => 
+        selectedFilters[filterId] && (product.tags?.includes(filterId) || product.category?.toLowerCase().includes(filterId))
+      );
+      
+      // Verificar filtros de idade (placeholder - seria necessário ter campo de idade nos produtos)
+      const hasActiveAgeFilters = Object.values(selectedAgeFilters).some(Boolean);
+      const matchesAgeFilters = !hasActiveAgeFilters; // Por enquanto, aceita todos se não há campo de idade
+      
+      return matchesCategory && matchesSearch && matchesPrice && matchesCategoryFilters && matchesAgeFilters;
     }) || [];
   }, [sourceProducts, selectedCategory, searchQuery, priceRange, selectedFilters]);
 
   // Contar filtros ativos
-  const activeFiltersCount = Object.values(selectedFilters).filter(Boolean).length;
+  const activeFiltersCount = Object.values(selectedFilters).filter(Boolean).length + Object.values(selectedAgeFilters).filter(Boolean).length;
 
   // Reset todos os filtros
   const resetFilters = () => {
     setSelectedFilters({});
+    setSelectedAgeFilters({});
     setSearchQuery("");
     setPriceRange([maxPrice]); // Reset to maximum price, not zero
   };
@@ -334,30 +219,44 @@ export default function Products() {
                   data-testid="slider-price-range"
                 />
               </div>
+
+              {/* Filtro por Idade */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-3">
+                  Por Idade
+                </label>
+                <div className="space-y-2">
+                  {ageFilters.map((ageFilter) => (
+                    <div key={ageFilter.value} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`age-${ageFilter.value}`}
+                        checked={selectedAgeFilters[ageFilter.value] || false}
+                        onChange={() => toggleAgeFilter(ageFilter.value)}
+                        className="w-4 h-4 text-purple-600 rounded mr-3"
+                      />
+                      <label 
+                        htmlFor={`age-${ageFilter.value}`}
+                        className="text-sm text-gray-700 cursor-pointer"
+                      >
+                        {ageFilter.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Menu Hierárquico */}
+          {/* Menu de Categorias Simplificado */}
           <div className="p-2">
             <div className="space-y-1">
               {Object.entries(filterHierarchy).map(([categoryId, category]) => (
                 <div key={categoryId}>
                   {/* Categoria Principal */}
-                  <div
-                    className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer group"
-                    onClick={() => toggleCategory(categoryId)}
-                  >
+                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer group">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center gap-2">
-                        {Object.keys(category.subcategories).length > 0 ? (
-                          expandedCategories[categoryId] ? 
-                            <ChevronDown className="w-4 h-4 text-gray-500" /> : 
-                            <ChevronRight className="w-4 h-4 text-gray-500" />
-                        ) : (
-                          <div className="w-4 h-4" />
-                        )}
-                        <span className="text-lg">{category.icon}</span>
-                      </div>
+                      <span className="text-lg">{category.icon}</span>
                       <span className={`font-medium text-sm ${category.color}`}>
                         {category.title}
                       </span>
@@ -367,93 +266,10 @@ export default function Products() {
                     <input
                       type="checkbox"
                       checked={selectedFilters[categoryId] || false}
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        toggleFilter(categoryId, null, null);
-                      }}
+                      onChange={() => toggleFilter(categoryId)}
                       className="w-4 h-4 text-purple-600 rounded"
                     />
                   </div>
-
-                  {/* Subcategorias */}
-                  {expandedCategories[categoryId] && Object.entries(category.subcategories).map(([subcategoryId, subcategory]) => (
-                    <div key={subcategoryId} className="ml-4">
-                      <div
-                        className="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer"
-                        onClick={() => toggleSubcategory(`${categoryId}-${subcategoryId}`)}
-                      >
-                        <div className="flex items-center gap-2">
-                          {(subcategory as any).subcategories ? (
-                            expandedSubcategories[`${categoryId}-${subcategoryId}`] ? 
-                              <ChevronDown className="w-3 h-3 text-gray-400" /> : 
-                              <ChevronRight className="w-3 h-3 text-gray-400" />
-                          ) : (
-                            <div className="w-3 h-3" />
-                          )}
-                          <span className="text-sm text-gray-700">{subcategory.title}</span>
-                        </div>
-                        
-                        <input
-                          type="checkbox"
-                          checked={selectedFilters[`${categoryId}-${subcategoryId}`] || false}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            toggleFilter(categoryId, subcategoryId, null);
-                          }}
-                          className="w-3 h-3 text-purple-600 rounded"
-                        />
-                      </div>
-
-                      {/* Sub-subcategorias (ex: Presente por Idade -> Bebê, Criança, Família) */}
-                      {expandedSubcategories[`${categoryId}-${subcategoryId}`] && (subcategory as any).subcategories && Object.entries((subcategory as any).subcategories).map(([subSubId, subSub]: [string, any]) => (
-                        <div key={subSubId} className="ml-4">
-                          <div className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3" />
-                              <span className="text-xs text-gray-600">{subSub.title}</span>
-                            </div>
-                            
-                            <input
-                              type="checkbox"
-                              checked={selectedFilters[`${categoryId}-${subcategoryId}-${subSubId}`] || false}
-                              onChange={() => toggleFilter(categoryId, subcategoryId, subSubId)}
-                              className="w-3 h-3 text-purple-600 rounded"
-                            />
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Ambientes da subcategoria */}
-                      {expandedSubcategories[`${categoryId}-${subcategoryId}`] && subcategory.environments && subcategory.environments.map((env: string) => (
-                        <div key={env} className="ml-6">
-                          <div className="flex items-center justify-between p-1 rounded hover:bg-gray-50">
-                            <span className="text-xs text-gray-500">{env}</span>
-                            <input
-                              type="checkbox"
-                              checked={selectedFilters[`${categoryId}-${subcategoryId}-${env}`] || false}
-                              onChange={() => toggleFilter(categoryId, subcategoryId, env)}
-                              className="w-3 h-3 text-purple-600 rounded"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-
-                  {/* Ambientes diretos da categoria */}
-                  {expandedCategories[categoryId] && 'environments' in category && category.environments && category.environments.map((env: string) => (
-                    <div key={env} className="ml-6">
-                      <div className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
-                        <span className="text-sm text-gray-600">{env}</span>
-                        <input
-                          type="checkbox"
-                          checked={selectedFilters[`${categoryId}-${env}`] || false}
-                          onChange={() => toggleFilter(categoryId, null, env)}
-                          className="w-3 h-3 text-purple-600 rounded"
-                        />
-                      </div>
-                    </div>
-                  ))}
                 </div>
               ))}
             </div>
