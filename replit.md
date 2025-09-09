@@ -112,3 +112,38 @@ All blog posts are automatically validated for:
 ## Third-party Integrations
 - **LLMs**: ChatGPT, Claude, Gemini (for content generation)
 - **Media**: YouTube, Unsplash
+
+# E-book System Standards
+
+## Visual Identity Pattern
+- **Colors**: Karooma gradient scheme (purple-pink gradients: from-purple-600 to-pink-600)
+- **Typography**: Fredoka One (headings), Poppins (body text), Inter (captions)
+- **Style**: Origami papercraft aesthetic with chaos-to-harmony transformation
+- **Layout**: Clean, modern, ample white space, mobile-first responsive
+
+## E-book Structure Template
+1. **Cover Page**: Title, subtitle, Karooma branding, origami hero image
+2. **Welcome Page**: Personal message from Karooma team, empathetic tone
+3. **Table of Contents**: Visual, organized sections with page numbers
+4. **5-7 Main Chapters**: Following blog content structure (Hook → Problem → Solutions → Bonus → Reflection)
+5. **Practical Checklists**: End of each chapter with actionable items
+6. **Resource Section**: Templates, planners, quick reference guides
+7. **Final Page**: Call-to-action for other products, newsletter signup
+
+## Image Assets (Existing)
+- **Hero Images**: House_organization_chaos_origami_2d1f488c.png, Wide_origami_home_organization_chaos_dbac14c5.png
+- **Success Images**: Wide_origami_home_organization_peace_dd648e67.png, Organized_family_home_origami_28044657.png
+- **Section Images**: Organized_playroom_origami_peace_2ade9726.png, Organized_time_management_origami_2ddfbdb0.png
+
+## Content Standards for E-books
+- **Target**: Working mothers seeking practical solutions
+- **Tone**: Empathetic, supportive, conversational (2nd person)
+- **Length**: 25-40 pages, 5000-8000 words
+- **Validation**: Must acknowledge struggles before providing solutions
+- **Actionability**: Every tip must be immediately implementable
+
+## Technical Implementation
+- **Format**: PDF generation with React components
+- **Template System**: Reusable components for consistent styling
+- **Content Source**: Expandable from existing blog posts
+- **Delivery**: Automated email distribution via newsletter system

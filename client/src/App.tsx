@@ -16,6 +16,7 @@ import TestFiltersClean from "./pages/test-filters-clean";
 import TestFiltersHierarchical from "./pages/test-filters-hierarchical";
 import TestFiltersVertical from "./pages/test-filters-vertical";
 import TestFiltersSidebar from "./pages/test-filters-sidebar";
+import EbookTest from "./pages/ebook-test";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProductImport } from "./pages/AdminProductImport";
@@ -74,6 +75,7 @@ function Router() {
               <Route path="/admin/temp-login" component={TempLogin} />
               
               <Route path="/sobre" component={About} />
+              <Route path="/ebook-test" component={EbookTest} />
               
               {/* Dynamic Page Routes - specific slugs */}
               <Route path="/sobre2" component={PageRenderer} />
