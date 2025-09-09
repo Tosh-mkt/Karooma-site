@@ -112,11 +112,11 @@ export default function Landing() {
       
       {/* Header com Logo */}
       <header className="absolute top-0 left-0 right-0 z-50 px-4 py-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto text-center">
           <motion.img 
             src={karoomaLogo} 
             alt="Karooma" 
-            className="h-8 object-contain"
+            className="h-8 object-contain mx-auto"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
