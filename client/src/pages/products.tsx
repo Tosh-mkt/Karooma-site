@@ -188,7 +188,6 @@ export default function Products() {
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
   const [expandedSubcategories, setExpandedSubcategories] = useState<Record<string, boolean>>({});
   const [selectedFilters, setSelectedFilters] = useState<Record<string, any>>({});
-  const [priceRange, setPriceRange] = useState([1000]);
   const { isAuthenticated } = useAuth();
 
   // Invalidate cache on component mount to ensure fresh data
@@ -200,6 +199,24 @@ export default function Products() {
     queryKey: ["/api/products"],
     staleTime: 0, // Always refetch
   });
+
+  // Calculate dynamic price range based on actual products
+  const maxPrice = useMemo(() => {
+    if (!products || products.length === 0) return 1000;
+    const prices = products
+      .map(p => p.currentPrice ? parseFloat(p.currentPrice.toString()) : 0)
+      .filter(price => price > 0);
+    return prices.length > 0 ? Math.max(...prices) : 1000;
+  }, [products]);
+
+  const [priceRange, setPriceRange] = useState<number[]>([]);
+
+  // Initialize price range when products load
+  useEffect(() => {
+    if (maxPrice && priceRange.length === 0) {
+      setPriceRange([maxPrice]);
+    }
+  }, [maxPrice, priceRange.length]);
 
   // Fetch user favorites
   const { data: favorites, isLoading: favoritesLoading } = useQuery<Product[]>({
@@ -243,7 +260,7 @@ export default function Products() {
       const matchesSearch = !searchQuery || 
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.description?.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesPrice = product.currentPrice ? 
+      const matchesPrice = product.currentPrice && priceRange.length > 0 ? 
         parseFloat(product.currentPrice.toString()) <= priceRange[0] : true;
       
       return matchesCategory && matchesSearch && matchesPrice;
@@ -257,7 +274,7 @@ export default function Products() {
   const resetFilters = () => {
     setSelectedFilters({});
     setSearchQuery("");
-    setPriceRange([0, 1000]);
+    setPriceRange([maxPrice]); // Reset to maximum price, not zero
   };
 
   const currentLoading = showFavorites ? favoritesLoading : isLoading;
@@ -306,13 +323,13 @@ export default function Products() {
               {/* Preço */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preço: até R$ {priceRange[0]}
+                  Preço: até R$ {priceRange.length > 0 ? priceRange[0]?.toFixed(2) : maxPrice?.toFixed(2)}
                 </label>
                 <Slider
-                  value={priceRange}
+                  value={priceRange.length > 0 ? priceRange : [maxPrice]}
                   onValueChange={setPriceRange}
-                  max={1000}
-                  step={10}
+                  max={maxPrice}
+                  step={1}
                   className="mt-2"
                   data-testid="slider-price-range"
                 />
