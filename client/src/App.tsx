@@ -50,6 +50,14 @@ function Router() {
           <PageRenderer />
         </LandingLayout>
       </Route>
+      
+      {/* Flipbooks - Layout Fullscreen (sem header/footer) */}
+      <Route path="/flipbook-organizacao">
+        <FlipbookOrganizacao />
+      </Route>
+      <Route path="/flipbook-test">
+        <FlipbookTest />
+      </Route>
 
       {/* Todas as outras páginas - Layout Normal */}
       <Route>
@@ -78,8 +86,6 @@ function Router() {
               
               <Route path="/sobre" component={About} />
               <Route path="/ebook-test" component={EbookTest} />
-              <Route path="/flipbook-organizacao" component={FlipbookOrganizacao} />
-              <Route path="/flipbook-test" component={FlipbookTest} />
               
               {/* Dynamic Page Routes - specific slugs */}
               <Route path="/sobre2" component={PageRenderer} />
