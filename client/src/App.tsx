@@ -29,49 +29,64 @@ import { PageRenderer } from "./components/PageRenderer";
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
 import Footer from "./components/layout/footer";
+import { LandingLayout } from "./components/layout/landing-layout";
 import { AutoNotification } from "./components/content/auto-notification";
 import { motion } from "framer-motion";
 
 function Router() {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Navigation />
-      <AutoNotification />
-      <main className="flex-1">
-        <Switch>
-          <Route path="/" component={Home} />
-          <Route path="/landing" component={Landing} />
-          <Route path="/guia-mae-ocupada" component={Landing} />
-          <Route path="/videos" component={Videos} />
-          <Route path="/blog" component={Blog} />
-          <Route path="/blog/:id" component={BlogPost} />
-          <Route path="/products" component={Products} />
-          <Route path="/filtros-hierarquia" component={TestFiltersClean} />
-          <Route path="/filtros-cascata" component={TestFiltersHierarchical} />
-          <Route path="/filtros-vertical" component={TestFiltersVertical} />
-          <Route path="/filtros-sidebar" component={TestFiltersSidebar} />
-          <Route path="/favoritos" component={Favorites} />
+    <Switch>
+      {/* Landing Pages - Layout Limpo (sem header/footer) */}
+      <Route path="/landing">
+        <LandingLayout>
+          <Landing />
+        </LandingLayout>
+      </Route>
+      <Route path="/guia-mae-ocupada">
+        <LandingLayout>
+          <Landing />
+        </LandingLayout>
+      </Route>
 
-          <Route path="/admin/dashboard" component={AdminDashboard} />
-          <Route path="/admin/import-products" component={AdminProductImport} />
-          <Route path="/login" component={Login} />
-          <Route path="/register" component={Register} />
-          <Route path="/admin/login" component={AdminLogin} />
-          <Route path="/admin/temp-login" component={TempLogin} />
-          
-          <Route path="/sobre" component={About} />
-          
-          {/* Dynamic Page Routes - specific slugs */}
-          <Route path="/sobre2" component={PageRenderer} />
-          <Route path="/facilita-a-vida" component={PageRenderer} />
-          <Route path="/inicio" component={PageRenderer} />
-          
-          <Route component={NotFound} />
-        </Switch>
-      </main>
-      <Footer />
-      
-    </div>
+      {/* Todas as outras páginas - Layout Normal */}
+      <Route>
+        <div className="min-h-screen flex flex-col">
+          <Navigation />
+          <AutoNotification />
+          <main className="flex-1">
+            <Switch>
+              <Route path="/" component={Home} />
+              <Route path="/videos" component={Videos} />
+              <Route path="/blog" component={Blog} />
+              <Route path="/blog/:id" component={BlogPost} />
+              <Route path="/products" component={Products} />
+              <Route path="/filtros-hierarquia" component={TestFiltersClean} />
+              <Route path="/filtros-cascata" component={TestFiltersHierarchical} />
+              <Route path="/filtros-vertical" component={TestFiltersVertical} />
+              <Route path="/filtros-sidebar" component={TestFiltersSidebar} />
+              <Route path="/favoritos" component={Favorites} />
+
+              <Route path="/admin/dashboard" component={AdminDashboard} />
+              <Route path="/admin/import-products" component={AdminProductImport} />
+              <Route path="/login" component={Login} />
+              <Route path="/register" component={Register} />
+              <Route path="/admin/login" component={AdminLogin} />
+              <Route path="/admin/temp-login" component={TempLogin} />
+              
+              <Route path="/sobre" component={About} />
+              
+              {/* Dynamic Page Routes - specific slugs */}
+              <Route path="/sobre2" component={PageRenderer} />
+              <Route path="/facilita-a-vida" component={PageRenderer} />
+              <Route path="/inicio" component={PageRenderer} />
+              
+              <Route component={NotFound} />
+            </Switch>
+          </main>
+          <Footer />
+        </div>
+      </Route>
+    </Switch>
   );
 }
 
@@ -85,7 +100,6 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="custom-scrollbar">
-          <Toaster />
           <Router />
         </div>
       </TooltipProvider>
