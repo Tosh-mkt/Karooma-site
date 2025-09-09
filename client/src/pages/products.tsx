@@ -631,7 +631,7 @@ export default function Products() {
                 Cada produto que recomendamos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar. Não funciona ou é mal avaliado, não se encontra aqui.
               </p>
               
-              <p className="font-inter text-sm text-gray-500 text-center italic">Como associado da Amazon, a Karooma ganha com compras qualificadas.</p>
+              <p className="font-inter text-sm text-gray-500 text-center italic">Como associado da Amazon, a Karooma ganha com compras qualificadas para ajudar na manutenção da estrutura e continuar trazendo conteúdo e melhores recomendações.</p>
               
             </motion.div>
           </div>
