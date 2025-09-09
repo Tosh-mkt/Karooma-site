@@ -4,12 +4,18 @@ import { PageSection } from "@/types/page-builder";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useQuery } from "@tanstack/react-query";
 import { Content, Product } from "@shared/schema";
 import { BlogCard } from "@/components/content/blog-card";
 import { ProductCard } from "@/components/content/product-card";
 import { VideoCard } from "@/components/content/video-card";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 import origamiBoatImage from "../../assets/ORIGAMI_BARCO_1756356626065.png";
+import karoomaLogo from "@/assets/LOGO_KAROOMA_TIPO_1753945361411.png";
+import heroBackground from "@assets/generated_images/Papercraft_origami_chaos_to_harmony_4b428ce9.png";
 
 interface SectionRendererProps {
   section: PageSection;
@@ -26,6 +32,14 @@ export function SectionRenderer({ section, isEditing = false }: SectionRendererP
       return <FeaturedContentSection section={section} isEditing={isEditing} />;
     case 'gallery':
       return <GallerySection section={section} isEditing={isEditing} />;
+    case 'landing-hero':
+      return <LandingHeroSection section={section} isEditing={isEditing} />;
+    case 'benefits-grid':
+      return <BenefitsGridSection section={section} isEditing={isEditing} />;
+    case 'testimonials':
+      return <TestimonialsSection section={section} isEditing={isEditing} />;
+    case 'newsletter-form':
+      return <NewsletterFormSection section={section} isEditing={isEditing} />;
     default:
       return (
         <div className="p-8 bg-gray-100 border-2 border-dashed border-gray-300">
@@ -1035,6 +1049,348 @@ function GallerySection({ section, isEditing }: SectionRendererProps) {
       {isEditing && (
         <div className="absolute top-4 left-4">
           <Badge variant="secondary">Gallery Section</Badge>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// Landing Page Hero Section com Formulário
+function LandingHeroSection({ section, isEditing }: SectionRendererProps) {
+  const { data } = section;
+  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      await apiRequest("POST", "/api/newsletter/subscribe", {
+        email: formData.email,
+        name: formData.name || "Mãe Organizada",
+        source: "landing_page"
+      });
+
+      toast({
+        title: "🎉 Parabéns!",
+        description: "Seu guia será enviado por email em alguns minutos!"
+      });
+
+      setFormData({ name: "", email: "" });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Ops! Algo deu errado",
+        description: "Tente novamente em alguns instantes"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <section 
+      className="pt-24 pb-12 px-4 relative min-h-screen flex items-center"
+      style={{
+        backgroundImage: `url(${data.backgroundImage || heroBackground})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      {/* Header com Logo */}
+      <header className="absolute top-0 left-0 right-0 z-50 px-4 py-6">
+        <div className="max-w-7xl mx-auto text-center">
+          <motion.img 
+            src={karoomaLogo} 
+            alt="Karooma" 
+            className="h-8 object-contain mx-auto"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          />
+        </div>
+      </header>
+
+      {/* Overlay para melhorar legibilidade */}
+      <div className="absolute inset-0 bg-gradient-to-br from-white/90 via-purple-50/80 to-pink-50/90"></div>
+      
+      <div className="max-w-4xl mx-auto text-center relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h1 className="font-fredoka text-4xl md:text-6xl gradient-text mb-6 leading-tight">
+            {data.title || 'Guia das 5 Soluções para a Mãe Ocupada'}
+          </h1>
+          
+          <p className="font-poppins text-xl md:text-2xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed">
+            {data.subtitle || 'Estratégias práticas testadas por mães reais para organizar a rotina familiar sem perder a sanidade'}
+          </p>
+
+          <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-8 md:p-10 shadow-xl border border-white/20 max-w-2xl mx-auto">
+            <h3 className="font-poppins text-2xl font-bold text-gray-800 mb-2">
+              {data.formTitle || 'Receba o Guia Gratuito'}
+            </h3>
+            <p className="font-poppins text-gray-600 mb-6">
+              {data.formSubtitle || 'Enviado direto para seu email em segundos'}
+            </p>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                type="text"
+                placeholder="Seu primeiro nome"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="text-center text-lg py-4 rounded-2xl border-2 border-purple-200 focus:border-purple-400"
+              />
+              
+              <Input
+                type="email"
+                placeholder="Seu melhor email"
+                value={formData.email}
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                required
+                className="text-center text-lg py-4 rounded-2xl border-2 border-purple-200 focus:border-purple-400"
+              />
+              
+              <GradientButton
+                type="submit"
+                size="lg" 
+                className="w-full text-xl py-6 rounded-2xl"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Enviando..." : "Receber Guia Gratuito 🎁"}
+              </GradientButton>
+            </form>
+
+            <p className="text-sm text-gray-500 mt-4 text-center">
+              ✅ Sem spam. Cancele quando quiser.
+            </p>
+          </div>
+        </motion.div>
+      </div>
+      
+      {isEditing && (
+        <div className="absolute top-4 left-4">
+          <Badge variant="secondary">Landing Hero Section</Badge>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// Grid de Benefícios
+function BenefitsGridSection({ section, isEditing }: SectionRendererProps) {
+  const { data } = section;
+  let benefits = [];
+  
+  try {
+    benefits = typeof data.benefits === 'string' ? JSON.parse(data.benefits) : data.benefits || [];
+  } catch (e) {
+    console.error('Error parsing benefits:', e);
+    benefits = [];
+  }
+
+  return (
+    <section className="py-16 bg-gradient-to-br from-purple-50 via-white to-pink-50 relative">
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.h2
+          className="font-fredoka text-4xl md:text-5xl text-center gradient-text mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {data.title || 'O que você vai conquistar:'}
+        </motion.h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {benefits.map((benefit: any, index: number) => (
+            <motion.div
+              key={index}
+              className="glassmorphism p-6 text-center rounded-2xl card-hover"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              <div className="text-4xl mb-4">{benefit.icon}</div>
+              <h3 className="font-outfit text-lg font-bold gradient-text mb-3">
+                {benefit.title}
+              </h3>
+              <p className="font-poppins text-sm text-gray-600">
+                {benefit.description}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+      
+      {isEditing && (
+        <div className="absolute top-4 left-4">
+          <Badge variant="secondary">Benefits Grid Section</Badge>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// Seção de Depoimentos
+function TestimonialsSection({ section, isEditing }: SectionRendererProps) {
+  const { data } = section;
+  let testimonials = [];
+  
+  try {
+    testimonials = typeof data.testimonials === 'string' ? JSON.parse(data.testimonials) : data.testimonials || [];
+  } catch (e) {
+    console.error('Error parsing testimonials:', e);
+    testimonials = [];
+  }
+
+  return (
+    <section className="py-16 bg-white relative">
+      <div className="max-w-6xl mx-auto px-4">
+        <motion.h2
+          className="font-fredoka text-4xl md:text-5xl text-center gradient-text mb-12"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {data.title || 'Mães que já transformaram suas rotinas:'}
+        </motion.h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((testimonial: any, index: number) => (
+            <motion.div
+              key={index}
+              className="glassmorphism p-6 rounded-2xl card-hover"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ scale: 1.02 }}
+            >
+              <div className="flex items-center mb-4">
+                <div className="text-3xl mr-3">{testimonial.avatar || '👩'}</div>
+                <div>
+                  <h4 className="font-outfit font-bold text-purple-600">
+                    {testimonial.name}
+                  </h4>
+                  <p className="font-poppins text-sm text-gray-500">
+                    {testimonial.role}
+                  </p>
+                </div>
+              </div>
+              <p className="font-poppins text-gray-700 italic">
+                "{testimonial.quote}"
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+      
+      {isEditing && (
+        <div className="absolute top-4 left-4">
+          <Badge variant="secondary">Testimonials Section</Badge>
+        </div>
+      )}
+    </section>
+  );
+}
+
+// Formulário Newsletter Standalone
+function NewsletterFormSection({ section, isEditing }: SectionRendererProps) {
+  const { data } = section;
+  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      await apiRequest("POST", "/api/newsletter/subscribe", {
+        email: formData.email,
+        name: formData.name || "Assinante",
+        source: "newsletter_section"
+      });
+
+      toast({
+        title: "🎉 Sucesso!",
+        description: "Você foi inscrito na nossa newsletter!"
+      });
+
+      setFormData({ name: "", email: "" });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Ops! Algo deu errado",
+        description: "Tente novamente em alguns instantes"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <section className="py-16 bg-gradient-to-br from-purple-600 to-pink-600 relative">
+      <div className="max-w-2xl mx-auto px-4 text-center">
+        <motion.h2
+          className="font-fredoka text-4xl md:text-5xl text-white mb-4"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {data.title || 'Receba o Guia Gratuito'}
+        </motion.h2>
+
+        <p className="font-poppins text-xl text-white/90 mb-8">
+          {data.subtitle || 'Enviado direto para seu email em segundos'}
+        </p>
+
+        <motion.div
+          className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 border border-white/20"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              type="text"
+              placeholder="Seu primeiro nome"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="text-center text-lg py-4 rounded-2xl bg-white/90 border-0"
+            />
+            
+            <Input
+              type="email"
+              placeholder="Seu melhor email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+              className="text-center text-lg py-4 rounded-2xl bg-white/90 border-0"
+            />
+            
+            <Button
+              type="submit"
+              size="lg" 
+              className="w-full text-xl py-6 rounded-2xl bg-white text-purple-600 hover:bg-gray-100"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Enviando..." : (data.buttonText || "Receber Guia Gratuito")}
+            </Button>
+          </form>
+
+          <p className="text-sm text-white/80 mt-4">
+            {data.disclaimer || "✅ Sem spam. Cancele quando quiser."}
+          </p>
+        </motion.div>
+      </div>
+      
+      {isEditing && (
+        <div className="absolute top-4 left-4">
+          <Badge variant="secondary">Newsletter Form Section</Badge>
         </div>
       )}
     </section>

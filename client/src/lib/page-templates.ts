@@ -171,6 +171,151 @@ export const sectionTypes: SectionType[] = [
       columns: '3',
       images: ''
     }
+  },
+  {
+    id: 'landing-hero',
+    name: 'Hero Landing Page',
+    category: 'Landing',
+    description: 'Hero específico para landing page com formulário integrado',
+    preview: '/templates/landing-hero-preview.jpg',
+    fields: [
+      {
+        id: 'title',
+        name: 'title',
+        type: 'text',
+        label: 'Título Principal',
+        placeholder: 'Ex: Guia das 5 Soluções',
+        required: true
+      },
+      {
+        id: 'subtitle',
+        name: 'subtitle',
+        type: 'textarea',
+        label: 'Subtítulo',
+        placeholder: 'Descrição do problema que você resolve'
+      },
+      {
+        id: 'backgroundImage',
+        name: 'backgroundImage',
+        type: 'image',
+        label: 'Imagem de Fundo'
+      },
+      {
+        id: 'formTitle',
+        name: 'formTitle',
+        type: 'text',
+        label: 'Título do Formulário',
+        placeholder: 'Receba o Guia Gratuito'
+      },
+      {
+        id: 'formSubtitle',
+        name: 'formSubtitle',
+        type: 'text',
+        label: 'Subtítulo do Formulário'
+      }
+    ],
+    defaultData: {
+      title: 'Guia das 5 Soluções para a Mãe Ocupada',
+      subtitle: 'Estratégias práticas testadas por mães reais para organizar a rotina familiar sem perder a sanidade',
+      backgroundImage: '',
+      formTitle: 'Receba o Guia Gratuito',
+      formSubtitle: 'Enviado direto para seu email em segundos'
+    }
+  },
+  {
+    id: 'benefits-grid',
+    name: 'Grid de Benefícios',
+    category: 'Landing',
+    description: 'Grade de benefícios com ícones e descrições',
+    preview: '/templates/benefits-preview.jpg',
+    fields: [
+      {
+        id: 'title',
+        name: 'title',
+        type: 'text',
+        label: 'Título da Seção',
+        required: true
+      },
+      {
+        id: 'benefits',
+        name: 'benefits',
+        type: 'textarea',
+        label: 'Benefícios (JSON)',
+        placeholder: '[{"icon":"⏰","title":"Economia de Tempo","description":"Reduza 2h diárias..."}]'
+      }
+    ],
+    defaultData: {
+      title: 'O que você vai conquistar:',
+      benefits: '[{"icon":"⏰","title":"Economia de Tempo","description":"Reduza 2h diárias na organização doméstica"},{"icon":"🧘‍♀️","title":"Menos Estresse","description":"Estratégias para manter a calma nos momentos caóticos"},{"icon":"👨‍👩‍👧‍👦","title":"Família Organizada","description":"Rotinas que funcionam para toda a família"},{"icon":"💆‍♀️","title":"Tempo para Você","description":"Encontre momentos de autocuidado na rotina"}]'
+    }
+  },
+  {
+    id: 'testimonials',
+    name: 'Depoimentos',
+    category: 'Landing',
+    description: 'Seção de depoimentos de clientes satisfeitos',
+    preview: '/templates/testimonials-preview.jpg',
+    fields: [
+      {
+        id: 'title',
+        name: 'title',
+        type: 'text',
+        label: 'Título da Seção'
+      },
+      {
+        id: 'testimonials',
+        name: 'testimonials',
+        type: 'textarea',
+        label: 'Depoimentos (JSON)',
+        placeholder: '[{"name":"Ana","role":"Mãe de 2","quote":"Mudou nossa rotina...","avatar":""}]'
+      }
+    ],
+    defaultData: {
+      title: 'Mães que já transformaram suas rotinas:',
+      testimonials: '[{"name":"Ana Paula","role":"Mãe de 2 (4 e 7 anos)","quote":"Finalmente consegui organizar nossa rotina matinal. As crianças agora se preparam sozinhas e sobra tempo para um café tranquilo!","avatar":""},{"name":"Mariana","role":"Mãe de 3 (2, 5 e 8 anos)","quote":"O guia me mostrou que pequenas mudanças fazem grande diferença. Agora tenho 1h livre todas as noites para cuidar de mim.","avatar":""},{"name":"Cláudia","role":"Mãe de 3 (10, 6 e 2 anos)","quote":"As estratégias são realmente práticas. Consegui envolver toda a família na organização da casa de forma divertida!","avatar":""}]'
+    }
+  },
+  {
+    id: 'newsletter-form',
+    name: 'Formulário Newsletter',
+    category: 'Landing',
+    description: 'Formulário standalone de captura de newsletter',
+    preview: '/templates/newsletter-preview.jpg',
+    fields: [
+      {
+        id: 'title',
+        name: 'title',
+        type: 'text',
+        label: 'Título',
+        required: true
+      },
+      {
+        id: 'subtitle',
+        name: 'subtitle',
+        type: 'text',
+        label: 'Subtítulo'
+      },
+      {
+        id: 'buttonText',
+        name: 'buttonText',
+        type: 'text',
+        label: 'Texto do Botão',
+        placeholder: 'Receber Guia Gratuito'
+      },
+      {
+        id: 'disclaimer',
+        name: 'disclaimer',
+        type: 'text',
+        label: 'Aviso Legal',
+        placeholder: 'Sem spam. Cancele quando quiser.'
+      }
+    ],
+    defaultData: {
+      title: 'Receba o Guia Gratuito',
+      subtitle: 'Enviado direto para seu email em segundos',
+      buttonText: 'Receber Guia Gratuito',
+      disclaimer: 'Sem spam. Cancele quando quiser.'
+    }
   }
 ];
 
