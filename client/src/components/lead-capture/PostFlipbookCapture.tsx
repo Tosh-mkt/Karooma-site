@@ -12,6 +12,10 @@ interface PostFlipbookCaptureProps {
   showInlineButton?: boolean;
   inlineButtonText?: string;
   className?: string;
+  config?: {
+    triggerDelay?: number;
+    triggerScrollPercent?: number;
+  };
 }
 
 export function PostFlipbookCapture({
@@ -20,7 +24,8 @@ export function PostFlipbookCapture({
   postTitle,
   showInlineButton = true,
   inlineButtonText,
-  className = ''
+  className = '',
+  config
 }: PostFlipbookCaptureProps) {
   const {
     isModalOpen,
@@ -31,7 +36,8 @@ export function PostFlipbookCapture({
   } = useFlipbookCapture({
     postId,
     postCategory,
-    postTitle
+    postTitle,
+    config
   });
 
   if (!flipbookConfig?.enabled) {

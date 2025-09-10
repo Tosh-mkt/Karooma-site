@@ -112,13 +112,13 @@ export function useFlipbookCapture({
 
   useEffect(() => {
     // Determinar se deve mostrar captura baseado na categoria
-    if (!postCategory && !config.enabled) return;
+    if (!postCategory && !config?.enabled) return;
     
     const themeId = mapCategoryToTheme(postCategory);
     const fullConfig = getDefaultConfig(themeId);
     
     setFlipbookConfig(fullConfig);
-  }, [postCategory, config]);
+  }, [postCategory, config?.enabled, config?.triggerDelay, config?.triggerScrollPercent]);
 
   useEffect(() => {
     if (!flipbookConfig?.enabled || hasTriggered) return;
@@ -177,7 +177,7 @@ export function useFlipbookCapture({
       if (timeoutId) clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [flipbookConfig, hasTriggered, postId]);
+  }, [flipbookConfig?.enabled, flipbookConfig?.triggerDelay, flipbookConfig?.triggerScrollPercent, flipbookConfig?.themeId, hasTriggered, postId]);
 
   const openModal = () => {
     setIsModalOpen(true);
