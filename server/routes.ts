@@ -405,6 +405,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para obter prompts de geração de imagens
+  app.get("/api/content/image-prompts", async (req, res) => {
+    try {
+      const { category, title } = req.query;
+      
+      if (!category || !title) {
+        return res.status(400).json({ error: "Category and title are required" });
+      }
+
+      const { getBlogPostImagePrompts } = await import("./imageGeneration");
+      const prompts = getBlogPostImagePrompts(String(category), String(title));
+      
+      res.json(prompts);
+    } catch (error) {
+      console.error("Error generating image prompts:", error);
+      res.status(500).json({ error: "Failed to generate image prompts" });
+    }
+  });
+
   app.post("/api/content", async (req, res) => {
     try {
       const validatedData = insertContentSchema.parse(req.body);

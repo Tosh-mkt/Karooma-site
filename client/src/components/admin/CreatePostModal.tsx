@@ -42,6 +42,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { PromptHelper } from "./PromptHelper";
 import { ImageUploader } from "./ImageUploader";
+import { AutoImageGenerator } from "./AutoImageGenerator";
 import { 
   PlusCircle, 
   Save, 
@@ -462,6 +463,17 @@ export function CreatePostModal({ trigger }: CreatePostModalProps) {
                     </TooltipProvider>
                   </div>
                 </div>
+
+                {/* Geração Automática de Imagens */}
+                <AutoImageGenerator
+                  category={form.watch("category")}
+                  title={form.watch("title")}
+                  onImagesGenerated={(heroUrl, footerUrl) => {
+                    form.setValue("heroImageUrl", heroUrl);
+                    form.setValue("footerImageUrl", footerUrl);
+                  }}
+                  disabled={createPostMutation.isPending}
+                />
 
                 {/* Imagem Hero */}
                 <FormField
