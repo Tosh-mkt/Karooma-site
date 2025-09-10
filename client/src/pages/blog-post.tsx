@@ -308,6 +308,7 @@ export default function BlogPost() {
         postId={post.id}
         postCategory={post.category || undefined}
         postTitle={post.title}
+        showInlineButton={false}
         config={{
           triggerDelay: 30, // Modal aparece após 30 segundos
           triggerScrollPercent: 60 // Ou quando o usuário faz scroll 60% da página

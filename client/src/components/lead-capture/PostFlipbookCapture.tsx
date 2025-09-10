@@ -52,65 +52,7 @@ export function PostFlipbookCapture({
   
   return (
     <>
-      {/* Botão inline opcional */}
-      {showInlineButton && (
-        <div className={`my-8 text-center ${className}`}>
-          <div 
-            className="relative p-6 rounded-2xl"
-            style={{
-              background: `linear-gradient(135deg, ${theme.colors.lightTone}, #ffffff)`,
-              border: `2px solid ${theme.colors.primary}20`
-            }}
-          >
-            <div className="mb-4">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-                   style={{ backgroundColor: `${theme.colors.primary}20` }}>
-                <BookOpen className="w-8 h-8" style={{ color: theme.colors.primary }} />
-              </div>
-              
-              <h3 className="font-fredoka text-xl text-gray-800 mb-2">
-                {flipbookConfig.title}
-              </h3>
-              
-              <p className="text-gray-600 font-poppins text-sm mb-4">
-                {flipbookConfig.description}
-              </p>
-              
-              {flipbookConfig.socialProof && (
-                <p className="text-xs text-gray-500 mb-4">
-                  ✨ +{flipbookConfig.socialProof.downloads} downloads
-                </p>
-              )}
-            </div>
-            
-            <Button
-              onClick={openModal}
-              className="w-full sm:w-auto px-8 py-3 text-white font-medium"
-              style={{
-                background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
-              }}
-            >
-              {isAuthenticated ? (
-                <>
-                  <CheckCircle className="w-4 h-4 mr-2" />
-                  Acessar Guia Agora
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4 mr-2" />
-                  {inlineButtonText || 'Baixar Guia Gratuito'}
-                </>
-              )}
-            </Button>
-            
-            {isAuthenticated && (
-              <p className="text-xs text-gray-500 mt-2 text-center">
-                ✅ Acesso direto como usuário cadastrado
-              </p>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Botão inline desabilitado - usando InlineFlipbookButton separado */}
 
       {/* Modal de captura */}
       <FlipbookCaptureModal
