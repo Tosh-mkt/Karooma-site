@@ -190,9 +190,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           tags: productData['Tags de Filtros de Pesquisa'] || productData['Tags'] || productData['tags'],
           introduction: productData['Introdução'] || productData['Introduction'] || productData['introduction'],
           evaluators: productData['Especialistas Selecionados'] || productData['evaluators'],
-          nutritionistEvaluation: productData['Avaliação Nutricionista'] || productData['Nutritionist Evaluation'],
-          organizerEvaluation: productData['Avaliação Organizadora'] || productData['Organizer Evaluation'],
-          designEvaluation: productData['Avaliação Design'] || productData['Design Evaluation'],
+          nutritionistEvaluation: productData['Nutricionista'] || productData['Avaliação Nutricionista'] || productData['Nutritionist Evaluation'] || productData['Avaliação da Nutricionista'] || productData['Análise Nutricionista'],
+          organizerEvaluation: productData['Organizadora'] || productData['Organizadora Profissional'] || productData['Avaliação Organizadora'] || productData['Organizer Evaluation'] || productData['Avaliação da Organizadora'] || productData['Análise Organizadora'],
+          designEvaluation: productData['Designer'] || productData['Design'] || productData['Avaliação Design'] || productData['Design Evaluation'] || productData['Avaliação de Design'] || productData['Análise Design'],
           karoomaTeamEvaluation: productData['Avaliação da Curadoria Karooma'] || productData['Avaliação Karooma'] || productData['Karooma Team Evaluation'],
           categoryTags: productData['Tags de Categorias e Benefícios'] || productData['Tags Categoria'] || productData['Category Tags'],
           searchTags: productData['Tags de Filtros de Pesquisa'] || productData['Tags Busca'] || productData['Search Tags']
@@ -209,10 +209,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.clearProducts();
       }
 
+      // Função para extrair avaliações individuais do expertReview consolidado
+      const extractIndividualEvaluations = (expertReview: string) => {
+        const evaluations = {
+          nutritionistEvaluation: '',
+          organizerEvaluation: '',
+          designEvaluation: ''
+        };
+
+        if (!expertReview) return evaluations;
+
+        // Split by specialist titles (looking for patterns like "Nutrição", "Organização", etc.)
+        const sections = expertReview.split(/<br><br>|<br>\s*<br>/).filter(s => s.trim());
+        
+        for (const section of sections) {
+          const cleanSection = section.replace(/<br>/g, '\n').trim();
+          
+          // Check for nutritionist
+          if (cleanSection.match(/^(Nutri.*|Alimentação.*|Bem-Estar Nutricional.*)/i)) {
+            evaluations.nutritionistEvaluation = cleanSection.replace(/^[^<]*<br>/, '').trim();
+          }
+          // Check for organizer
+          else if (cleanSection.match(/^(Organiz.*|Organização Doméstica.*)/i)) {
+            evaluations.organizerEvaluation = cleanSection.replace(/^[^<]*<br>/, '').trim();
+          }
+          // Check for design
+          else if (cleanSection.match(/^(Design.*|Usabilidade.*|Design e Usabilidade.*)/i)) {
+            evaluations.designEvaluation = cleanSection.replace(/^[^<]*<br>/, '').trim();
+          }
+        }
+
+        return evaluations;
+      };
+
       // Inserir produtos no banco
       const insertedProducts = [];
       for (const productData of products) {
         try {
+          // Extrair avaliações individuais se existir expertReview consolidado
+          if (productData.expertReview && (!productData.nutritionistEvaluation && !productData.organizerEvaluation && !productData.designEvaluation)) {
+            const individualEvaluations = extractIndividualEvaluations(productData.expertReview);
+            productData.nutritionistEvaluation = individualEvaluations.nutritionistEvaluation;
+            productData.organizerEvaluation = individualEvaluations.organizerEvaluation;
+            productData.designEvaluation = individualEvaluations.designEvaluation;
+          }
+
           const insertedProduct = await storage.createProduct(productData);
           insertedProducts.push(insertedProduct);
         } catch (error) {
@@ -590,10 +631,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const productData = convertAnalysisToProduct(analysis, productInfo);
       
       // Inserir produto no banco
-      const [product] = await db
-        .insert(products)
-        .values(productData)
-        .returning();
+      const product = await storage.createProduct(productData);
 
       res.json({ success: true, product });
     } catch (error) {
