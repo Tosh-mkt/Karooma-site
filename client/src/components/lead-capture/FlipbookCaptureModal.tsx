@@ -222,6 +222,28 @@ export function FlipbookCaptureModal({
                 </div>
               )}
 
+              {/* Contextual Connection to Post */}
+              {postTitle && (
+                <div className="mb-6 p-4 rounded-lg border-l-4 bg-blue-50" 
+                     style={{ borderLeftColor: theme.colors.primary }}>
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                         style={{ backgroundColor: `${theme.colors.primary}20` }}>
+                      <Sparkles className="w-4 h-4" style={{ color: theme.colors.primary }} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-700 font-medium mb-1">
+                        💡 Aprofunde o que você acabou de ler
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Este guia complementa o post <strong>"{postTitle}"</strong> com um passo a passo detalhado 
+                        para implementar todas as recomendações na prática, além de dicas extras exclusivas.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Social Proof */}
               {socialProof?.testimonial && (
                 <div className="mb-6 p-4 bg-gray-50 rounded-lg">
