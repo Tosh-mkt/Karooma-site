@@ -277,3 +277,44 @@ export type InsertFavorite = typeof favorites.$inferInsert;
 // Authorized Flipbook Users types
 export type AuthorizedFlipbookUser = typeof authorizedFlipbookUsers.$inferSelect;
 export type InsertAuthorizedFlipbookUser = typeof authorizedFlipbookUsers.$inferInsert;
+
+// Tabelas para Analytics de Conversão
+export const flipbookConversions = pgTable("flipbook_conversions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id"),
+  flipbookTheme: varchar("flipbook_theme").notNull(),
+  email: varchar("email").notNull(),
+  source: varchar("source").notNull(), // post-modal, inline-button, floating-button
+  timestamp: timestamp("timestamp").defaultNow(),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  ipAddress: varchar("ip_address"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("flipbook_conversions_theme_idx").on(table.flipbookTheme),
+  index("flipbook_conversions_post_idx").on(table.postId),
+  index("flipbook_conversions_date_idx").on(table.timestamp),
+]);
+
+export const flipbookModalTriggers = pgTable("flipbook_modal_triggers", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  triggerType: varchar("trigger_type").notNull(), // time, scroll, manual
+  postId: varchar("post_id"),
+  themeId: varchar("theme_id").notNull(),
+  delaySeconds: integer("delay_seconds"),
+  scrollPercent: integer("scroll_percent"),
+  timestamp: timestamp("timestamp").defaultNow(),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("flipbook_triggers_theme_idx").on(table.themeId),
+  index("flipbook_triggers_post_idx").on(table.postId),
+  index("flipbook_triggers_date_idx").on(table.timestamp),
+]);
+
+// Analytics types
+export type FlipbookConversion = typeof flipbookConversions.$inferSelect;
+export type InsertFlipbookConversion = typeof flipbookConversions.$inferInsert;
+export type FlipbookModalTrigger = typeof flipbookModalTriggers.$inferSelect;
+export type InsertFlipbookModalTrigger = typeof flipbookModalTriggers.$inferInsert;

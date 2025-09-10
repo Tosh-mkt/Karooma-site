@@ -20,8 +20,15 @@ import {
   newsletterSubscriptions,
   favorites,
   pages,
-  authorizedFlipbookUsers
+  authorizedFlipbookUsers,
+  flipbookConversions,
+  flipbookModalTriggers,
+  type FlipbookConversion,
+  type InsertFlipbookConversion,
+  type FlipbookModalTrigger,
+  type InsertFlipbookModalTrigger
 } from "@shared/schema";
+import type { ConversionData, ModalTriggerData, ConversionMetrics, ThemePerformance, PostConversionReport } from "@shared/analytics";
 import { randomUUID } from "crypto";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -906,6 +913,104 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(authorizedFlipbookUsers)
       .orderBy(desc(authorizedFlipbookUsers.createdAt));
+  }
+
+  // Analytics methods
+  async trackConversion(data: ConversionData): Promise<FlipbookConversion> {
+    const [conversion] = await db
+      .insert(flipbookConversions)
+      .values({
+        postId: data.postId,
+        flipbookTheme: data.flipbookTheme,
+        email: data.email,
+        source: data.source,
+        timestamp: data.timestamp,
+        userAgent: data.userAgent,
+        referrer: data.referrer,
+        ipAddress: data.ipAddress
+      })
+      .returning();
+    return conversion;
+  }
+
+  async trackModalTrigger(data: ModalTriggerData): Promise<FlipbookModalTrigger> {
+    const [trigger] = await db
+      .insert(flipbookModalTriggers)
+      .values({
+        triggerType: data.triggerType,
+        postId: data.postId,
+        themeId: data.themeId,
+        delaySeconds: data.delaySeconds,
+        scrollPercent: data.scrollPercent,
+        timestamp: data.timestamp,
+        ipAddress: data.ipAddress,
+        userAgent: data.userAgent
+      })
+      .returning();
+    return trigger;
+  }
+
+  async getConversionMetrics(filters: {
+    startDate: Date;
+    endDate: Date;
+    flipbookTheme?: string;
+    postId?: string;
+  }): Promise<ConversionMetrics> {
+    // Implementação básica - pode ser expandida com queries mais complexas
+    const conversions = await db
+      .select()
+      .from(flipbookConversions)
+      .where(
+        and(
+          // Filtros de data, tema e post podem ser adicionados aqui
+        )
+      );
+
+    const totalConversions = conversions.length;
+    const conversionsByTheme: Record<string, number> = {};
+    const conversionsByPost: Record<string, number> = {};
+    const conversionsBySource: Record<string, number> = {};
+
+    conversions.forEach(conversion => {
+      // Contar por tema
+      conversionsByTheme[conversion.flipbookTheme] = 
+        (conversionsByTheme[conversion.flipbookTheme] || 0) + 1;
+      
+      // Contar por post
+      if (conversion.postId) {
+        conversionsByPost[conversion.postId] = 
+          (conversionsByPost[conversion.postId] || 0) + 1;
+      }
+      
+      // Contar por source
+      conversionsBySource[conversion.source] = 
+        (conversionsBySource[conversion.source] || 0) + 1;
+    });
+
+    return {
+      totalConversions,
+      conversionsByTheme,
+      conversionsByPost,
+      conversionsBySource,
+      dailyConversions: [] // Implementar query para dados diários
+    };
+  }
+
+  async getThemePerformance(filters: {
+    startDate: Date;
+    endDate: Date;
+  }): Promise<ThemePerformance[]> {
+    // Implementação básica - retorna array vazio por agora
+    return [];
+  }
+
+  async getPostConversionReport(filters: {
+    startDate: Date;
+    endDate: Date;
+    limit: number;
+  }): Promise<PostConversionReport[]> {
+    // Implementação básica - retorna array vazio por agora
+    return [];
   }
 }
 

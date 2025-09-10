@@ -134,8 +134,8 @@ export function useFlipbookCapture({
           setIsModalOpen(true);
           
           // Analytics
-          if (typeof gtag !== 'undefined') {
-            gtag('event', 'flipbook_modal_triggered', {
+          if (typeof (window as any).gtag !== 'undefined') {
+            (window as any).gtag('event', 'flipbook_modal_triggered', {
               trigger_type: 'time',
               post_id: postId,
               theme_id: flipbookConfig.themeId,
@@ -160,8 +160,8 @@ export function useFlipbookCapture({
         if (timeoutId) clearTimeout(timeoutId);
         
         // Analytics
-        if (typeof gtag !== 'undefined') {
-          gtag('event', 'flipbook_modal_triggered', {
+        if (typeof (window as any).gtag !== 'undefined') {
+          (window as any).gtag('event', 'flipbook_modal_triggered', {
             trigger_type: 'scroll',
             post_id: postId,
             theme_id: flipbookConfig.themeId,
@@ -181,8 +181,8 @@ export function useFlipbookCapture({
 
   const openModal = () => {
     setIsModalOpen(true);
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'flipbook_modal_opened', {
+    if (typeof (window as any).gtag !== 'undefined') {
+      (window as any).gtag('event', 'flipbook_modal_opened', {
         trigger_type: 'manual',
         post_id: postId,
         theme_id: flipbookConfig?.themeId
@@ -213,8 +213,8 @@ export function useConversionTracking() {
     timestamp?: Date;
   }) => {
     // Google Analytics
-    if (typeof gtag !== 'undefined') {
-      gtag('event', 'conversion', {
+    if (typeof (window as any).gtag !== 'undefined') {
+      (window as any).gtag('event', 'conversion', {
         event_category: 'flipbook',
         event_label: data.flipbookTheme,
         custom_parameters: {
@@ -226,8 +226,8 @@ export function useConversionTracking() {
     }
 
     // Facebook Pixel (se disponível)
-    if (typeof fbq !== 'undefined') {
-      fbq('track', 'Lead', {
+    if (typeof (window as any).fbq !== 'undefined') {
+      (window as any).fbq('track', 'Lead', {
         content_category: data.flipbookTheme,
         content_ids: [data.postId || 'unknown'],
         source: data.source

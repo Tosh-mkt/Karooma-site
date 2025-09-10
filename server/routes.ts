@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
+import { registerAnalyticsRoutes } from "./routes/analytics";
 import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
@@ -28,6 +29,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register flipbook access routes
   registerFlipbookAccessRoutes(app);
   registerFlipbookTemporaryAccessRoutes(app);
+  registerAnalyticsRoutes(app);
 
 
   // Object Storage routes
