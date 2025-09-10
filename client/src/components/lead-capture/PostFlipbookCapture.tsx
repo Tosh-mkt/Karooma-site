@@ -2,7 +2,7 @@ import React from 'react';
 import { useFlipbookCapture } from '@/hooks/useFlipbookCapture';
 import { FlipbookCaptureModal } from './FlipbookCaptureModal';
 import { Button } from '@/components/ui/button';
-import { BookOpen, Download } from 'lucide-react';
+import { BookOpen, Download, CheckCircle } from 'lucide-react';
 import { getFlipbookTheme } from '@shared/flipbook-themes';
 
 interface PostFlipbookCaptureProps {
@@ -32,7 +32,9 @@ export function PostFlipbookCapture({
     flipbookConfig,
     openModal,
     closeModal,
-    hasTriggered
+    hasTriggered,
+    isAuthenticated,
+    user
   } = useFlipbookCapture({
     postId,
     postCategory,
@@ -86,9 +88,24 @@ export function PostFlipbookCapture({
                 background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
               }}
             >
-              <Download className="w-4 h-4 mr-2" />
-              {inlineButtonText || 'Baixar Guia Gratuito'}
+              {isAuthenticated ? (
+                <>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Acessar Guia Agora
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  {inlineButtonText || 'Baixar Guia Gratuito'}
+                </>
+              )}
             </Button>
+            
+            {isAuthenticated && (
+              <p className="text-xs text-gray-500 mt-2 text-center">
+                ✅ Acesso direto como usuário cadastrado
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -115,7 +132,7 @@ export function FloatingFlipbookButton({
   postCategory,
   postTitle
 }: PostFlipbookCaptureProps) {
-  const { openModal, flipbookConfig } = useFlipbookCapture({
+  const { openModal, flipbookConfig, isAuthenticated } = useFlipbookCapture({
     postId,
     postCategory, 
     postTitle,
@@ -137,9 +154,19 @@ export function FloatingFlipbookButton({
           background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
         }}
       >
-        <BookOpen className="w-4 h-4 mr-2" />
-        <span className="hidden sm:inline">Guia Gratuito</span>
-        <span className="sm:hidden">Guia</span>
+        {isAuthenticated ? (
+          <>
+            <CheckCircle className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Acessar Guia</span>
+            <span className="sm:hidden">Guia</span>
+          </>
+        ) : (
+          <>
+            <BookOpen className="w-4 h-4 mr-2" />
+            <span className="hidden sm:inline">Guia Gratuito</span>
+            <span className="sm:hidden">Guia</span>
+          </>
+        )}
       </Button>
     </div>
   );

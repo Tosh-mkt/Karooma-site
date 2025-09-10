@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface FlipbookCaptureConfig {
   enabled: boolean;
@@ -31,6 +32,7 @@ export function useFlipbookCapture({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [flipbookConfig, setFlipbookConfig] = useState<FlipbookCaptureConfig | null>(null);
+  const { user, isAuthenticated } = useAuth();
 
   // Mapear categoria do post para tema do flipbook
   const mapCategoryToTheme = (category?: string): string => {
@@ -131,7 +133,14 @@ export function useFlipbookCapture({
       timeoutId = setTimeout(() => {
         if (!hasScrollTriggered && !hasTriggered) {
           setHasTriggered(true);
-          setIsModalOpen(true);
+          
+          // Se usuário está logado, fazer download direto
+          if (isAuthenticated && user?.email) {
+            handleAuthenticatedDownload();
+          } else {
+            // Se não está logado, mostrar modal
+            setIsModalOpen(true);
+          }
           
           // Analytics
           if (typeof (window as any).gtag !== 'undefined') {
@@ -139,7 +148,8 @@ export function useFlipbookCapture({
               trigger_type: 'time',
               post_id: postId,
               theme_id: flipbookConfig.themeId,
-              delay_seconds: flipbookConfig.triggerDelay
+              delay_seconds: flipbookConfig.triggerDelay,
+              user_authenticated: isAuthenticated
             });
           }
         }
@@ -155,9 +165,16 @@ export function useFlipbookCapture({
       if (scrollPercent >= (flipbookConfig.triggerScrollPercent || 70)) {
         hasScrollTriggered = true;
         setHasTriggered(true);
-        setIsModalOpen(true);
         
         if (timeoutId) clearTimeout(timeoutId);
+        
+        // Se usuário está logado, fazer download direto
+        if (isAuthenticated && user?.email) {
+          handleAuthenticatedDownload();
+        } else {
+          // Se não está logado, mostrar modal
+          setIsModalOpen(true);
+        }
         
         // Analytics
         if (typeof (window as any).gtag !== 'undefined') {
@@ -165,7 +182,8 @@ export function useFlipbookCapture({
             trigger_type: 'scroll',
             post_id: postId,
             theme_id: flipbookConfig.themeId,
-            scroll_percent: Math.round(scrollPercent)
+            scroll_percent: Math.round(scrollPercent),
+            user_authenticated: isAuthenticated
           });
         }
       }
@@ -177,9 +195,16 @@ export function useFlipbookCapture({
       if (timeoutId) clearTimeout(timeoutId);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [flipbookConfig?.enabled, flipbookConfig?.triggerDelay, flipbookConfig?.triggerScrollPercent, flipbookConfig?.themeId, hasTriggered, postId]);
+  }, [flipbookConfig?.enabled, flipbookConfig?.triggerDelay, flipbookConfig?.triggerScrollPercent, flipbookConfig?.themeId, hasTriggered, postId, isAuthenticated, user?.email]);
 
   const openModal = () => {
+    // Se o usuário está logado, fazer download direto
+    if (isAuthenticated && user?.email) {
+      handleAuthenticatedDownload();
+      return;
+    }
+    
+    // Se não está logado, mostrar modal de captura
     setIsModalOpen(true);
     if (typeof (window as any).gtag !== 'undefined') {
       (window as any).gtag('event', 'flipbook_modal_opened', {
@@ -187,6 +212,42 @@ export function useFlipbookCapture({
         post_id: postId,
         theme_id: flipbookConfig?.themeId
       });
+    }
+  };
+
+  const handleAuthenticatedDownload = async () => {
+    if (!isAuthenticated || !user?.email || !flipbookConfig) return;
+
+    try {
+      // Registrar acesso direto para usuário logado
+      await fetch('/api/flipbook-access/grant-temporary', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          flipbookId: flipbookConfig.themeId,
+          source: 'authenticated-user',
+          expiresInDays: 30
+        })
+      });
+
+      // Analytics para usuário logado
+      if (typeof (window as any).gtag !== 'undefined') {
+        (window as any).gtag('event', 'flipbook_download_authenticated', {
+          flipbook_theme: flipbookConfig.themeId,
+          post_id: postId,
+          user_type: 'authenticated'
+        });
+      }
+
+      // Redirecionar para o flipbook
+      const flipbookPath = `/flipbook/${flipbookConfig.themeId}`;
+      window.open(flipbookPath, '_blank');
+
+    } catch (error) {
+      console.error('Erro ao processar download para usuário logado:', error);
+      // Em caso de erro, mostrar modal mesmo assim
+      setIsModalOpen(true);
     }
   };
 
@@ -199,7 +260,9 @@ export function useFlipbookCapture({
     flipbookConfig,
     openModal,
     closeModal,
-    hasTriggered
+    hasTriggered,
+    isAuthenticated,
+    user
   };
 }
 
