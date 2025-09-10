@@ -12,12 +12,15 @@ import {
   type InsertFavorite,
   type Page,
   type InsertPage,
+  type AuthorizedFlipbookUser,
+  type InsertAuthorizedFlipbookUser,
   users,
   content,
   products,
   newsletterSubscriptions,
   favorites,
-  pages
+  pages,
+  authorizedFlipbookUsers
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { db } from "./db";
@@ -76,6 +79,13 @@ export interface IStorage {
   updatePage(id: string, pageData: Partial<InsertPage>): Promise<Page | undefined>;
   deletePage(id: string): Promise<void>;
   getPublishedPages(): Promise<Page[]>;
+  
+  // Flipbook Access Control methods
+  isEmailAuthorizedForFlipbook(email: string, flipbookId: string): Promise<boolean>;
+  addAuthorizedUser(data: InsertAuthorizedFlipbookUser): Promise<AuthorizedFlipbookUser>;
+  removeAuthorizedUser(email: string, flipbookId: string): Promise<void>;
+  getAuthorizedUsers(flipbookId: string): Promise<AuthorizedFlipbookUser[]>;
+  getAllAuthorizedUsers(): Promise<AuthorizedFlipbookUser[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -460,6 +470,27 @@ export class MemStorage implements IStorage {
         new Date(b.updatedAt || 0).getTime() - new Date(a.updatedAt || 0).getTime()
       );
   }
+
+  // Flipbook Access Control methods for MemStorage (simplified)
+  async isEmailAuthorizedForFlipbook(email: string, flipbookId: string): Promise<boolean> {
+    return false; // Simplified for memory storage
+  }
+
+  async addAuthorizedUser(data: InsertAuthorizedFlipbookUser): Promise<AuthorizedFlipbookUser> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+
+  async removeAuthorizedUser(email: string, flipbookId: string): Promise<void> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+
+  async getAuthorizedUsers(flipbookId: string): Promise<AuthorizedFlipbookUser[]> {
+    return [];
+  }
+
+  async getAllAuthorizedUsers(): Promise<AuthorizedFlipbookUser[]> {
+    return [];
+  }
 }
 
 export class DatabaseStorage implements IStorage {
@@ -807,6 +838,74 @@ export class DatabaseStorage implements IStorage {
       ...page,
       sections: typeof page.sections === 'string' ? JSON.parse(page.sections) : page.sections
     })) as Page[];
+  }
+
+  // Flipbook Access Control methods
+  async isEmailAuthorizedForFlipbook(email: string, flipbookId: string): Promise<boolean> {
+    const [result] = await db
+      .select()
+      .from(authorizedFlipbookUsers)
+      .where(
+        and(
+          eq(authorizedFlipbookUsers.email, email),
+          eq(authorizedFlipbookUsers.flipbookId, flipbookId),
+          eq(authorizedFlipbookUsers.isActive, true)
+        )
+      )
+      .limit(1);
+
+    if (!result) return false;
+
+    // Check if expired
+    if (result.expiresAt && new Date() > result.expiresAt) {
+      return false;
+    }
+
+    return true;
+  }
+
+  async addAuthorizedUser(data: InsertAuthorizedFlipbookUser): Promise<AuthorizedFlipbookUser> {
+    // Remove existing entry if exists
+    await db
+      .delete(authorizedFlipbookUsers)
+      .where(
+        and(
+          eq(authorizedFlipbookUsers.email, data.email),
+          eq(authorizedFlipbookUsers.flipbookId, data.flipbookId)
+        )
+      );
+
+    const [user] = await db
+      .insert(authorizedFlipbookUsers)
+      .values(data)
+      .returning();
+    return user;
+  }
+
+  async removeAuthorizedUser(email: string, flipbookId: string): Promise<void> {
+    await db
+      .delete(authorizedFlipbookUsers)
+      .where(
+        and(
+          eq(authorizedFlipbookUsers.email, email),
+          eq(authorizedFlipbookUsers.flipbookId, flipbookId)
+        )
+      );
+  }
+
+  async getAuthorizedUsers(flipbookId: string): Promise<AuthorizedFlipbookUser[]> {
+    return await db
+      .select()
+      .from(authorizedFlipbookUsers)
+      .where(eq(authorizedFlipbookUsers.flipbookId, flipbookId))
+      .orderBy(desc(authorizedFlipbookUsers.createdAt));
+  }
+
+  async getAllAuthorizedUsers(): Promise<AuthorizedFlipbookUser[]> {
+    return await db
+      .select()
+      .from(authorizedFlipbookUsers)
+      .orderBy(desc(authorizedFlipbookUsers.createdAt));
   }
 }
 
