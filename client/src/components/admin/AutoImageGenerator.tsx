@@ -55,8 +55,8 @@ export function AutoImageGenerator({
       await new Promise(resolve => setTimeout(resolve, 3000));
       
       // URLs de imagens de exemplo (em produção seriam geradas automaticamente)
-      const heroUrl = "/attached_assets/generated_images/Baby_sleep_chaos_origami_9f730555.png";
-      const footerUrl = "/attached_assets/generated_images/Baby_sleep_peace_origami_c25441c5.png";
+      const heroUrl = "/api/images/generated_images/Baby_sleep_chaos_origami_9f730555.png";
+      const footerUrl = "/api/images/generated_images/Baby_sleep_peace_origami_c25441c5.png";
 
       // 3. Notificar componente pai
       onImagesGenerated(heroUrl, footerUrl);
