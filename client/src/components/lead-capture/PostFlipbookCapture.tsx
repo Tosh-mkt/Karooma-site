@@ -180,7 +180,7 @@ export function InlineFlipbookButton({
   postCategory,
   postTitle
 }: PostFlipbookCaptureProps) {
-  const { openModal, flipbookConfig, isAuthenticated } = useFlipbookCapture({
+  const { openModal, flipbookConfig, isAuthenticated, isModalOpen, closeModal } = useFlipbookCapture({
     postId,
     postCategory, 
     postTitle,
