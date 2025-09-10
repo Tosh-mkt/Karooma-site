@@ -446,6 +446,66 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para download de templates de import
+  app.get("/api/admin/download-template/:format", async (req, res) => {
+    try {
+      const { format } = req.params;
+      
+      if (format === 'csv') {
+        const csvTemplate = `Título,Descrição,Categoria,Preço Atual,Preço Original,Link Afiliado,Imagem,Avaliação,Destaque,Introdução,Benefícios,Avaliação Equipe,Tags
+"Exemplo Produto 1","Descrição detalhada do produto","casa","29.90","39.90","https://exemplo.com/afiliado1","https://exemplo.com/imagem1.jpg","4.5","true","Uma introdução convincente sobre o produto...","Benefício 1, Benefício 2, Benefício 3","Análise profissional da equipe Karooma","#casa #organização #família"
+"Exemplo Produto 2","Outra descrição detalhada","educacao","19.90","","https://exemplo.com/afiliado2","https://exemplo.com/imagem2.jpg","4.0","false","Outra introdução interessante...","Mais benefícios aqui","Outra avaliação da equipe","#educação #crianças"`;
+        
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=template-produtos.csv');
+        res.send(csvTemplate);
+        
+      } else if (format === 'json') {
+        const jsonTemplate = [
+          {
+            "title": "Exemplo Produto 1",
+            "description": "Descrição detalhada do produto",
+            "category": "casa",
+            "currentPrice": "29.90",
+            "originalPrice": "39.90",
+            "affiliateLink": "https://exemplo.com/afiliado1",
+            "imageUrl": "https://exemplo.com/imagem1.jpg",
+            "rating": "4.5",
+            "featured": true,
+            "introduction": "Uma introdução convincente sobre o produto...",
+            "benefits": "Benefício 1, Benefício 2, Benefício 3",
+            "teamEvaluation": "Análise profissional da equipe Karooma",
+            "tags": "#casa #organização #família"
+          },
+          {
+            "title": "Exemplo Produto 2",
+            "description": "Outra descrição detalhada",
+            "category": "educacao",
+            "currentPrice": "19.90",
+            "affiliateLink": "https://exemplo.com/afiliado2",
+            "imageUrl": "https://exemplo.com/imagem2.jpg",
+            "rating": "4.0",
+            "featured": false,
+            "introduction": "Outra introdução interessante...",
+            "benefits": "Mais benefícios aqui",
+            "teamEvaluation": "Outra avaliação da equipe",
+            "tags": "#educação #crianças"
+          }
+        ];
+        
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', 'attachment; filename=template-produtos.json');
+        res.json(jsonTemplate);
+        
+      } else {
+        res.status(400).json({ error: "Formato não suportado. Use 'csv' ou 'json'." });
+      }
+    } catch (error) {
+      console.error("Error generating template:", error);
+      res.status(500).json({ error: "Failed to generate template" });
+    }
+  });
+
   // Endpoint para criar produto a partir da análise da Curadoria
   app.post("/api/admin/products-from-curadoria", async (req, res) => {
     try {
@@ -458,10 +518,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Inserir produto no banco
       const [product] = await db
         .insert(products)
-        .values({
-          ...productData,
-          views: 0
-        })
+        .values(productData)
         .returning();
 
       res.json({ success: true, product });

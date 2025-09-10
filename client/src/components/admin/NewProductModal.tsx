@@ -244,6 +244,30 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
                   <p>• JSON: Array de objetos com dados dos produtos</p>
                   <p>• CSV: Planilha com colunas: Título, Categoria, Link Afiliado...</p>
                 </div>
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open('/api/admin/download-template/csv', '_blank');
+                    }}
+                    className="text-xs"
+                  >
+                    ⬇️ Template CSV
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open('/api/admin/download-template/json', '_blank');
+                    }}
+                    className="text-xs"
+                  >
+                    ⬇️ Template JSON
+                  </Button>
+                </div>
                 <Button className="w-full bg-gradient-to-r from-purple-500 to-violet-500">
                   <Upload className="w-4 h-4 mr-2" />
                   Fazer Upload
