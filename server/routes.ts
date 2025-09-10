@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
@@ -22,6 +23,9 @@ import express from "express";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
   setupNextAuth(app);
+
+  // Register flipbook access routes
+  registerFlipbookAccessRoutes(app);
 
 
   // Object Storage routes
