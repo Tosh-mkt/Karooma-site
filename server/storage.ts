@@ -14,6 +14,8 @@ import {
   type InsertPage,
   type AuthorizedFlipbookUser,
   type InsertAuthorizedFlipbookUser,
+  type Flipbook,
+  type InsertFlipbook,
   users,
   content,
   products,
@@ -21,6 +23,7 @@ import {
   favorites,
   pages,
   authorizedFlipbookUsers,
+  flipbooks,
   flipbookConversions,
   flipbookModalTriggers,
   type FlipbookConversion,
@@ -93,6 +96,13 @@ export interface IStorage {
   removeAuthorizedUser(email: string, flipbookId: string): Promise<void>;
   getAuthorizedUsers(flipbookId: string): Promise<AuthorizedFlipbookUser[]>;
   getAllAuthorizedUsers(): Promise<AuthorizedFlipbookUser[]>;
+  
+  // Flipbook methods
+  getFlipbookByPost(postId: string): Promise<Flipbook | undefined>;
+  getFlipbook(id: string): Promise<Flipbook | undefined>;
+  createFlipbook(data: InsertFlipbook): Promise<Flipbook>;
+  updateFlipbookStatus(id: string, status: string, updates?: Partial<Flipbook>): Promise<Flipbook>;
+  upsertFlipbookByPost(postId: string, data: InsertFlipbook): Promise<Flipbook>;
 }
 
 export class MemStorage implements IStorage {
@@ -101,6 +111,7 @@ export class MemStorage implements IStorage {
   private products: Map<string, Product>;
   private newsletters: Map<string, NewsletterSubscription>;
   private pages: Map<string, Page>;
+  private flipbooks: Map<string, Flipbook>;
 
   constructor() {
     this.users = new Map();
@@ -108,6 +119,7 @@ export class MemStorage implements IStorage {
     this.products = new Map();
     this.newsletters = new Map();
     this.pages = new Map();
+    this.flipbooks = new Map();
     
     // Initialize with empty state - no mock data
     // Real data will be added through API calls or String.com integration
@@ -366,6 +378,10 @@ export class MemStorage implements IStorage {
     }
   }
 
+  async clearProducts(): Promise<void> {
+    this.products.clear();
+  }
+
   // Newsletter methods
   async createNewsletterSubscription(insertSubscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
     const id = randomUUID();
@@ -497,6 +513,62 @@ export class MemStorage implements IStorage {
 
   async getAllAuthorizedUsers(): Promise<AuthorizedFlipbookUser[]> {
     return [];
+  }
+
+  // Flipbook methods for MemStorage
+  async getFlipbookByPost(postId: string): Promise<Flipbook | undefined> {
+    for (const flipbook of Array.from(this.flipbooks.values())) {
+      if (flipbook.postId === postId) {
+        return flipbook;
+      }
+    }
+    return undefined;
+  }
+
+  async getFlipbook(id: string): Promise<Flipbook | undefined> {
+    return this.flipbooks.get(id);
+  }
+
+  async createFlipbook(data: InsertFlipbook): Promise<Flipbook> {
+    const id = randomUUID();
+    const flipbook: Flipbook = {
+      id,
+      postId: data.postId,
+      themeId: data.themeId,
+      title: data.title,
+      description: data.description || null,
+      status: data.status || "generating",
+      previewImages: data.previewImages || [],
+      pages: data.pages || [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.flipbooks.set(id, flipbook);
+    return flipbook;
+  }
+
+  async updateFlipbookStatus(id: string, status: string, updates?: Partial<Flipbook>): Promise<Flipbook> {
+    const flipbook = this.flipbooks.get(id);
+    if (!flipbook) {
+      throw new Error('Flipbook not found');
+    }
+    const updatedFlipbook = { 
+      ...flipbook, 
+      ...updates, 
+      status, 
+      updatedAt: new Date() 
+    };
+    this.flipbooks.set(id, updatedFlipbook);
+    return updatedFlipbook;
+  }
+
+  async upsertFlipbookByPost(postId: string, data: InsertFlipbook): Promise<Flipbook> {
+    const existing = await this.getFlipbookByPost(postId);
+    if (existing) {
+      return await this.updateFlipbookStatus(existing.id, data.status || existing.status, data);
+    } else {
+      return await this.createFlipbook({ ...data, postId });
+    }
   }
 }
 
@@ -1011,6 +1083,50 @@ export class DatabaseStorage implements IStorage {
   }): Promise<PostConversionReport[]> {
     // Implementação básica - retorna array vazio por agora
     return [];
+  }
+
+  // Flipbook methods for DatabaseStorage
+  async getFlipbookByPost(postId: string): Promise<Flipbook | undefined> {
+    const [flipbook] = await db.select().from(flipbooks).where(eq(flipbooks.postId, postId));
+    return flipbook || undefined;
+  }
+
+  async getFlipbook(id: string): Promise<Flipbook | undefined> {
+    const [flipbook] = await db.select().from(flipbooks).where(eq(flipbooks.id, id));
+    return flipbook || undefined;
+  }
+
+  async createFlipbook(data: InsertFlipbook): Promise<Flipbook> {
+    const [flipbook] = await db
+      .insert(flipbooks)
+      .values(data)
+      .returning();
+    return flipbook;
+  }
+
+  async updateFlipbookStatus(id: string, status: string, updates?: Partial<Flipbook>): Promise<Flipbook> {
+    const [flipbook] = await db
+      .update(flipbooks)
+      .set({ 
+        ...updates, 
+        status, 
+        updatedAt: new Date() 
+      })
+      .where(eq(flipbooks.id, id))
+      .returning();
+    if (!flipbook) {
+      throw new Error('Flipbook not found');
+    }
+    return flipbook;
+  }
+
+  async upsertFlipbookByPost(postId: string, data: InsertFlipbook): Promise<Flipbook> {
+    const existing = await this.getFlipbookByPost(postId);
+    if (existing) {
+      return await this.updateFlipbookStatus(existing.id, data.status || existing.status, data);
+    } else {
+      return await this.createFlipbook({ ...data, postId });
+    }
   }
 }
 

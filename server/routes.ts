@@ -24,6 +24,9 @@ import { getBlogTemplate, generateContentSuggestions, type BlogCategory } from "
 import { blogValidator } from "./blog-validator";
 import path from "path";
 import express from "express";
+import { flipbookGenerator } from "./services/flipbookGenerator";
+import { insertFlipbookSchema } from "@shared/schema";
+import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
@@ -1325,6 +1328,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Erro interno no teste de email',
         error: error instanceof Error ? error.message : 'Erro desconhecido'
       });
+    }
+  });
+
+  // Schema de validação para geração de flipbook
+  const generateFlipbookSchema = z.object({
+    postId: z.string().min(1, "postId is required"),
+    force: z.boolean().optional().default(false)
+  });
+
+  // Flipbook Generation Routes
+  // Generate flipbook from post
+  app.post("/api/flipbooks/generate", async (req, res) => {
+    try {
+      const validatedData = generateFlipbookSchema.parse(req.body);
+      const { postId, force } = validatedData;
+
+      // Check if API is ready
+      if (!flipbookGenerator.isReady()) {
+        return res.status(503).json({ 
+          error: "Flipbook generator not ready",
+          message: "Anthropic API key not configured"
+        });
+      }
+
+      const flipbook = await flipbookGenerator.generateFlipbookFromPost(postId, { force });
+      
+      res.status(202).json({
+        flipbookId: flipbook.id,
+        status: flipbook.status,
+        title: flipbook.title,
+        description: flipbook.description,
+        message: flipbook.status === 'generating' 
+          ? 'Flipbook generation started' 
+          : 'Flipbook already exists'
+      });
+    } catch (error) {
+      console.error("Error generating flipbook:", error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      res.status(500).json({ error: "Failed to generate flipbook", message: errorMessage });
+    }
+  });
+
+  // Get flipbook by post ID
+  app.get("/api/flipbooks/by-post/:postId", async (req, res) => {
+    try {
+      const { postId } = req.params;
+      
+      const flipbook = await storage.getFlipbookByPost(postId);
+      
+      if (!flipbook) {
+        return res.status(404).json({ error: "Flipbook not found for this post" });
+      }
+      
+      res.json(flipbook);
+    } catch (error) {
+      console.error("Error fetching flipbook by post:", error);
+      res.status(500).json({ error: "Failed to fetch flipbook" });
+    }
+  });
+
+  // Get flipbook by ID
+  app.get("/api/flipbooks/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const flipbook = await storage.getFlipbook(id);
+      
+      if (!flipbook) {
+        return res.status(404).json({ error: "Flipbook not found" });
+      }
+      
+      res.json(flipbook);
+    } catch (error) {
+      console.error("Error fetching flipbook:", error);
+      res.status(500).json({ error: "Failed to fetch flipbook" });
+    }
+  });
+
+  // Get flipbook status
+  app.get("/api/flipbooks/:id/status", async (req, res) => {
+    try {
+      const { id } = req.params;
+      
+      const flipbook = await storage.getFlipbook(id);
+      
+      if (!flipbook) {
+        return res.status(404).json({ error: "Flipbook not found" });
+      }
+      
+      res.json({
+        id: flipbook.id,
+        status: flipbook.status,
+        title: flipbook.title,
+        description: flipbook.description,
+        createdAt: flipbook.createdAt,
+        updatedAt: flipbook.updatedAt
+      });
+    } catch (error) {
+      console.error("Error fetching flipbook status:", error);
+      res.status(500).json({ error: "Failed to fetch flipbook status" });
     }
   });
 

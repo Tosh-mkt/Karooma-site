@@ -16,6 +16,17 @@ interface FlipbookCaptureConfig {
   previewPages?: string[];
 }
 
+interface GeneratedFlipbook {
+  id: string;
+  postId: string;
+  themeId: string;
+  title: string;
+  description: string | null;
+  status: 'generating' | 'ready' | 'failed';
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface UseFlipbookCaptureProps {
   postId?: string;
   postCategory?: string;
@@ -32,7 +43,35 @@ export function useFlipbookCapture({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [flipbookConfig, setFlipbookConfig] = useState<FlipbookCaptureConfig | null>(null);
+  const [generatedFlipbook, setGeneratedFlipbook] = useState<GeneratedFlipbook | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showGenerateButton, setShowGenerateButton] = useState(false);
   const { user, isAuthenticated } = useAuth();
+
+  // Verificar se existe flipbook gerado para este post
+  useEffect(() => {
+    const checkGeneratedFlipbook = async () => {
+      if (!postId) return;
+      
+      try {
+        const response = await fetch(`/api/flipbooks/by-post/${postId}`);
+        if (response.ok) {
+          const flipbook = await response.json();
+          setGeneratedFlipbook(flipbook);
+          setShowGenerateButton(false);
+        } else if (response.status === 404) {
+          // Não existe flipbook para este post
+          setGeneratedFlipbook(null);
+          setShowGenerateButton(true);
+        }
+      } catch (error) {
+        console.warn('Erro ao verificar flipbook gerado:', error);
+        setShowGenerateButton(true);
+      }
+    };
+
+    checkGeneratedFlipbook();
+  }, [postId]);
 
   // Mapear categoria do post para tema do flipbook
   const mapCategoryToTheme = (category?: string): string => {
@@ -124,14 +163,31 @@ export function useFlipbookCapture({
   };
 
   useEffect(() => {
-    // Determinar se deve mostrar captura baseado na categoria
-    if (!postCategory && !config?.enabled) return;
-    
-    const themeId = mapCategoryToTheme(postCategory);
-    const fullConfig = getDefaultConfig(themeId);
-    
-    setFlipbookConfig(fullConfig);
-  }, [postCategory, config?.enabled, config?.triggerDelay, config?.triggerScrollPercent]);
+    // Determinar configuração baseada no flipbook gerado ou categoria
+    if (generatedFlipbook) {
+      // Se há flipbook gerado, usar suas configurações
+      const customConfig: FlipbookCaptureConfig = {
+        enabled: true,
+        themeId: generatedFlipbook.themeId,
+        title: generatedFlipbook.title,
+        description: generatedFlipbook.description || undefined,
+        triggerDelay: config?.triggerDelay || 45,
+        triggerScrollPercent: config?.triggerScrollPercent || 70,
+        socialProof: {
+          downloads: 1,
+          testimonial: `Guia personalizado para "${postTitle || 'este post'}"`,
+          testimonialAuthor: 'Equipe Karooma'
+        },
+        ...config
+      };
+      setFlipbookConfig(customConfig);
+    } else if (postCategory || config?.enabled) {
+      // Fallback para configuração por categoria
+      const themeId = mapCategoryToTheme(postCategory);
+      const fullConfig = getDefaultConfig(themeId);
+      setFlipbookConfig(fullConfig);
+    }
+  }, [generatedFlipbook, postCategory, postTitle, config?.enabled, config?.triggerDelay, config?.triggerScrollPercent]);
 
   useEffect(() => {
     if (!flipbookConfig?.enabled || hasTriggered) return;
@@ -276,6 +332,147 @@ export function useFlipbookCapture({
     setIsModalOpen(false);
   };
 
+  // Função para gerar flipbook
+  const generateFlipbook = async () => {
+    if (!postId || isGenerating) return;
+
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/flipbooks/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Se o flipbook já está pronto, definir imediatamente
+        if (result.status === 'ready') {
+          const flipbookResponse = await fetch(`/api/flipbooks/${result.flipbookId}`);
+          if (flipbookResponse.ok) {
+            const flipbook = await flipbookResponse.json();
+            setGeneratedFlipbook(flipbook);
+            setShowGenerateButton(false);
+          }
+          setIsGenerating(false);
+        } else if (result.status === 'generating') {
+          // Iniciar polling - o polling gerencia o estado isGenerating
+          pollFlipbookStatus(result.flipbookId);
+          // NÃO definir isGenerating=false aqui - deixar o polling controlar
+        }
+      } else {
+        const error = await response.json();
+        console.error('Erro ao gerar flipbook:', error);
+        
+        if (response.status === 503) {
+          alert('O gerador de flipbooks não está disponível no momento. Entre em contato com o suporte.');
+        } else {
+          alert('Erro ao gerar o guia personalizado. Tente novamente.');
+        }
+        setIsGenerating(false);
+      }
+    } catch (error) {
+      console.error('Erro na geração do flipbook:', error);
+      alert('Erro na conexão. Tente novamente.');
+      setIsGenerating(false);
+    }
+  };
+
+  // Polling para verificar status de geração
+  const pollFlipbookStatus = async (flipbookId: string) => {
+    const maxAttempts = 36; // 6 minutos máximo (36 x 10 segundos)
+    let attempts = 0;
+    let consecutiveErrors = 0;
+
+    const poll = async () => {
+      if (attempts >= maxAttempts) {
+        console.warn('Timeout na geração do flipbook após 6 minutos');
+        setIsGenerating(false);
+        alert('A geração está demorando mais que o esperado. Recarregue a página em alguns minutos para verificar o status.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/flipbooks/${flipbookId}/status`);
+        
+        if (response.ok) {
+          consecutiveErrors = 0; // Reset error counter on success
+          const status = await response.json();
+          
+          if (status.status === 'ready') {
+            // Buscar flipbook completo
+            const flipbookResponse = await fetch(`/api/flipbooks/${flipbookId}`);
+            if (flipbookResponse.ok) {
+              const flipbook = await flipbookResponse.json();
+              setGeneratedFlipbook(flipbook);
+              setShowGenerateButton(false);
+              setIsGenerating(false);
+              
+              // Analytics
+              if (typeof (window as any).gtag !== 'undefined') {
+                (window as any).gtag('event', 'flipbook_generated_success', {
+                  flipbook_id: flipbookId,
+                  post_id: postId,
+                  generation_time_seconds: attempts * 10
+                });
+              }
+              return;
+            }
+          } else if (status.status === 'failed') {
+            console.error('Falha na geração do flipbook');
+            setIsGenerating(false);
+            setShowGenerateButton(true); // Permitir tentar novamente
+            alert('Falha na geração do guia. Você pode tentar novamente.');
+            
+            // Analytics
+            if (typeof (window as any).gtag !== 'undefined') {
+              (window as any).gtag('event', 'flipbook_generation_failed', {
+                flipbook_id: flipbookId,
+                post_id: postId,
+                attempts: attempts
+              });
+            }
+            return;
+          }
+          // Status ainda é 'generating', continuar polling
+        } else {
+          consecutiveErrors++;
+          console.warn(`Erro HTTP ${response.status} ao verificar status do flipbook`);
+          
+          // Se muitos erros consecutivos, parar
+          if (consecutiveErrors >= 5) {
+            console.error('Muitos erros consecutivos no polling');
+            setIsGenerating(false);
+            alert('Erro ao verificar o progresso da geração. Tente recarregar a página em alguns minutos.');
+            return;
+          }
+        }
+      } catch (error) {
+        consecutiveErrors++;
+        console.warn('Erro no polling do status:', error);
+        
+        // Se muitos erros consecutivos, parar
+        if (consecutiveErrors >= 5) {
+          console.error('Muitos erros consecutivos no polling');
+          setIsGenerating(false);
+          alert('Problemas de conexão ao verificar o progresso. Tente recarregar a página em alguns minutos.');
+          return;
+        }
+      }
+
+      attempts++;
+      // Backoff exponencial limitado: começar com 3s, depois 5s, depois 10s
+      const delay = Math.min(3000 + attempts * 1000, 10000);
+      setTimeout(poll, delay);
+    };
+
+    // Primeira verificação em 3 segundos
+    setTimeout(poll, 3000);
+  };
+
   return {
     isModalOpen,
     flipbookConfig,
@@ -283,7 +480,12 @@ export function useFlipbookCapture({
     closeModal,
     hasTriggered,
     isAuthenticated,
-    user
+    user,
+    // Novos campos para flipbooks gerados
+    generatedFlipbook,
+    showGenerateButton,
+    generateFlipbook,
+    isGenerating
   };
 }
 

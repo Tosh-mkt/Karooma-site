@@ -3,7 +3,7 @@ import { useFlipbookCapture } from '@/hooks/useFlipbookCapture';
 import { FlipbookCaptureModal } from './FlipbookCaptureModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Download, CheckCircle } from 'lucide-react';
+import { BookOpen, Download, CheckCircle, Wand2, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getFlipbookTheme } from '@shared/flipbook-themes';
 
@@ -122,18 +122,29 @@ export function InlineFlipbookButton({
   postCategory,
   postTitle
 }: PostFlipbookCaptureProps) {
-  const { openModal, flipbookConfig, isAuthenticated, isModalOpen, closeModal } = useFlipbookCapture({
+  const { 
+    openModal, 
+    flipbookConfig, 
+    isAuthenticated, 
+    isModalOpen, 
+    closeModal,
+    generatedFlipbook,
+    showGenerateButton,
+    generateFlipbook,
+    isGenerating
+  } = useFlipbookCapture({
     postId,
     postCategory, 
     postTitle,
     config: { enabled: true, triggerDelay: undefined } // Não trigger automático
   });
 
-  if (!flipbookConfig?.enabled) {
+  // Determinar se deve mostrar alguma coisa
+  if (!flipbookConfig?.enabled && !showGenerateButton) {
     return null;
   }
 
-  const theme = getFlipbookTheme(flipbookConfig.themeId);
+  const theme = getFlipbookTheme(flipbookConfig?.themeId || 'organizacao');
 
   return (
     <motion.div
@@ -160,14 +171,24 @@ export function InlineFlipbookButton({
             </div>
             
             <h3 className="font-poppins font-bold text-xl text-gray-800 mb-2">
-              {flipbookConfig.title}
+              {generatedFlipbook ? generatedFlipbook.title : (flipbookConfig?.title || 'Guia Prático Personalizado')}
             </h3>
             
             <p className="text-gray-600 mb-4 max-w-md">
-              {flipbookConfig.description}
+              {showGenerateButton 
+                ? `Gere um guia prático exclusivo baseado neste post sobre "${postTitle || 'este tópico'}". Conteúdo personalizado em minutos!`
+                : (generatedFlipbook?.description || flipbookConfig?.description || 'Acesse seu guia personalizado')
+              }
             </p>
             
-            {flipbookConfig.socialProof && (
+            {isGenerating && (
+              <p className="text-sm text-blue-600 mb-4 flex items-center justify-center">
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Gerando seu guia personalizado...
+              </p>
+            )}
+            
+            {!isGenerating && flipbookConfig?.socialProof && !showGenerateButton && (
               <p className="text-sm text-gray-500 mb-4">
                 📥 Já baixado por <strong>{flipbookConfig.socialProof.downloads}+ mães</strong>
               </p>
@@ -175,21 +196,35 @@ export function InlineFlipbookButton({
             
             <Button
               onClick={() => {
-                console.log('Botão inline flipbook clicado!', { 
-                  flipbookConfig, 
-                  isAuthenticated, 
-                  openModal: typeof openModal 
-                });
-                openModal();
+                if (showGenerateButton && !isGenerating) {
+                  console.log('Gerando flipbook para postId:', postId);
+                  generateFlipbook();
+                } else if (generatedFlipbook || flipbookConfig) {
+                  console.log('Abrindo modal para flipbook:', { generatedFlipbook, flipbookConfig });
+                  openModal();
+                }
               }}
               size="lg"
-              className="text-white font-semibold px-8 py-3 hover:scale-105 transition-all duration-300"
+              disabled={isGenerating}
+              className={`text-white font-semibold px-8 py-3 transition-all duration-300 ${
+                isGenerating ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105'
+              }`}
               style={{
                 background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
               }}
               data-testid="button-inline-flipbook"
             >
-              {isAuthenticated ? (
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Gerando...
+                </>
+              ) : showGenerateButton ? (
+                <>
+                  <Wand2 className="w-5 h-5 mr-2" />
+                  Gerar Guia Prático
+                </>
+              ) : isAuthenticated ? (
                 <>
                   <CheckCircle className="w-5 h-5 mr-2" />
                   Acessar Guia Agora
@@ -203,7 +238,10 @@ export function InlineFlipbookButton({
             </Button>
             
             <p className="text-xs text-gray-500 mt-3">
-              ✨ Acesso imediato após cadastro
+              {showGenerateButton 
+                ? '🤖 Gerado por IA em minutos' 
+                : '✨ Acesso imediato após cadastro'
+              }
             </p>
           </div>
         </CardContent>

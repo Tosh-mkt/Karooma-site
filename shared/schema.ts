@@ -313,8 +313,35 @@ export const flipbookModalTriggers = pgTable("flipbook_modal_triggers", {
   index("flipbook_triggers_date_idx").on(table.timestamp),
 ]);
 
+// Tabela para flipbooks gerados automaticamente por post
+export const flipbooks = pgTable("flipbooks", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  postId: varchar("post_id").notNull().unique().references(() => content.id, { onDelete: "cascade" }),
+  themeId: varchar("theme_id").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  status: varchar("status", { length: 20 }).notNull().default("generating"), // generating, ready, failed
+  previewImages: text("preview_images").array().default([]),
+  pages: json("pages").notNull().default([]), // Array de objetos página
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("flipbooks_post_idx").on(table.postId),
+  index("flipbooks_status_idx").on(table.status),
+]);
+
+export const insertFlipbookSchema = createInsertSchema(flipbooks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Analytics types
 export type FlipbookConversion = typeof flipbookConversions.$inferSelect;
 export type InsertFlipbookConversion = typeof flipbookConversions.$inferInsert;
 export type FlipbookModalTrigger = typeof flipbookModalTriggers.$inferSelect;
 export type InsertFlipbookModalTrigger = typeof flipbookModalTriggers.$inferInsert;
+
+// Flipbook types
+export type Flipbook = typeof flipbooks.$inferSelect;
+export type InsertFlipbook = z.infer<typeof insertFlipbookSchema>;
