@@ -87,6 +87,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const lines = csvData.trim().split('\n');
       const headers = lines[0].split(',').map((h: string) => h.trim().replace(/"/g, ''));
       
+      // Função auxiliar para extrair categoria dos dados
+      const extractCategory = (productData: any) => {
+        // Primeiro tenta encontrar categoria explícita
+        let category = productData['Categoria'] || productData['Category'] || productData['category'];
+        
+        if (category) return category;
+        
+        // Se não tem categoria, tenta inferir das tags ou do nome do produto
+        const tags = productData['Tags de Categorias e Benefícios'] || productData['Tags'] || '';
+        const productName = productData['Nome do Produto'] || productData['Título'] || '';
+        
+        // Inferência baseada no nome ou tags
+        if (tags.toLowerCase().includes('música') || productName.toLowerCase().includes('bateria') || 
+            productName.toLowerCase().includes('kalimba')) {
+          return 'educacao';
+        } else if (tags.toLowerCase().includes('água') || productName.toLowerCase().includes('purificador') ||
+                   productName.toLowerCase().includes('garrafa')) {
+          return 'casa';
+        }
+        
+        return 'geral'; // categoria padrão
+      };
+
       const products = [];
       
       for (let i = 1; i < lines.length; i++) {
@@ -101,31 +124,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Mapear campos do CSV para o schema do produto
         const product = {
-          title: productData['Título'] || productData['Title'] || productData['title'],
+          title: productData['Nome do Produto'] || productData['Título'] || productData['Title'] || productData['title'],
           description: productData['Descrição'] || productData['Description'] || productData['description'],
-          category: productData['Categoria'] || productData['Category'] || productData['category'],
+          category: extractCategory(productData),
           imageUrl: productData['Imagem'] || productData['Image'] || productData['imageUrl'],
           currentPrice: productData['Preço Atual'] || productData['Current Price'] || productData['currentPrice'],
           originalPrice: productData['Preço Original'] || productData['Original Price'] || productData['originalPrice'],
           affiliateLink: productData['Link Afiliado'] || productData['Affiliate Link'] || productData['affiliateLink'],
+          productLink: productData['Link do Produto'] || productData['Product Link'] || productData['productLink'],
           rating: productData['Avaliação'] || productData['Rating'] || productData['rating'],
           discount: productData['Desconto'] || productData['Discount'] || productData['discount'],
           featured: (productData['Destaque'] || productData['Featured'] || productData['featured'])?.toLowerCase() === 'true',
-          expertReview: productData['Avaliação Especialista'] || productData['Expert Review'] || productData['expertReview'],
-          teamEvaluation: productData['Avaliação Equipe'] || productData['Team Evaluation'] || productData['teamEvaluation'],
+          expertReview: productData['Avaliação por especialistas'] || productData['Avaliação Especialista'] || productData['Expert Review'] || productData['expertReview'],
+          teamEvaluation: productData['Avaliação da Curadoria Karooma'] || productData['Avaliação Equipe'] || productData['Team Evaluation'] || productData['teamEvaluation'],
           benefits: productData['Benefícios'] || productData['Benefits'] || productData['benefits'],
-          tags: productData['Tags'] || productData['tags'],
+          tags: productData['Tags de Filtros de Pesquisa'] || productData['Tags'] || productData['tags'],
           introduction: productData['Introdução'] || productData['Introduction'] || productData['introduction'],
+          evaluators: productData['Especialistas Selecionados'] || productData['evaluators'],
           nutritionistEvaluation: productData['Avaliação Nutricionista'] || productData['Nutritionist Evaluation'],
           organizerEvaluation: productData['Avaliação Organizadora'] || productData['Organizer Evaluation'],
           designEvaluation: productData['Avaliação Design'] || productData['Design Evaluation'],
-          karoomaTeamEvaluation: productData['Avaliação Karooma'] || productData['Karooma Team Evaluation'],
-          categoryTags: productData['Tags Categoria'] || productData['Category Tags'],
-          searchTags: productData['Tags Busca'] || productData['Search Tags']
+          karoomaTeamEvaluation: productData['Avaliação da Curadoria Karooma'] || productData['Avaliação Karooma'] || productData['Karooma Team Evaluation'],
+          categoryTags: productData['Tags de Categorias e Benefícios'] || productData['Tags Categoria'] || productData['Category Tags'],
+          searchTags: productData['Tags de Filtros de Pesquisa'] || productData['Tags Busca'] || productData['Search Tags']
         };
 
-        // Validar dados essenciais
-        if (product.title && product.category && product.affiliateLink) {
+        // Validar dados essenciais (título e link afiliado são obrigatórios)
+        if (product.title && product.affiliateLink) {
           products.push(product);
         }
       }
