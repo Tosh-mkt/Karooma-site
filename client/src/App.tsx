@@ -18,6 +18,7 @@ import TestFiltersVertical from "./pages/test-filters-vertical";
 import TestFiltersSidebar from "./pages/test-filters-sidebar";
 import EbookTest from "./pages/ebook-test";
 import FlipbookOrganizacao from "./pages/flipbook-organizacao";
+import FlipbookAlimentacao from "./pages/flipbook-alimentacao";
 import FlipbookUsersAdmin from "./pages/admin/flipbook-users";
 import FlipbookThemesAdmin from "./pages/admin/flipbook-themes";
 import DemoFlipbookCapture from "./pages/demo-flipbook-capture";
@@ -57,6 +58,9 @@ function Router() {
       {/* Flipbooks - Layout Fullscreen (sem header/footer) */}
       <Route path="/flipbook-organizacao">
         <FlipbookOrganizacao />
+      </Route>
+      <Route path="/flipbook-alimentacao">
+        <FlipbookAlimentacao />
       </Route>
       <Route path="/flipbook-test">
         <FlipbookTest />
