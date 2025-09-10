@@ -78,24 +78,16 @@ export function FlipbookCaptureModal({
   const subscribeMutation = useMutation({
     mutationFn: async (data: FlipbookSubscriptionData) => {
       // Primeiro, inscrever na newsletter com tag do flipbook
-      const subscriptionResponse = await apiRequest("/api/newsletter/subscribe-advanced", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+      const subscriptionResponse = await apiRequest("POST", "/api/newsletter/subscribe-advanced", data);
 
       // Depois, registrar acesso ao flipbook se necessário
       if (flipbookTheme) {
         try {
-          await apiRequest("/api/flipbook-access/grant-temporary", {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: data.email,
-              flipbookId: flipbookTheme,
-              source: 'lead-magnet',
-              expiresInDays: 30 // Acesso temporário por 30 dias
-            })
+          await apiRequest("POST", "/api/flipbook-access/grant-temporary", {
+            email: data.email,
+            flipbookId: flipbookTheme,
+            source: 'lead-magnet',
+            expiresInDays: 30 // Acesso temporário por 30 dias
           });
         } catch (error) {
           console.log('Flipbook access grant failed (not critical):', error);
