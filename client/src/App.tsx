@@ -19,6 +19,7 @@ import TestFiltersSidebar from "./pages/test-filters-sidebar";
 import EbookTest from "./pages/ebook-test";
 import FlipbookOrganizacao from "./pages/flipbook-organizacao";
 import FlipbookAlimentacao from "./pages/flipbook-alimentacao";
+import GeneratedFlipbookPage from "./pages/generated-flipbook";
 import FlipbookUsersAdmin from "./pages/admin/flipbook-users";
 import FlipbookThemesAdmin from "./pages/admin/flipbook-themes";
 import DemoFlipbookCapture from "./pages/demo-flipbook-capture";
@@ -62,6 +63,9 @@ function Router() {
       </Route>
       <Route path="/flipbook-alimentacao">
         <FlipbookAlimentacao />
+      </Route>
+      <Route path="/generated-flipbook/:flipbookId">
+        <GeneratedFlipbookPage />
       </Route>
       <Route path="/flipbook-test">
         <FlipbookTest />
