@@ -19,6 +19,7 @@ import TestFiltersSidebar from "./pages/test-filters-sidebar";
 import EbookTest from "./pages/ebook-test";
 import FlipbookOrganizacao from "./pages/flipbook-organizacao";
 import FlipbookUsersAdmin from "./pages/admin/flipbook-users";
+import FlipbookThemesAdmin from "./pages/admin/flipbook-themes";
 import FlipbookTest from "./pages/flipbook-test";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
@@ -81,6 +82,7 @@ function Router() {
               <Route path="/admin/dashboard" component={AdminDashboard} />
               <Route path="/admin/import-products" component={AdminProductImport} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
+              <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />
               <Route path="/login" component={Login} />
               <Route path="/register" component={Register} />
               <Route path="/admin/login" component={AdminLogin} />

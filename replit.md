@@ -35,6 +35,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Affiliate Product System**: Dynamic product cards with pricing, ratings, discounts. Organized categorization, external link tracking for affiliate commissions, and featured product promotion.
 - **Newsletter System**: Email capture and toast notifications for user feedback.
 - **Image Upload System**: Google Cloud Storage integration with direct upload functionality. Features file validation (5MB max, images only), automatic markdown insertion into blog content, and public ACL configuration for web serving. **REFINED**: Blog posts now support exactly two independent image fields - Hero image (displays at post beginning) and Footer image (displays at post end), each with separate upload/URL options for enhanced visual storytelling.
+- **Flipbook Access Control System**: Email-based authorization system for flipbook access restriction. Includes database table `authorized_flipbook_users`, middleware authentication system (`flipbookAuth.ts`), API routes (`/api/flipbook-access/*`), frontend protection with `FlipbookAccessGuard` component, and admin interface for managing authorized users at `/admin/flipbook-users`.
 
 # Blog Content Standards
 
@@ -153,9 +154,13 @@ All blog posts are automatically validated for:
 - **Mobile-First**: Horizontal layout optimized for phone screens
 - **Touch Gestures**: Swipe left/right navigation with visual feedback
 - **Consistent Layout**: Same structure across all e-books, only colors vary
-- **Color Schemes**: Variable color system for different topics
-  - Organization: Purple-Pink gradient (#8b5cf6 to #ec4899)
-  - Safety: Red-Orange gradient (to be defined)
-  - Wellbeing: Green-Blue gradient (to be defined)
+- **Centralized Color System**: Theme-based color configuration in `shared/flipbook-themes.ts`
+  - **Produtividade Doméstica**: Purple/Lilac (#8B6BB7) - productivity and home organization
+  - **Finanças Familiares**: Pink/Coral (#D99298) - family financial management
+  - **Bem Estar Familiar**: Green (#8FBC8F) - family wellness and self-care
+  - **Tecnologia e Educação**: Blue (#5B9BD5) - technology integration and education
+  - **Segurança**: Yellow/Gold (#C4B454) - safety protocols and prevention
+  - **Organização**: Purple-Pink gradient (#8b5cf6 to #ec4899) - default theme
 - **Page Structure**: Cover → Welcome → ToC → Chapters → Checklists → Testimonials → Final
 - **Interactive Elements**: Page indicators, progress counter, navigation controls
+- **Theme Management**: Admin interface at `/admin/flipbook-themes` for color preview and management

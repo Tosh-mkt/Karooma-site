@@ -9,16 +9,11 @@ import {
   TestimonialPage, 
   FinalPage 
 } from './FlipbookPages';
+import { getFlipbookTheme } from '@shared/flipbook-themes';
 
-// Color scheme for Organization theme
-const organizationColorScheme = {
-  primary: '#8b5cf6', // purple-500
-  secondary: '#ec4899', // pink-500
-  gradient: 'from-purple-600 to-pink-600',
-  background: '#ffffff',
-  text: '#1f2937', // gray-800
-  accent: '#f3f4f6', // gray-100
-};
+// Usar o tema de organização da configuração central
+const organizationTheme = getFlipbookTheme('organizacao');
+const organizationColorScheme = organizationTheme.colors;
 
 export function OrganizationFlipbook() {
   const pages = [

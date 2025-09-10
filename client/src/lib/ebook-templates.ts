@@ -46,16 +46,12 @@ export interface EbookMetadata {
   sourcePost?: string;
 }
 
-// Padrão Visual Karooma
+import { getFlipbookTheme } from '@shared/flipbook-themes';
+
+// Padrão Visual Karooma - usando tema centralizado
+const defaultTheme = getFlipbookTheme('organizacao');
 export const EBOOK_STYLES = {
-  colors: {
-    primary: '#8b5cf6', // purple-500
-    secondary: '#ec4899', // pink-500
-    gradient: 'from-purple-600 to-pink-600',
-    background: '#ffffff',
-    text: '#1f2937', // gray-800
-    accent: '#f3f4f6', // gray-100
-  },
+  colors: defaultTheme.colors,
   fonts: {
     heading: 'Fredoka One',
     body: 'Poppins',
