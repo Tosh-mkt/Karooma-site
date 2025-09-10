@@ -83,9 +83,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "CSV data is required" });
       }
 
-      // Parse CSV data
-      const lines = csvData.trim().split('\n');
-      const headers = lines[0].split(',').map((h: string) => h.trim().replace(/"/g, ''));
+      // Parser CSV robusto que lida com campos entre aspas e vírgulas internas
+      const parseCSV = (csvData: string) => {
+        const rows: string[][] = [];
+        const lines = csvData.split(/\r?\n/);
+        
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          
+          const row: string[] = [];
+          let currentField = '';
+          let insideQuotes = false;
+          let i = 0;
+          
+          while (i < line.length) {
+            const char = line[i];
+            
+            if (char === '"') {
+              if (insideQuotes && line[i + 1] === '"') {
+                // Aspas duplas escapadas
+                currentField += '"';
+                i += 2;
+              } else {
+                // Toggle estado de aspas
+                insideQuotes = !insideQuotes;
+                i++;
+              }
+            } else if (char === ',' && !insideQuotes) {
+              // Vírgula fora de aspas = separador de campo
+              row.push(currentField.trim());
+              currentField = '';
+              i++;
+            } else {
+              // Caractere normal
+              currentField += char;
+              i++;
+            }
+          }
+          
+          // Adicionar último campo
+          row.push(currentField.trim());
+          rows.push(row);
+        }
+        
+        return rows;
+      };
+
+      const csvRows = parseCSV(csvData);
+      if (csvRows.length === 0) {
+        return res.status(400).json({ error: "CSV vazio ou inválido" });
+      }
+
+      const headers = csvRows[0].map((h: string) => h.replace(/^"|"$/g, '').trim());
       
       // Função auxiliar para extrair categoria dos dados
       const extractCategory = (productData: any) => {
@@ -112,10 +161,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const products = [];
       
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map((v: string) => v.trim().replace(/"/g, ''));
+      for (let i = 1; i < csvRows.length; i++) {
+        const values = csvRows[i].map((v: string) => v.replace(/^"|"$/g, '').trim());
         
-        if (values.length !== headers.length) continue;
+        if (values.length === 0 || values.every(v => !v)) continue; // Pular linhas vazias
         
         const productData: any = {};
         headers.forEach((header: string, index: number) => {
