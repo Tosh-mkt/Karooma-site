@@ -2,7 +2,9 @@ import React from 'react';
 import { useFlipbookCapture } from '@/hooks/useFlipbookCapture';
 import { FlipbookCaptureModal } from './FlipbookCaptureModal';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { BookOpen, Download, CheckCircle } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { getFlipbookTheme } from '@shared/flipbook-themes';
 
 interface PostFlipbookCaptureProps {
@@ -169,6 +171,95 @@ export function FloatingFlipbookButton({
         )}
       </Button>
     </div>
+  );
+}
+
+// Componente para botão inline no final do post
+export function InlineFlipbookButton({
+  postId,
+  postCategory,
+  postTitle
+}: PostFlipbookCaptureProps) {
+  const { openModal, flipbookConfig, isAuthenticated } = useFlipbookCapture({
+    postId,
+    postCategory, 
+    postTitle,
+    config: { enabled: true, triggerDelay: undefined } // Não trigger automático
+  });
+
+  if (!flipbookConfig?.enabled) {
+    return null;
+  }
+
+  const theme = getFlipbookTheme(flipbookConfig.themeId);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.5 }}
+      className="mb-12"
+    >
+      <Card 
+        className="glassmorphism border-0 overflow-hidden"
+        style={{
+          background: `linear-gradient(135deg, ${theme.colors.primary}15, ${theme.colors.secondary}15)`
+        }}
+      >
+        <CardContent className="p-6 text-center">
+          <div className="flex flex-col items-center">
+            <div 
+              className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+              style={{
+                background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
+              }}
+            >
+              <BookOpen className="w-6 h-6 text-white" />
+            </div>
+            
+            <h3 className="font-poppins font-bold text-xl text-gray-800 mb-2">
+              {flipbookConfig.title}
+            </h3>
+            
+            <p className="text-gray-600 mb-4 max-w-md">
+              {flipbookConfig.description}
+            </p>
+            
+            {flipbookConfig.socialProof && (
+              <p className="text-sm text-gray-500 mb-4">
+                📥 Já baixado por <strong>{flipbookConfig.socialProof.downloads}+ mães</strong>
+              </p>
+            )}
+            
+            <Button
+              onClick={openModal}
+              size="lg"
+              className="text-white font-semibold px-8 py-3 hover:scale-105 transition-all duration-300"
+              style={{
+                background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
+              }}
+              data-testid="button-inline-flipbook"
+            >
+              {isAuthenticated ? (
+                <>
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  Acessar Guia Agora
+                </>
+              ) : (
+                <>
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  Baixar Guia Gratuito
+                </>
+              )}
+            </Button>
+            
+            <p className="text-xs text-gray-500 mt-3">
+              ✨ Acesso imediato após cadastro
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 

@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import type { Content } from "@shared/schema";
-import { PostFlipbookCapture } from "@/components/lead-capture/PostFlipbookCapture";
+import { PostFlipbookCapture, InlineFlipbookButton } from "@/components/lead-capture/PostFlipbookCapture";
 
 export default function BlogPost() {
   const [match, params] = useRoute("/blog/:id");
@@ -223,6 +223,13 @@ export default function BlogPost() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Botão de Flipbook - Segunda oportunidade de acesso */}
+        <InlineFlipbookButton
+          postId={post.id}
+          postCategory={post.category || undefined}
+          postTitle={post.title}
+        />
 
         {/* Call to Action */}
         <motion.div
