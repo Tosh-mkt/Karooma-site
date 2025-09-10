@@ -1,6 +1,9 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { products } from "@shared/schema";
+import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
@@ -457,10 +460,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .insert(products)
         .values({
           ...productData,
-          id: crypto.randomUUID(),
-          views: 0,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          views: 0
         })
         .returning();
 
