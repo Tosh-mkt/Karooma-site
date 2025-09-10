@@ -106,54 +106,67 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
     setUploadProgress(0);
 
     try {
-      const formData = new FormData();
+      // Simular progresso
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90));
+      }, 100);
+
+      let requestBody = {};
+      let endpoint = '/api/admin/import-products';
       
-      if (file.type === 'application/json') {
+      if (file.type === 'application/json' || file.name.endsWith('.json')) {
         const text = await file.text();
         const jsonData = JSON.parse(text);
         
-        // Simular progresso
-        const progressInterval = setInterval(() => {
-          setUploadProgress(prev => Math.min(prev + 10, 90));
-        }, 100);
-
-        const response = await fetch('/api/products/import', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: text,
-        });
-
-        clearInterval(progressInterval);
-        setUploadProgress(100);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'Falha ao importar produto');
+        // Se for array de produtos, converter para CSV
+        if (Array.isArray(jsonData)) {
+          const csvData = convertJsonToCsv(jsonData);
+          requestBody = { csvData, overwrite: false };
+        } else {
+          throw new Error('JSON deve conter um array de produtos');
         }
-
-        const result = await response.json();
-        setUploadResult(result);
         
-        toast({
-          title: "Produto importado com sucesso!",
-          description: "O card foi criado automaticamente",
-        });
-
-        queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      } else if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        const csvData = await file.text();
+        requestBody = { csvData, overwrite: false };
         
-        setTimeout(() => {
-          onOpenChange(false);
-          setMode("choice");
-          setUploadResult(null);
-          setUploadProgress(0);
-        }, 2000);
-
-      } else if (file.type === 'text/csv') {
-        // TODO: Implementar parser CSV
-        throw new Error('Upload CSV será implementado em breve');
+      } else {
+        throw new Error('Formato de arquivo não suportado. Use JSON ou CSV.');
       }
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Falha ao importar produtos');
+      }
+
+      const result = await response.json();
+      setUploadResult(result);
+      
+      toast({
+        title: "Produtos importados com sucesso!",
+        description: `${result.imported} produtos foram criados automaticamente`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      
+      setTimeout(() => {
+        onOpenChange(false);
+        setMode("choice");
+        setUploadResult(null);
+        setUploadProgress(0);
+      }, 2000);
+
     } catch (error: any) {
       toast({
         title: "Erro no upload",
@@ -163,6 +176,36 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  // Função para converter JSON array para CSV
+  const convertJsonToCsv = (jsonArray: any[]) => {
+    if (!jsonArray || jsonArray.length === 0) {
+      throw new Error('Array JSON vazio');
+    }
+
+    const headers = ['Título', 'Descrição', 'Categoria', 'Preço Atual', 'Link Afiliado', 'Imagem', 'Avaliação', 'Destaque', 'Introdução', 'Benefícios', 'Avaliação Equipe', 'Tags'];
+    const csvRows = [headers.join(',')];
+
+    jsonArray.forEach(item => {
+      const row = [
+        item.title || item.titulo || '',
+        item.description || item.descricao || '',
+        item.category || item.categoria || '',
+        item.currentPrice || item.precoAtual || item.preco || '',
+        item.affiliateLink || item.linkAfiliado || '',
+        item.imageUrl || item.imagem || '',
+        item.rating || item.avaliacao || '',
+        item.featured || item.destaque || 'false',
+        item.introduction || item.introducao || '',
+        item.benefits || item.beneficios || '',
+        item.teamEvaluation || item.avaliacaoEquipe || '',
+        item.tags || ''
+      ];
+      csvRows.push(row.map(field => `"${field}"`).join(','));
+    });
+
+    return csvRows.join('\n');
   };
 
   const onSubmit = (data: ProductFormData) => {
@@ -195,8 +238,12 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
                 <CloudUpload className="w-12 h-12 mx-auto text-purple-500" />
                 <h3 className="text-lg font-semibold">Upload de Arquivo</h3>
                 <p className="text-sm text-muted-foreground">
-                  Envie um arquivo JSON (template) ou CSV com os dados do produto
+                  Envie um arquivo JSON ou CSV com dados de múltiplos produtos
                 </p>
+                <div className="text-xs text-purple-600 space-y-1">
+                  <p>• JSON: Array de objetos com dados dos produtos</p>
+                  <p>• CSV: Planilha com colunas: Título, Categoria, Link Afiliado...</p>
+                </div>
                 <Button className="w-full bg-gradient-to-r from-purple-500 to-violet-500">
                   <Upload className="w-4 h-4 mr-2" />
                   Fazer Upload
