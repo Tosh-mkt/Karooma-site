@@ -146,20 +146,14 @@ export function EditProductModal({ product, open, onOpenChange }: EditProductMod
   };
 
   const categories = [
-    "Eletrodomésticos",
-    "Cozinha",
+    "Comer e Preparar",
+    "Presentear", 
+    "Sono e Relaxamento",
+    "Aprender e Brincar",
+    "Sair e Viajar",
     "Organização",
-    "Limpeza", 
-    "Casa e Jardim",
-    "Tecnologia",
-    "Beleza",
-    "Moda",
-    "Livros",
-    "Bebês e Crianças",
-    "Pets",
-    "Saúde",
-    "Esporte",
-    "Outros"
+    "Saúde e Segurança",
+    "Decorar e Brilhar"
   ];
 
   if (!product) return null;
