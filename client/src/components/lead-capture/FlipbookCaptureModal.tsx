@@ -80,8 +80,8 @@ export function FlipbookCaptureModal({
       // Primeiro, inscrever na newsletter com tag do flipbook
       const subscriptionResponse = await apiRequest("/api/newsletter/subscribe-advanced", {
         method: 'POST',
-        body: JSON.stringify(data),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
 
       // Depois, registrar acesso ao flipbook se necessário
@@ -89,13 +89,13 @@ export function FlipbookCaptureModal({
         try {
           await apiRequest("/api/flipbook-access/grant-temporary", {
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               email: data.email,
               flipbookId: flipbookTheme,
               source: 'lead-magnet',
               expiresInDays: 30 // Acesso temporário por 30 dias
-            }),
-            headers: { 'Content-Type': 'application/json' }
+            })
           });
         } catch (error) {
           console.log('Flipbook access grant failed (not critical):', error);
