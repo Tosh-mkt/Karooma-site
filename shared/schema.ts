@@ -175,6 +175,21 @@ export const favorites = pgTable("favorites", {
   index("idx_favorites_product_id").on(table.productId),
 ]);
 
+// Tabela para controlar acesso aos flipbooks
+export const authorizedFlipbookUsers = pgTable("authorized_flipbook_users", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  email: varchar("email").notNull(),
+  flipbookId: varchar("flipbook_id").notNull(), // 'organizacao', 'bem-estar', etc.
+  addedByAdmin: varchar("added_by_admin").notNull(), // ID do admin que adicionou
+  notes: text("notes"), // Notas sobre o usuário
+  isActive: boolean("is_active").default(true),
+  expiresAt: timestamp("expires_at"), // Opcional: data de expiração
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_authorized_email_flipbook").on(table.email, table.flipbookId),
+]);
+
 export const upsertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
@@ -258,3 +273,7 @@ export type InsertNewsletterAdvanced = z.infer<typeof insertNewsletterAdvancedSc
 // Favorites types
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = typeof favorites.$inferInsert;
+
+// Authorized Flipbook Users types
+export type AuthorizedFlipbookUser = typeof authorizedFlipbookUsers.$inferSelect;
+export type InsertAuthorizedFlipbookUser = typeof authorizedFlipbookUsers.$inferInsert;
