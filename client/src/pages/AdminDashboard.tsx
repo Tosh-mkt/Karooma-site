@@ -18,7 +18,7 @@ import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
   Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
-  Terminal, FileText, Upload
+  Terminal, FileText, Upload, Brain
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -491,10 +491,14 @@ export function AdminDashboard() {
             
             {/* Secondary row for mobile */}
             <div className="mt-2">
-              <TabsList className="grid w-full grid-cols-5 glassmorphism h-10">
+              <TabsList className="grid w-full grid-cols-6 glassmorphism h-10">
                 <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Database className="w-3 h-3" />
                   <span className="hidden sm:inline">Produtos</span>
+                </TabsTrigger>
+                <TabsTrigger value="curadoria" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <Brain className="w-3 h-3" />
+                  <span className="hidden sm:inline">Curadoria</span>
                 </TabsTrigger>
                 <TabsTrigger value="import" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Upload className="w-3 h-3" />
@@ -518,7 +522,7 @@ export function AdminDashboard() {
           
           {/* Desktop: Original layout */}
           <div className="hidden md:block">
-            <TabsList className="grid w-full grid-cols-8 glassmorphism">
+            <TabsList className="grid w-full grid-cols-9 glassmorphism">
               <TabsTrigger value="dashboard" className="flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -530,6 +534,10 @@ export function AdminDashboard() {
               <TabsTrigger value="products" className="flex items-center space-x-2">
                 <Database className="w-4 h-4" />
                 <span>Produtos</span>
+              </TabsTrigger>
+              <TabsTrigger value="curadoria" className="flex items-center space-x-2">
+                <Brain className="w-4 h-4" />
+                <span>Curadoria</span>
               </TabsTrigger>
               <TabsTrigger value="import" className="flex items-center space-x-2">
                 <Upload className="w-4 h-4" />
@@ -594,6 +602,40 @@ export function AdminDashboard() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="curadoria">
+            <div className="space-y-6">
+              <Card className="glassmorphism border-0">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-purple-600" />
+                    Curadoria KAROOMA
+                  </CardTitle>
+                  <CardDescription>
+                    Assistente especializado para análise automatizada de produtos com metodologia multidisciplinar
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <Brain className="w-16 h-16 mx-auto mb-4 text-purple-400" />
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                      Análise Automatizada de Produtos
+                    </h3>
+                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                      Use nossa equipe de especialistas virtuais para analisar produtos e criar cards automaticamente no sistema
+                    </p>
+                    <Button
+                      onClick={() => window.open('/admin/curadoria-karooma', '_blank')}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    >
+                      <Brain className="w-4 h-4 mr-2" />
+                      Abrir Curadoria KAROOMA
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="settings">
