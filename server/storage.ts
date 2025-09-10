@@ -114,14 +114,14 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const user: User = {
       id,
+      name: userData.name || null,
       email: userData.email || null,
+      emailVerified: null,
+      image: userData.image || null,
       firstName: userData.firstName || null,
       lastName: userData.lastName || null,
-      profileImageUrl: userData.profileImageUrl || null,
-      provider: null,
-      providerId: null,
-      passwordHash: null,
-      isAdmin: false,
+      passwordHash: userData.passwordHash || null,
+      isAdmin: userData.isAdmin || false,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -143,12 +143,12 @@ export class MemStorage implements IStorage {
     const id = userData.id || randomUUID();
     const user: User = { 
       id,
+      name: userData.name || null,
       email: userData.email || null,
+      emailVerified: userData.emailVerified || null,
+      image: userData.image || null,
       firstName: userData.firstName || null,
       lastName: userData.lastName || null,
-      profileImageUrl: userData.profileImageUrl || null,
-      provider: userData.provider || null,
-      providerId: userData.providerId || null,
       passwordHash: userData.passwordHash || null,
       isAdmin: userData.isAdmin || false,
       createdAt: new Date(),
