@@ -424,6 +424,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para análise da Curadoria KAROOMA
+  app.post("/api/admin/curadoria-analysis", async (req, res) => {
+    try {
+      const { productLink, affiliateLink } = req.body;
+      
+      if (!productLink || !affiliateLink) {
+        return res.status(400).json({ error: "Product link and affiliate link are required" });
+      }
+
+      const { analyzeCuradoriaKarooma } = await import("./curadoriaKarooma");
+      const analysis = await analyzeCuradoriaKarooma(productLink, affiliateLink);
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error("Error analyzing product with Curadoria KAROOMA:", error);
+      res.status(500).json({ error: "Failed to analyze product" });
+    }
+  });
+
+  // Endpoint para criar produto a partir da análise da Curadoria
+  app.post("/api/admin/products-from-curadoria", async (req, res) => {
+    try {
+      const analysis = req.body;
+      
+      const { convertAnalysisToProduct, extractProductInfo } = await import("./curadoriaKarooma");
+      const productInfo = await extractProductInfo(analysis.productLink);
+      const productData = convertAnalysisToProduct(analysis, productInfo);
+      
+      // Inserir produto no banco
+      const [product] = await db
+        .insert(products)
+        .values({
+          ...productData,
+          id: crypto.randomUUID(),
+          views: 0,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+        .returning();
+
+      res.json({ success: true, product });
+    } catch (error) {
+      console.error("Error creating product from Curadoria analysis:", error);
+      res.status(500).json({ error: "Failed to create product" });
+    }
+  });
+
   app.post("/api/content", async (req, res) => {
     try {
       const validatedData = insertContentSchema.parse(req.body);
