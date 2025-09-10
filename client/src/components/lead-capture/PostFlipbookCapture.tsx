@@ -232,7 +232,14 @@ export function InlineFlipbookButton({
             )}
             
             <Button
-              onClick={openModal}
+              onClick={() => {
+                console.log('Botão inline flipbook clicado!', { 
+                  flipbookConfig, 
+                  isAuthenticated, 
+                  openModal: typeof openModal 
+                });
+                openModal();
+              }}
               size="lg"
               className="text-white font-semibold px-8 py-3 hover:scale-105 transition-all duration-300"
               style={{
@@ -259,6 +266,19 @@ export function InlineFlipbookButton({
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de captura para botão inline */}
+      <FlipbookCaptureModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        flipbookTheme={flipbookConfig.themeId}
+        postTitle={postTitle}
+        postId={postId}
+        flipbookTitle={flipbookConfig.title}
+        flipbookDescription={flipbookConfig.description}
+        socialProof={flipbookConfig.socialProof}
+        previewPages={flipbookConfig.previewPages}
+      />
     </motion.div>
   );
 }
