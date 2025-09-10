@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import type { Content } from "@shared/schema";
+import { PostFlipbookCapture } from "@/components/lead-capture/PostFlipbookCapture";
 
 export default function BlogPost() {
   const [match, params] = useRoute("/blog/:id");
@@ -294,6 +295,17 @@ export default function BlogPost() {
           </motion.div>
         )}
       </article>
+
+      {/* Captura de Lead para Flipbook - Modal automático baseado na categoria do post */}
+      <PostFlipbookCapture
+        postId={post.id}
+        postCategory={post.category || undefined}
+        postTitle={post.title}
+        config={{
+          triggerDelay: 30, // Modal aparece após 30 segundos
+          triggerScrollPercent: 60 // Ou quando o usuário faz scroll 60% da página
+        }}
+      />
     </div>
   );
 }

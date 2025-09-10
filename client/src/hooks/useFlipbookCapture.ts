@@ -40,6 +40,8 @@ export function useFlipbookCapture({
       'organizacao': 'organizacao',
       'bem-estar': 'bem-estar', 
       'saude': 'bem-estar',
+      'alimentacao': 'alimentacao', // Alimentação tem flipbook próprio
+      'alimentação': 'alimentacao', // Suporte para acentos
       'financas': 'financas',
       'educacao': 'tecnologia',
       'tecnologia': 'tecnologia',
@@ -69,6 +71,15 @@ export function useFlipbookCapture({
           downloads: 623,
           testimonial: 'Finalmente consegui tempo para mim sem culpa.',
           testimonialAuthor: 'Ana, mãe de 2'
+        }
+      },
+      'alimentacao': {
+        title: 'Guia: Refeições Rápidas e Nutritivas',
+        description: 'Receitas práticas para mães ocupadas prepararem refeições saudáveis em menos de 20 minutos',
+        socialProof: {
+          downloads: 847,
+          testimonial: 'As receitas salvaram meus jantares! Agora consigo fazer refeições gostosas em 15 minutos.',
+          testimonialAuthor: 'Ana Paula, mãe de 2'
         }
       },
       'financas': {
@@ -240,8 +251,18 @@ export function useFlipbookCapture({
         });
       }
 
-      // Redirecionar para o flipbook
-      const flipbookPath = `/flipbook/${flipbookConfig.themeId}`;
+      // Redirecionar para o flipbook - mapeamento de tema para URL
+      const flipbookUrlMap: Record<string, string> = {
+        'organizacao': '/flipbook-organizacao',
+        'bem-estar': '/flipbook-bem-estar', 
+        'alimentacao': '/flipbook-alimentacao',
+        'financas': '/flipbook-financas',
+        'tecnologia': '/flipbook-tecnologia',
+        'seguranca': '/flipbook-seguranca',
+        'produtividade': '/flipbook-produtividade'
+      };
+      
+      const flipbookPath = flipbookUrlMap[flipbookConfig.themeId] || '/flipbook-organizacao';
       window.open(flipbookPath, '_blank');
 
     } catch (error) {
