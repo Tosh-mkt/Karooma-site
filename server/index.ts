@@ -5,8 +5,8 @@ import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 import path from "path";
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 // Anti-cache headers SUPER AGRESSIVO para forçar atualização do browser
 app.use((req, res, next) => {
