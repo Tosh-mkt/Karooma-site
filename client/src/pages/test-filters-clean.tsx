@@ -180,25 +180,82 @@ export default function TestFiltersClean() {
     { id: "selfcare", label: "Cuidado dos Pais", icon: "💆‍♀️", color: "bg-pink-100 hover:bg-pink-200 text-pink-700" },
   ];
 
-  // Mapeamento de tags dos produtos para filtros hierárquicos
-  const tagToFilterMapping: Record<string, string[]> = {
-    // Música e instrumentos -> Aprender e Brincar
-    "#música": ["aprender-brincar"],
-    "música": ["aprender-brincar"],
-    "#ManutençãoDoméstica": ["organizacao"],
-    "#SegurançaEmCasa": ["saude-seguranca"],
-    "#EmergênciaFamiliar": ["saude-seguranca"],
-    "#OrganizaçãoDoméstica": ["organizacao"],
-    "#LazerEmFamília": ["aprender-brincar"],
-    "#Casa": ["organizacao"],
-    "#Organizar": ["organizacao"],
-    "#Quarto": ["organizacao", "sono-relaxamento"],
-    "#RoupaECalçados": ["organizacao"],
-    "#Brinquedo": ["aprender-brincar"],
-    "#Reparar": ["organizacao"],
-    "#Lazer": ["aprender-brincar"],
-    "música e instrumentos": ["aprender-brincar"]
+  // Helper para normalização de texto
+  const normalize = (s: string): string => 
+    s.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '').trim();
+
+  // Helper para extrair tags de um produto preservando frases multi-palavra
+  const parseProductTags = (product: Product): string[] => {
+    const tagsSet = new Set<string>();
+    
+    const addTags = (field?: string | null) => {
+      if (!field) return;
+      const str = field.trim();
+      if (!str) return;
+      
+      // Se contém hashtags, extrair tokens com hashtag
+      if (str.includes('#')) {
+        const hashtagMatches = str.matchAll(/#([^\s#]+)/g);
+        for (const match of hashtagMatches) {
+          const token = normalize(match[1]);
+          tagsSet.add(token);
+        }
+      } 
+      // Se contém delimitadores, dividir por eles
+      else if (/[|,;\/]/.test(str)) {
+        str.split(/[|,;\/]+/).forEach(tag => {
+          const normalized = normalize(tag);
+          if (normalized) tagsSet.add(normalized);
+        });
+      } 
+      // Caso contrário, tratar como uma frase única
+      else {
+        const normalized = normalize(str);
+        if (normalized) tagsSet.add(normalized);
+      }
+    };
+
+    addTags(product.tags);
+    addTags(product.searchTags);
+    addTags(product.categoryTags);
+    addTags(product.category);
+
+    return Array.from(tagsSet);
   };
+
+  // Mapeamento normalizado de tags para filtros hierárquicos
+  const tagToFilterMappingRaw: Record<string, string[]> = {
+    // Música e instrumentos -> Aprender e Brincar
+    "musica": ["aprender-brincar"],
+    "musica e instrumentos": ["aprender-brincar"],
+    "aprender": ["aprender-brincar"],
+    "brinquedo": ["aprender-brincar"],
+    "lazer": ["aprender-brincar"],
+    // Organização
+    "manutencaodomestica": ["organizacao"],
+    "organizacaodomestica": ["organizacao"],
+    "casa": ["organizacao"],
+    "organizar": ["organizacao"],
+    "quarto": ["organizacao", "sono-relaxamento"],
+    "roupaecalcados": ["organizacao"],
+    "reparar": ["organizacao"],
+    // Saúde e Segurança
+    "segurancaemcasa": ["saude-seguranca"],
+    "emergenciafamiliar": ["saude-seguranca"],
+    // Sono e Relaxamento
+    "sono": ["sono-relaxamento"],
+    "relaxamento": ["sono-relaxamento"],
+    // Bem-estar parental
+    "bemestparental": ["sair-viajar"],
+    "tempoemfamilia": ["aprender-brincar"],
+    "desenvolvimentoinfantil": ["aprender-brincar"],
+    "autocuidado": ["decorar-brilhar"],
+    "hobbies": ["aprender-brincar"],
+  };
+
+  const tagToFilterMapping = Object.fromEntries(
+    Object.entries(tagToFilterMappingRaw).map(([key, value]) => [normalize(key), value])
+  );
 
   const sourceProducts = showFavorites ? favorites : products;
   
@@ -224,25 +281,14 @@ export default function TestFiltersClean() {
         return true;
       }
       
-      // Verificar filtro primário (ex: "comer-preparar", "aprender-brincar")
+      // Verificar filtro primário usando o novo parser de tags
       if (selectedPrimaryTag) {
-        const allTags = [
-          ...(product.tags?.split(' ') || []),
-          ...(product.searchTags?.split(' ') || []),
-          ...(product.categoryTags?.split(' ') || []),
-          product.category || ''
-        ].filter(Boolean);
+        const productTags = parseProductTags(product);
         
-        let matchesPrimaryTag = false;
-        
-        // Verificar se alguma tag do produto mapeia para o filtro primário selecionado
-        for (const tag of allTags) {
+        const matchesPrimaryTag = productTags.some(tag => {
           const mappedFilters = tagToFilterMapping[tag] || [];
-          if (mappedFilters.includes(selectedPrimaryTag)) {
-            matchesPrimaryTag = true;
-            break;
-          }
-        }
+          return mappedFilters.includes(selectedPrimaryTag);
+        });
         
         if (!matchesPrimaryTag) return false;
       }
