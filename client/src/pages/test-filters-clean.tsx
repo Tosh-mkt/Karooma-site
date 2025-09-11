@@ -180,6 +180,26 @@ export default function TestFiltersClean() {
     { id: "selfcare", label: "Cuidado dos Pais", icon: "💆‍♀️", color: "bg-pink-100 hover:bg-pink-200 text-pink-700" },
   ];
 
+  // Mapeamento de tags dos produtos para filtros hierárquicos
+  const tagToFilterMapping: Record<string, string[]> = {
+    // Música e instrumentos -> Aprender e Brincar
+    "#música": ["aprender-brincar"],
+    "música": ["aprender-brincar"],
+    "#ManutençãoDoméstica": ["organizacao"],
+    "#SegurançaEmCasa": ["saude-seguranca"],
+    "#EmergênciaFamiliar": ["saude-seguranca"],
+    "#OrganizaçãoDoméstica": ["organizacao"],
+    "#LazerEmFamília": ["aprender-brincar"],
+    "#Casa": ["organizacao"],
+    "#Organizar": ["organizacao"],
+    "#Quarto": ["organizacao", "sono-relaxamento"],
+    "#RoupaECalçados": ["organizacao"],
+    "#Brinquedo": ["aprender-brincar"],
+    "#Reparar": ["organizacao"],
+    "#Lazer": ["aprender-brincar"],
+    "música e instrumentos": ["aprender-brincar"]
+  };
+
   const sourceProducts = showFavorites ? favorites : products;
   
   const filteredProducts = sourceProducts?.filter(product => {
@@ -196,7 +216,43 @@ export default function TestFiltersClean() {
     const productRating = product.rating ? parseFloat(product.rating.toString()) : 0;
     const matchesRating = selectedRating === 0 || productRating >= selectedRating;
     
-    return matchesCategory && matchesSearch && matchesPrice && matchesRating;
+    // Hierarchical filter logic
+    const matchesHierarchicalFilters = () => {
+      // Se nenhum filtro hierárquico está selecionado, passa por todos
+      if (!selectedPrimaryTag && selectedTargetAudience.length === 0 && 
+          selectedEnvironments.length === 0 && selectedOccasions.length === 0) {
+        return true;
+      }
+      
+      // Verificar filtro primário (ex: "comer-preparar", "aprender-brincar")
+      if (selectedPrimaryTag) {
+        const allTags = [
+          ...(product.tags?.split(' ') || []),
+          ...(product.searchTags?.split(' ') || []),
+          ...(product.categoryTags?.split(' ') || []),
+          product.category || ''
+        ].filter(Boolean);
+        
+        let matchesPrimaryTag = false;
+        
+        // Verificar se alguma tag do produto mapeia para o filtro primário selecionado
+        for (const tag of allTags) {
+          const mappedFilters = tagToFilterMapping[tag] || [];
+          if (mappedFilters.includes(selectedPrimaryTag)) {
+            matchesPrimaryTag = true;
+            break;
+          }
+        }
+        
+        if (!matchesPrimaryTag) return false;
+      }
+      
+      // TODO: Implementar lógica para selectedTargetAudience, selectedEnvironments, selectedOccasions
+      // Por enquanto, se o filtro primário passou, aceita o produto
+      return true;
+    };
+    
+    return matchesCategory && matchesSearch && matchesPrice && matchesRating && matchesHierarchicalFilters();
   }) || [];
 
   const currentLoading = showFavorites ? favoritesLoading : isLoading;
