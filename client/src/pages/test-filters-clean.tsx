@@ -223,50 +223,71 @@ export default function TestFiltersClean() {
     return Array.from(tagsSet);
   };
 
-  // Mapeamento normalizado de tags para filtros hierárquicos
+  // Mapeamento normalizado baseado nas tags REAIS do sistema
   const tagToFilterMappingRaw: Record<string, string[]> = {
-    // Música e instrumentos -> Aprender e Brincar
+    
+    // ===== COMER E PREPARAR =====
+    "comererepapar": ["comer-preparar"],
+    "comerepreparar": ["comer-preparar"], 
+    "cozinha": ["comer-preparar"],
+    "cozinhaeficiente": ["comer-preparar"],
+    "mealprep": ["comer-preparar"],
+    "nutricao": ["comer-preparar"],
+    "nutricaofamiliar": ["comer-preparar"],
+    "cozinhasaudavel": ["comer-preparar"],
+    "cozinharcomamor": ["comer-preparar"],
+    "cozinhaorganizada": ["comer-preparar"],
+    "cozinhamoderna": ["comer-preparar"],
+    "saudefamiliar": ["comer-preparar"],
+    "tecnologiaparacasa": ["comer-preparar"],
+    "bemestarsaude": ["comer-preparar"],
+    
+    // ===== APRENDER E BRINCAR =====
     "musica": ["aprender-brincar"],
     "musica e instrumentos": ["aprender-brincar"],
     "aprender": ["aprender-brincar"],
     "brinquedo": ["aprender-brincar"],
     "lazer": ["aprender-brincar"],
+    "lazeremdamilia": ["aprender-brincar"],
+    "hobbies": ["aprender-brincar"],
+    "infancia": ["aprender-brincar"],
+    "tempoemfamilia": ["aprender-brincar"],
+    "desenvolvimentoinfantil": ["aprender-brincar"],
     
-    // Comer e Preparar -> Específico
-    "comererepapar": ["comer-preparar"],
-    "comerepreparar": ["comer-preparar"],
-    "cozinha": ["comer-preparar"],
-    "mealprep": ["comer-preparar"],
-    
-    // Organização
-    "manutencaodomestica": ["organizacao"],
+    // ===== ORGANIZAÇÃO =====
     "organizacaodomestica": ["organizacao"],
     "casa": ["organizacao"],
     "organizar": ["organizacao"],
-    "quarto": ["organizacao", "sono-relaxamento"],
-    "roupaecalcados": ["organizacao"],
-    "reparar": ["organizacao"],
-    "casaefamilia": ["organizacao"],
     "praticidade": ["organizacao"],
+    "rotinafluida": ["organizacao"],
+    "manutencaodomestica": ["organizacao"],
+    "reparar": ["organizacao"],
+    "limpeza": ["organizacao"],
+    "limpezaeficiente": ["organizacao"],
+    "limpezafacil": ["organizacao"],
+    "guardaroupaorganizado": ["organizacao"],
     
-    // Saúde e Segurança
+    // ===== SONO E RELAXAMENTO =====
+    "sono": ["sono-relaxamento"],
+    "sonoinfantil": ["sono-relaxamento"],
+    "quarto": ["sono-relaxamento"],
+    "relaxamento": ["sono-relaxamento"],
+    "psicologiainfantil": ["sono-relaxamento"],
+    
+    // ===== SAÚDE E SEGURANÇA =====
     "segurancaemcasa": ["saude-seguranca"],
     "emergenciafamiliar": ["saude-seguranca"],
-    "bemestarsaude": ["saude-seguranca"],
+    "saudeebeleza": ["saude-seguranca"],
+    "rotineifiente": ["saude-seguranca"],
     
-    // Sono e Relaxamento
-    "sono": ["sono-relaxamento"],
-    "relaxamento": ["sono-relaxamento"],
-    
-    // Bem-estar parental e família
+    // ===== DECORAR E BRILHAR =====
     "bemestparental": ["decorar-brilhar"],
-    "tempoemfamilia": ["aprender-brincar"],
-    "desenvolvimentoinfantil": ["aprender-brincar"],
     "autocuidado": ["decorar-brilhar"],
-    "hobbies": ["aprender-brincar"],
     
-    // Infância e desenvolvimento
-    "infancia": ["aprender-brincar"],
+    // ===== SAIR E VIAJAR =====
+    "bebe": ["sair-viajar"],
+    "acessoriosparabebes": ["sair-viajar"],
+    "roupaecalcados": ["sair-viajar"],
   };
 
   const tagToFilterMapping = Object.fromEntries(
