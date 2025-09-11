@@ -231,6 +231,13 @@ export default function TestFiltersClean() {
     "aprender": ["aprender-brincar"],
     "brinquedo": ["aprender-brincar"],
     "lazer": ["aprender-brincar"],
+    
+    // Comer e Preparar -> Específico
+    "comererepapar": ["comer-preparar"],
+    "comerepreparar": ["comer-preparar"],
+    "cozinha": ["comer-preparar"],
+    "mealprep": ["comer-preparar"],
+    
     // Organização
     "manutencaodomestica": ["organizacao"],
     "organizacaodomestica": ["organizacao"],
@@ -239,18 +246,27 @@ export default function TestFiltersClean() {
     "quarto": ["organizacao", "sono-relaxamento"],
     "roupaecalcados": ["organizacao"],
     "reparar": ["organizacao"],
+    "casaefamilia": ["organizacao"],
+    "praticidade": ["organizacao"],
+    
     // Saúde e Segurança
     "segurancaemcasa": ["saude-seguranca"],
     "emergenciafamiliar": ["saude-seguranca"],
+    "bemestarsaude": ["saude-seguranca"],
+    
     // Sono e Relaxamento
     "sono": ["sono-relaxamento"],
     "relaxamento": ["sono-relaxamento"],
-    // Bem-estar parental
-    "bemestparental": ["sair-viajar"],
+    
+    // Bem-estar parental e família
+    "bemestparental": ["decorar-brilhar"],
     "tempoemfamilia": ["aprender-brincar"],
     "desenvolvimentoinfantil": ["aprender-brincar"],
     "autocuidado": ["decorar-brilhar"],
     "hobbies": ["aprender-brincar"],
+    
+    // Infância e desenvolvimento
+    "infancia": ["aprender-brincar"],
   };
 
   const tagToFilterMapping = Object.fromEntries(
