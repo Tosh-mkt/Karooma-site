@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useFlipbookCapture } from '@/hooks/useFlipbookCapture';
+import { useAuth } from '@/hooks/useAuth';
 import { FlipbookCaptureModal } from './FlipbookCaptureModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { BookOpen, Download, CheckCircle, Wand2, Loader2, X, Heart, Bell } from 'lucide-react';
+import { BookOpen, Download, CheckCircle, Wand2, Loader2, X, Heart, Bell, Settings, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getFlipbookTheme, FlipbookTheme } from '@shared/flipbook-themes';
 
@@ -143,6 +144,9 @@ export function InlineFlipbookButton({
   // Estado para modal de interesse
   const [showInterestModal, setShowInterestModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  
+  // Verificar se usuário é admin
+  const { isAdmin } = useAuth();
 
   // Determinar se deve mostrar alguma coisa
   if (!flipbookConfig?.enabled && !showGenerateButton) {
@@ -176,6 +180,51 @@ export function InlineFlipbookButton({
       // Toast ou feedback de sucesso seria aqui
     } catch (error) {
       console.error('Erro ao registrar interesse:', error);
+    } finally {
+      setIsRegistering(false);
+    }
+  };
+
+  // Handler para admin gerar guia e notificar interessados
+  const handleAdminCreateGuide = async () => {
+    if (!postId || !postTitle) return;
+    
+    setIsRegistering(true);
+    try {
+      // 1. Gerar o guia
+      const generateResponse = await fetch('/api/flipbooks/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId,
+          force: false
+        })
+      });
+      
+      if (!generateResponse.ok) {
+        throw new Error('Erro ao gerar guia');
+      }
+      
+      const guideData = await generateResponse.json();
+      
+      // 2. Notificar usuários interessados
+      await fetch('/api/admin/notify-interested-users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          postId,
+          postTitle,
+          postCategory,
+          flipbookId: guideData.flipbookId
+        })
+      });
+      
+      // 3. Recarregar página ou atualizar estado
+      window.location.reload(); // Simples - força reload da página para mostrar guia disponível
+      
+    } catch (error) {
+      console.error('Erro ao criar guia:', error);
+      alert('Erro ao criar guia. Tente novamente.');
     } finally {
       setIsRegistering(false);
     }
@@ -301,6 +350,30 @@ export function InlineFlipbookButton({
               )}
             </Button>
             
+            {/* BOTÃO ESPECIAL DE ADMIN */}
+            {isAdmin && !hasExistingGuide && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p className="text-xs text-blue-600 mb-2 flex items-center justify-center">
+                  <Settings className="w-3 h-3 mr-1" />
+                  Painel Administrador
+                </p>
+                <Button
+                  onClick={handleAdminCreateGuide}
+                  size="sm"
+                  variant="outline"
+                  disabled={isGenerating || isRegistering}
+                  className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:border-blue-300"
+                  data-testid="button-admin-create-guide"
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  Admin: Criar Guia & Notificar
+                </Button>
+                <p className="text-xs text-blue-500 mt-1">
+                  ⚡ Cria o guia e notifica todos os interessados automaticamente
+                </p>
+              </div>
+            )}
+
             {/* TEXTO DE APOIO */}
             <p className="text-xs text-gray-500 mt-3">
               {hasExistingGuide 

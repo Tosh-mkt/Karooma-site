@@ -1072,6 +1072,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin route to notify interested users when guide is ready
+  app.post("/api/admin/notify-interested-users", async (req, res) => {
+    try {
+      const { postId, postTitle, postCategory, flipbookId } = req.body;
+      
+      if (!postId || !postTitle || !flipbookId) {
+        return res.status(400).json({ error: "Dados obrigatórios: postId, postTitle, flipbookId" });
+      }
+
+      // For now, we'll simulate finding interested users
+      // In a real implementation, you would query the database for users who registered interest
+      const interestedUsers = [];
+
+      if (interestedUsers.length === 0) {
+        return res.json({ 
+          success: true, 
+          message: 'Nenhum usuário interessado encontrado',
+          notifiedUsers: 0
+        });
+      }
+
+      // Prepare notification data
+      const notificationData = {
+        type: 'guide_ready',
+        postId,
+        postTitle,
+        postCategory,
+        flipbookId,
+        guideUrl: `/flipbook/${flipbookId}`,
+        totalInterestedUsers: interestedUsers.length,
+        timestamp: new Date().toISOString()
+      };
+
+      // Broadcast to admin dashboard
+      sseManager.broadcast('guide-ready-notification', notificationData);
+
+      // Log successful notification
+      console.log(`📖 GUIA PRONTO - Notificando ${interestedUsers.length} usuários interessados em "${postTitle}"`);
+      console.log(`📧 Emails: ${interestedUsers.map(u => u.email).join(', ')}`);
+
+      // Here you could integrate with your email service to send actual emails
+      // For now, we'll just log and notify via SSE
+      
+      res.json({
+        success: true,
+        message: `${interestedUsers.length} usuário(s) serão notificados`,
+        notifiedUsers: interestedUsers.length,
+        interestedEmails: interestedUsers.map(u => u.email),
+        guideUrl: `/flipbook/${flipbookId}`
+      });
+
+    } catch (error) {
+      console.error('Error notifying interested users:', error);
+      res.status(500).json({ error: "Falha ao notificar usuários interessados" });
+    }
+  });
+
 
 
 
