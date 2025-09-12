@@ -26,7 +26,7 @@ import path from "path";
 import express from "express";
 import { flipbookGenerator } from "./services/flipbookGenerator";
 import { insertFlipbookSchema } from "@shared/schema";
-import { z } from "zod";
+import { extractUserInfo } from "./middleware/flipbookAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
@@ -1073,8 +1073,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin route to notify interested users when guide is ready
-  app.post("/api/admin/notify-interested-users", async (req, res) => {
+  app.post("/api/admin/notify-interested-users", extractUserInfo, async (req: any, res) => {
     try {
+      // Verificar se usuário é administrador
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Acesso negado. Apenas administradores podem executar esta ação." });
+      }
+      
       const { postId, postTitle, postCategory, flipbookId } = req.body;
       
       if (!postId || !postTitle || !flipbookId) {
@@ -1083,7 +1088,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // For now, we'll simulate finding interested users
       // In a real implementation, you would query the database for users who registered interest
-      const interestedUsers = [];
+      const interestedUsers: Array<{ email: string }> = [];
 
       if (interestedUsers.length === 0) {
         return res.json({ 
