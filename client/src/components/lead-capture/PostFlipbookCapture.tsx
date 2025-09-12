@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFlipbookCapture } from '@/hooks/useFlipbookCapture';
 import { FlipbookCaptureModal } from './FlipbookCaptureModal';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { BookOpen, Download, CheckCircle, Wand2, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { getFlipbookTheme } from '@shared/flipbook-themes';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { BookOpen, Download, CheckCircle, Wand2, Loader2, X, Heart, Bell } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { getFlipbookTheme, FlipbookTheme } from '@shared/flipbook-themes';
 
 interface PostFlipbookCaptureProps {
   postId?: string;
@@ -139,12 +140,46 @@ export function InlineFlipbookButton({
     config: { enabled: true, triggerDelay: undefined } // Não trigger automático
   });
 
+  // Estado para modal de interesse
+  const [showInterestModal, setShowInterestModal] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+
   // Determinar se deve mostrar alguma coisa
   if (!flipbookConfig?.enabled && !showGenerateButton) {
     return null;
   }
 
   const theme = getFlipbookTheme(flipbookConfig?.themeId || 'organizacao');
+  const hasExistingGuide = generatedFlipbook || (flipbookConfig && !showGenerateButton);
+
+  // Handler para registrar interesse
+  const handleRegisterInterest = async (email?: string) => {
+    if (!postId || !postTitle) return;
+    
+    setIsRegistering(true);
+    try {
+      await fetch('/api/newsletter/register-interest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email || (isAuthenticated ? 'authenticated_user' : ''),
+          postId,
+          postTitle,
+          postCategory,
+          interestedInGuide: true,
+          source: 'post_guide_interest'
+        })
+      });
+      
+      // Mostrar confirmação
+      setShowInterestModal(false);
+      // Toast ou feedback de sucesso seria aqui
+    } catch (error) {
+      console.error('Erro ao registrar interesse:', error);
+    } finally {
+      setIsRegistering(false);
+    }
+  };
 
   return (
     <motion.div
@@ -170,17 +205,22 @@ export function InlineFlipbookButton({
               <BookOpen className="w-6 h-6 text-white" />
             </div>
             
+            {/* TÍTULO E DESCRIÇÃO BASEADOS NA EXISTÊNCIA DO GUIA */}
             <h3 className="font-poppins font-bold text-xl text-gray-800 mb-2">
-              {generatedFlipbook ? generatedFlipbook.title : (flipbookConfig?.title || 'Guia Prático Personalizado')}
+              {hasExistingGuide 
+                ? (generatedFlipbook?.title || flipbookConfig?.title || 'Guia Prático Disponível')
+                : 'Guia Prático em Preparação'
+              }
             </h3>
             
             <p className="text-gray-600 mb-4 max-w-md">
-              {showGenerateButton 
-                ? `Gere um guia prático exclusivo baseado neste post sobre "${postTitle || 'este tópico'}". Conteúdo personalizado em minutos!`
-                : (generatedFlipbook?.description || flipbookConfig?.description || 'Acesse seu guia personalizado')
+              {hasExistingGuide 
+                ? "Quer se aprofundar na prática da aplicação das informações deste post? Baixe o guia e vamos implementar a mudança na sua família."
+                : `Que tal um guia prático sobre "${postTitle}"? Registre seu interesse e avisaremos quando estiver pronto!`
               }
             </p>
             
+            {/* ESTADOS DE CARREGAMENTO */}
             {isGenerating && (
               <p className="text-sm text-blue-600 mb-4 flex items-center justify-center">
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -188,26 +228,43 @@ export function InlineFlipbookButton({
               </p>
             )}
             
-            {!isGenerating && flipbookConfig?.socialProof && !showGenerateButton && (
+            {isRegistering && (
+              <p className="text-sm text-green-600 mb-4 flex items-center justify-center">
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Registrando seu interesse...
+              </p>
+            )}
+            
+            {/* SOCIAL PROOF PARA GUIAS EXISTENTES */}
+            {!isGenerating && !isRegistering && hasExistingGuide && flipbookConfig?.socialProof && (
               <p className="text-sm text-gray-500 mb-4">
                 📥 Já baixado por <strong>{flipbookConfig.socialProof.downloads}+ mães</strong>
               </p>
             )}
             
+            {/* BOTÃO PRINCIPAL */}
             <Button
               onClick={() => {
-                if (showGenerateButton && !isGenerating) {
-                  console.log('Gerando flipbook para postId:', postId);
-                  generateFlipbook();
-                } else if (generatedFlipbook || flipbookConfig) {
-                  console.log('Abrindo modal para flipbook:', { generatedFlipbook, flipbookConfig });
-                  openModal();
+                if (hasExistingGuide) {
+                  // Guia existe - abrir para download
+                  if (showGenerateButton && !isGenerating) {
+                    generateFlipbook();
+                  } else {
+                    openModal();
+                  }
+                } else {
+                  // Guia não existe - registrar interesse
+                  if (isAuthenticated) {
+                    handleRegisterInterest();
+                  } else {
+                    setShowInterestModal(true);
+                  }
                 }
               }}
               size="lg"
-              disabled={isGenerating}
+              disabled={isGenerating || isRegistering}
               className={`text-white font-semibold px-8 py-3 transition-all duration-300 ${
-                isGenerating ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105'
+                (isGenerating || isRegistering) ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105'
               }`}
               style={{
                 background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
@@ -219,46 +276,68 @@ export function InlineFlipbookButton({
                   <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                   Gerando...
                 </>
-              ) : showGenerateButton ? (
+              ) : isRegistering ? (
                 <>
-                  <Wand2 className="w-5 h-5 mr-2" />
-                  Gerar Guia Prático
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Registrando...
                 </>
-              ) : isAuthenticated ? (
-                <>
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  Acessar Guia Agora
-                </>
+              ) : hasExistingGuide ? (
+                isAuthenticated ? (
+                  <>
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    Baixar Guia Prático
+                  </>
+                ) : (
+                  <>
+                    <BookOpen className="w-5 h-5 mr-2" />
+                    Baixar Guia Gratuito
+                  </>
+                )
               ) : (
                 <>
-                  <BookOpen className="w-5 h-5 mr-2" />
-                  Baixar Guia Gratuito
+                  <Wand2 className="w-5 h-5 mr-2" />
+                  {isAuthenticated ? 'Quero Este Guia!' : 'Registrar Interesse'}
                 </>
               )}
             </Button>
             
+            {/* TEXTO DE APOIO */}
             <p className="text-xs text-gray-500 mt-3">
-              {showGenerateButton 
-                ? '🤖 Gerado por IA em minutos' 
-                : '✨ Acesso imediato após cadastro'
+              {hasExistingGuide 
+                ? '✨ Acesso imediato após cadastro'
+                : '🔔 Você será avisada quando estiver pronto'
               }
             </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* Modal de captura para botão inline */}
-      <FlipbookCaptureModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        flipbookTheme={flipbookConfig.themeId}
-        postTitle={postTitle}
-        postId={postId}
-        flipbookTitle={flipbookConfig.title}
-        flipbookDescription={flipbookConfig.description}
-        socialProof={flipbookConfig.socialProof}
-        previewPages={flipbookConfig.previewPages}
-      />
+      {/* MODAL DE CAPTURA PARA GUIAS EXISTENTES */}
+      {hasExistingGuide && (
+        <FlipbookCaptureModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          flipbookTheme={flipbookConfig?.themeId || 'organizacao'}
+          postTitle={postTitle}
+          postId={postId}
+          flipbookTitle={flipbookConfig?.title}
+          flipbookDescription={flipbookConfig?.description}
+          socialProof={flipbookConfig?.socialProof}
+          previewPages={flipbookConfig?.previewPages}
+        />
+      )}
+
+      {/* MODAL DE INTERESSE PARA GUIAS INEXISTENTES */}
+      {showInterestModal && (
+        <InterestCaptureModal
+          isOpen={showInterestModal}
+          onClose={() => setShowInterestModal(false)}
+          postTitle={postTitle}
+          postCategory={postCategory}
+          theme={theme}
+          onRegisterInterest={handleRegisterInterest}
+        />
+      )}
     </motion.div>
   );
 }
@@ -297,4 +376,148 @@ export function usePostFlipbookIntegration(postData: {
     ...capture,
     insertInlineButton
   };
+}
+
+// Modal para capturar interesse em guias não existentes
+interface InterestCaptureModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  postTitle?: string;
+  postCategory?: string;
+  theme: FlipbookTheme;
+  onRegisterInterest: (email?: string) => Promise<void>;
+}
+
+function InterestCaptureModal({
+  isOpen,
+  onClose,
+  postTitle,
+  postCategory,
+  theme,
+  onRegisterInterest
+}: InterestCaptureModalProps) {
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      await onRegisterInterest(email);
+      setEmail('');
+    } catch (error) {
+      console.error('Erro ao registrar interesse:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        {/* Backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={onClose}
+          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        />
+        
+        {/* Modal */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.9, y: 20 }}
+          className="relative w-full max-w-md"
+        >
+          <Card className="border-0 shadow-2xl">
+            <CardHeader className="text-center pb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onClose}
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                data-testid="button-close-interest-modal"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+              
+              <div 
+                className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
+                style={{
+                  background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
+                }}
+              >
+                <Bell className="w-8 h-8 text-white" />
+              </div>
+              
+              <CardTitle className="font-fredoka text-2xl text-gray-800 mb-2">
+                Queremos preparar este guia!
+              </CardTitle>
+              
+              <p className="text-gray-600 text-sm max-w-sm mx-auto">
+                Deixe seu email e avisaremos quando o guia prático sobre 
+                <strong> "{postTitle}"</strong> estiver pronto para você!
+              </p>
+            </CardHeader>
+            
+            <CardContent className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Input
+                    type="email"
+                    placeholder="Seu melhor email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    className="text-center"
+                    data-testid="input-interest-email"
+                  />
+                </div>
+                
+                <Button
+                  type="submit"
+                  size="lg"
+                  disabled={isSubmitting || !email.trim()}
+                  className={`w-full text-white font-semibold py-3 transition-all duration-300 ${
+                    isSubmitting ? 'opacity-75 cursor-not-allowed' : 'hover:scale-[1.02]'
+                  }`}
+                  style={{
+                    background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`
+                  }}
+                  data-testid="button-register-interest"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Registrando...
+                    </>
+                  ) : (
+                    <>
+                      <Heart className="w-5 h-5 mr-2" />
+                      Quero ser avisada!
+                    </>
+                  )}
+                </Button>
+              </form>
+              
+              <div className="text-center">
+                <p className="text-xs text-gray-500">
+                  🔒 Seus dados estão seguros conosco
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  ✨ Você será a primeira a saber quando estiver pronto
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
 }

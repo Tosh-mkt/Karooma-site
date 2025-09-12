@@ -1005,6 +1005,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Register interest for guide creation
+  app.post("/api/newsletter/register-interest", async (req, res) => {
+    try {
+      const { email, postId, postTitle, postCategory, interestedInGuide, source } = req.body;
+      
+      if (!email || !postId || !postTitle) {
+        return res.status(400).json({ error: "Dados obrigatórios: email, postId, postTitle" });
+      }
+
+      // Create or update newsletter subscription with guide interest
+      const interestData = {
+        email,
+        source: source || 'guide_interest',
+        leadMagnet: `guide_interest_${postId}`,
+        interests: {
+          categories: postCategory ? [postCategory] : [],
+          guideRequests: [{
+            postId,
+            postTitle,
+            postCategory,
+            requestedAt: new Date().toISOString()
+          }]
+        },
+        preferences: {
+          interestedInGuides: true,
+          specificGuideRequest: {
+            postId,
+            postTitle,
+            postCategory
+          }
+        }
+      };
+
+      // Create new subscription with advanced preferences
+      const subscription = await storage.createNewsletterAdvanced(interestData);
+
+      // Prepare notification data for admin
+      const notificationData = {
+        email: subscription.email,
+        type: 'guide_interest',
+        postId,
+        postTitle,
+        postCategory,
+        source: subscription.source || undefined,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Broadcast to admin dashboard
+      sseManager.broadcast('guide-interest', notificationData);
+      
+      // Log to console
+      console.log(`📖 Nova solicitação de guia: ${postTitle} | Email: ${email}`);
+      
+      res.status(201).json({ 
+        success: true, 
+        message: 'Interesse registrado com sucesso!',
+        subscription: {
+          id: subscription.id,
+          email: subscription.email
+        }
+      });
+    } catch (error) {
+      console.error('Guide interest registration error:', error);
+      res.status(500).json({ error: "Falha ao registrar interesse" });
+    }
+  });
+
 
 
 
