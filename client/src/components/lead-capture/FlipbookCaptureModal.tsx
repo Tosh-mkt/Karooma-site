@@ -189,7 +189,7 @@ export function FlipbookCaptureModal({
               </div>
               <div>
                 <h2 className="font-fredoka text-2xl">
-                  {flipbookTitle || `Guia Completo: ${theme.name}`}
+                  {flipbookTitle || (postTitle ? `Guia Completo: ${postTitle}` : `Guia Completo: ${theme.name}`)}
                 </h2>
                 <p className="text-white/80 text-sm">
                   {socialProof?.downloads && `+${socialProof.downloads} mães já baixaram`}
@@ -199,7 +199,10 @@ export function FlipbookCaptureModal({
             
             <p className="text-white/90 font-poppins">
               {flipbookDescription || 
-               `Receba o guia completo com métodos práticos e testados para ${theme.name.toLowerCase()}`}
+               (postTitle ? 
+                 `Sistema de 8 passos que funcionou para +500 famílias` :
+                 `Receba o guia completo com métodos práticos e testados para ${theme.name.toLowerCase()}`
+               )}
             </p>
           </div>
 
