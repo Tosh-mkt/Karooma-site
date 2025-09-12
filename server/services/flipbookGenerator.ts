@@ -128,20 +128,18 @@ export class FlipbookGenerator {
     try {
       const prompt = this.buildPrompt(post);
       
-      // Obter modelo do Gemini
-      const model = this.genAI!.getGenerativeModel({
+      const generatePromise = this.genAI!.models.generateContent({
         model: DEFAULT_MODEL_STR,
-        systemInstruction: this.getSystemPrompt(),
-        generationConfig: {
+        contents: [{ text: prompt }],
+        config: {
+          systemInstruction: this.getSystemPrompt(),
           responseMimeType: "application/json"
         }
       });
       
-      const generatePromise = model.generateContent(prompt);
-      
       const result = await Promise.race([generatePromise, timeoutPromise]);
       
-      const responseText = result.response.text();
+      const responseText = result.text;
       if (!responseText) {
         throw new Error('Empty response from Gemini');
       }
