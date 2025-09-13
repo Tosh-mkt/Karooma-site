@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ChevronDown, ChevronRight, Users, Award, Shield, Target, ShoppingBag, Star, Heart } from "lucide-react";
+import { X, ChevronDown, ChevronRight, Users, Award, Shield, Target, ShoppingBag, Star, Heart, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
@@ -165,6 +165,36 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
   const { toast } = useToast();
   const specialistEvaluations = parseSpecialistEvaluations(product);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Detectar possibilidade de scroll
+  const checkScrollability = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    setCanScrollUp(scrollTop > 0);
+    setCanScrollDown(scrollTop + clientHeight < scrollHeight - 1);
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    checkScrollability();
+    container.addEventListener('scroll', checkScrollability);
+    
+    // Recheck when content changes
+    const resizeObserver = new ResizeObserver(checkScrollability);
+    resizeObserver.observe(container);
+
+    return () => {
+      container.removeEventListener('scroll', checkScrollability);
+      resizeObserver.disconnect();
+    };
+  }, [isOpen, expandedItems]);
 
   const toggleExpanded = (id: string) => {
     setExpandedItems(prev => ({
@@ -212,7 +242,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
             className="fixed inset-0 z-50 flex items-center justify-center p-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[85vh] overflow-hidden flex flex-col">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[80vh] overflow-hidden flex flex-col relative">
               {/* Header */}
               <div className="relative p-6 bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 text-white">
                 <button
@@ -234,7 +264,35 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto">
+              {/* Scroll indicators */}
+              {canScrollUp && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute top-[100px] left-0 right-0 h-8 bg-gradient-to-b from-white/90 to-transparent z-10 pointer-events-none flex items-start justify-center pt-2"
+                >
+                  <ChevronUp className="w-4 h-4 text-purple-600 animate-bounce" />
+                </motion.div>
+              )}
+
+              {canScrollDown && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="absolute bottom-[80px] left-0 right-0 h-8 bg-gradient-to-t from-white/90 to-transparent z-10 pointer-events-none flex items-end justify-center pb-2"
+                >
+                  <ChevronDown className="w-4 h-4 text-purple-600 animate-bounce" />
+                </motion.div>
+              )}
+
+              <div 
+                ref={scrollContainerRef}
+                className="flex-1 overflow-y-auto scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-purple-300 hover:scrollbar-thumb-purple-400"
+                style={{
+                  scrollbarWidth: 'thin',
+                  scrollbarColor: '#c084fc #f3f4f6'
+                }}
+              >
                 {/* Introduction Section */}
                 {product.introduction && (
                   <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-green-50 to-emerald-50">

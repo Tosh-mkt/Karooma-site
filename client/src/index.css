@@ -160,4 +160,41 @@
     0%, 100% { transform: rotate(-3deg); }
     50% { transform: rotate(3deg); }
   }
+  
+  /* Custom scrollbar utilities for recommendation modal */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+  }
+  
+  .scrollbar-track-gray-100::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 4px;
+  }
+  
+  .scrollbar-thumb-purple-300::-webkit-scrollbar-thumb {
+    background: #c084fc;
+    border-radius: 4px;
+  }
+  
+  .hover\:scrollbar-thumb-purple-400::-webkit-scrollbar-thumb:hover {
+    background: #a855f7;
+  }
+  
+  /* Global scrollbar improvements */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
 }
