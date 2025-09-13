@@ -195,11 +195,11 @@ export const upsertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  email: true,
-  firstName: true,
-  lastName: true,
-  image: true,
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  emailVerified: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const insertContentSchema = createInsertSchema(content).omit({

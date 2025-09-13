@@ -317,24 +317,16 @@ export class MemStorage implements IStorage {
     const id = randomUUID();
     const product: Product = {
       id,
-      title: insertProduct.title,
-      description: insertProduct.description || null,
-      category: insertProduct.category,
-      imageUrl: insertProduct.imageUrl || null,
-      currentPrice: insertProduct.currentPrice || null,
-      originalPrice: insertProduct.originalPrice || null,
-      affiliateLink: insertProduct.affiliateLink,
-      productLink: insertProduct.productLink || null,
-      rating: insertProduct.rating || null,
-      discount: insertProduct.discount || null,
-      featured: insertProduct.featured || false,
-      expertReview: insertProduct.expertReview || null,
-      teamEvaluation: insertProduct.teamEvaluation || null,
-      benefits: insertProduct.benefits || null,
-      tags: insertProduct.tags || null,
-      evaluators: insertProduct.evaluators || null,
-      introduction: insertProduct.introduction || null,
+      ...insertProduct,
+      featured: insertProduct.featured ?? false,
+      isPrime: insertProduct.isPrime ?? false,
+      availability: insertProduct.availability ?? "available",
+      status: insertProduct.status ?? "active",
+      updateFrequency: insertProduct.updateFrequency ?? "medium",
+      autoCheckEnabled: insertProduct.autoCheckEnabled ?? true,
+      failedChecks: insertProduct.failedChecks ?? 0,
       createdAt: new Date(),
+      updatedAt: new Date(),
     };
     this.products.set(id, product);
     return product;
@@ -345,7 +337,7 @@ export class MemStorage implements IStorage {
     if (!existingProduct) {
       throw new Error('Product not found');
     }
-    const updatedProduct = { ...existingProduct, ...updates };
+    const updatedProduct = { ...existingProduct, ...updates, updatedAt: new Date() };
     this.products.set(id, updatedProduct);
     return updatedProduct;
   }
@@ -386,9 +378,21 @@ export class MemStorage implements IStorage {
   async createNewsletterSubscription(insertSubscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
     const id = randomUUID();
     const subscription: NewsletterSubscription = {
-      ...insertSubscription,
       id,
+      ...insertSubscription,
+      name: insertSubscription.name ?? null,
+      interests: insertSubscription.interests ?? null,
+      keywords: insertSubscription.keywords ?? null,
+      frequency: insertSubscription.frequency ?? "weekly",
+      contentTypes: insertSubscription.contentTypes ?? null,
+      source: insertSubscription.source ?? null,
+      leadMagnet: insertSubscription.leadMagnet ?? null,
+      status: insertSubscription.status ?? "active",
+      preferences: insertSubscription.preferences ?? null,
+      lastInteraction: insertSubscription.lastInteraction ?? null,
+      engagementScore: insertSubscription.engagementScore ?? "0",
       createdAt: new Date(),
+      updatedAt: new Date(),
     };
     this.newsletters.set(id, subscription);
     return subscription;
