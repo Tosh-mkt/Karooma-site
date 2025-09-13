@@ -18,19 +18,19 @@ interface Product {
   discount: number | null;
   featured: boolean | null;
   createdAt: Date;
-  // Campos para avaliações estruturadas (snake_case do banco)
-  team_evaluation?: string | null;
+  // Campos para avaliações estruturadas (camelCase do Drizzle ORM)
+  teamEvaluation?: string | null;
   benefits?: string | null;
   evaluators?: string | null;
   introduction?: string | null;
   tags?: string | null;
-  // Campos baseados no formato fornecido (snake_case do banco)
-  nutritionist_evaluation?: string | null;
-  organizer_evaluation?: string | null;
-  design_evaluation?: string | null;
-  karooma_team_evaluation?: string | null;
-  category_tags?: string | null;
-  search_tags?: string | null;
+  // Campos baseados no formato fornecido (camelCase do Drizzle ORM)
+  nutritionistEvaluation?: string | null;
+  organizerEvaluation?: string | null;
+  designEvaluation?: string | null;
+  karoomaTeamEvaluation?: string | null;
+  categoryTags?: string | null;
+  searchTags?: string | null;
 }
 
 interface RecommendationModalProps {
@@ -68,35 +68,35 @@ const parseSpecialistEvaluations = (product: Product): SpecialistEvaluation[] =>
   const evaluations: SpecialistEvaluation[] = [];
 
   // Avaliação da Nutricionista
-  if (product.nutritionist_evaluation && !isHashtagOnlyText(product.nutritionist_evaluation)) {
+  if (product.nutritionistEvaluation && !isHashtagOnlyText(product.nutritionistEvaluation)) {
     evaluations.push({
       id: "nutritionist",
       title: "Nutricionista",
       icon: <Heart className="w-4 h-4" />,
       color: "bg-pink-500",
-      content: product.nutritionist_evaluation
+      content: product.nutritionistEvaluation
     });
   }
 
   // Avaliação da Organizadora Doméstica
-  if (product.organizer_evaluation && !isHashtagOnlyText(product.organizer_evaluation)) {
+  if (product.organizerEvaluation && !isHashtagOnlyText(product.organizerEvaluation)) {
     evaluations.push({
       id: "organizer",
       title: "Organização Doméstica",
       icon: <Target className="w-4 h-4" />,
       color: "bg-blue-500",
-      content: product.organizer_evaluation
+      content: product.organizerEvaluation
     });
   }
 
   // Avaliação de Design e Usabilidade
-  if (product.design_evaluation && !isHashtagOnlyText(product.design_evaluation)) {
+  if (product.designEvaluation && !isHashtagOnlyText(product.designEvaluation)) {
     evaluations.push({
       id: "design",
       title: "Design e Usabilidade",
       icon: <Award className="w-4 h-4" />,
       color: "bg-purple-500",
-      content: product.design_evaluation
+      content: product.designEvaluation
     });
   }
 
@@ -163,7 +163,24 @@ function CompactSpecialistItem({
 
 export default function RecommendationModal({ product, isOpen, onClose }: RecommendationModalProps) {
   const { toast } = useToast();
+  
+  // Log temporário para debug
+  console.log("🔍 RecommendationModal - Product data:", {
+    id: product.id,
+    title: product.title,
+    introduction: product.introduction,
+    teamEvaluation: product.teamEvaluation,
+    karoomaTeamEvaluation: product.karoomaTeamEvaluation,
+    nutritionistEvaluation: product.nutritionistEvaluation,
+    organizerEvaluation: product.organizerEvaluation,
+    designEvaluation: product.designEvaluation,
+    categoryTags: product.categoryTags,
+    searchTags: product.searchTags
+  });
+  
   const specialistEvaluations = parseSpecialistEvaluations(product);
+  console.log("🔍 Specialist evaluations found:", specialistEvaluations);
+  
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const toggleExpanded = (id: string) => {
@@ -188,8 +205,8 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
   };
 
   // Parse das tags de categoria e pesquisa
-  const categoryTags = product.category_tags ? product.category_tags.split(' ').filter(tag => tag.startsWith('#')) : [];
-  const searchTags = product.search_tags ? product.search_tags.split(' ').filter(tag => tag.startsWith('#')) : [];
+  const categoryTags = product.categoryTags ? product.categoryTags.split(' ').filter(tag => tag.startsWith('#')) : [];
+  const searchTags = product.searchTags ? product.searchTags.split(' ').filter(tag => tag.startsWith('#')) : [];
 
   return (
     <AnimatePresence>
@@ -279,8 +296,8 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                 )}
 
                 {/* Karooma Team Evaluation */}
-                {(product.karooma_team_evaluation || product.team_evaluation) && 
-                 !isHashtagOnlyText(product.karooma_team_evaluation || product.team_evaluation || '') && (
+                {(product.karoomaTeamEvaluation || product.teamEvaluation) && 
+                 !isHashtagOnlyText(product.karoomaTeamEvaluation || product.teamEvaluation || '') && (
                   <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-yellow-50 to-orange-50">
                     <div className="flex items-center gap-2 mb-3">
                       <div className="w-6 h-6 bg-orange-500 rounded-lg flex items-center justify-center">
@@ -289,7 +306,7 @@ export default function RecommendationModal({ product, isOpen, onClose }: Recomm
                       <h4 className="font-semibold text-gray-900 text-sm">Avaliação Final KAROOMA</h4>
                     </div>
                     <p className="text-gray-600 text-sm leading-relaxed">
-                      {product.karooma_team_evaluation || product.team_evaluation}
+                      {product.karoomaTeamEvaluation || product.teamEvaluation}
                     </p>
                   </div>
                 )}
