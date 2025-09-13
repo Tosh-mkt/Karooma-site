@@ -72,11 +72,11 @@ export class APICostOptimizer {
     // Calcular estatísticas do mês
     const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
     const daysElapsed = today.getDate();
-    const dailyAverage = (limits.currentMonthlySpent?.toNumber() || 0) / daysElapsed;
+    const dailyAverage = (parseFloat(limits.currentMonthlySpent?.toString() || '0')) / daysElapsed;
     const projectedSpend = dailyAverage * daysInMonth;
     
     // Determinar nível de risco
-    const budgetUsagePercent = (limits.currentMonthlySpent?.toNumber() || 0) / (limits.monthlyBudget?.toNumber() || 1);
+    const budgetUsagePercent = (parseFloat(limits.currentMonthlySpent?.toString() || '0')) / (parseFloat(limits.monthlyBudget?.toString() || '1'));
     let riskLevel: 'low' | 'medium' | 'high' = 'low';
     
     if (budgetUsagePercent > 0.8) riskLevel = 'high';
@@ -86,10 +86,10 @@ export class APICostOptimizer {
     const recommendations = await this.generateCostRecommendations(regionId, limits);
 
     return {
-      currentMonthSpent: limits.currentMonthlySpent?.toNumber() || 0,
+      currentMonthSpent: parseFloat(limits.currentMonthlySpent?.toString() || '0'),
       dailyAverageSpent: dailyAverage,
       requestsToday: limits.currentDailyUsage || 0,
-      remainingBudget: (limits.monthlyBudget?.toNumber() || 0) - (limits.currentMonthlySpent?.toNumber() || 0),
+      remainingBudget: parseFloat(limits.monthlyBudget?.toString() || '0') - parseFloat(limits.currentMonthlySpent?.toString() || '0'),
       projectedMonthlySpend: projectedSpend,
       riskLevel,
       recommendations
@@ -101,7 +101,7 @@ export class APICostOptimizer {
    */
   private async generateCostRecommendations(regionId: string, limits: RegionApiLimits): Promise<string[]> {
     const recommendations: string[] = [];
-    const budgetUsage = (limits.currentMonthlySpent?.toNumber() || 0) / (limits.monthlyBudget?.toNumber() || 1);
+    const budgetUsage = parseFloat(limits.currentMonthlySpent?.toString() || '0') / parseFloat(limits.monthlyBudget?.toString() || '1');
 
     if (budgetUsage > 0.8) {
       recommendations.push("🚨 Orçamento quase esgotado - considere throttling agressivo");
@@ -204,7 +204,7 @@ export class APICostOptimizer {
 
     const clicks = clicksResult[0]?.count || 0;
     const favorites = favoritesResult[0]?.count || 0;
-    const views = viewsResult[0]?.views || 0;
+    const views = 0; // TODO: Implementar tracking de views
 
     // Fórmula ponderada para score de popularidade (0-1)
     const normalizedClicks = Math.min(clicks / 100, 1); // Max 100 cliques = score 1
@@ -375,7 +375,7 @@ export class APICostOptimizer {
     }
 
     // Verificar orçamento mensal
-    const budgetUsage = (limits.currentMonthlySpent?.toNumber() || 0) / (limits.monthlyBudget?.toNumber() || 1);
+    const budgetUsage = parseFloat(limits.currentMonthlySpent?.toString() || '0') / parseFloat(limits.monthlyBudget?.toString() || '1');
     if (budgetUsage >= 0.95) {
       return { 
         allowed: false, 
@@ -391,7 +391,7 @@ export class APICostOptimizer {
    */
   async implementDynamicThrottling(regionId: string): Promise<void> {
     const limits = await this.getRegionLimits(regionId);
-    const budgetUsage = (limits.currentMonthlySpent?.toNumber() || 0) / (limits.monthlyBudget?.toNumber() || 1);
+    const budgetUsage = parseFloat(limits.currentMonthlySpent?.toString() || '0') / parseFloat(limits.monthlyBudget?.toString() || '1');
     
     // Throttling agressivo se orçamento > 80%
     if (budgetUsage > 0.8) {
@@ -446,7 +446,7 @@ export class APICostOptimizer {
 
     const [created] = await db
       .insert(regionApiLimits)
-      .values(defaultLimits)
+      .values([defaultLimits])
       .returning();
 
     return created;
