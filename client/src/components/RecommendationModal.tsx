@@ -43,10 +43,17 @@ interface RecommendationModalProps {
 interface SpecialistEvaluation {
   id: string;
   title: string;
-  icon: React.ReactNode;
+  icon: 'heart' | 'target' | 'award';
   color: string;
   content?: string;
 }
+
+// Map for icon components - keeps React elements separate from data
+const iconMap = {
+  heart: Heart,
+  target: Target,
+  award: Award,
+} as const;
 
 // Função para verificar se texto contém apenas hashtags (dados incorretos)
 const isHashtagOnlyText = (text: string): boolean => {
@@ -72,7 +79,7 @@ const parseSpecialistEvaluations = (product: Product): SpecialistEvaluation[] =>
     evaluations.push({
       id: "nutritionist",
       title: "Nutricionista",
-      icon: <Heart className="w-4 h-4" />,
+      icon: "heart",
       color: "bg-pink-500",
       content: product.nutritionistEvaluation
     });
@@ -83,7 +90,7 @@ const parseSpecialistEvaluations = (product: Product): SpecialistEvaluation[] =>
     evaluations.push({
       id: "organizer",
       title: "Organização Doméstica",
-      icon: <Target className="w-4 h-4" />,
+      icon: "target",
       color: "bg-blue-500",
       content: product.organizerEvaluation
     });
@@ -94,7 +101,7 @@ const parseSpecialistEvaluations = (product: Product): SpecialistEvaluation[] =>
     evaluations.push({
       id: "design",
       title: "Design e Usabilidade",
-      icon: <Award className="w-4 h-4" />,
+      icon: "award",
       color: "bg-purple-500",
       content: product.designEvaluation
     });
@@ -122,7 +129,10 @@ function CompactSpecialistItem({
       >
         <div className="flex items-center gap-3">
           <div className={`w-8 h-8 ${evaluation.color} rounded-lg flex items-center justify-center text-white`}>
-            {evaluation.icon}
+            {(() => {
+              const IconComponent = iconMap[evaluation.icon];
+              return <IconComponent className="w-4 h-4" />;
+            })()}
           </div>
           <span className="font-semibold text-gray-900 text-sm text-left">
             {evaluation.title}
