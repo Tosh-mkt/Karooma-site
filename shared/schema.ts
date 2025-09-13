@@ -345,3 +345,192 @@ export type InsertFlipbookModalTrigger = typeof flipbookModalTriggers.$inferInse
 // Flipbook types
 export type Flipbook = typeof flipbooks.$inferSelect;
 export type InsertFlipbook = z.infer<typeof insertFlipbookSchema>;
+
+// ========================================
+// GLOBALIZAÇÃO - SISTEMA MULTI-REGIONAL
+// ========================================
+
+// Tabela de regiões/marketplaces suportados
+export const regions = pgTable("regions", {
+  id: varchar("id").primaryKey(), // 'BR', 'US', 'ES', 'FR', 'DE', 'MX', etc.
+  name: text("name").notNull(), // "Brasil", "Estados Unidos", etc.
+  currency: varchar("currency", { length: 3 }).notNull(), // 'BRL', 'USD', 'EUR'
+  language: varchar("language", { length: 5 }).notNull(), // 'pt-BR', 'en-US', 'es-ES'
+  amazonDomain: varchar("amazon_domain").notNull(), // 'amazon.com.br', 'amazon.com'
+  affiliateTag: varchar("affiliate_tag"), // Tag de afiliado para esta região
+  isActive: boolean("is_active").default(true),
+  priority: integer("priority").default(1), // Prioridade para fallback
+  timezone: varchar("timezone").default("UTC"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Dados regionais dos produtos (cache inteligente)
+export const productRegionalData = pgTable("product_regional_data", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  regionId: varchar("region_id").notNull().references(() => regions.id, { onDelete: "cascade" }),
+  asin: varchar("asin", { length: 10 }), // ASIN específico da região
+  localPrice: decimal("local_price", { precision: 10, scale: 2 }),
+  originalLocalPrice: decimal("original_local_price", { precision: 10, scale: 2 }),
+  currency: varchar("currency", { length: 3 }),
+  affiliateLink: text("affiliate_link"), // Link de afiliado regionalizado
+  availability: varchar("availability", { length: 50 }).default("unknown"),
+  rating: decimal("rating", { precision: 2, scale: 1 }),
+  reviewCount: integer("review_count"),
+  isPrime: boolean("is_prime").default(false),
+  shippingInfo: text("shipping_info"),
+  localizedTitle: text("localized_title"), // Título traduzido/adaptado
+  localizedDescription: text("localized_description"),
+  // Cache da PA API para esta região
+  amazonRegionalData: json("amazon_regional_data"),
+  // Controle de atualização
+  lastChecked: timestamp("last_checked"),
+  lastUpdated: timestamp("last_updated"),
+  checkFrequency: varchar("check_frequency", { length: 20 }).default("medium"),
+  failedChecks: integer("failed_checks").default(0),
+  isAvailable: boolean("is_available").default(true),
+  unavailableSince: timestamp("unavailable_since"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_product_regional_product").on(table.productId),
+  index("idx_product_regional_region").on(table.regionId),
+  index("idx_product_regional_asin").on(table.asin),
+  index("idx_product_regional_availability").on(table.isAvailable),
+]);
+
+// Cache de consultas de localização de usuários
+export const userLocationCache = pgTable("user_location_cache", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  ipAddress: varchar("ip_address").notNull(),
+  countryCode: varchar("country_code", { length: 2 }),
+  regionCode: varchar("region_code", { length: 10 }),
+  city: varchar("city"),
+  detectedRegion: varchar("detected_region").notNull().references(() => regions.id),
+  confidence: decimal("confidence", { precision: 3, scale: 2 }), // 0.00 a 1.00
+  source: varchar("source", { length: 50 }), // 'geoip', 'cloudflare', 'manual'
+  browserLanguage: varchar("browser_language"),
+  timezone: varchar("timezone"),
+  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(), // Cache expira em 7 dias
+}, (table) => [
+  index("idx_user_location_ip").on(table.ipAddress),
+  index("idx_user_location_expires").on(table.expiresAt),
+]);
+
+// Preferências regionais do usuário (localStorage + banco)
+export const userRegionalPreferences = pgTable("user_regional_preferences", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id"), // Para usuários não logados
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }), // Para usuários logados
+  preferredRegion: varchar("preferred_region").notNull().references(() => regions.id),
+  detectedRegion: varchar("detected_region").references(() => regions.id),
+  isManualSelection: boolean("is_manual_selection").default(false),
+  lastUsed: timestamp("last_used").defaultNow(),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_user_prefs_session").on(table.sessionId),
+  index("idx_user_prefs_user").on(table.userId),
+]);
+
+// Analytics de links inteligentes (para otimização)
+export const smartLinkAnalytics = pgTable("smart_link_analytics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  originalRegion: varchar("original_region").notNull().references(() => regions.id),
+  redirectedRegion: varchar("redirected_region").notNull().references(() => regions.id),
+  userAgent: text("user_agent"),
+  ipAddress: varchar("ip_address"),
+  wasAvailable: boolean("was_available"),
+  fallbackUsed: boolean("fallback_used").default(false),
+  clickTimestamp: timestamp("click_timestamp").defaultNow(),
+}, (table) => [
+  index("idx_smart_link_product").on(table.productId),
+  index("idx_smart_link_date").on(table.clickTimestamp),
+]);
+
+// Configurações de custo e orçamento da PA API por região
+export const regionApiLimits = pgTable("region_api_limits", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  regionId: varchar("region_id").notNull().references(() => regions.id, { onDelete: "cascade" }),
+  dailyRequestLimit: integer("daily_request_limit").default(1000),
+  currentDailyUsage: integer("current_daily_usage").default(0),
+  monthlyBudget: decimal("monthly_budget", { precision: 10, scale: 2 }),
+  currentMonthlySpent: decimal("current_monthly_spent", { precision: 10, scale: 2 }).default("0"),
+  costPerRequest: decimal("cost_per_request", { precision: 5, scale: 4 }), // Em USD
+  lastReset: timestamp("last_reset").defaultNow(),
+  isThrottled: boolean("is_throttled").default(false),
+  throttleUntil: timestamp("throttle_until"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_region_limits_region").on(table.regionId),
+]);
+
+// Tabela de produtos similares/equivalentes entre regiões
+export const productMappings = pgTable("product_mappings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  baseProductId: varchar("base_product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  equivalentProductId: varchar("equivalent_product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  regionId: varchar("region_id").notNull().references(() => regions.id),
+  similarityScore: decimal("similarity_score", { precision: 3, scale: 2 }), // 0.00 a 1.00
+  mappingType: varchar("mapping_type", { length: 50 }).default("automatic"), // 'automatic', 'manual', 'ai-generated'
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_product_mapping_base").on(table.baseProductId),
+  index("idx_product_mapping_region").on(table.regionId),
+]);
+
+// Insert schemas para as novas tabelas
+export const insertRegionSchema = createInsertSchema(regions).omit({
+  createdAt: true,
+});
+
+export const insertProductRegionalDataSchema = createInsertSchema(productRegionalData).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserLocationCacheSchema = createInsertSchema(userLocationCache).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserRegionalPreferencesSchema = createInsertSchema(userRegionalPreferences).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSmartLinkAnalyticsSchema = createInsertSchema(smartLinkAnalytics).omit({
+  id: true,
+  clickTimestamp: true,
+});
+
+export const insertRegionApiLimitsSchema = createInsertSchema(regionApiLimits).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProductMappingsSchema = createInsertSchema(productMappings).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types para as novas tabelas
+export type Region = typeof regions.$inferSelect;
+export type InsertRegion = z.infer<typeof insertRegionSchema>;
+export type ProductRegionalData = typeof productRegionalData.$inferSelect;
+export type InsertProductRegionalData = z.infer<typeof insertProductRegionalDataSchema>;
+export type UserLocationCache = typeof userLocationCache.$inferSelect;
+export type InsertUserLocationCache = z.infer<typeof insertUserLocationCacheSchema>;
+export type UserRegionalPreferences = typeof userRegionalPreferences.$inferSelect;
+export type InsertUserRegionalPreferences = z.infer<typeof insertUserRegionalPreferencesSchema>;
+export type SmartLinkAnalytics = typeof smartLinkAnalytics.$inferSelect;
+export type InsertSmartLinkAnalytics = z.infer<typeof insertSmartLinkAnalyticsSchema>;
+export type RegionApiLimits = typeof regionApiLimits.$inferSelect;
+export type InsertRegionApiLimits = z.infer<typeof insertRegionApiLimitsSchema>;
+export type ProductMappings = typeof productMappings.$inferSelect;
+export type InsertProductMappings = z.infer<typeof insertProductMappingsSchema>;
