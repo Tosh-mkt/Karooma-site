@@ -163,24 +163,7 @@ function CompactSpecialistItem({
 
 export default function RecommendationModal({ product, isOpen, onClose }: RecommendationModalProps) {
   const { toast } = useToast();
-  
-  // Log temporário para debug
-  console.log("🔍 RecommendationModal - Product data:", {
-    id: product.id,
-    title: product.title,
-    introduction: product.introduction,
-    teamEvaluation: product.teamEvaluation,
-    karoomaTeamEvaluation: product.karoomaTeamEvaluation,
-    nutritionistEvaluation: product.nutritionistEvaluation,
-    organizerEvaluation: product.organizerEvaluation,
-    designEvaluation: product.designEvaluation,
-    categoryTags: product.categoryTags,
-    searchTags: product.searchTags
-  });
-  
   const specialistEvaluations = parseSpecialistEvaluations(product);
-  console.log("🔍 Specialist evaluations found:", specialistEvaluations);
-  
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   const toggleExpanded = (id: string) => {
