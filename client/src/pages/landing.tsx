@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useConsent } from "@/contexts/ConsentContext";
 import karoomaLogo from "@/assets/LOGO_KAROOMA_TIPO_1753945361411.png";
 import heroBackground from "@assets/generated_images/Papercraft_origami_chaos_to_harmony_4b428ce9.png";
 
@@ -16,6 +17,7 @@ export default function Landing() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { canUseAnalytics } = useConsent();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,8 +42,8 @@ export default function Landing() {
       // Reset form
       setFormData({ name: "", email: "" });
 
-      // Track conversion (opcional - para analytics)
-      if (typeof window !== 'undefined' && (window as any).gtag) {
+      // Track conversion (opcional - para analytics) - só se consentimento for dado
+      if (canUseAnalytics && typeof window !== 'undefined' && (window as any).gtag) {
         (window as any).gtag('event', 'conversion', {
           'send_to': 'landing_page_signup'
         });

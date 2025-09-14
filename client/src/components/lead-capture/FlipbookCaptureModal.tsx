@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { getFlipbookTheme } from '@shared/flipbook-themes';
+import { useConsent } from '@/contexts/ConsentContext';
 
 interface FlipbookCaptureModalProps {
   isOpen: boolean;
@@ -59,6 +60,7 @@ export function FlipbookCaptureModal({
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const { toast } = useToast();
+  const { canUseAnalytics } = useConsent();
   
   const theme = getFlipbookTheme(flipbookTheme);
   
@@ -98,8 +100,8 @@ export function FlipbookCaptureModal({
     },
     onSuccess: () => {
       setStep(2);
-      // Analytics tracking
-      if (typeof (window as any).gtag !== 'undefined') {
+      // Analytics tracking - só se consentimento for dado
+      if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
         (window as any).gtag('event', 'flipbook_conversion', {
           flipbook_theme: flipbookTheme,
           post_id: postId,

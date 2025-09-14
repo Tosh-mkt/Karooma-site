@@ -34,12 +34,15 @@ import { AdminLogin } from "./pages/AdminLogin";
 import { Register } from "./pages/Register";
 import Favorites from "./pages/Favorites";
 import { PageRenderer } from "./components/PageRenderer";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 
 import NotFound from "./pages/not-found";
 import Navigation from "./components/layout/navigation";
 import Footer from "./components/layout/footer";
 import { LandingLayout } from "./components/layout/landing-layout";
 import { AutoNotification } from "./components/content/auto-notification";
+import { CookieConsent } from "./components/CookieConsent";
+import { ConsentProvider } from "./contexts/ConsentContext";
 import { motion } from "framer-motion";
 
 function Router() {
@@ -101,6 +104,7 @@ function Router() {
               <Route path="/admin/temp-login" component={TempLogin} />
               
               <Route path="/sobre" component={About} />
+              <Route path="/privacidade" component={PrivacyPolicy} />
               <Route path="/ebook-test" component={EbookTest} />
               
               {/* Dynamic Page Routes - specific slugs */}
@@ -127,9 +131,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="custom-scrollbar">
-          <Router />
-        </div>
+        <ConsentProvider>
+          <div className="custom-scrollbar">
+            <Router />
+            <CookieConsent />
+          </div>
+        </ConsentProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

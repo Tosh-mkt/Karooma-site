@@ -5,6 +5,7 @@ import { FlipbookAccessGuard } from '@/components/flipbook/FlipbookAccessGuard';
 import { motion } from 'framer-motion';
 import { BookOpen, AlertCircle, ArrowLeft } from 'lucide-react';
 import { Link } from 'wouter';
+import { useConsent } from '@/contexts/ConsentContext';
 
 interface FlipbookPageData {
   id: string;
@@ -37,6 +38,7 @@ export default function GeneratedFlipbookPage() {
   const [flipbook, setFlipbook] = useState<FlipbookData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { canUseAnalytics } = useConsent();
   
   const flipbookId = params?.flipbookId;
 
@@ -219,8 +221,8 @@ export default function GeneratedFlipbookPage() {
         <GeneratedFlipbook 
           flipbook={flipbook}
           onPageChange={(pageIndex) => {
-            // Analytics opcional
-            if (typeof (window as any).gtag !== 'undefined') {
+            // Analytics opcional - só se consentimento for dado
+            if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
               (window as any).gtag('event', 'flipbook_page_view', {
                 flipbook_id: flipbook.id,
                 post_id: flipbook.postId,

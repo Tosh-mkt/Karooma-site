@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useConsent } from '@/contexts/ConsentContext';
 
 interface FlipbookCaptureConfig {
   enabled: boolean;
@@ -47,6 +48,7 @@ export function useFlipbookCapture({
   const [isGenerating, setIsGenerating] = useState(false);
   const [showGenerateButton, setShowGenerateButton] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const { canUseAnalytics } = useConsent();
 
   // Verificar se existe flipbook gerado para este post
   useEffect(() => {
@@ -209,8 +211,8 @@ export function useFlipbookCapture({
             setIsModalOpen(true);
           }
           
-          // Analytics
-          if (typeof (window as any).gtag !== 'undefined') {
+          // Analytics - só se consentimento for dado
+          if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
             (window as any).gtag('event', 'flipbook_modal_triggered', {
               trigger_type: 'time',
               post_id: postId,
@@ -243,8 +245,8 @@ export function useFlipbookCapture({
           setIsModalOpen(true);
         }
         
-        // Analytics
-        if (typeof (window as any).gtag !== 'undefined') {
+        // Analytics - só se consentimento for dado
+        if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
           (window as any).gtag('event', 'flipbook_modal_triggered', {
             trigger_type: 'scroll',
             post_id: postId,
@@ -273,7 +275,7 @@ export function useFlipbookCapture({
     
     // Se não está logado, mostrar modal de captura
     setIsModalOpen(true);
-    if (typeof (window as any).gtag !== 'undefined') {
+    if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
       (window as any).gtag('event', 'flipbook_modal_opened', {
         trigger_type: 'manual',
         post_id: postId,
@@ -298,8 +300,8 @@ export function useFlipbookCapture({
         })
       });
 
-      // Analytics para usuário logado
-      if (typeof (window as any).gtag !== 'undefined') {
+      // Analytics para usuário logado - só se consentimento for dado
+      if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
         (window as any).gtag('event', 'flipbook_download_authenticated', {
           flipbook_theme: flipbookConfig.themeId,
           post_id: postId,
@@ -411,8 +413,8 @@ export function useFlipbookCapture({
               setShowGenerateButton(false);
               setIsGenerating(false);
               
-              // Analytics
-              if (typeof (window as any).gtag !== 'undefined') {
+              // Analytics - só se consentimento for dado
+              if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
                 (window as any).gtag('event', 'flipbook_generated_success', {
                   flipbook_id: flipbookId,
                   post_id: postId,
@@ -427,8 +429,8 @@ export function useFlipbookCapture({
             setShowGenerateButton(true); // Permitir tentar novamente
             alert('Falha na geração do guia. Você pode tentar novamente.');
             
-            // Analytics
-            if (typeof (window as any).gtag !== 'undefined') {
+            // Analytics - só se consentimento for dado
+            if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
               (window as any).gtag('event', 'flipbook_generation_failed', {
                 flipbook_id: flipbookId,
                 post_id: postId,
@@ -491,6 +493,8 @@ export function useFlipbookCapture({
 
 // Hook para analytics de conversão
 export function useConversionTracking() {
+  const { canUseAnalytics } = useConsent();
+  
   const trackConversion = (data: {
     postId?: string;
     flipbookTheme: string;
@@ -498,8 +502,8 @@ export function useConversionTracking() {
     source: string;
     timestamp?: Date;
   }) => {
-    // Google Analytics
-    if (typeof (window as any).gtag !== 'undefined') {
+    // Google Analytics - só se consentimento for dado
+    if (canUseAnalytics && typeof (window as any).gtag !== 'undefined') {
       (window as any).gtag('event', 'conversion', {
         event_category: 'flipbook',
         event_label: data.flipbookTheme,

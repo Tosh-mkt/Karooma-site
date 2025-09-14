@@ -25,7 +25,7 @@ import { blogValidator } from "./blog-validator";
 import path from "path";
 import express from "express";
 import { flipbookGenerator } from "./services/flipbookGenerator";
-import { insertFlipbookSchema } from "@shared/schema";
+import { insertFlipbookSchema, insertCookieConsentSchema } from "@shared/schema";
 import { extractUserInfo } from "./middleware/flipbookAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1557,6 +1557,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching flipbook status:", error);
       res.status(500).json({ error: "Failed to fetch flipbook status" });
+    }
+  });
+
+  // Cookie Consent Routes
+  app.post("/api/cookie-consent", async (req, res) => {
+    try {
+      const validatedData = insertCookieConsentSchema.parse(req.body);
+      const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('User-Agent') || '';
+      
+      const consentData = {
+        ...validatedData,
+        ipAddress: clientIP,
+        userAgent: userAgent
+      };
+      
+      const consent = await storage.createCookieConsent(consentData);
+      
+      res.json({
+        success: true,
+        message: "Preferências de cookies salvas com sucesso!",
+        consent: {
+          id: consent.id,
+          sessionId: consent.sessionId,
+          necessary: consent.necessary,
+          analytics: consent.analytics,
+          marketing: consent.marketing,
+          consentDate: consent.consentDate
+        }
+      });
+    } catch (error) {
+      console.error("Error creating cookie consent:", error);
+      res.status(400).json({ 
+        error: "Erro ao salvar preferências de cookies",
+        details: error instanceof z.ZodError ? error.errors : undefined 
+      });
+    }
+  });
+
+  app.put("/api/cookie-consent/:sessionId", async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const validatedData = insertCookieConsentSchema.partial().parse(req.body);
+      
+      // Remove sessionId e userEmail dos dados de update por segurança
+      const { sessionId: _, userEmail: __, ...safeData } = validatedData;
+      
+      const consent = await storage.updateCookieConsent(sessionId, safeData);
+      
+      res.json({
+        success: true,
+        message: "Preferências atualizadas com sucesso!",
+        consent: {
+          id: consent.id,
+          sessionId: consent.sessionId,
+          necessary: consent.necessary,
+          analytics: consent.analytics,
+          marketing: consent.marketing,
+          lastUpdated: consent.lastUpdated
+        }
+      });
+    } catch (error) {
+      console.error("Error updating cookie consent:", error);
+      res.status(400).json({ 
+        error: "Erro ao atualizar preferências de cookies" 
+      });
+    }
+  });
+
+  app.get("/api/cookie-consent/:sessionId", async (req, res) => {
+    try {
+      const { sessionId } = req.params;
+      const consent = await storage.getCookieConsent(sessionId);
+      
+      if (!consent) {
+        return res.status(404).json({ error: "Consentimento não encontrado" });
+      }
+      
+      res.json({
+        consent: {
+          id: consent.id,
+          sessionId: consent.sessionId,
+          necessary: consent.necessary,
+          analytics: consent.analytics,
+          marketing: consent.marketing,
+          consentDate: consent.consentDate,
+          lastUpdated: consent.lastUpdated
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching cookie consent:", error);
+      res.status(500).json({ error: "Erro ao buscar preferências de cookies" });
     }
   });
 

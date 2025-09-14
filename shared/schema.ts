@@ -336,11 +336,39 @@ export const insertFlipbookSchema = createInsertSchema(flipbooks).omit({
   updatedAt: true,
 });
 
+// Tabela para consentimentos de cookies
+export const cookieConsents = pgTable("cookie_consents", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id"), // Para visitantes anônimos
+  userEmail: varchar("user_email"), // Para usuários identificados (newsletter)
+  necessary: boolean("necessary").notNull().default(true),
+  analytics: boolean("analytics").notNull().default(false),
+  marketing: boolean("marketing").notNull().default(false),
+  ipAddress: varchar("ip_address"),
+  userAgent: text("user_agent"),
+  consentDate: timestamp("consent_date").defaultNow(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+}, (table) => [
+  index("cookie_consents_session_idx").on(table.sessionId),
+  index("cookie_consents_email_idx").on(table.userEmail),
+  index("cookie_consents_date_idx").on(table.consentDate),
+]);
+
+export const insertCookieConsentSchema = createInsertSchema(cookieConsents).omit({
+  id: true,
+  consentDate: true,
+  lastUpdated: true,
+});
+
 // Analytics types
 export type FlipbookConversion = typeof flipbookConversions.$inferSelect;
 export type InsertFlipbookConversion = typeof flipbookConversions.$inferInsert;
 export type FlipbookModalTrigger = typeof flipbookModalTriggers.$inferSelect;
 export type InsertFlipbookModalTrigger = typeof flipbookModalTriggers.$inferInsert;
+
+// Cookie Consent types
+export type CookieConsent = typeof cookieConsents.$inferSelect;
+export type InsertCookieConsent = z.infer<typeof insertCookieConsentSchema>;
 
 // Flipbook types
 export type Flipbook = typeof flipbooks.$inferSelect;

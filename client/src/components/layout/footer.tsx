@@ -124,19 +124,34 @@ export default function Footer() {
         >
           <div className="text-gray-400 font-inter text-sm space-y-1">
             <p>© 2024 Karooma. Todos os direitos reservados.</p>
-            <p className="text-xs">Como associado da Amazon, a Karooma ganha com compras qualificadas.</p>
+            <p className="text-xs">💜 Como associada da Amazon, a Karooma recebe uma comissão quando você compra produtos que recomendamos (sem custo extra para você!).</p>
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            {["Privacidade", "Termos", "Cookies"].map((item) => (
-              <motion.a
-                key={item}
-                href="#"
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <Link 
+                href="/privacidade" 
                 className="text-gray-400 hover:text-white transition-colors duration-300 text-sm font-inter"
-                whileHover={{ scale: 1.05 }}
               >
-                {item}
-              </motion.a>
-            ))}
+                Privacidade
+              </Link>
+            </motion.div>
+            <motion.a
+              href="#"
+              className="text-gray-400 hover:text-white transition-colors duration-300 text-sm font-inter"
+              whileHover={{ scale: 1.05 }}
+            >
+              Termos
+            </motion.a>
+            <motion.button
+              onClick={() => {
+                // Dispara evento customizado para reabrir banner de cookies
+                window.dispatchEvent(new CustomEvent("reopen-cookie-banner"));
+              }}
+              className="text-gray-400 hover:text-white transition-colors duration-300 text-sm font-inter cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+            >
+              Cookies
+            </motion.button>
           </div>
         </motion.div>
       </div>

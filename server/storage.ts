@@ -16,6 +16,8 @@ import {
   type InsertAuthorizedFlipbookUser,
   type Flipbook,
   type InsertFlipbook,
+  type CookieConsent,
+  type InsertCookieConsent,
   users,
   content,
   products,
@@ -26,6 +28,7 @@ import {
   flipbooks,
   flipbookConversions,
   flipbookModalTriggers,
+  cookieConsents,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -103,6 +106,11 @@ export interface IStorage {
   createFlipbook(data: InsertFlipbook): Promise<Flipbook>;
   updateFlipbookStatus(id: string, status: string, updates?: Partial<Flipbook>): Promise<Flipbook>;
   upsertFlipbookByPost(postId: string, data: InsertFlipbook): Promise<Flipbook>;
+
+  // Cookie consent methods
+  createCookieConsent(data: InsertCookieConsent): Promise<CookieConsent>;
+  updateCookieConsent(sessionId: string, data: Partial<InsertCookieConsent>): Promise<CookieConsent>;
+  getCookieConsent(sessionId: string): Promise<CookieConsent | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -546,6 +554,19 @@ export class MemStorage implements IStorage {
 
   async getAllAuthorizedUsers(): Promise<AuthorizedFlipbookUser[]> {
     return [];
+  }
+
+  // Cookie consent methods for MemStorage
+  async createCookieConsent(data: InsertCookieConsent): Promise<CookieConsent> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+
+  async updateCookieConsent(sessionId: string, data: Partial<InsertCookieConsent>): Promise<CookieConsent> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+
+  async getCookieConsent(sessionId: string): Promise<CookieConsent | undefined> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
   }
 
   // Flipbook methods for MemStorage
@@ -1160,6 +1181,43 @@ export class DatabaseStorage implements IStorage {
     } else {
       return await this.createFlipbook({ ...data, postId });
     }
+  }
+
+  // Cookie consent methods
+  async createCookieConsent(data: InsertCookieConsent): Promise<CookieConsent> {
+    const [consent] = await db
+      .insert(cookieConsents)
+      .values({
+        ...data,
+        consentDate: new Date(),
+        lastUpdated: new Date()
+      })
+      .returning();
+    return consent;
+  }
+
+  async updateCookieConsent(sessionId: string, data: Partial<InsertCookieConsent>): Promise<CookieConsent> {
+    const [consent] = await db
+      .update(cookieConsents)
+      .set({ 
+        ...data, 
+        lastUpdated: new Date() 
+      })
+      .where(eq(cookieConsents.sessionId, sessionId))
+      .returning();
+    if (!consent) {
+      throw new Error('Cookie consent not found');
+    }
+    return consent;
+  }
+
+  async getCookieConsent(sessionId: string): Promise<CookieConsent | undefined> {
+    const [consent] = await db
+      .select()
+      .from(cookieConsents)
+      .where(eq(cookieConsents.sessionId, sessionId))
+      .orderBy(desc(cookieConsents.lastUpdated));
+    return consent;
   }
 }
 
