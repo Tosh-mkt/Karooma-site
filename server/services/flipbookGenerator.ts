@@ -122,7 +122,7 @@ export class FlipbookGenerator {
     console.info(`Generating flipbook ${flipbook.id}...`);
     
     const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => reject(new Error('Timeout generating content')), 60000);
+      setTimeout(() => reject(new Error('Timeout generating content')), 180000); // 3 minutos
     });
 
     try {
