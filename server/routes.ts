@@ -78,8 +78,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Google Sheets Import - Importar produtos do CSV
-  app.post("/api/admin/import-products", async (req, res) => {
+  app.post("/api/admin/import-products", extractUserInfo, async (req: any, res) => {
     try {
+      // Verificar se o usuário está autenticado e é admin
+      if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores podem importar produtos." });
+      }
+
       const { csvData, overwrite = false } = req.body;
       
       if (!csvData) {
@@ -184,7 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           originalPrice: productData['Preço Original'] || productData['Original Price'] || productData['originalPrice'],
           affiliateLink: productData['Link Afiliado'] || productData['Affiliate Link'] || productData['affiliateLink'],
           productLink: productData['Link do Produto'] || productData['Product Link'] || productData['productLink'],
-          rating: productData['Avaliação'] || productData['Rating'] || productData['rating'],
+          rating: String(productData['Avaliação'] || productData['Rating'] || productData['rating'] || ''),
           discount: productData['Desconto'] || productData['Discount'] || productData['discount'],
           featured: (productData['Destaque'] || productData['Featured'] || productData['featured'])?.toLowerCase() === 'true',
           expertReview: productData['Avaliação por especialistas'] || productData['Avaliação Especialista'] || productData['Expert Review'] || productData['expertReview'],
@@ -198,7 +203,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           designEvaluation: productData['Designer'] || productData['Design'] || productData['Avaliação Design'] || productData['Design Evaluation'] || productData['Avaliação de Design'] || productData['Análise Design'],
           karoomaTeamEvaluation: productData['Avaliação da Curadoria Karooma'] || productData['Avaliação Karooma'] || productData['Karooma Team Evaluation'],
           categoryTags: productData['Tags de Categorias e Benefícios'] || productData['Tags Categoria'] || productData['Category Tags'],
-          searchTags: productData['Tags de Filtros de Pesquisa'] || productData['Tags Busca'] || productData['Search Tags']
+          searchTags: productData['Tags de Filtros de Pesquisa'] || productData['Tags Busca'] || productData['Search Tags'],
+          asin: productData['ASIN'] || productData['asin'] || productData['Amazon ASIN'] || productData['Código ASIN']
         };
 
         // Validar dados essenciais (título e link afiliado são obrigatórios)
