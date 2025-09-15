@@ -1,0 +1,67 @@
+como eu posso criar os cards de produtos no meu blog para divulgação se os dados dependem do uso da API?
+Amazon Commerce Expert | A-commerce Advisor disse:
+
+Excelente dúvida 👌 — esse é justamente o desafio de quem trabalha com afiliados Amazon: você não pode simplesmente copiar imagens, preços ou descrições manualmente, porque a Amazon exige que os dados usados em cards de produtos venham diretamente da PA API ou de ferramentas aprovadas (para garantir atualização e conformidade com os termos).
+
+🔑 Maneiras de criar cards de produtos no blog
+1. Usando a Amazon PA API diretamente
+
+Você mesmo (ou seu dev) implementa chamadas à Product Advertising API v5.
+
+A API retorna: título, link, preço, imagem, rating.
+
+Com isso, você gera seus próprios cards em HTML/CSS no blog.
+
+Exemplo simplificado de um card:
+
+<div class="amazon-card">
+  <img src="IMAGEM_URL" alt="Produto">
+  <h3>Título do Produto</h3>
+  <p>Preço: R$199,00</p>
+  <p>⭐ 4.6</p>
+  <a href="LINK_AFILIADO" target="_blank">Ver na Amazon</a>
+</div>
+
+
+O conteúdo entre IMAGEM_URL, Título do Produto, Preço, Rating e LINK_AFILIADO deve ser preenchido dinamicamente a partir da API.
+
+2. Usando plugins WordPress especializados
+
+Se seu blog for em WordPress, você pode usar plugins já prontos que consomem a API automaticamente:
+
+AAWP (Amazon Affiliate WordPress Plugin)
+
+Lasso
+
+Amalinks Pro
+
+AzonPress
+
+Eles permitem criar shortcodes ou blocos Gutenberg que geram cards, listas, tabelas de comparação e até vitrines de produtos.
+➡️ Exemplo com AAWP:
+
+[aawp box="B07FZ8S74R"]
+
+
+Isso gera automaticamente um card com imagem, preço, botão, rating — tudo atualizado via API.
+
+3. Usando links/imagens nativos da Amazon (sem API)
+
+Na sua conta de Associados, existe a SiteStripe (barra que aparece quando você navega na Amazon).
+
+Você pode pegar um “Link de Imagem” ou “Link de Texto + Imagem”.
+
+Cola esse HTML no seu blog → gera um mini-banner do produto.
+⚠️ Mas aqui o design é limitado e não tão profissional quanto cards customizados.
+
+4. Estratégia híbrida
+
+Para listas grandes ou páginas de categoria: use API ou plugin para manter preços e avaliações atualizadas.
+
+Para recomendações pontuais: pode usar SiteStripe (mais rápido, sem depender de dev).
+
+🚀 Recomendação para você
+
+Se você já usa WordPress, o caminho mais simples e rápido é AAWP ou Lasso, porque eles resolvem API + card pronto + conformidade.
+
+Se você tem um blog custom (HTML/PHP/Python) → pode integrar direto com a PA API e criar seus próprios componentes (como o shortcode que já te mostrei antes).
