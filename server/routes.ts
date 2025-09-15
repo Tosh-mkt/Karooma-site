@@ -167,6 +167,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return 'geral'; // categoria padrão
       };
 
+      // Função para normalizar preços e ratings do formato brasileiro para padrão
+      const normalizePrice = (value: string) => {
+        if (!value || typeof value !== 'string') return '';
+        
+        // Remove espaços em branco extras
+        let normalized = value.trim();
+        
+        // Remove símbolos de moeda comuns (R$, $, €, £)
+        normalized = normalized.replace(/^(R\$|US\$|\$|€|£)\s*/i, '');
+        
+        // Remove pontos usados como separadores de milhar (apenas se há vírgula depois)
+        if (normalized.includes(',')) {
+          normalized = normalized.replace(/\./g, '');
+        }
+        
+        // Converte vírgula para ponto (formato brasileiro para internacional)
+        normalized = normalized.replace(',', '.');
+        
+        // Remove caracteres não numéricos exceto ponto decimal
+        normalized = normalized.replace(/[^\d.]/g, '');
+        
+        // Garante que só há um ponto decimal
+        const parts = normalized.split('.');
+        if (parts.length > 2) {
+          normalized = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
+        return normalized;
+      };
+
+      // Função para extrair imageUrl com mapeamentos expandidos
+      const extractImageUrl = (productData: any) => {
+        const imageFields = [
+          'Imagem', 'Image', 'imageUrl',
+          'Imagem URL', 'URL Imagem', 'Imagem Principal',
+          'URL da Imagem', 'Link da Imagem', 'Foto',
+          'Image URL', 'Primary Image', 'Main Image',
+          'Imagem Produto', 'Product Image', 'Foto Produto'
+        ];
+        
+        for (const field of imageFields) {
+          if (productData[field] && productData[field].trim()) {
+            return productData[field].trim();
+          }
+        }
+        
+        return '';
+      };
+
       const products = [];
       
       for (let i = 1; i < csvRows.length; i++) {
@@ -184,13 +233,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           title: productData['Nome do Produto'] || productData['Título'] || productData['Title'] || productData['title'],
           description: productData['Descrição'] || productData['Description'] || productData['description'],
           category: extractCategory(productData),
-          imageUrl: productData['Imagem'] || productData['Image'] || productData['imageUrl'],
-          currentPrice: productData['Preço Atual'] || productData['Current Price'] || productData['currentPrice'],
-          originalPrice: productData['Preço Original'] || productData['Original Price'] || productData['originalPrice'],
+          imageUrl: extractImageUrl(productData),
+          currentPrice: normalizePrice(productData['Preço Atual'] || productData['Current Price'] || productData['currentPrice'] || ''),
+          originalPrice: normalizePrice(productData['Preço Original'] || productData['Original Price'] || productData['originalPrice'] || ''),
           affiliateLink: productData['Link Afiliado'] || productData['Affiliate Link'] || productData['affiliateLink'],
           productLink: productData['Link do Produto'] || productData['Product Link'] || productData['productLink'],
-          rating: String(productData['Avaliação'] || productData['Rating'] || productData['rating'] || ''),
-          discount: productData['Desconto'] || productData['Discount'] || productData['discount'],
+          rating: normalizePrice(productData['Avaliação'] || productData['Rating'] || productData['rating'] || ''),
+          discount: normalizePrice(productData['Desconto'] || productData['Discount'] || productData['discount'] || ''),
           featured: (productData['Destaque'] || productData['Featured'] || productData['featured'])?.toLowerCase() === 'true',
           expertReview: productData['Avaliação por especialistas'] || productData['Avaliação Especialista'] || productData['Expert Review'] || productData['expertReview'],
           teamEvaluation: productData['Avaliação da Curadoria Karooma'] || productData['Avaliação Equipe'] || productData['Team Evaluation'] || productData['teamEvaluation'],
