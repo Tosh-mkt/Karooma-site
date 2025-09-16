@@ -190,6 +190,37 @@ export const authorizedFlipbookUsers = pgTable("authorized_flipbook_users", {
   index("idx_authorized_email_flipbook").on(table.email, table.flipbookId),
 ]);
 
+// Tabela de taxonomias hierárquicas para filtros de produtos
+export const taxonomies = pgTable("taxonomies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug", { length: 100 }).notNull().unique(), // Identificador único (ex: "comer-e-preparar")
+  name: text("name").notNull(), // Nome exibido (ex: "Comer e Preparar")
+  parentSlug: varchar("parent_slug", { length: 100 }), // null para categorias raiz
+  level: integer("level").notNull().default(1), // 1, 2, 3 para hierarquia
+  sortOrder: integer("sort_order").default(0), // Ordem de exibição
+  description: text("description"), // Descrição opcional
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_taxonomy_parent_slug").on(table.parentSlug),
+  index("idx_taxonomy_level").on(table.level),
+  index("idx_taxonomy_sort_order").on(table.sortOrder),
+]);
+
+// Tabela de relação muitos-para-muitos entre produtos e taxonomias
+export const productTaxonomies = pgTable("product_taxonomies", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  productId: varchar("product_id").notNull().references(() => products.id, { onDelete: "cascade" }),
+  taxonomySlug: varchar("taxonomy_slug", { length: 100 }).notNull().references(() => taxonomies.slug, { onDelete: "cascade" }),
+  isPrimary: boolean("is_primary").default(false), // Se é a taxonomia principal do produto
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_product_taxonomies_product_id").on(table.productId),
+  index("idx_product_taxonomies_taxonomy_slug").on(table.taxonomySlug),
+  index("idx_product_taxonomies_primary").on(table.isPrimary),
+]);
+
 export const upsertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
@@ -220,6 +251,19 @@ export const insertSectionSchema = createInsertSchema(sections).omit({
 });
 
 export const insertProductSchema = createInsertSchema(products).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Schema para taxonomias
+export const insertTaxonomySchema = createInsertSchema(taxonomies).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Schema para relação produto-taxonomia
+export const insertProductTaxonomySchema = createInsertSchema(productTaxonomies).omit({
   id: true,
   createdAt: true,
 });
@@ -277,6 +321,12 @@ export type InsertFavorite = typeof favorites.$inferInsert;
 // Authorized Flipbook Users types
 export type AuthorizedFlipbookUser = typeof authorizedFlipbookUsers.$inferSelect;
 export type InsertAuthorizedFlipbookUser = typeof authorizedFlipbookUsers.$inferInsert;
+
+// Taxonomy types
+export type Taxonomy = typeof taxonomies.$inferSelect;
+export type InsertTaxonomy = z.infer<typeof insertTaxonomySchema>;
+export type ProductTaxonomy = typeof productTaxonomies.$inferSelect;
+export type InsertProductTaxonomy = z.infer<typeof insertProductTaxonomySchema>;
 
 // Tabelas para Analytics de Conversão
 export const flipbookConversions = pgTable("flipbook_conversions", {

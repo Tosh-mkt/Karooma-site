@@ -791,8 +791,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Product routes (String.com integration ready)
   app.get("/api/products", async (req, res) => {
     try {
-      const products = await storage.getAllProducts();
-      res.json(products);
+      const { taxonomy, taxonomies } = req.query;
+      
+      if (taxonomy && typeof taxonomy === 'string') {
+        // Filter by single taxonomy
+        const products = await storage.getProductsByTaxonomy(taxonomy);
+        res.json(products);
+      } else if (taxonomies && typeof taxonomies === 'string') {
+        // Filter by multiple taxonomies (comma-separated)
+        const taxonomyList = taxonomies.split(',').map(t => t.trim()).filter(t => t);
+        const products = await storage.getProductsByTaxonomies(taxonomyList);
+        res.json(products);
+      } else {
+        // Get all products
+        const products = await storage.getAllProducts();
+        res.json(products);
+      }
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch products" });
     }
@@ -814,6 +828,74 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(products);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch products by category" });
+    }
+  });
+
+  // Taxonomy routes
+  app.get("/api/taxonomies", async (req, res) => {
+    try {
+      const taxonomies = await storage.getTaxonomyHierarchy();
+      
+      // Build hierarchical structure
+      const hierarchyMap = new Map();
+      const rootTaxonomies = [];
+      
+      // First pass: create the structure
+      taxonomies.forEach(taxonomy => {
+        hierarchyMap.set(taxonomy.slug, {
+          ...taxonomy,
+          children: []
+        });
+      });
+      
+      // Second pass: build the hierarchy
+      taxonomies.forEach(taxonomy => {
+        if (taxonomy.parentSlug) {
+          const parent = hierarchyMap.get(taxonomy.parentSlug);
+          if (parent) {
+            parent.children.push(hierarchyMap.get(taxonomy.slug));
+          }
+        } else {
+          rootTaxonomies.push(hierarchyMap.get(taxonomy.slug));
+        }
+      });
+      
+      res.json(rootTaxonomies);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch taxonomies" });
+    }
+  });
+
+  app.get("/api/taxonomies/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const taxonomy = await storage.getTaxonomyBySlug(slug);
+      if (!taxonomy) {
+        return res.status(404).json({ error: "Taxonomy not found" });
+      }
+      res.json(taxonomy);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch taxonomy" });
+    }
+  });
+
+  app.get("/api/taxonomies/:slug/children", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const children = await storage.getTaxonomiesByParent(slug);
+      res.json(children);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch taxonomy children" });
+    }
+  });
+
+  app.get("/api/taxonomies/:slug/products", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const products = await storage.getProductsByTaxonomy(slug);
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch products by taxonomy" });
     }
   });
 
@@ -1237,6 +1319,229 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao deletar produto:", error);
       res.status(500).json({ error: "Falha ao deletar produto" });
+    }
+  });
+
+  // Admin taxonomy management routes
+  app.post("/api/admin/taxonomies", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const taxonomyData = req.body;
+      const taxonomy = await storage.createTaxonomy(taxonomyData);
+      res.status(201).json(taxonomy);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create taxonomy" });
+    }
+  });
+
+  app.patch("/api/admin/taxonomies/:slug", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { slug } = req.params;
+      const updates = req.body;
+      const taxonomy = await storage.updateTaxonomy(slug, updates);
+      res.json(taxonomy);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update taxonomy" });
+    }
+  });
+
+  app.delete("/api/admin/taxonomies/:slug", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { slug } = req.params;
+      await storage.deleteTaxonomy(slug);
+      res.json({ message: "Taxonomy deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete taxonomy" });
+    }
+  });
+
+  // Product taxonomy relationship management
+  app.post("/api/admin/products/:productId/taxonomies", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { productId } = req.params;
+      const { taxonomySlug, isPrimary = false } = req.body;
+      
+      const productTaxonomy = await storage.addProductTaxonomy({
+        productId,
+        taxonomySlug,
+        isPrimary
+      });
+      
+      res.status(201).json(productTaxonomy);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add product taxonomy" });
+    }
+  });
+
+  app.delete("/api/admin/products/:productId/taxonomies/:taxonomySlug", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { productId, taxonomySlug } = req.params;
+      await storage.removeProductTaxonomy(productId, taxonomySlug);
+      res.json({ message: "Product taxonomy relationship removed" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to remove product taxonomy" });
+    }
+  });
+
+  app.get("/api/admin/products/:productId/taxonomies", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+      
+      const { productId } = req.params;
+      const taxonomies = await storage.getProductTaxonomies(productId);
+      res.json(taxonomies);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch product taxonomies" });
+    }
+  });
+
+  // Taxonomy import endpoint
+  app.post("/api/admin/taxonomies/import", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.isAdmin) {
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      // Define the taxonomy structure from the requirements
+      const taxonomyStructure = [
+        // Level 1 - Main Categories
+        { slug: "comer-e-preparar", name: "Comer e Preparar", parentSlug: null, level: 1, sortOrder: 1 },
+        { slug: "presentear", name: "Presentear", parentSlug: null, level: 1, sortOrder: 2 },
+        { slug: "saude-e-seguranca", name: "Saúde e Segurança", parentSlug: null, level: 1, sortOrder: 3 },
+        { slug: "decorar-e-brilhar", name: "Decorar e Brilhar", parentSlug: null, level: 1, sortOrder: 4 },
+        { slug: "sono-e-relaxamento", name: "Sono e Relaxamento", parentSlug: null, level: 1, sortOrder: 5 },
+        { slug: "aprender-e-brincar", name: "Aprender e Brincar", parentSlug: null, level: 1, sortOrder: 6 },
+        { slug: "sair-e-viajar", name: "Sair e Viajar", parentSlug: null, level: 1, sortOrder: 7 },
+        { slug: "organizacao", name: "Organização", parentSlug: null, level: 1, sortOrder: 8 },
+
+        // Level 2 - Subcategories for ComerEPreparar
+        { slug: "crianca-comer", name: "Criança", parentSlug: "comer-e-preparar", level: 2, sortOrder: 1 },
+        { slug: "bebe-comer", name: "Bebê", parentSlug: "comer-e-preparar", level: 2, sortOrder: 2 },
+        { slug: "familia-comer", name: "Família", parentSlug: "comer-e-preparar", level: 2, sortOrder: 3 },
+
+        // Level 2 - Subcategories for Presentear
+        { slug: "presente-ocasioes", name: "Presente para ocasiões", parentSlug: "presentear", level: 2, sortOrder: 1 },
+        { slug: "presente-idade", name: "Presente por idade", parentSlug: "presentear", level: 2, sortOrder: 2 },
+
+        // Level 3 - Sub-subcategories for Presente por idade
+        { slug: "bebe-presente", name: "Bebê", parentSlug: "presente-idade", level: 3, sortOrder: 1 },
+        { slug: "crianca-presente", name: "Criança", parentSlug: "presente-idade", level: 3, sortOrder: 2 },
+        { slug: "familia-presente", name: "Família", parentSlug: "presente-idade", level: 3, sortOrder: 3 },
+
+        // Level 2 - Subcategories for SaudeESeguranca
+        { slug: "crianca-saude", name: "Criança", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 1 },
+        { slug: "familia-saude", name: "Família", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 2 },
+        { slug: "primeiros-socorros", name: "Primeiros socorros", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 3 },
+        { slug: "casa-saude", name: "Casa", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 4 },
+        { slug: "cozinha-saude", name: "Cozinha", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 5 },
+        { slug: "area-servico-saude", name: "Área de serviço", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 6 },
+        { slug: "quarto-bebe-saude", name: "Quarto do bebê", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 7 },
+        { slug: "quarto-crianca-saude", name: "Quarto da criança", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 8 },
+        { slug: "carro-saude", name: "Carro", parentSlug: "saude-e-seguranca", level: 2, sortOrder: 9 },
+
+        // Level 2 - Subcategories for DecorarEBrilhar
+        { slug: "casa-decorar", name: "Casa", parentSlug: "decorar-e-brilhar", level: 2, sortOrder: 1 },
+        { slug: "cozinha-decorar", name: "Cozinha", parentSlug: "decorar-e-brilhar", level: 2, sortOrder: 2 },
+        { slug: "area-servico-decorar", name: "Área de serviço", parentSlug: "decorar-e-brilhar", level: 2, sortOrder: 3 },
+        { slug: "quarto-bebe-decorar", name: "Quarto do bebê", parentSlug: "decorar-e-brilhar", level: 2, sortOrder: 4 },
+        { slug: "quarto-crianca-decorar", name: "Quarto da criança", parentSlug: "decorar-e-brilhar", level: 2, sortOrder: 5 },
+        { slug: "carro-decorar", name: "Carro", parentSlug: "decorar-e-brilhar", level: 2, sortOrder: 6 },
+
+        // Level 2 - Subcategories for SonoERelaxamento
+        { slug: "bebe-sono", name: "Bebê", parentSlug: "sono-e-relaxamento", level: 2, sortOrder: 1 },
+        { slug: "crianca-sono", name: "Criança", parentSlug: "sono-e-relaxamento", level: 2, sortOrder: 2 },
+        { slug: "pais-cuidadores", name: "Pais e cuidadores", parentSlug: "sono-e-relaxamento", level: 2, sortOrder: 3 },
+
+        // Level 2 - Subcategories for AprenderEBrincar
+        { slug: "bebe-aprender", name: "Bebê", parentSlug: "aprender-e-brincar", level: 2, sortOrder: 1 },
+        { slug: "crianca-aprender", name: "Criança", parentSlug: "aprender-e-brincar", level: 2, sortOrder: 2 },
+        { slug: "familia-aprender", name: "Família", parentSlug: "aprender-e-brincar", level: 2, sortOrder: 3 },
+
+        // Level 2 - Subcategories for SairEViajar
+        { slug: "bebe-viajar", name: "Bebê", parentSlug: "sair-e-viajar", level: 2, sortOrder: 1 },
+        { slug: "crianca-viajar", name: "Criança", parentSlug: "sair-e-viajar", level: 2, sortOrder: 2 },
+        { slug: "familia-viajar", name: "Família", parentSlug: "sair-e-viajar", level: 2, sortOrder: 3 },
+        { slug: "primeiros-socorros-viajar", name: "Primeiros socorros", parentSlug: "sair-e-viajar", level: 2, sortOrder: 4 },
+        { slug: "carro-viajar", name: "Carro", parentSlug: "sair-e-viajar", level: 2, sortOrder: 5 },
+        { slug: "casa-viajar", name: "Casa", parentSlug: "sair-e-viajar", level: 2, sortOrder: 6 },
+        { slug: "cozinha-viajar", name: "Cozinha", parentSlug: "sair-e-viajar", level: 2, sortOrder: 7 },
+        { slug: "area-servico-viajar", name: "Área de serviço", parentSlug: "sair-e-viajar", level: 2, sortOrder: 8 },
+        { slug: "quarto-bebe-viajar", name: "Quarto do bebê", parentSlug: "sair-e-viajar", level: 2, sortOrder: 9 },
+        { slug: "quarto-crianca-viajar", name: "Quarto da criança", parentSlug: "sair-e-viajar", level: 2, sortOrder: 10 },
+
+        // Level 2 - Subcategories for Organizacao
+        { slug: "casa-organizacao", name: "Casa", parentSlug: "organizacao", level: 2, sortOrder: 1 },
+        { slug: "cozinha-organizacao", name: "Cozinha", parentSlug: "organizacao", level: 2, sortOrder: 2 },
+        { slug: "area-servico-organizacao", name: "Área de serviço", parentSlug: "organizacao", level: 2, sortOrder: 3 },
+        { slug: "quarto-bebe-organizacao", name: "Quarto do bebê", parentSlug: "organizacao", level: 2, sortOrder: 4 },
+        { slug: "quarto-crianca-organizacao", name: "Quarto da criança", parentSlug: "organizacao", level: 2, sortOrder: 5 },
+        { slug: "carro-organizacao", name: "Carro", parentSlug: "organizacao", level: 2, sortOrder: 6 },
+      ];
+
+      let importedCount = 0;
+      let skippedCount = 0;
+
+      // Import taxonomies in order (parents before children)
+      for (const taxonomy of taxonomyStructure) {
+        try {
+          const existing = await storage.getTaxonomyBySlug(taxonomy.slug);
+          if (existing) {
+            skippedCount++;
+            continue;
+          }
+
+          await storage.createTaxonomy(taxonomy);
+          importedCount++;
+        } catch (error) {
+          console.error(`Error importing taxonomy ${taxonomy.slug}:`, error);
+        }
+      }
+
+      res.json({ 
+        message: "Taxonomy import completed",
+        imported: importedCount,
+        skipped: skippedCount,
+        total: taxonomyStructure.length
+      });
+    } catch (error) {
+      console.error("Error importing taxonomies:", error);
+      res.status(500).json({ error: "Failed to import taxonomies" });
+    }
+  });
+
+  // Debug taxonomy endpoint
+  app.get("/api/debug/taxonomies", async (req, res) => {
+    try {
+      console.log("Debug: Testing taxonomy query...");
+      const rawQuery = await db
+        .select()
+        .from(taxonomies);
+      console.log("Debug: Raw query result:", rawQuery);
+      res.json(rawQuery);
+    } catch (error) {
+      console.error("Debug: Error in taxonomy query:", error);
+      res.status(500).json({ error: error.message });
     }
   });
 

@@ -1,0 +1,62 @@
+# TAGS DE FILTROS DE PESQUISA DE PRODUTOS NO SITE:
+
+#ComerEPreparar
+	- #Criança
+	- #Bebê
+	- #Família
+
+#Presentear
+	- #Presente para ocasiões
+	- #Presente por idade
+  		- #Bebê
+  		- #Criança
+  		- #Família
+
+#SaúdeESegurança
+	- #Criança
+	- #Família
+	- #Primeiros socorros
+	- #Casa
+	- #Cozinha
+	- #Área de serviço
+	- #Quarto do bebê
+	- #Quarto da criança
+	- #Carro
+
+#DecorarEBrilhar
+	- #Casa
+	- #Cozinha
+	- #Área de serviço
+	- #Quarto do bebê
+	- #Quarto da criança
+	- #Carro
+
+#SonoERelaxamento
+	- #Bebê
+	- #Criança
+	- #Pais e cuidadores
+
+#AprenderEBrincar
+	- #Bebê
+	- #Criança
+	- #Família
+
+#SairEViajar
+	- #Bebê
+	- #Criança
+	- #Família
+	- #Primeiros socorros
+	- #Carro
+	- #Casa
+	- #Cozinha
+	- #Área de serviço
+	- #Quarto do bebê
+	- #Quarto da criança
+
+#Organização
+	- #Casa
+	- #Cozinha
+	- #Área de serviço
+	- #Quarto do bebê
+	- #Quarto da criança
+	- #Carro

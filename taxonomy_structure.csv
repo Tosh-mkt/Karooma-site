@@ -1,0 +1,54 @@
+slug,name,parent_slug,sort_order,description
+comer-e-preparar,Comer e Preparar,,1,Produtos para alimentação e preparo de refeições
+presentear,Presentear,,2,Produtos ideais para presente
+saude-e-seguranca,Saúde e Segurança,,3,Produtos para saúde e segurança da família
+decorar-e-brilhar,Decorar e Brilhar,,4,Produtos para decoração e organização visual
+sono-e-relaxamento,Sono e Relaxamento,,5,Produtos para descanso e bem-estar
+aprender-e-brincar,Aprender e Brincar,,6,Produtos educativos e recreativos
+sair-e-viajar,Sair e Viajar,,7,Produtos para passeios e viagens
+organizacao,Organização,,8,Produtos para organização de ambientes
+comer-e-preparar/crianca,Criança,comer-e-preparar,1,Produtos de alimentação para crianças
+comer-e-preparar/bebe,Bebê,comer-e-preparar,2,Produtos de alimentação para bebês
+comer-e-preparar/familia,Família,comer-e-preparar,3,Produtos de alimentação para toda família
+presentear/presente-ocasioes,Presente para ocasiões,presentear,1,Presentes para datas especiais
+presentear/presente-idade,Presente por idade,presentear,2,Presentes categorizados por faixa etária
+presentear/presente-idade/bebe,Bebê,presentear/presente-idade,1,Presentes para bebês
+presentear/presente-idade/crianca,Criança,presentear/presente-idade,2,Presentes para crianças
+presentear/presente-idade/familia,Família,presentear/presente-idade,3,Presentes para toda família
+saude-e-seguranca/crianca,Criança,saude-e-seguranca,1,Produtos de saúde e segurança para crianças
+saude-e-seguranca/familia,Família,saude-e-seguranca,2,Produtos de saúde e segurança para família
+saude-e-seguranca/primeiros-socorros,Primeiros socorros,saude-e-seguranca,3,Produtos para primeiros socorros
+saude-e-seguranca/casa,Casa,saude-e-seguranca,4,Produtos de segurança para casa
+saude-e-seguranca/cozinha,Cozinha,saude-e-seguranca,5,Produtos de segurança para cozinha
+saude-e-seguranca/area-servico,Área de serviço,saude-e-seguranca,6,Produtos de segurança para área de serviço
+saude-e-seguranca/quarto-bebe,Quarto do bebê,saude-e-seguranca,7,Produtos de segurança para quarto do bebê
+saude-e-seguranca/quarto-crianca,Quarto da criança,saude-e-seguranca,8,Produtos de segurança para quarto da criança
+saude-e-seguranca/carro,Carro,saude-e-seguranca,9,Produtos de segurança para carro
+decorar-e-brilhar/casa,Casa,decorar-e-brilhar,1,Produtos de decoração para casa
+decorar-e-brilhar/cozinha,Cozinha,decorar-e-brilhar,2,Produtos de decoração para cozinha
+decorar-e-brilhar/area-servico,Área de serviço,decorar-e-brilhar,3,Produtos de decoração para área de serviço
+decorar-e-brilhar/quarto-bebe,Quarto do bebê,decorar-e-brilhar,4,Produtos de decoração para quarto do bebê
+decorar-e-brilhar/quarto-crianca,Quarto da criança,decorar-e-brilhar,5,Produtos de decoração para quarto da criança
+decorar-e-brilhar/carro,Carro,decorar-e-brilhar,6,Produtos de decoração para carro
+sono-e-relaxamento/bebe,Bebê,sono-e-relaxamento,1,Produtos de sono e relaxamento para bebês
+sono-e-relaxamento/crianca,Criança,sono-e-relaxamento,2,Produtos de sono e relaxamento para crianças
+sono-e-relaxamento/pais-cuidadores,Pais e cuidadores,sono-e-relaxamento,3,Produtos de relaxamento para pais e cuidadores
+aprender-e-brincar/bebe,Bebê,aprender-e-brincar,1,Produtos educativos para bebês
+aprender-e-brincar/crianca,Criança,aprender-e-brincar,2,Produtos educativos para crianças
+aprender-e-brincar/familia,Família,aprender-e-brincar,3,Produtos educativos para toda família
+sair-e-viajar/bebe,Bebê,sair-e-viajar,1,Produtos para viajar com bebês
+sair-e-viajar/crianca,Criança,sair-e-viajar,2,Produtos para viajar com crianças
+sair-e-viajar/familia,Família,sair-e-viajar,3,Produtos para viajar em família
+sair-e-viajar/primeiros-socorros,Primeiros socorros,sair-e-viajar,4,Produtos de primeiros socorros para viagem
+sair-e-viajar/carro,Carro,sair-e-viajar,5,Produtos para viagem de carro
+sair-e-viajar/casa,Casa,sair-e-viajar,6,Produtos para casa durante viagens
+sair-e-viajar/cozinha,Cozinha,sair-e-viajar,7,Produtos de cozinha para viagem
+sair-e-viajar/area-servico,Área de serviço,sair-e-viajar,8,Produtos para área de serviço em viagem
+sair-e-viajar/quarto-bebe,Quarto do bebê,sair-e-viajar,9,Produtos para quarto do bebê em viagem
+sair-e-viajar/quarto-crianca,Quarto da criança,sair-e-viajar,10,Produtos para quarto da criança em viagem
+organizacao/casa,Casa,organizacao,1,Produtos de organização para casa
+organizacao/cozinha,Cozinha,organizacao,2,Produtos de organização para cozinha
+organizacao/area-servico,Área de serviço,organizacao,3,Produtos de organização para área de serviço
+organizacao/quarto-bebe,Quarto do bebê,organizacao,4,Produtos de organização para quarto do bebê
+organizacao/quarto-crianca,Quarto da criança,organizacao,5,Produtos de organização para quarto da criança
+organizacao/carro,Carro,organizacao,6,Produtos de organização para carro

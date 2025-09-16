@@ -18,6 +18,10 @@ import {
   type InsertFlipbook,
   type CookieConsent,
   type InsertCookieConsent,
+  type Taxonomy,
+  type InsertTaxonomy,
+  type ProductTaxonomy,
+  type InsertProductTaxonomy,
   users,
   content,
   products,
@@ -29,6 +33,8 @@ import {
   flipbookConversions,
   flipbookModalTriggers,
   cookieConsents,
+  taxonomies,
+  productTaxonomies,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -37,7 +43,7 @@ import {
 import type { ConversionData, ModalTriggerData, ConversionMetrics, ThemePerformance, PostConversionReport } from "@shared/analytics";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, isNull } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -111,6 +117,22 @@ export interface IStorage {
   createCookieConsent(data: InsertCookieConsent): Promise<CookieConsent>;
   updateCookieConsent(sessionId: string, data: Partial<InsertCookieConsent>): Promise<CookieConsent>;
   getCookieConsent(sessionId: string): Promise<CookieConsent | undefined>;
+  
+  // Taxonomy methods
+  getAllTaxonomies(): Promise<Taxonomy[]>;
+  getTaxonomyBySlug(slug: string): Promise<Taxonomy | undefined>;
+  getTaxonomiesByParent(parentSlug: string | null): Promise<Taxonomy[]>;
+  createTaxonomy(data: InsertTaxonomy): Promise<Taxonomy>;
+  updateTaxonomy(slug: string, data: Partial<InsertTaxonomy>): Promise<Taxonomy>;
+  deleteTaxonomy(slug: string): Promise<void>;
+  getTaxonomyHierarchy(): Promise<Taxonomy[]>;
+  
+  // Product taxonomy relationship methods
+  getProductTaxonomies(productId: string): Promise<ProductTaxonomy[]>;
+  addProductTaxonomy(data: InsertProductTaxonomy): Promise<ProductTaxonomy>;
+  removeProductTaxonomy(productId: string, taxonomySlug: string): Promise<void>;
+  getProductsByTaxonomy(taxonomySlug: string): Promise<Product[]>;
+  getProductsByTaxonomies(taxonomySlugs: string[]): Promise<Product[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -120,6 +142,8 @@ export class MemStorage implements IStorage {
   private newsletters: Map<string, NewsletterSubscription>;
   private pages: Map<string, Page>;
   private flipbooks: Map<string, Flipbook>;
+  private taxonomies: Map<string, Taxonomy>; // key: slug
+  private productTaxonomies: Map<string, ProductTaxonomy[]>; // key: productId
 
   constructor() {
     this.users = new Map();
@@ -128,6 +152,8 @@ export class MemStorage implements IStorage {
     this.newsletters = new Map();
     this.pages = new Map();
     this.flipbooks = new Map();
+    this.taxonomies = new Map();
+    this.productTaxonomies = new Map();
     
     // Initialize with empty state - no mock data
     // Real data will be added through API calls or String.com integration
@@ -1218,6 +1244,203 @@ export class DatabaseStorage implements IStorage {
       .where(eq(cookieConsents.sessionId, sessionId))
       .orderBy(desc(cookieConsents.lastUpdated));
     return consent;
+  }
+
+  // Taxonomy methods
+  async getAllTaxonomies(): Promise<Taxonomy[]> {
+    return await db
+      .select()
+      .from(taxonomies)
+      .orderBy(taxonomies.level, taxonomies.sortOrder);
+  }
+
+  async getTaxonomyBySlug(slug: string): Promise<Taxonomy | undefined> {
+    const [taxonomy] = await db
+      .select()
+      .from(taxonomies)
+      .where(eq(taxonomies.slug, slug));
+    return taxonomy || undefined;
+  }
+
+  async getTaxonomiesByParent(parentSlug: string | null): Promise<Taxonomy[]> {
+    if (parentSlug === null) {
+      return await db
+        .select()
+        .from(taxonomies)
+        .where(isNull(taxonomies.parentSlug))
+        .orderBy(taxonomies.sortOrder);
+    } else {
+      return await db
+        .select()
+        .from(taxonomies)
+        .where(eq(taxonomies.parentSlug, parentSlug))
+        .orderBy(taxonomies.sortOrder);
+    }
+  }
+
+  async createTaxonomy(data: InsertTaxonomy): Promise<Taxonomy> {
+    const [taxonomy] = await db
+      .insert(taxonomies)
+      .values(data)
+      .returning();
+    return taxonomy;
+  }
+
+  async updateTaxonomy(slug: string, data: Partial<InsertTaxonomy>): Promise<Taxonomy> {
+    const [taxonomy] = await db
+      .update(taxonomies)
+      .set(data)
+      .where(eq(taxonomies.slug, slug))
+      .returning();
+    if (!taxonomy) {
+      throw new Error('Taxonomy not found');
+    }
+    return taxonomy;
+  }
+
+  async deleteTaxonomy(slug: string): Promise<void> {
+    await db
+      .delete(taxonomies)
+      .where(eq(taxonomies.slug, slug));
+  }
+
+  async getTaxonomyHierarchy(): Promise<Taxonomy[]> {
+    return await db
+      .select()
+      .from(taxonomies)
+      .orderBy(taxonomies.level, taxonomies.sortOrder);
+  }
+
+  // Product taxonomy relationship methods
+  async getProductTaxonomies(productId: string): Promise<ProductTaxonomy[]> {
+    return await db
+      .select()
+      .from(productTaxonomies)
+      .where(eq(productTaxonomies.productId, productId));
+  }
+
+  async addProductTaxonomy(data: InsertProductTaxonomy): Promise<ProductTaxonomy> {
+    const [productTaxonomy] = await db
+      .insert(productTaxonomies)
+      .values(data)
+      .returning();
+    return productTaxonomy;
+  }
+
+  async removeProductTaxonomy(productId: string, taxonomySlug: string): Promise<void> {
+    await db
+      .delete(productTaxonomies)
+      .where(and(
+        eq(productTaxonomies.productId, productId),
+        eq(productTaxonomies.taxonomySlug, taxonomySlug)
+      ));
+  }
+
+  async getProductsByTaxonomy(taxonomySlug: string): Promise<Product[]> {
+    return await db
+      .select({
+        id: products.id,
+        title: products.title,
+        description: products.description,
+        category: products.category,
+        imageUrl: products.imageUrl,
+        currentPrice: products.currentPrice,
+        originalPrice: products.originalPrice,
+        affiliateLink: products.affiliateLink,
+        productLink: products.productLink,
+        rating: products.rating,
+        discount: products.discount,
+        featured: products.featured,
+        expertReview: products.expertReview,
+        teamEvaluation: products.teamEvaluation,
+        benefits: products.benefits,
+        tags: products.tags,
+        evaluators: products.evaluators,
+        introduction: products.introduction,
+        nutritionistEvaluation: products.nutritionistEvaluation,
+        organizerEvaluation: products.organizerEvaluation,
+        designEvaluation: products.designEvaluation,
+        karoomaTeamEvaluation: products.karoomaTeamEvaluation,
+        categoryTags: products.categoryTags,
+        searchTags: products.searchTags,
+        asin: products.asin,
+        brand: products.brand,
+        reviewCount: products.reviewCount,
+        isPrime: products.isPrime,
+        availability: products.availability,
+        bestSellerRank: products.bestSellerRank,
+        status: products.status,
+        lastChecked: products.lastChecked,
+        lastUpdated: products.lastUpdated,
+        updateFrequency: products.updateFrequency,
+        autoCheckEnabled: products.autoCheckEnabled,
+        failedChecks: products.failedChecks,
+        unavailableSince: products.unavailableSince,
+        amazonData: products.amazonData,
+        createdAt: products.createdAt,
+        updatedAt: products.updatedAt,
+      })
+      .from(products)
+      .innerJoin(productTaxonomies, eq(products.id, productTaxonomies.productId))
+      .where(and(
+        eq(productTaxonomies.taxonomySlug, taxonomySlug),
+        eq(products.status, 'active')
+      ));
+  }
+
+  async getProductsByTaxonomies(taxonomySlugs: string[]): Promise<Product[]> {
+    if (taxonomySlugs.length === 0) return [];
+    
+    return await db
+      .select({
+        id: products.id,
+        title: products.title,
+        description: products.description,
+        category: products.category,
+        imageUrl: products.imageUrl,
+        currentPrice: products.currentPrice,
+        originalPrice: products.originalPrice,
+        affiliateLink: products.affiliateLink,
+        productLink: products.productLink,
+        rating: products.rating,
+        discount: products.discount,
+        featured: products.featured,
+        expertReview: products.expertReview,
+        teamEvaluation: products.teamEvaluation,
+        benefits: products.benefits,
+        tags: products.tags,
+        evaluators: products.evaluators,
+        introduction: products.introduction,
+        nutritionistEvaluation: products.nutritionistEvaluation,
+        organizerEvaluation: products.organizerEvaluation,
+        designEvaluation: products.designEvaluation,
+        karoomaTeamEvaluation: products.karoomaTeamEvaluation,
+        categoryTags: products.categoryTags,
+        searchTags: products.searchTags,
+        asin: products.asin,
+        brand: products.brand,
+        reviewCount: products.reviewCount,
+        isPrime: products.isPrime,
+        availability: products.availability,
+        bestSellerRank: products.bestSellerRank,
+        status: products.status,
+        lastChecked: products.lastChecked,
+        lastUpdated: products.lastUpdated,
+        updateFrequency: products.updateFrequency,
+        autoCheckEnabled: products.autoCheckEnabled,
+        failedChecks: products.failedChecks,
+        unavailableSince: products.unavailableSince,
+        amazonData: products.amazonData,
+        createdAt: products.createdAt,
+        updatedAt: products.updatedAt,
+      })
+      .from(products)
+      .innerJoin(productTaxonomies, eq(products.id, productTaxonomies.productId))
+      .where(and(
+        productTaxonomies.taxonomySlug.in ? productTaxonomies.taxonomySlug.in(taxonomySlugs) : 
+          taxonomySlugs.map(slug => eq(productTaxonomies.taxonomySlug, slug)).reduce((a, b) => and(a, b)),
+        eq(products.status, 'active')
+      ));
   }
 }
 
