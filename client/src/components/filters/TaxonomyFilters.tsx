@@ -2,15 +2,15 @@ import React, { useState, useMemo } from "react";
 import { ChevronRight, ChevronDown, Tag } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
-// Estilos para cada categoria principal
+// Estilos para cada categoria principal (baseado na taxonomia real)
 const categoryStyles: Record<string, { icon: string; color: string }> = {
   'comer-e-preparar': { icon: '🍽️', color: 'text-purple-600' },
   'saude-e-seguranca': { icon: '🛡️', color: 'text-red-600' },
-  'dormir-e-descansar': { icon: '😴', color: 'text-blue-600' },
-  'higiene-e-cuidados': { icon: '🧽', color: 'text-green-600' },
-  'brincar-e-aprender': { icon: '🎨', color: 'text-yellow-600' },
-  'organizar-e-guardar': { icon: '📦', color: 'text-indigo-600' },
-  'vestir-e-proteger': { icon: '👕', color: 'text-pink-600' },
+  'decorar-e-brilhar': { icon: '✨', color: 'text-pink-600' },
+  'sono-e-relaxamento': { icon: '😴', color: 'text-indigo-600' },
+  'aprender-e-brincar': { icon: '🎨', color: 'text-green-600' },
+  'sair-e-viajar': { icon: '✈️', color: 'text-yellow-600' },
+  'organizacao': { icon: '📦', color: 'text-teal-600' },
 };
 
 interface TaxonomyNode {
