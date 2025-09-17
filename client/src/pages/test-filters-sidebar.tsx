@@ -5,187 +5,93 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { useQuery } from "@tanstack/react-query";
-import type { Product } from "@shared/schema";
+import type { Product, Taxonomy } from "@shared/schema";
 
-// Dados dos filtros hierárquicos baseados no mapa fornecido
-const filterHierarchy = {
-  "comer-preparar": {
-    title: "Comer e Preparar",
-    icon: "🍽️",
-    color: "text-purple-600",
-    subcategories: {
-      "crianca": {
-        title: "Criança",
-        environments: []
-      },
-      "bebe": {
-        title: "Bebê", 
-        environments: []
-      },
-      "familia": {
-        title: "Família",
-        environments: []
-      }
-    }
-  },
-  "apresentar": {
-    title: "Apresentar",
-    icon: "🎁", 
-    color: "text-blue-600",
-    subcategories: {
-      "presente-para-ocasioes": {
-        title: "Presente para Ocasiões",
-        environments: []
-      },
-      "presente-por-idade": {
-        title: "Presente por Idade",
-        subcategories: {
-          "bebe": {
-            title: "Bebê",
-            environments: []
-          },
-          "crianca": {
-            title: "Criança", 
-            environments: []
-          },
-          "familia": {
-            title: "Família",
-            environments: []
-          }
-        }
-      }
-    }
-  },
-  "saude-seguranca": {
-    title: "Saúde e Segurança",
-    icon: "🛡️",
-    color: "text-red-600", 
-    subcategories: {
-      "primeiros-socorros": {
-        title: "Primeiros Socorros",
-        environments: ["Casa", "Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança"]
-      }
-    }
-  },
-  "decorar-brilhar": {
-    title: "Decorar e Brilhar", 
-    icon: "✨",
-    color: "text-pink-600",
-    subcategories: {},
-    environments: ["Carro", "Casa", "Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança"]
-  },
-  "sono-relaxamento": {
-    title: "Sono e Relaxamento",
-    icon: "😴",
-    color: "text-indigo-600",
-    subcategories: {
-      "bebe": {
-        title: "Bebê",
-        environments: []
-      },
-      "crianca": {
-        title: "Criança",
-        environments: []
-      },
-      "pais-cuidadores": {
-        title: "Pais e Cuidadores", 
-        environments: []
-      }
-    }
-  },
-  "aprender-brincar": {
-    title: "Aprender e Brincar",
-    icon: "🎨",
-    color: "text-green-600",
-    subcategories: {
-      "bebe": {
-        title: "Bebê",
-        environments: []
-      },
-      "crianca": {
-        title: "Criança", 
-        environments: []
-      },
-      "familia": {
-        title: "Família",
-        environments: []
-      }
-    }
-  },
-  "sair-viajar": {
-    title: "Sair e Viajar",
-    icon: "✈️",
-    color: "text-yellow-600",
-    subcategories: {
-      "primeiros-socorros": {
-        title: "Primeiros Socorros",
-        environments: []
-      },
-      "bebe": {
-        title: "Bebê",
-        environments: []
-      },
-      "crianca": {
-        title: "Criança",
-        environments: []
-      },
-      "familia": {
-        title: "Família", 
-        environments: []
-      }
-    },
-    environments: ["Carro", "Casa", "Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança"]
-  },
-  "organizacao": {
-    title: "Organização",
-    icon: "📦",
-    color: "text-teal-600",
-    subcategories: {},
-    environments: ["Cozinha", "Área de Serviço", "Quarto do Bebê", "Quarto da Criança", "Carro"]
-  }
+// Mapeamento de ícones e cores para categorias principais
+const categoryStyles: Record<string, { icon: string; color: string }> = {
+  "comer-e-preparar": { icon: "🍽️", color: "text-purple-600" },
+  "saude-e-seguranca": { icon: "🛡️", color: "text-red-600" },
+  "decorar-e-brilhar": { icon: "✨", color: "text-pink-600" },
+  "sono-e-relaxamento": { icon: "😴", color: "text-indigo-600" },
+  "aprender-e-brincar": { icon: "🎨", color: "text-green-600" },
+  "sair-e-viajar": { icon: "✈️", color: "text-yellow-600" },
+  "organizacao": { icon: "📦", color: "text-teal-600" }
+};
+
+type TaxonomyNode = {
+  slug: string;
+  name: string;
+  children?: TaxonomyNode[];
+  icon?: string;
+  color?: string;
+};
+
+// Função para construir hierarquia das taxonomias
+const buildTaxonomyHierarchy = (taxonomies: Taxonomy[]): TaxonomyNode[] => {
+  const mainCategories = taxonomies.filter(t => t.level === 1);
+  
+  return mainCategories.map(category => {
+    const children = taxonomies.filter(t => 
+      t.parentSlug === category.slug && t.level === 2
+    ).map(child => ({
+      slug: child.slug,
+      name: child.name,
+      children: [] // Pode ser expandido para nível 3 se necessário
+    }));
+    
+    const style = categoryStyles[category.slug] || { icon: "📦", color: "text-gray-600" };
+    
+    return {
+      slug: category.slug,
+      name: category.name,
+      children,
+      icon: style.icon,
+      color: style.color
+    };
+  });
 };
 
 export default function TestFiltersSidebar() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
-  const [expandedSubcategories, setExpandedSubcategories] = useState<Record<string, boolean>>({});
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, any>>({});
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
 
+  // Buscar taxonomias do banco
+  const { data: rawTaxonomies = [], isLoading: taxonomiesLoading } = useQuery<Taxonomy[]>({
+    queryKey: ["/api/taxonomies"],
+  });
+  
+  // Construir hierarquia das taxonomias
+  const taxonomyHierarchy = useMemo(() => {
+    return buildTaxonomyHierarchy(rawTaxonomies);
+  }, [rawTaxonomies]);
+
   // Buscar produtos
-  const { data: products = [], isLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
 
   // Toggle expansão das categorias
-  const toggleCategory = (categoryId: string) => {
+  const toggleCategory = (categorySlug: string) => {
     setExpandedCategories(prev => ({
       ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
-  };
-
-  // Toggle expansão das subcategorias
-  const toggleSubcategory = (subcategoryId: string) => {
-    setExpandedSubcategories(prev => ({
-      ...prev,
-      [subcategoryId]: !prev[subcategoryId]
+      [categorySlug]: !prev[categorySlug]
     }));
   };
 
   // Selecionar filtro
-  const toggleFilter = (categoryId: string, subcategoryId: string | null, environmentId: string | null) => {
-    const filterId = `${categoryId}${subcategoryId ? `-${subcategoryId}` : ''}${environmentId ? `-${environmentId}` : ''}`;
+  const toggleFilter = (taxonomySlug: string) => {
     setSelectedFilters(prev => ({
       ...prev,
-      [filterId]: !prev[filterId]
+      [taxonomySlug]: !prev[taxonomySlug]
     }));
   };
 
   // Produtos filtrados
   const filteredProducts = useMemo(() => {
-    return products.filter((product: Product) => {
+    return products.filter((product) => {
       const matchesSearch = product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           product.description?.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesPrice = product.currentPrice ? 
@@ -205,6 +111,18 @@ export default function TestFiltersSidebar() {
     setSearchQuery("");
     setPriceRange([0, 1000]);
   };
+
+  // Loading state
+  if (taxonomiesLoading || productsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Carregando filtros...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 flex">
@@ -285,17 +203,17 @@ export default function TestFiltersSidebar() {
           {/* Menu Hierárquico */}
           <div className="p-2">
             <div className="space-y-1">
-              {Object.entries(filterHierarchy).map(([categoryId, category]) => (
-                <div key={categoryId}>
+              {taxonomyHierarchy.map((category) => (
+                <div key={category.slug}>
                   {/* Categoria Principal */}
                   <div
                     className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer group"
-                    onClick={() => toggleCategory(categoryId)}
+                    onClick={() => toggleCategory(category.slug)}
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
-                        {Object.keys(category.subcategories).length > 0 ? (
-                          expandedCategories[categoryId] ? 
+                        {category.children && category.children.length > 0 ? (
+                          expandedCategories[category.slug] ? 
                             <ChevronDown className="w-4 h-4 text-gray-500" /> : 
                             <ChevronRight className="w-4 h-4 text-gray-500" />
                         ) : (
@@ -304,103 +222,54 @@ export default function TestFiltersSidebar() {
                         <span className="text-lg">{category.icon}</span>
                       </div>
                       <span className={`font-medium text-sm ${category.color}`}>
-                        {category.title}
+                        {category.name}
                       </span>
                     </div>
                     
                     {/* Checkbox para categoria */}
                     <input
                       type="checkbox"
-                      checked={selectedFilters[categoryId] || false}
+                      checked={selectedFilters[category.slug] || false}
                       onChange={(e) => {
                         e.stopPropagation();
-                        toggleFilter(categoryId, null, null);
+                        toggleFilter(category.slug);
                       }}
                       className="w-4 h-4 text-purple-600 rounded"
+                      data-testid={`checkbox-${category.slug}`}
                     />
                   </div>
 
                   {/* Subcategorias */}
-                  {expandedCategories[categoryId] && Object.entries(category.subcategories).map(([subcategoryId, subcategory]) => (
-                    <div key={subcategoryId} className="ml-4">
-                      <div
-                        className="flex items-center justify-between p-2 rounded hover:bg-gray-50 cursor-pointer"
-                        onClick={() => toggleSubcategory(`${categoryId}-${subcategoryId}`)}
-                      >
+                  {expandedCategories[category.slug] && category.children?.map((subcategory) => (
+                    <div key={subcategory.slug} className="ml-4">
+                      <div className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
                         <div className="flex items-center gap-2">
-                          {(subcategory as any).subcategories ? (
-                            expandedSubcategories[`${categoryId}-${subcategoryId}`] ? 
-                              <ChevronDown className="w-3 h-3 text-gray-400" /> : 
-                              <ChevronRight className="w-3 h-3 text-gray-400" />
-                          ) : (
-                            <div className="w-3 h-3" />
-                          )}
-                          <span className="text-sm text-gray-700">{subcategory.title}</span>
+                          <div className="w-3 h-3" />
+                          <span className="text-sm text-gray-700">{subcategory.name}</span>
                         </div>
                         
                         <input
                           type="checkbox"
-                          checked={selectedFilters[`${categoryId}-${subcategoryId}`] || false}
-                          onChange={(e) => {
-                            e.stopPropagation();
-                            toggleFilter(categoryId, subcategoryId, null);
-                          }}
+                          checked={selectedFilters[subcategory.slug] || false}
+                          onChange={() => toggleFilter(subcategory.slug)}
                           className="w-3 h-3 text-purple-600 rounded"
-                        />
-                      </div>
-
-                      {/* Sub-subcategorias (ex: Presente por Idade -> Bebê, Criança, Família) */}
-                      {expandedSubcategories[`${categoryId}-${subcategoryId}`] && (subcategory as any).subcategories && Object.entries((subcategory as any).subcategories).map(([subSubId, subSub]: [string, any]) => (
-                        <div key={subSubId} className="ml-4">
-                          <div className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
-                            <div className="flex items-center gap-2">
-                              <div className="w-3 h-3" />
-                              <span className="text-xs text-gray-600">{subSub.title}</span>
-                            </div>
-                            
-                            <input
-                              type="checkbox"
-                              checked={selectedFilters[`${categoryId}-${subcategoryId}-${subSubId}`] || false}
-                              onChange={() => toggleFilter(categoryId, subcategoryId, subSubId)}
-                              className="w-3 h-3 text-purple-600 rounded"
-                            />
-                          </div>
-                        </div>
-                      ))}
-
-                      {/* Ambientes da subcategoria */}
-                      {expandedSubcategories[`${categoryId}-${subcategoryId}`] && subcategory.environments && subcategory.environments.map((env: string) => (
-                        <div key={env} className="ml-6">
-                          <div className="flex items-center justify-between p-1 rounded hover:bg-gray-50">
-                            <span className="text-xs text-gray-500">{env}</span>
-                            <input
-                              type="checkbox"
-                              checked={selectedFilters[`${categoryId}-${subcategoryId}-${env}`] || false}
-                              onChange={() => toggleFilter(categoryId, subcategoryId, env)}
-                              className="w-3 h-3 text-purple-600 rounded"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ))}
-
-                  {/* Ambientes diretos da categoria */}
-                  {expandedCategories[categoryId] && category.environments && category.environments.map((env: string) => (
-                    <div key={env} className="ml-6">
-                      <div className="flex items-center justify-between p-2 rounded hover:bg-gray-50">
-                        <span className="text-sm text-gray-600">{env}</span>
-                        <input
-                          type="checkbox"
-                          checked={selectedFilters[`${categoryId}-${env}`] || false}
-                          onChange={() => toggleFilter(categoryId, null, env)}
-                          className="w-3 h-3 text-purple-600 rounded"
+                          data-testid={`checkbox-${subcategory.slug}`}
                         />
                       </div>
                     </div>
                   ))}
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Debug Info */}
+          <div className="p-4 border-t border-gray-200 bg-gray-50">
+            <div className="text-xs text-gray-500 space-y-1">
+              <div>📊 {taxonomyHierarchy.length} categorias principais</div>
+              <div>🏷️ {rawTaxonomies.filter(t => t.level === 2).length} subcategorias</div>
+              <div>🛒 {filteredProducts.length} produtos encontrados</div>
+              <div>🎯 {activeFiltersCount} filtros ativos</div>
             </div>
           </div>
         </div>
@@ -415,75 +284,78 @@ export default function TestFiltersSidebar() {
               <div className="flex items-center gap-4">
                 {!sidebarOpen && (
                   <Button
+                    onClick={() => setSidebarOpen(true)}
                     variant="outline"
                     size="sm"
-                    onClick={() => setSidebarOpen(true)}
-                    className="flex items-center gap-2"
+                    className="border-purple-200"
                   >
-                    <Menu className="w-4 h-4" />
+                    <Menu className="w-4 h-4 mr-2" />
                     Filtros
-                    {activeFiltersCount > 0 && (
-                      <Badge className="bg-purple-600 text-white text-xs">
-                        {activeFiltersCount}
-                      </Badge>
-                    )}
                   </Button>
                 )}
                 <div>
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                    Menu de Filtros Lateral
+                    Produtos Filtrados
                   </h1>
-                  <p className="text-gray-600 text-sm">Baseado no mapa hierárquico oficial</p>
+                  <p className="text-sm text-gray-600">
+                    {filteredProducts.length} produtos encontrados
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Produtos */}
+        {/* Lista de Produtos */}
         <div className="flex-1 p-6">
-          <div className="bg-white rounded-2xl shadow-xl p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-gray-800">
-                Produtos Encontrados ({filteredProducts.length})
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {isLoading ? (
-                <div className="col-span-full text-center py-12">
-                  <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600 mx-auto"></div>
-                  <p className="mt-4 text-gray-600">Carregando produtos...</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map((product) => (
+              <div 
+                key={product.id} 
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-6 border border-gray-100"
+                data-testid={`product-card-${product.id}`}
+              >
+                <div className="aspect-square bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                  {product.imageUrl && (
+                    <img 
+                      src={product.imageUrl} 
+                      alt={product.title}
+                      className="w-full h-full object-cover"
+                      data-testid={`product-image-${product.id}`}
+                    />
+                  )}
                 </div>
-              ) : filteredProducts.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  <div className="text-6xl mb-4">🔍</div>
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">Nenhum produto encontrado</h3>
-                  <p className="text-gray-600">Tente ajustar seus filtros para ver mais resultados</p>
+                <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2" data-testid={`product-title-${product.id}`}>
+                  {product.title}
+                </h3>
+                <p className="text-sm text-gray-600 mb-3 line-clamp-3" data-testid={`product-description-${product.id}`}>
+                  {product.description}
+                </p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-bold text-purple-600" data-testid={`product-price-${product.id}`}>
+                    R$ {product.currentPrice?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || 'N/A'}
+                  </span>
+                  <Button size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600" data-testid={`button-view-${product.id}`}>
+                    Ver Produto
+                  </Button>
                 </div>
-              ) : (
-                filteredProducts.map((product) => (
-                  <div key={product.id} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                    <div className="aspect-video bg-gradient-to-br from-purple-100 to-blue-100 flex items-center justify-center">
-                      <div className="text-4xl">{product.title.charAt(0)}</div>
-                    </div>
-                    <div className="p-6">
-                      <h3 className="font-bold text-lg mb-2 line-clamp-2">{product.title}</h3>
-                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">{product.description}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="text-2xl font-bold text-purple-600">
-                          R$ {product.currentPrice ? parseFloat(product.currentPrice.toString()).toFixed(2) : '0.00'}
-                        </div>
-                        <div className="flex items-center text-yellow-500">
-                          {product.rating ? '⭐'.repeat(Math.round(parseFloat(product.rating.toString()))) : '⭐'}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+              </div>
+            ))}
           </div>
+
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <Search className="w-16 h-16 mx-auto" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Nenhum produto encontrado
+              </h3>
+              <p className="text-gray-600">
+                Tente ajustar os filtros ou termo de busca
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
