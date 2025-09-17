@@ -52,6 +52,7 @@ export default function TestFiltersSidebar() {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [maxBudget, setMaxBudget] = useState(1000);
 
   // Buscar taxonomias do banco (já hierárquicas)
   const { data: rawTaxonomies = [], isLoading: taxonomiesLoading, error: taxonomiesError } = useQuery<any[]>({
@@ -78,6 +79,13 @@ export default function TestFiltersSidebar() {
   const { data: products = [], isLoading: productsLoading } = useQuery<Product[]>({
     queryKey: ["/api/products"],
   });
+  
+  // Calcular preço máximo dos produtos disponíveis
+  const maxProductPrice = useMemo(() => {
+    if (products.length === 0) return 1000;
+    const maxPrice = Math.max(...products.map(p => p.currentPrice ? Number(p.currentPrice) : 0));
+    return Math.ceil(maxPrice / 100) * 100; // Arredondar para centena mais próxima
+  }, [products]);
 
   // Toggle expansão das categorias
   const toggleCategory = (categorySlug: string) => {
@@ -115,7 +123,7 @@ export default function TestFiltersSidebar() {
   const resetFilters = () => {
     setSelectedFilters({});
     setSearchQuery("");
-    setPriceRange([0, 1000]);
+    setPriceRange([0, maxBudget]);
   };
 
   // Loading state
@@ -189,19 +197,52 @@ export default function TestFiltersSidebar() {
                 </div>
               </div>
 
-              {/* Preço */}
+              {/* Orçamento Máximo */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Preço: R$ {priceRange[0]} - R$ {priceRange[1]}
+                  Seu orçamento máximo: R$ {maxBudget}
+                </label>
+                <Slider
+                  value={[maxBudget]}
+                  onValueChange={(value) => {
+                    const newBudget = value[0];
+                    setMaxBudget(newBudget);
+                    // Ajustar filtro de preço se necessário
+                    if (priceRange[1] > newBudget) {
+                      setPriceRange([priceRange[0], newBudget]);
+                    }
+                  }}
+                  max={maxProductPrice}
+                  step={50}
+                  className="mt-2"
+                  data-testid="slider-max-budget"
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>R$ 0</span>
+                  <span>R$ {maxProductPrice}</span>
+                </div>
+              </div>
+              
+              {/* Filtro de Preço */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Faixa de preço: R$ {priceRange[0]} - R$ {priceRange[1]}
                 </label>
                 <Slider
                   value={priceRange}
                   onValueChange={setPriceRange}
-                  max={1000}
+                  max={maxBudget}
                   step={10}
                   className="mt-2"
                   data-testid="slider-price-range"
                 />
+                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                  <span>R$ 0</span>
+                  <span>R$ {maxBudget}</span>
+                </div>
+                <div className="mt-2 text-xs text-gray-600">
+                  💵 Mostrando produtos até seu orçamento de R$ {maxBudget}
+                </div>
               </div>
             </div>
           </div>
