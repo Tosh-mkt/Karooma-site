@@ -103,8 +103,8 @@ export default function Products() {
         parseFloat(product.currentPrice.toString()) <= priceRange[0] : true;
       
       // Verificar filtros de idade (placeholder - seria necessário ter campo de idade nos produtos)
-      const hasActiveAgeFilters = Object.values(selectedAgeFilters).some(Boolean);
-      const matchesAgeFilters = !hasActiveAgeFilters; // Por enquanto, aceita todos se não há campo de idade
+      // Por enquanto, sempre aceita todos os produtos pois não há campo de idade implementado
+      const matchesAgeFilters = true; // TODO: Implementar campo de idade nos produtos
       
       return matchesCategory && matchesSearch && matchesPrice && matchesAgeFilters;
     }) || [];
