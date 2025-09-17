@@ -26,25 +26,20 @@ type TaxonomyNode = {
   color?: string;
 };
 
-// Função para construir hierarquia das taxonomias
-const buildTaxonomyHierarchy = (taxonomies: Taxonomy[]): TaxonomyNode[] => {
-  const mainCategories = taxonomies.filter(t => t.level === 1);
-  
-  return mainCategories.map(category => {
-    const children = taxonomies.filter(t => 
-      t.parentSlug === category.slug && t.level === 2
-    ).map(child => ({
-      slug: child.slug,
-      name: child.name,
-      children: [] // Pode ser expandido para nível 3 se necessário
-    }));
-    
+// Função para processar taxonomias já hierárquicas da API
+const processTaxonomyData = (taxonomies: any[]): TaxonomyNode[] => {
+  // A API já retorna dados hierárquicos com children
+  return taxonomies.map(category => {
     const style = categoryStyles[category.slug] || { icon: "📦", color: "text-gray-600" };
     
     return {
       slug: category.slug,
       name: category.name,
-      children,
+      children: category.children?.map((child: any) => ({
+        slug: child.slug,
+        name: child.name,
+        children: [] // Expandir se houver nível 3
+      })) || [],
       icon: style.icon,
       color: style.color
     };
@@ -58,14 +53,25 @@ export default function TestFiltersSidebar() {
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
 
-  // Buscar taxonomias do banco
-  const { data: rawTaxonomies = [], isLoading: taxonomiesLoading } = useQuery<Taxonomy[]>({
+  // Buscar taxonomias do banco (já hierárquicas)
+  const { data: rawTaxonomies = [], isLoading: taxonomiesLoading, error: taxonomiesError } = useQuery<any[]>({
     queryKey: ["/api/taxonomies"],
   });
   
-  // Construir hierarquia das taxonomias
+  // Debug taxonomies loading
+  console.log("🔍 Taxonomies Debug:", {
+    rawTaxonomies,
+    taxonomiesLoading,
+    taxonomiesError,
+    count: rawTaxonomies.length,
+    sample: rawTaxonomies[0]
+  });
+  
+  // Processar taxonomias já hierárquicas
   const taxonomyHierarchy = useMemo(() => {
-    return buildTaxonomyHierarchy(rawTaxonomies);
+    const hierarchy = processTaxonomyData(rawTaxonomies);
+    console.log("🏗️ Taxonomy Hierarchy Processed:", hierarchy);
+    return hierarchy;
   }, [rawTaxonomies]);
 
   // Buscar produtos
