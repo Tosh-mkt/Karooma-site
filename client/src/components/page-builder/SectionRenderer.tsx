@@ -20,16 +20,17 @@ import heroBackground from "@assets/generated_images/Papercraft_origami_chaos_to
 interface SectionRendererProps {
   section: PageSection;
   isEditing?: boolean;
+  selectedTaxonomies?: string[];
 }
 
-export function SectionRenderer({ section, isEditing = false }: SectionRendererProps) {
+export function SectionRenderer({ section, isEditing = false, selectedTaxonomies }: SectionRendererProps) {
   switch (section.type) {
     case 'hero':
       return <HeroSection section={section} isEditing={isEditing} />;
     case 'content':
       return <ContentSection section={section} isEditing={isEditing} />;
     case 'featured-content':
-      return <FeaturedContentSection section={section} isEditing={isEditing} />;
+      return <FeaturedContentSection section={section} isEditing={isEditing} selectedTaxonomies={selectedTaxonomies} />;
     case 'gallery':
       return <GallerySection section={section} isEditing={isEditing} />;
     case 'landing-hero':
@@ -924,11 +925,16 @@ function ContentSection({ section, isEditing }: SectionRendererProps) {
 }
 
 // Seção de Conteúdo em Destaque
-function FeaturedContentSection({ section, isEditing }: SectionRendererProps) {
+function FeaturedContentSection({ section, isEditing, selectedTaxonomies }: SectionRendererProps) {
   const { data } = section;
   
+  // Se há taxonomias selecionadas e é uma seção de produtos, usar filtros
+  const shouldFilter = selectedTaxonomies && selectedTaxonomies.length > 0 && data.contentType === 'products';
+  
   const { data: content, isLoading } = useQuery({
-    queryKey: [`/api/${data.contentType === 'products' ? 'products' : 'content'}${data.contentType === 'products' ? '' : `/${data.contentType}`}/featured`],
+    queryKey: shouldFilter 
+      ? [`/api/products?taxonomies=${selectedTaxonomies.join(',')}`]
+      : [`/api/${data.contentType === 'products' ? 'products' : 'content'}${data.contentType === 'products' ? '' : `/${data.contentType}`}/featured`],
     enabled: !!data.contentType
   });
 

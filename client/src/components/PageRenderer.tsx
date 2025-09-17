@@ -1,15 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRoute } from "wouter";
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Page } from "@shared/schema";
 import { SectionRenderer } from "./page-builder/SectionRenderer";
 import { PageSection } from "@/types/page-builder";
+import { TaxonomyFilters } from "./filters/TaxonomyFilters";
 import NotFound from "../pages/not-found";
 
 
 export function PageRenderer() {
   const [match, params] = useRoute("/:slug");
   const slug = params?.slug;
+  const [selectedTaxonomies, setSelectedTaxonomies] = useState<string[]>([]);
+  
+  // Verifica se é a página "facilita-a-vida"
+  const isFacilitaAVidaPage = slug === "facilita-a-vida";
 
   const { data: page, isLoading, error } = useQuery<Page>({
     queryKey: [`/api/pages/${slug}`],
@@ -53,12 +59,33 @@ export function PageRenderer() {
         <meta name="description" content={page.metaDescription} />
       )}
       
+      {/* Filtros de Taxonomia apenas para página facilita-a-vida */}
+      {isFacilitaAVidaPage && (
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-b border-purple-100">
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <TaxonomyFilters
+              selected={selectedTaxonomies}
+              onChange={setSelectedTaxonomies}
+              defaultExpanded={['saude-e-seguranca', 'comer-e-preparar']}
+              className="bg-white rounded-lg shadow-sm p-4"
+            />
+            {selectedTaxonomies.length > 0 && (
+              <div className="mt-4 text-sm text-purple-700" data-testid="filter-status">
+                🔍 Mostrando produtos de: <strong>{selectedTaxonomies.length} {selectedTaxonomies.length === 1 ? 'categoria selecionada' : 'categorias selecionadas'}</strong>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
       {/* Render Page Sections using SectionRenderer */}
       {sections.map((section) => (
         <SectionRenderer 
           key={section.id} 
           section={section} 
-          isEditing={false} 
+          isEditing={false}
+          // Passar taxonomias selecionadas para seções que mostram produtos
+          selectedTaxonomies={isFacilitaAVidaPage ? selectedTaxonomies : undefined}
         />
       ))}
     </div>
