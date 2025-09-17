@@ -7,50 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { ProductCard } from "@/components/content/product-card";
+import { TaxonomyFilters } from "@/components/filters/TaxonomyFilters";
 import { useQuery } from "@tanstack/react-query";
 import { Product } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 
-// Dados dos filtros simplificados - só categorias principais
-const filterHierarchy = {
-  "comer-preparar": {
-    title: "Comer e Preparar",
-    icon: "🍽️",
-    color: "text-purple-600"
-  },
-  "saude-seguranca": {
-    title: "Saúde e Segurança",
-    icon: "🛡️",
-    color: "text-red-600"
-  },
-  "decorar-brilhar": {
-    title: "Decorar e Brilhar", 
-    icon: "✨",
-    color: "text-pink-600"
-  },
-  "sono-relaxamento": {
-    title: "Sono e Relaxamento",
-    icon: "😴",
-    color: "text-indigo-600"
-  },
-  "aprender-brincar": {
-    title: "Aprender e Brincar",
-    icon: "🎨",
-    color: "text-green-600"
-  },
-  "sair-viajar": {
-    title: "Sair e Viajar",
-    icon: "✈️",
-    color: "text-yellow-600"
-  },
-  "organizacao": {
-    title: "Organização",
-    icon: "📦",
-    color: "text-teal-600"
-  }
-};
+// Filtros de taxonomia agora vêm do banco de dados via TaxonomyFilters component
 
 // Filtros de idade
 const ageFilters = [
@@ -68,7 +32,7 @@ export default function Products() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showFavorites, setShowFavorites] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, any>>({});
+  const [selectedTaxonomies, setSelectedTaxonomies] = useState<string[]>([]);
   const [selectedAgeFilters, setSelectedAgeFilters] = useState<Record<string, boolean>>({});
   const { isAuthenticated } = useAuth();
 
@@ -77,8 +41,12 @@ export default function Products() {
     queryClient.invalidateQueries({ queryKey: ["/api/products"] });
   }, []);
 
+  // Buscar produtos com filtros de taxonomia aplicados
+  const shouldFilterByTaxonomy = selectedTaxonomies.length > 0;
   const { data: products, isLoading } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
+    queryKey: shouldFilterByTaxonomy 
+      ? [`/api/products?taxonomies=${selectedTaxonomies.join(',')}`]
+      : ["/api/products"],
     staleTime: 0, // Always refetch
   });
 
@@ -107,12 +75,9 @@ export default function Products() {
   });
 
 
-  // Selecionar filtro de categoria
-  const toggleFilter = (categoryId: string) => {
-    setSelectedFilters(prev => ({
-      ...prev,
-      [categoryId]: !prev[categoryId]
-    }));
+  // Função para lidar com mudanças nos filtros de taxonomia
+  const handleTaxonomyChange = (taxonomies: string[]) => {
+    setSelectedTaxonomies(taxonomies);
   };
 
   // Selecionar filtro de idade
@@ -127,7 +92,7 @@ export default function Products() {
   // Use favorites or all products based on toggle
   const sourceProducts = showFavorites ? favorites : products;
   
-  // Produtos filtrados com novo sistema de filtros
+  // Produtos filtrados (taxonomias já aplicadas na query, filtrar apenas busca, preço e idade)
   const filteredProducts = useMemo(() => {
     return sourceProducts?.filter(product => {
       const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
@@ -137,26 +102,20 @@ export default function Products() {
       const matchesPrice = product.currentPrice && priceRange.length > 0 ? 
         parseFloat(product.currentPrice.toString()) <= priceRange[0] : true;
       
-      // Verificar se algum filtro de categoria está ativo
-      const hasActiveCategoryFilters = Object.values(selectedFilters).some(Boolean);
-      const matchesCategoryFilters = !hasActiveCategoryFilters || Object.keys(selectedFilters).some(filterId => 
-        selectedFilters[filterId] && (product.tags?.includes(filterId) || product.category?.toLowerCase().includes(filterId))
-      );
-      
       // Verificar filtros de idade (placeholder - seria necessário ter campo de idade nos produtos)
       const hasActiveAgeFilters = Object.values(selectedAgeFilters).some(Boolean);
       const matchesAgeFilters = !hasActiveAgeFilters; // Por enquanto, aceita todos se não há campo de idade
       
-      return matchesCategory && matchesSearch && matchesPrice && matchesCategoryFilters && matchesAgeFilters;
+      return matchesCategory && matchesSearch && matchesPrice && matchesAgeFilters;
     }) || [];
-  }, [sourceProducts, selectedCategory, searchQuery, priceRange, selectedFilters]);
+  }, [sourceProducts, selectedCategory, searchQuery, priceRange, selectedAgeFilters]);
 
   // Contar filtros ativos
-  const activeFiltersCount = Object.values(selectedFilters).filter(Boolean).length + Object.values(selectedAgeFilters).filter(Boolean).length;
+  const activeFiltersCount = selectedTaxonomies.length + Object.values(selectedAgeFilters).filter(Boolean).length;
 
   // Reset todos os filtros
   const resetFilters = () => {
-    setSelectedFilters({});
+    setSelectedTaxonomies([]);
     setSelectedAgeFilters({});
     setSearchQuery("");
     setPriceRange([maxPrice]); // Reset to maximum price, not zero
@@ -248,31 +207,14 @@ export default function Products() {
             </div>
           </div>
 
-          {/* Menu de Categorias Simplificado */}
-          <div className="p-2">
-            <div className="space-y-1">
-              {Object.entries(filterHierarchy).map(([categoryId, category]) => (
-                <div key={categoryId}>
-                  {/* Categoria Principal */}
-                  <div className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 cursor-pointer group">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">{category.icon}</span>
-                      <span className={`font-medium text-sm ${category.color}`}>
-                        {category.title}
-                      </span>
-                    </div>
-                    
-                    {/* Checkbox para categoria */}
-                    <input
-                      type="checkbox"
-                      checked={selectedFilters[categoryId] || false}
-                      onChange={() => toggleFilter(categoryId)}
-                      className="w-4 h-4 text-purple-600 rounded"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* Filtros de Taxonomia Hierárquicos */}
+          <div className="p-4">
+            <TaxonomyFilters
+              selected={selectedTaxonomies}
+              onChange={handleTaxonomyChange}
+              defaultExpanded={['saude-e-seguranca', 'comer-e-preparar']}
+              data-testid="taxonomy-filters-products"
+            />
           </div>
         </div>
       </div>
