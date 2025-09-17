@@ -333,7 +333,7 @@ export default function TestFiltersSidebar() {
                 </p>
                 <div className="flex items-center justify-between">
                   <span className="text-xl font-bold text-purple-600" data-testid={`product-price-${product.id}`}>
-                    R$ {product.currentPrice?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || 'N/A'}
+                    R$ {product.currentPrice ? Number(product.currentPrice).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) : 'N/A'}
                   </span>
                   <Button size="sm" className="bg-gradient-to-r from-purple-600 to-blue-600" data-testid={`button-view-${product.id}`}>
                     Ver Produto
