@@ -41,14 +41,33 @@ export default function Products() {
     queryClient.invalidateQueries({ queryKey: ["/api/products"] });
   }, []);
 
-  // Buscar produtos com filtros de taxonomia aplicados
-  const shouldFilterByTaxonomy = selectedTaxonomies.length > 0;
-  const { data: products, isLoading } = useQuery<Product[]>({
-    queryKey: shouldFilterByTaxonomy 
-      ? [`/api/products?taxonomies=${selectedTaxonomies.join(',')}`]
-      : ["/api/products"],
+  // Buscar todos os produtos (sem filtro de taxonomia na query)
+  const { data: allProducts, isLoading } = useQuery<Product[]>({
+    queryKey: ["/api/products"],
     staleTime: 0, // Always refetch
   });
+
+  // Aplicar filtros de taxonomia no frontend
+  const products = useMemo(() => {
+    if (!allProducts) return [];
+    if (selectedTaxonomies.length === 0) return allProducts;
+    
+    return allProducts.filter(product => {
+      // Verifica se o produto corresponde a alguma das taxonomias selecionadas
+      return selectedTaxonomies.some(taxonomy => {
+        // Verifica category direta
+        if (product.category === taxonomy) return true;
+        
+        // Verifica categoryTags se existir
+        if (product.categoryTags && product.categoryTags.includes(taxonomy)) return true;
+        
+        // Verifica searchTags se existir
+        if (product.searchTags && product.searchTags.includes(taxonomy)) return true;
+        
+        return false;
+      });
+    });
+  }, [allProducts, selectedTaxonomies]);
 
   // Calculate dynamic price range based on actual products
   const maxPrice = useMemo(() => {
