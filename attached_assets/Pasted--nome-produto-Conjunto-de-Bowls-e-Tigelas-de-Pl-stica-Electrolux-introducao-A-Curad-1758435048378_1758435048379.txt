@@ -1,0 +1,16 @@
+{
+  "nome_produto": "Conjunto de Bowls e Tigelas de Plástica Electrolux",
+  "introducao": "A Curadoria KAROOMA, com sua equipe de especialistas, analisou o Conjunto de Bowls e Tigelas da Electrolux para avaliar como este kit pode otimizar a organização e o preparo de refeições no dia a dia de mães ocupadas.",
+  "link_produto": "https://www.amazon.com.br/Conjunto-Bowls-Tigelas-Pl%C3%A1stica-Electrolux/dp/B0C2ZNDWK6/ref=pd_bxgy_thbs_d_sccl_1/132-9831170-3495757?pd_rd_w=JzuMs&content-id=amzn1.sym.383da3a7-6575-48e0-b3db-32c989c715fa&pf_rd_p=383da3a7-6575-48e0-b3db-32c989c715fa&pf_rd_r=Z6Y51HGAE8EK4R4JQCX3&pd_rd_wg=UrxyO&pd_rd_r=2fa3014a-b927-42a7-8312-da1629ed8f28&pd_rd_i=B0C2ZNDWK6&psc=1",
+  "link_afiliado": "https://amzn.to/4mzriLT",
+  "especialistas_selecionados": "Organização Doméstica Profissional, Nutrição, Design e Usabilidade",
+  "avaliacao_nutricao": "Prós: Facilita o preparo de refeições e o controle de porções, incentivando o armazenamento de alimentos saudáveis para a família. Contras: Nenhum relacionado à nutrição.",
+  "avaliacao_organizacao": "Prós: As tampas e o design de encaixe tornam o armazenamento em armários e geladeiras mais eficiente. Ideal para guardar sobras e otimizar o espaço. Contras: As peças podem ocupar espaço se não forem guardadas empilhadas.",
+  "avaliacao_design": "Prós: O design ergonômico e o material plástico leve tornam o manuseio fácil e seguro. As tampas garantem a vedação, protegendo os alimentos. Contras: O plástico pode manchar com o tempo, especialmente com molhos e temperos coloridos.",
+  "avaliacao_psicologia": null,
+  "avaliacao_bem_estar": null,
+  "avaliacao_experiencias": null,
+  "avaliacao_karooma": "O Conjunto de Bowls Electrolux é uma solução versátil e essencial para mães que buscam mais praticidade na cozinha. A Curadoria KAROOMA aprova o kit como um investimento inteligente para a organização e o planejamento de refeições em família, transformando a rotina de cozinhar em uma experiência mais fluida e eficiente.",
+  "tags_categorias": "#CozinhaOrganizada #ArmazenamentoDeAlimentos #PraticidadeNaCozinha #AlimentaçãoSaudável #Eletrolux",
+  "tags_filtros": "comer-e-preparar, organizacao/cozinha"
+}
