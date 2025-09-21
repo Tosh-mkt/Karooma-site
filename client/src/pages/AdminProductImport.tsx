@@ -23,6 +23,8 @@ export function AdminProductImport() {
   
   // Novos estados para Google Sheets JSON
   const [sheetsUrl, setSheetsUrl] = useState("");
+  const [sheetName, setSheetName] = useState("");
+  const [jsonColumn, setJsonColumn] = useState("");
   const [jsonData, setJsonData] = useState("");
   const [isLoadingSheets, setIsLoadingSheets] = useState(false);
   const [jsonPreview, setJsonPreview] = useState<any[]>([]);
@@ -59,7 +61,11 @@ export function AdminProductImport() {
 
     setIsLoadingSheets(true);
     try {
-      const response = await apiRequest("POST", "/api/admin/load-google-sheets", { sheetsUrl });
+      const response = await apiRequest("POST", "/api/admin/load-google-sheets", { 
+        sheetsUrl, 
+        sheetName: sheetName.trim() || undefined,
+        jsonColumn: jsonColumn.trim() || undefined
+      });
       const result = await response.json();
       
       setJsonData(JSON.stringify(result.data, null, 2));
@@ -339,10 +345,11 @@ export function AdminProductImport() {
                     <h4 className="font-semibold mb-2">🔗 Como usar:</h4>
                     <ol className="text-sm text-gray-600 space-y-1">
                       <li>1. Configure sua planilha com uma coluna contendo dados JSON</li>
-                      <li>2. Cada linha deve ter um produto completo em formato JSON</li>
-                      <li>3. Cole a URL da planilha abaixo</li>
-                      <li>4. Clique em "Carregar Dados" para preview</li>
-                      <li>5. Confirme a importação</li>
+                      <li>2. Cole a URL da planilha (obrigatório)</li>
+                      <li>3. Especifique o nome da aba (ex: "SELEÇÃO DE PRODUTOS")</li>
+                      <li>4. Especifique a coluna JSON (nome ou número da coluna)</li>
+                      <li>5. Clique em "Carregar Dados" para preview</li>
+                      <li>6. Confirme a importação</li>
                     </ol>
                   </div>
                   <div>
@@ -364,16 +371,42 @@ export function AdminProductImport() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="sheets-url">URL da Planilha</Label>
-                  <Input
-                    id="sheets-url"
-                    type="url"
-                    placeholder="https://docs.google.com/spreadsheets/d/..."
-                    value={sheetsUrl}
-                    onChange={(e) => setSheetsUrl(e.target.value)}
-                    data-testid="input-sheets-url"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="sheets-url">URL da Planilha</Label>
+                    <Input
+                      id="sheets-url"
+                      type="url"
+                      placeholder="https://docs.google.com/spreadsheets/d/..."
+                      value={sheetsUrl}
+                      onChange={(e) => setSheetsUrl(e.target.value)}
+                      data-testid="input-sheets-url"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="sheet-name">Nome da Aba <span className="text-sm text-gray-500">(opcional)</span></Label>
+                    <Input
+                      id="sheet-name"
+                      type="text"
+                      placeholder="Ex: SELEÇÃO DE PRODUTOS"
+                      value={sheetName}
+                      onChange={(e) => setSheetName(e.target.value)}
+                      data-testid="input-sheet-name"
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="json-column">Coluna JSON <span className="text-sm text-gray-500">(opcional)</span></Label>
+                    <Input
+                      id="json-column"
+                      type="text"
+                      placeholder="Ex: dados_json ou 5"
+                      value={jsonColumn}
+                      onChange={(e) => setJsonColumn(e.target.value)}
+                      data-testid="input-json-column"
+                    />
+                  </div>
                 </div>
                 
                 <Button 

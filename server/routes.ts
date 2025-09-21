@@ -340,7 +340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Acesso negado. Somente administradores podem carregar dados." });
       }
 
-      const { sheetsUrl } = req.body;
+      const { sheetsUrl, sheetName, jsonColumn } = req.body;
       
       if (!sheetsUrl) {
         return res.status(400).json({ error: "URL do Google Sheets é obrigatória" });
@@ -348,13 +348,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Converter URL do Google Sheets para CSV export
       let csvUrl = sheetsUrl;
-      if (sheetsUrl.includes('/edit#gid=') || sheetsUrl.includes('/edit?usp=')) {
-        // Extrair spreadsheet ID do URL
-        const spreadsheetIdMatch = sheetsUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-        if (spreadsheetIdMatch) {
-          const spreadsheetId = spreadsheetIdMatch[1];
-          csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`;
+      let gid = null;
+      
+      // Extrair spreadsheet ID do URL
+      const spreadsheetIdMatch = sheetsUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (!spreadsheetIdMatch) {
+        return res.status(400).json({ error: "URL do Google Sheets inválida" });
+      }
+      
+      const spreadsheetId = spreadsheetIdMatch[1];
+      
+      // Se há um nome de aba especificado, tentar obter o GID
+      if (sheetName) {
+        try {
+          // Fazer requisição para obter a lista de abas
+          const sheetsListUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`;
+          const sheetsListResponse = await fetch(sheetsListUrl);
+          const sheetsListText = await sheetsListResponse.text();
+          
+          // Procurar pelo GID da aba especificada
+          const gidMatch = sheetsListText.match(new RegExp(`"sheet":"${sheetName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"[^}]*"sheetId":([0-9]+)`, 'i'));
+          if (gidMatch) {
+            gid = gidMatch[1];
+          }
+        } catch (error) {
+          console.warn('Não foi possível obter o GID da aba especificada:', error);
         }
+      }
+      
+      // Construir URL do CSV
+      if (gid) {
+        csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`;
+      } else {
+        csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`;
       }
 
       // Fazer requisição para o Google Sheets
@@ -376,20 +402,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Buscar coluna que contém JSON
       let jsonColumnIndex = -1;
-      const jsonColumnNames = ['json', 'dados_json', 'product_json', 'dados', 'data', 'json_data', 'informações', 'informacoes'];
       
-      for (let i = 0; i < headers.length; i++) {
-        const header = headers[i].toLowerCase();
-        if (jsonColumnNames.some(name => header.includes(name)) || header.includes('json')) {
-          jsonColumnIndex = i;
-          break;
+      // Se uma coluna JSON foi especificada pelo usuário
+      if (jsonColumn) {
+        // Verificar se é um número (índice da coluna)
+        const columnNumber = parseInt(jsonColumn);
+        if (!isNaN(columnNumber) && columnNumber > 0 && columnNumber <= headers.length) {
+          jsonColumnIndex = columnNumber - 1; // Converter para índice baseado em 0
+        } else {
+          // Procurar pelo nome da coluna
+          for (let i = 0; i < headers.length; i++) {
+            if (headers[i].toLowerCase().includes(jsonColumn.toLowerCase())) {
+              jsonColumnIndex = i;
+              break;
+            }
+          }
+        }
+      } else {
+        // Busca automática por nomes comuns de coluna JSON
+        const jsonColumnNames = ['json', 'dados_json', 'product_json', 'dados', 'data', 'json_data', 'informações', 'informacoes'];
+        
+        for (let i = 0; i < headers.length; i++) {
+          const header = headers[i].toLowerCase();
+          if (jsonColumnNames.some(name => header.includes(name)) || header.includes('json')) {
+            jsonColumnIndex = i;
+            break;
+          }
         }
       }
 
       if (jsonColumnIndex === -1) {
         return res.status(400).json({ 
-          error: "Não foi encontrada uma coluna com dados JSON. Certifique-se de que há uma coluna nomeada 'JSON' ou similar.",
-          headers: headers
+          error: jsonColumn 
+            ? `Não foi encontrada a coluna '${jsonColumn}'. Verifique o nome ou número da coluna.`
+            : "Não foi encontrada uma coluna com dados JSON. Especifique a coluna ou use nomes como 'json', 'dados_json', etc.",
+          headers: headers,
+          availableColumns: headers.map((h, i) => `${i + 1}. ${h}`)
         });
       }
 
@@ -480,8 +528,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             originalPrice: normalizePrice(productData.originalPrice || productData.precoOriginal || ''),
             affiliateLink: productData.affiliateLink || productData.linkAfiliado || productData.link,
             productLink: productData.productLink || productData.linkProduto,
-            rating: normalizePrice(productData.rating || productData.avaliacao || ''),
-            discount: normalizePrice(productData.discount || productData.desconto || ''),
+            rating: normalizePrice(productData.rating || productData.avaliacao || '') || '0',
+            discount: parseFloat(normalizePrice(productData.discount || productData.desconto || '') || '0'),
             featured: productData.featured === true || productData.destaque === true,
             introduction: productData.introduction || productData.introducao,
             nutritionistEvaluation: productData.nutritionistEvaluation || productData.avaliacaoNutricionista,
