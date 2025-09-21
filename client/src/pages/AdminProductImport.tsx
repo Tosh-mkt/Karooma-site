@@ -33,13 +33,8 @@ export function AdminProductImport() {
 
     setIsImporting(true);
     try {
-      const result = await apiRequest("/api/admin/import-products", {
-        method: "POST",
-        body: JSON.stringify({ csvData, overwrite }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await apiRequest("POST", "/api/admin/import-products", { csvData, overwrite });
+      const result = await response.json();
 
       setImportResult(result);
       
