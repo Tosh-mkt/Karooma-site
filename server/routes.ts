@@ -332,6 +332,192 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Endpoint para carregar dados do Google Sheets
+  app.post("/api/admin/load-google-sheets", extractUserInfo, async (req: any, res) => {
+    try {
+      // Verificar se o usuário está autenticado e é admin
+      if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores podem carregar dados." });
+      }
+
+      const { sheetsUrl } = req.body;
+      
+      if (!sheetsUrl) {
+        return res.status(400).json({ error: "URL do Google Sheets é obrigatória" });
+      }
+
+      // Converter URL do Google Sheets para CSV export
+      let csvUrl = sheetsUrl;
+      if (sheetsUrl.includes('/edit#gid=') || sheetsUrl.includes('/edit?usp=')) {
+        // Extrair spreadsheet ID do URL
+        const spreadsheetIdMatch = sheetsUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+        if (spreadsheetIdMatch) {
+          const spreadsheetId = spreadsheetIdMatch[1];
+          csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`;
+        }
+      }
+
+      // Fazer requisição para o Google Sheets
+      const response = await fetch(csvUrl);
+      if (!response.ok) {
+        throw new Error(`Erro ao acessar Google Sheets: ${response.status}`);
+      }
+
+      const csvText = await response.text();
+      
+      // Processar CSV para extrair dados JSON
+      const lines = csvText.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
+        return res.status(400).json({ error: "Planilha não contém dados suficientes" });
+      }
+
+      const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+      const data = [];
+
+      // Buscar coluna que contém JSON
+      let jsonColumnIndex = -1;
+      const jsonColumnNames = ['json', 'dados_json', 'product_json', 'dados', 'data', 'json_data', 'informações', 'informacoes'];
+      
+      for (let i = 0; i < headers.length; i++) {
+        const header = headers[i].toLowerCase();
+        if (jsonColumnNames.some(name => header.includes(name)) || header.includes('json')) {
+          jsonColumnIndex = i;
+          break;
+        }
+      }
+
+      if (jsonColumnIndex === -1) {
+        return res.status(400).json({ 
+          error: "Não foi encontrada uma coluna com dados JSON. Certifique-se de que há uma coluna nomeada 'JSON' ou similar.",
+          headers: headers
+        });
+      }
+
+      // Processar cada linha
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(',');
+        if (row.length > jsonColumnIndex) {
+          const jsonText = row[jsonColumnIndex].replace(/"/g, '').trim();
+          if (jsonText && jsonText.startsWith('{')) {
+            try {
+              const productData = JSON.parse(jsonText);
+              data.push(productData);
+            } catch (jsonError) {
+              console.warn(`Erro ao processar JSON na linha ${i + 1}:`, jsonError);
+            }
+          }
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        data: data,
+        found: data.length,
+        jsonColumn: headers[jsonColumnIndex]
+      });
+
+    } catch (error) {
+      console.error('Error loading Google Sheets:', error);
+      res.status(500).json({ 
+        error: 'Erro ao carregar dados do Google Sheets',
+        details: error.message 
+      });
+    }
+  });
+
+  // Endpoint para importar produtos JSON
+  app.post("/api/admin/import-json-products", extractUserInfo, async (req: any, res) => {
+    try {
+      // Verificar se o usuário está autenticado e é admin
+      if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores podem importar produtos." });
+      }
+
+      const { jsonData, overwrite } = req.body;
+      
+      if (!jsonData || !Array.isArray(jsonData)) {
+        return res.status(400).json({ error: "Dados JSON inválidos. Esperado um array de produtos." });
+      }
+
+      // Limpar produtos existentes se overwrite = true
+      if (overwrite) {
+        await storage.clearProducts();
+      }
+
+      // Função para normalizar preços
+      const normalizePrice = (value: string) => {
+        if (!value || typeof value !== 'string') return '';
+        
+        let normalized = value.trim();
+        normalized = normalized.replace(/^(R\$|US\$|\$|€|£)\s*/i, '');
+        
+        if (normalized.includes(',')) {
+          normalized = normalized.replace(/\./g, '');
+        }
+        
+        normalized = normalized.replace(',', '.');
+        normalized = normalized.replace(/[^\d.]/g, '');
+        
+        const parts = normalized.split('.');
+        if (parts.length > 2) {
+          normalized = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
+        return normalized;
+      };
+
+      // Processar e inserir produtos
+      const insertedProducts = [];
+      for (const productData of jsonData) {
+        try {
+          // Normalizar dados do produto
+          const product = {
+            title: productData.title || productData.nome || productData.name,
+            description: productData.description || productData.descricao,
+            category: productData.category || productData.categoria,
+            imageUrl: productData.imageUrl || productData.imagem || productData.image,
+            currentPrice: normalizePrice(productData.currentPrice || productData.precoAtual || productData.preco || ''),
+            originalPrice: normalizePrice(productData.originalPrice || productData.precoOriginal || ''),
+            affiliateLink: productData.affiliateLink || productData.linkAfiliado || productData.link,
+            productLink: productData.productLink || productData.linkProduto,
+            rating: normalizePrice(productData.rating || productData.avaliacao || ''),
+            discount: normalizePrice(productData.discount || productData.desconto || ''),
+            featured: productData.featured === true || productData.destaque === true,
+            introduction: productData.introduction || productData.introducao,
+            nutritionistEvaluation: productData.nutritionistEvaluation || productData.avaliacaoNutricionista,
+            organizerEvaluation: productData.organizerEvaluation || productData.avaliacaoOrganizadora,
+            designEvaluation: productData.designEvaluation || productData.avaliacaoDesign,
+            karoomaTeamEvaluation: productData.karoomaTeamEvaluation || productData.avaliacaoEquipeKarooma,
+            benefits: productData.benefits || productData.beneficios,
+            tags: productData.tags || productData.etiquetas,
+            categoryTags: productData.categoryTags || productData.tagsCategoria,
+            searchTags: productData.searchTags || productData.tagsBusca,
+            asin: productData.asin || productData.codigoASIN
+          };
+
+          // Validar dados essenciais
+          if (product.title && product.affiliateLink) {
+            const insertedProduct = await storage.createProduct(product);
+            insertedProducts.push(insertedProduct);
+          }
+        } catch (error) {
+          console.error('Erro ao inserir produto JSON:', error);
+        }
+      }
+
+      res.json({ 
+        success: true, 
+        imported: insertedProducts.length, 
+        total: jsonData.length, 
+        products: insertedProducts 
+      });
+
+    } catch (error) {
+      console.error('Error importing JSON products:', error);
+      res.status(500).json({ error: 'Erro ao importar produtos JSON' });
+    }
+  });
+
   app.put("/api/images/upload", async (req, res) => {
     if (!req.body.imageURL) {
       return res.status(400).json({ error: "imageURL is required" });
