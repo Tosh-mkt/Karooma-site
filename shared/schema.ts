@@ -612,3 +612,67 @@ export type RegionApiLimits = typeof regionApiLimits.$inferSelect;
 export type InsertRegionApiLimits = z.infer<typeof insertRegionApiLimitsSchema>;
 export type ProductMappings = typeof productMappings.$inferSelect;
 export type InsertProductMappings = z.infer<typeof insertProductMappingsSchema>;
+
+// Marketing Automation System Tables
+export const automationJobs = pgTable("automation_jobs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: varchar("type").notNull(), // 'send_email', 'push_notification', 'price_alert', etc.
+  status: varchar("status").default("pending"), // 'pending', 'processing', 'completed', 'failed'
+  payload: json("payload"), // Job data as JSON
+  scheduledFor: timestamp("scheduled_for").defaultNow(),
+  attempts: integer("attempts").default(0),
+  maxAttempts: integer("max_attempts").default(3),
+  errorMessage: text("error_message"),
+  createdAt: timestamp("created_at").defaultNow(),
+  processedAt: timestamp("processed_at"),
+});
+
+export const automationProgress = pgTable("automation_progress", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  stage: varchar("stage").notNull(), // 'day_1', 'day_2', 'day_3', etc.
+  status: varchar("status").default("pending"), // 'pending', 'in_progress', 'completed'
+  evidence: json("evidence"), // Proof of completion
+  completedAt: timestamp("completed_at"),
+  nextStage: varchar("next_stage"), // Next recommended stage
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const notificationSubscriptions = pgTable("notification_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  email: varchar("email"), // For non-registered users
+  channel: varchar("channel").notNull(), // 'email', 'push', 'whatsapp', 'telegram'
+  endpoint: text("endpoint"), // Push endpoint or phone number
+  active: boolean("active").default(true),
+  preferences: json("preferences"), // Channel-specific preferences
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Zod schemas for automation system
+export const insertAutomationJobSchema = createInsertSchema(automationJobs).omit({
+  id: true,
+  createdAt: true,
+  processedAt: true,
+});
+
+export const insertAutomationProgressSchema = createInsertSchema(automationProgress).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertNotificationSubscriptionSchema = createInsertSchema(notificationSubscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertAutomationJob = z.infer<typeof insertAutomationJobSchema>;
+export type SelectAutomationJob = typeof automationJobs.$inferSelect;
+export type InsertAutomationProgress = z.infer<typeof insertAutomationProgressSchema>;
+export type SelectAutomationProgress = typeof automationProgress.$inferSelect;
+export type InsertNotificationSubscription = z.infer<typeof insertNotificationSubscriptionSchema>;
+export type SelectNotificationSubscription = typeof notificationSubscriptions.$inferSelect;

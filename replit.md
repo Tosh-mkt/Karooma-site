@@ -164,3 +164,33 @@ All blog posts are automatically validated for:
 - **Page Structure**: Cover → Welcome → ToC → Chapters → Checklists → Testimonials → Final
 - **Interactive Elements**: Page indicators, progress counter, navigation controls
 - **Theme Management**: Admin interface at `/admin/flipbook-themes` for color preview and management
+
+# Marketing Automation System
+
+## Strategy Overview
+Ultra-lean MVP-first approach focused on immediate ROI with minimal external dependencies and maximum control.
+
+## 7-Day Implementation Roadmap
+- **Day 1-2:** Email Welcome System + Lead Magnet Delivery (SendGrid)
+- **Day 3-4:** Web Push Notifications (Service Worker + Opt-in)  
+- **Day 5:** WhatsApp Opt-in Collection (preparation for future expansion)
+- **Day 6-7:** Price Alert System (monitoring + automated notifications)
+
+## Technical Architecture
+- **Job Queue:** PostgreSQL-based with `automation_jobs` table
+- **Progress Tracking:** `automation_progress` table with completion criteria
+- **Continuity System:** Visual dashboard at `/admin/automation` 
+- **Evidence-Based Transitions:** Each stage requires measurable completion proof
+
+## Success Metrics
+- Email open rate: >25%
+- Web push opt-in rate: >20% 
+- Price alert conversion increase: +10-20%
+- Time to first automation: <2 hours
+- Implementation continuity: 100% stage completion visibility
+
+## Expansion Strategy (Post-MVP)
+- **Phase 2:** WhatsApp Business API integration for high-engagement leads
+- **Phase 3:** Telegram integration for specific product categories
+- **Phase 4:** AI-powered content personalization
+- **Phase 5:** Advanced behavioral segmentation and retargeting
