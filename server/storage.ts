@@ -38,7 +38,13 @@ import {
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
-  type InsertFlipbookModalTrigger
+  type InsertFlipbookModalTrigger,
+  type SelectAutomationProgress,
+  type InsertAutomationProgress,
+  type SelectAutomationJob,
+  type InsertAutomationJob,
+  automationProgress,
+  automationJobs
 } from "@shared/schema";
 import type { ConversionData, ModalTriggerData, ConversionMetrics, ThemePerformance, PostConversionReport } from "@shared/analytics";
 import { randomUUID } from "crypto";
@@ -133,6 +139,17 @@ export interface IStorage {
   removeProductTaxonomy(productId: string, taxonomySlug: string): Promise<void>;
   getProductsByTaxonomy(taxonomySlug: string): Promise<Product[]>;
   getProductsByTaxonomies(taxonomySlugs: string[]): Promise<Product[]>;
+  
+  // Automation methods
+  getAutomationProgress(): Promise<SelectAutomationProgress[]>;
+  getAutomationProgressByStage(stage: string): Promise<SelectAutomationProgress | undefined>;
+  createAutomationProgress(data: InsertAutomationProgress): Promise<SelectAutomationProgress>;
+  updateAutomationProgress(stage: string, data: Partial<InsertAutomationProgress>): Promise<SelectAutomationProgress>;
+  deleteAutomationProgress(stage: string): Promise<void>;
+  
+  getAutomationJobs(): Promise<SelectAutomationJob[]>;
+  createAutomationJob(data: InsertAutomationJob): Promise<SelectAutomationJob>;
+  updateAutomationJob(id: string, data: Partial<InsertAutomationJob>): Promise<SelectAutomationJob>;
 }
 
 export class MemStorage implements IStorage {
@@ -1441,6 +1458,97 @@ export class DatabaseStorage implements IStorage {
           taxonomySlugs.map(slug => eq(productTaxonomies.taxonomySlug, slug)).reduce((a, b) => and(a, b)),
         eq(products.status, 'active')
       ));
+  }
+
+  // Automation methods implementation
+  async getAutomationProgress(): Promise<SelectAutomationProgress[]> {
+    return await db.select().from(automationProgress);
+  }
+
+  async getAutomationProgressByStage(stage: string): Promise<SelectAutomationProgress | undefined> {
+    const results = await db.select().from(automationProgress).where(eq(automationProgress.stage, stage));
+    return results[0];
+  }
+
+  async createAutomationProgress(data: InsertAutomationProgress): Promise<SelectAutomationProgress> {
+    const results = await db.insert(automationProgress).values(data).returning();
+    return results[0];
+  }
+
+  async updateAutomationProgress(stage: string, data: Partial<InsertAutomationProgress>): Promise<SelectAutomationProgress> {
+    const updateData = {
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    const results = await db.update(automationProgress)
+      .set(updateData)
+      .where(eq(automationProgress.stage, stage))
+      .returning();
+      
+    if (results.length === 0) {
+      throw new Error(`Automation stage '${stage}' not found. Please initialize the automation system first.`);
+    }
+    
+    return results[0];
+  }
+
+  async deleteAutomationProgress(stage: string): Promise<void> {
+    await db.delete(automationProgress).where(eq(automationProgress.stage, stage));
+  }
+
+  async getAutomationJobs(): Promise<SelectAutomationJob[]> {
+    return await db.select().from(automationJobs).orderBy(desc(automationJobs.createdAt));
+  }
+
+  async createAutomationJob(data: InsertAutomationJob): Promise<SelectAutomationJob> {
+    const jobData = {
+      id: randomUUID(),
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const results = await db.insert(automationJobs).values(jobData).returning();
+    return results[0];
+  }
+
+  async updateAutomationJob(id: string, data: Partial<InsertAutomationJob>): Promise<SelectAutomationJob> {
+    const updateData = {
+      ...data,
+      updatedAt: new Date()
+    };
+    const results = await db.update(automationJobs)
+      .set(updateData)
+      .where(eq(automationJobs.id, id))
+      .returning();
+    return results[0];
+  }
+
+  async getAutomationWorkflows(): Promise<AutomationWorkflow[]> {
+    return await db.select().from(automationWorkflows).orderBy(desc(automationWorkflows.createdAt));
+  }
+
+  async createAutomationWorkflow(data: InsertAutomationWorkflow): Promise<AutomationWorkflow> {
+    const workflowData = {
+      id: randomUUID(),
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    const results = await db.insert(automationWorkflows).values(workflowData).returning();
+    return results[0];
+  }
+
+  async updateAutomationWorkflow(id: string, data: Partial<InsertAutomationWorkflow>): Promise<AutomationWorkflow> {
+    const updateData = {
+      ...data,
+      updatedAt: new Date()
+    };
+    const results = await db.update(automationWorkflows)
+      .set(updateData)
+      .where(eq(automationWorkflows.id, id))
+      .returning();
+    return results[0];
   }
 }
 

@@ -7,7 +7,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
@@ -2243,6 +2243,151 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching cookie consent:", error);
       res.status(500).json({ error: "Erro ao buscar preferências de cookies" });
+    }
+  });
+
+  // Automation API routes
+  app.get("/api/admin/automation/progress", extractUserInfo, async (req: any, res) => {
+    // Check admin authorization
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores podem acessar dados de automação." });
+    }
+    try {
+      const progress = await storage.getAutomationProgress();
+      res.json(progress);
+    } catch (error) {
+      console.error("Error fetching automation progress:", error);
+      res.status(500).json({ error: "Erro ao buscar progresso da automação" });
+    }
+  });
+
+  app.post("/api/admin/automation/initialize", extractUserInfo, async (req: any, res) => {
+    // Check admin authorization
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores podem inicializar automações." });
+    }
+    try {
+      // Initialize the automation system by creating initial progress entries
+      const stages = [
+        'day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'day_6', 'day_7'
+      ];
+
+      const progressEntries = [];
+      for (const stage of stages) {
+        const existingProgress = await storage.getAutomationProgressByStage(stage);
+        if (!existingProgress) {
+          const progress = await storage.createAutomationProgress({
+            stage,
+            status: stage === 'day_1' ? 'pending' : 'pending',
+            evidence: null,
+            completedAt: null
+          });
+          progressEntries.push(progress);
+        }
+      }
+
+      // Create initialization job
+      await storage.createAutomationJob({
+        type: 'system_initialization',
+        status: 'completed',
+        payload: { stages: stages.length },
+        processedAt: new Date()
+      });
+
+      res.json({ 
+        success: true, 
+        message: "Sistema de automação inicializado com sucesso!",
+        stages: progressEntries.length 
+      });
+    } catch (error) {
+      console.error("Error initializing automation system:", error);
+      res.status(500).json({ error: "Erro ao inicializar sistema de automação" });
+    }
+  });
+
+  app.post("/api/admin/automation/start-stage", extractUserInfo, async (req: any, res) => {
+    // Check admin authorization
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores podem iniciar etapas." });
+    }
+    
+    try {
+      // Validate request body
+      const validatedData = startStageSchema.parse(req.body);
+      const { stageId } = validatedData;
+
+      // Update stage status to in_progress
+      const progress = await storage.updateAutomationProgress(stageId, {
+        status: 'in_progress'
+      });
+
+      // Create job for stage start
+      await storage.createAutomationJob({
+        type: 'stage_start',
+        status: 'completed',
+        payload: { stageId },
+        processedAt: new Date()
+      });
+
+      res.json({ 
+        success: true, 
+        message: `Etapa ${stageId} iniciada!`,
+        progress 
+      });
+    } catch (error) {
+      console.error("Error starting stage:", error);
+      res.status(500).json({ error: "Erro ao iniciar etapa" });
+    }
+  });
+
+  app.post("/api/admin/automation/complete-stage", extractUserInfo, async (req: any, res) => {
+    // Check admin authorization
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores podem completar etapas." });
+    }
+    
+    try {
+      // Validate request body
+      const validatedData = completeStageSchema.parse(req.body);
+      const { stageId, evidence } = validatedData;
+
+      // Update stage status to completed
+      const progress = await storage.updateAutomationProgress(stageId, {
+        status: 'completed',
+        evidence,
+        completedAt: new Date()
+      });
+
+      // Create job for stage completion
+      await storage.createAutomationJob({
+        type: 'stage_completion',
+        status: 'completed',
+        payload: { stageId, evidence },
+        processedAt: new Date()
+      });
+
+      res.json({ 
+        success: true, 
+        message: `Etapa ${stageId} concluída!`,
+        progress 
+      });
+    } catch (error) {
+      console.error("Error completing stage:", error);
+      res.status(500).json({ error: "Erro ao concluir etapa" });
+    }
+  });
+
+  app.get("/api/admin/automation/jobs", extractUserInfo, async (req: any, res) => {
+    // Check admin authorization
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores podem acessar jobs de automação." });
+    }
+    try {
+      const jobs = await storage.getAutomationJobs();
+      res.json(jobs);
+    } catch (error) {
+      console.error("Error fetching automation jobs:", error);
+      res.status(500).json({ error: "Erro ao buscar jobs de automação" });
     }
   });
 

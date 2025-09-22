@@ -676,3 +676,16 @@ export type InsertAutomationProgress = z.infer<typeof insertAutomationProgressSc
 export type SelectAutomationProgress = typeof automationProgress.$inferSelect;
 export type InsertNotificationSubscription = z.infer<typeof insertNotificationSubscriptionSchema>;
 export type SelectNotificationSubscription = typeof notificationSubscriptions.$inferSelect;
+
+// Automation API validation schemas
+export const startStageSchema = z.object({
+  stageId: z.enum(['day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'day_6', 'day_7'])
+});
+
+export const completeStageSchema = z.object({
+  stageId: z.enum(['day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'day_6', 'day_7']),
+  evidence: z.record(z.any()).optional()
+});
+
+export type StartStageRequest = z.infer<typeof startStageSchema>;
+export type CompleteStageRequest = z.infer<typeof completeStageSchema>;
