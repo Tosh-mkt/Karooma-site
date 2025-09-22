@@ -27,6 +27,7 @@ import FlipbookTest from "./pages/flipbook-test";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProductImport } from "./pages/AdminProductImport";
+import { AdminAutomation } from "./pages/AdminAutomation";
 import AdminCuradoriaKarooma from "./pages/AdminCuradoriaKarooma";
 import { TempLogin } from "./pages/TempLogin";
 import { Login } from "./pages/Login";
@@ -94,6 +95,7 @@ function Router() {
 
               <Route path="/admin/dashboard" component={AdminDashboard} />
               <Route path="/admin/import-products" component={AdminProductImport} />
+              <Route path="/admin/automation" component={AdminAutomation} />
               <Route path="/admin/curadoria-karooma" component={AdminCuradoriaKarooma} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
               <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />
