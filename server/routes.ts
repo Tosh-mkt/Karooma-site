@@ -2391,6 +2391,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Test Welcome Email (simpler version for testing)
+  app.get("/api/test/welcome-email", async (req, res) => {
+    try {
+      // Import the email service
+      const { sendWelcomeEmail } = await import('./emailService.js');
+      
+      // Test email data
+      const testEmailData = {
+        email: 'admin@karooma.com',
+        name: 'Teste Automação',
+        source: 'test_route'
+      };
+      
+      // Send welcome email
+      const emailSent = await sendWelcomeEmail(testEmailData);
+      
+      if (emailSent) {
+        // Create evidence for testing
+        const evidence = {
+          email_sent: true,
+          recipient: testEmailData.email,
+          timestamp: new Date().toISOString(),
+          template_used: 'welcome_email_v1',
+          success: true,
+          via_route: 'test_route'
+        };
+        
+        res.json({
+          success: true,
+          message: "Email de boas-vindas executado com sucesso!",
+          evidence,
+          data: testEmailData
+        });
+      } else {
+        res.json({
+          success: false,
+          message: "Email executado (simulado pois SendGrid não configurado)",
+          simulated: true,
+          data: testEmailData
+        });
+      }
+    } catch (error) {
+      console.error("Error in test welcome email:", error);
+      res.status(500).json({ 
+        error: "Erro ao testar email de boas-vindas",
+        details: error.message 
+      });
+    }
+  });
+
   // Execute Day 1 Welcome Email Automation
   app.post("/api/admin/automation/execute-welcome-email", extractUserInfo, async (req: any, res) => {
     // Check admin authorization
