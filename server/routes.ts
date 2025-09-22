@@ -2391,6 +2391,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Execute Day 1 Welcome Email Automation
+  app.post("/api/admin/automation/execute-welcome-email", extractUserInfo, async (req: any, res) => {
+    // Check admin authorization
+    if (!req.user || !req.user.isAdmin) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores podem executar automações." });
+    }
+    
+    try {
+      const { sendWelcomeEmail } = await import('../server/emailService.js');
+      
+      // Test email data
+      const testEmailData = {
+        email: 'admin@karooma.com',
+        name: 'Admin Karooma',
+        source: 'automation_test'
+      };
+      
+      // Send welcome email
+      const emailSent = await sendWelcomeEmail(testEmailData);
+      
+      if (emailSent) {
+        // Create automation job record
+        await storage.createAutomationJob({
+          type: 'welcome_email',
+          status: 'completed',
+          payload: { email: testEmailData.email, name: testEmailData.name },
+          processedAt: new Date()
+        });
+        
+        // Create evidence for Day 1 completion
+        const evidence = {
+          email_sent: true,
+          recipient: testEmailData.email,
+          timestamp: new Date().toISOString(),
+          template_used: 'welcome_email_v1',
+          success: true
+        };
+        
+        res.json({
+          success: true,
+          message: "Email de boas-vindas enviado com sucesso!",
+          evidence,
+          data: testEmailData
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          message: "Falha ao enviar email de boas-vindas",
+          error: "Email service failed"
+        });
+      }
+    } catch (error) {
+      console.error("Error executing welcome email:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Erro ao executar email de boas-vindas",
+        details: error.message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
