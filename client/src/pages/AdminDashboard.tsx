@@ -491,7 +491,7 @@ export function AdminDashboard() {
             
             {/* Secondary row for mobile */}
             <div className="mt-2">
-              <TabsList className="grid w-full grid-cols-7 glassmorphism h-10">
+              <TabsList className="grid w-full grid-cols-6 glassmorphism h-10">
                 <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Database className="w-3 h-3" />
                   <span className="hidden sm:inline">Produtos</span>
@@ -499,10 +499,6 @@ export function AdminDashboard() {
                 <TabsTrigger value="curadoria" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Brain className="w-3 h-3" />
                   <span className="hidden sm:inline">Curadoria</span>
-                </TabsTrigger>
-                <TabsTrigger value="import" className="flex items-center justify-center space-x-1 text-xs py-2">
-                  <Upload className="w-3 h-3" />
-                  <span className="hidden sm:inline">Import</span>
                 </TabsTrigger>
                 <TabsTrigger value="monitoring" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Activity className="w-3 h-3" />
@@ -526,7 +522,7 @@ export function AdminDashboard() {
           
           {/* Desktop: Original layout */}
           <div className="hidden md:block">
-            <TabsList className="grid w-full grid-cols-10 glassmorphism">
+            <TabsList className="grid w-full grid-cols-9 glassmorphism">
               <TabsTrigger value="dashboard" className="flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -542,10 +538,6 @@ export function AdminDashboard() {
               <TabsTrigger value="curadoria" className="flex items-center space-x-2">
                 <Brain className="w-4 h-4" />
                 <span>Curadoria</span>
-              </TabsTrigger>
-              <TabsTrigger value="import" className="flex items-center space-x-2">
-                <Upload className="w-4 h-4" />
-                <span>Importar</span>
               </TabsTrigger>
               <TabsTrigger value="monitoring" className="flex items-center space-x-2">
                 <Activity className="w-4 h-4" />
@@ -580,10 +572,6 @@ export function AdminDashboard() {
 
           <TabsContent value="products">
             <ProductsManagement />
-          </TabsContent>
-
-          <TabsContent value="import">
-            <AdminProductImport />
           </TabsContent>
 
           <TabsContent value="monitoring">

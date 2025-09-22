@@ -11,9 +11,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, Plus, CloudUpload, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, FileText, Plus, CloudUpload, CheckCircle, AlertCircle, Database, ExternalLink, FileSpreadsheet } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { apiRequest } from "@/lib/queryClient";
 
 const productSchema = z.object({
   title: z.string().min(1, "Título é obrigatório").max(255, "Título muito longo"),
@@ -40,11 +44,24 @@ interface NewProductModalProps {
 }
 
 export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
-  const [mode, setMode] = useState<"choice" | "upload" | "manual">("choice");
+  const [mode, setMode] = useState<"choice" | "upload" | "manual" | "import">("choice");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState<any>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Import states
+  const [csvData, setCsvData] = useState("");
+  const [sheetsUrl, setSheetsUrl] = useState("");
+  const [sheetName, setSheetName] = useState("");
+  const [jsonColumn, setJsonColumn] = useState("");
+  const [jsonData, setJsonData] = useState("");
+  const [isLoadingSheets, setIsLoadingSheets] = useState(false);
+  const [jsonPreview, setJsonPreview] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("csv");
+  const [overwrite, setOverwrite] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResult, setImportResult] = useState<any>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -212,10 +229,145 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
     createProduct.mutate(data);
   };
 
+  // Import functions
+  const loadFromGoogleSheets = async () => {
+    if (!sheetsUrl.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, insira a URL do Google Sheets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoadingSheets(true);
+    try {
+      const response = await apiRequest("POST", "/api/admin/load-google-sheets", { 
+        sheetsUrl, 
+        sheetName: sheetName.trim() || undefined,
+        jsonColumn: jsonColumn.trim() || undefined
+      });
+      const result = await response.json();
+      
+      setJsonData(JSON.stringify(result.data, null, 2));
+      setJsonPreview(result.data.slice(0, 3));
+      
+      toast({
+        title: "Dados carregados!",
+        description: `${result.data.length} produtos encontrados na planilha.`,
+      });
+    } catch (error: any) {
+      console.error("Erro ao carregar Google Sheets:", error);
+      toast({
+        title: "Erro ao carregar",
+        description: error.message || "Erro ao conectar com Google Sheets.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingSheets(false);
+    }
+  };
+
+  const handleJsonImport = async () => {
+    if (!jsonData.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, carregue dados JSON ou cole manualmente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    let parsedData;
+    try {
+      parsedData = JSON.parse(jsonData);
+    } catch (error) {
+      toast({
+        title: "Erro de formato",
+        description: "Os dados JSON são inválidos. Verifique a formatação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const response = await apiRequest("POST", "/api/admin/import-json-products", { 
+        jsonData: parsedData, 
+        overwrite 
+      });
+      const result = await response.json();
+
+      setImportResult(result);
+      
+      toast({
+        title: "Importação JSON concluída!",
+        description: `${result.imported} produtos importados com sucesso de ${result.total} processados.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+    } catch (error: any) {
+      console.error("Erro na importação JSON:", error);
+      toast({
+        title: "Erro na importação",
+        description: error.message || "Erro ao importar produtos JSON.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleCsvImport = async () => {
+    if (!csvData.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, cole os dados CSV no campo de texto.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImporting(true);
+    try {
+      const response = await apiRequest("POST", "/api/admin/import-products", { 
+        csvData, 
+        overwrite 
+      });
+      const result = await response.json();
+
+      setImportResult(result);
+      
+      toast({
+        title: "Importação CSV concluída!",
+        description: `${result.imported} produtos importados com sucesso de ${result.total} processados.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+    } catch (error: any) {
+      console.error("Erro na importação CSV:", error);
+      toast({
+        title: "Erro na importação",
+        description: error.message || "Erro ao importar produtos CSV.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   const resetModal = () => {
     setMode("choice");
     setUploadProgress(0);
     setUploadResult(null);
+    setCsvData("");
+    setSheetsUrl("");
+    setSheetName("");
+    setJsonColumn("");
+    setJsonData("");
+    setJsonPreview([]);
+    setActiveTab("csv");
+    setOverwrite(false);
+    setIsImporting(false);
+    setImportResult(null);
     form.reset();
   };
 
@@ -232,7 +384,7 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
         </DialogHeader>
 
         {mode === "choice" && (
-          <div className="grid md:grid-cols-2 gap-6 py-6">
+          <div className="grid md:grid-cols-3 gap-6 py-6">
             <Card className="glassmorphism border-purple-200 hover:border-purple-400 transition-all cursor-pointer" onClick={() => setMode("upload")}>
               <CardContent className="p-6 text-center space-y-4">
                 <CloudUpload className="w-12 h-12 mx-auto text-purple-500" />
@@ -285,6 +437,24 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
                 <Button className="w-full bg-gradient-to-r from-pink-500 to-rose-500">
                   <Plus className="w-4 h-4 mr-2" />
                   Criar Manual
+                </Button>
+              </CardContent>
+            </Card>
+            
+            <Card className="glassmorphism border-blue-200 hover:border-blue-400 transition-all cursor-pointer" onClick={() => setMode("import")}>
+              <CardContent className="p-6 text-center space-y-4">
+                <Database className="w-12 h-12 mx-auto text-blue-500" />
+                <h3 className="text-lg font-semibold">Importar Produtos</h3>
+                <p className="text-sm text-muted-foreground">
+                  Google Sheets & CSV em massa com dados estruturados
+                </p>
+                <div className="text-xs text-blue-600 space-y-1">
+                  <p>• Google Sheets JSON</p>
+                  <p>• CSV tradicional</p>
+                </div>
+                <Button className="w-full bg-gradient-to-r from-blue-500 to-indigo-500">
+                  <FileSpreadsheet className="w-4 h-4 mr-2" />
+                  Importar
                 </Button>
               </CardContent>
             </Card>
@@ -553,6 +723,251 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
                 </Button>
               </form>
             </Form>
+          </div>
+        )}
+        
+        {mode === "import" && (
+          <div className="space-y-6 py-6">
+            <div className="text-center">
+              <Button
+                variant="outline"
+                onClick={() => setMode("choice")}
+                className="mb-4"
+              >
+                ← Voltar às Opções
+              </Button>
+            </div>
+
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="csv" className="flex items-center gap-2">
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Importação CSV
+                </TabsTrigger>
+                <TabsTrigger value="sheets" className="flex items-center gap-2">
+                  <Database className="w-4 h-4" />
+                  Google Sheets JSON
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="csv" className="space-y-6">
+                <Card className="glassmorphism border-0">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <FileSpreadsheet className="w-5 h-5 text-green-600" />
+                        Importação CSV
+                      </h3>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => window.open('/api/admin/download-template/csv', '_blank')}
+                          className="text-xs"
+                        >
+                          ⬇️ CSV de exemplo com formato correto
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground">
+                      Importe produtos em massa a partir do Google Sheets com dados JSON estruturados ou arquivo CSV tradicional.
+                    </p>
+
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="csv-data">Cole seu CSV aqui:</Label>
+                        <Textarea
+                          id="csv-data"
+                          placeholder="Título,Descrição,Categoria,Preço Atual,Link Afiliado..."
+                          value={csvData}
+                          onChange={(e) => setCsvData(e.target.value)}
+                          className="min-h-[200px] font-mono text-xs"
+                        />
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="overwrite"
+                          checked={overwrite}
+                          onCheckedChange={(checked) => setOverwrite(checked as boolean)}
+                        />
+                        <Label htmlFor="overwrite" className="text-sm">
+                          Sobrescrever produtos existentes (limpar base de dados antes)
+                        </Label>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handleCsvImport}
+                          disabled={isImporting || !csvData.trim()}
+                          className="flex-1 bg-gradient-to-r from-green-600 to-blue-600"
+                        >
+                          {isImporting ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                              Importando...
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Upload className="w-4 h-4" />
+                              Importar CSV
+                            </div>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="sheets" className="space-y-6">
+                <Card className="glassmorphism border-0">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-semibold flex items-center gap-2">
+                        <ExternalLink className="w-5 h-5 text-blue-600" />
+                        Google Sheets JSON
+                      </h3>
+                    </div>
+                    
+                    <p className="text-sm text-muted-foreground">
+                      Conecte-se diretamente ao Google Sheets e importe dados JSON estruturados.
+                    </p>
+
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="sheets-url">URL do Google Sheets (compartilhado publicamente):</Label>
+                        <Input
+                          id="sheets-url"
+                          placeholder="https://docs.google.com/spreadsheets/d/..."
+                          value={sheetsUrl}
+                          onChange={(e) => setSheetsUrl(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="sheet-name">Nome da Aba (opcional):</Label>
+                          <Input
+                            id="sheet-name"
+                            placeholder="Sheet1, Produtos..."
+                            value={sheetName}
+                            onChange={(e) => setSheetName(e.target.value)}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="json-column">Coluna JSON (opcional):</Label>
+                          <Input
+                            id="json-column"
+                            placeholder="B, C, dados..."
+                            value={jsonColumn}
+                            onChange={(e) => setJsonColumn(e.target.value)}
+                          />
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={loadFromGoogleSheets}
+                        disabled={isLoadingSheets || !sheetsUrl.trim()}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600"
+                      >
+                        {isLoadingSheets ? (
+                          <div className="flex items-center gap-2">
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            Carregando...
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-2">
+                            <Database className="w-4 h-4" />
+                            Carregar do Google Sheets
+                          </div>
+                        )}
+                      </Button>
+
+                      {jsonPreview.length > 0 && (
+                        <Alert>
+                          <CheckCircle className="h-4 w-4" />
+                          <AlertDescription>
+                            <strong>Preview dos dados:</strong> {jsonPreview.length} produtos encontrados. 
+                            <details className="mt-2">
+                              <summary className="cursor-pointer text-sm font-medium">Ver primeiros produtos</summary>
+                              <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto max-h-32">
+                                {JSON.stringify(jsonPreview, null, 2)}
+                              </pre>
+                            </details>
+                          </AlertDescription>
+                        </Alert>
+                      )}
+
+                      {jsonData && (
+                        <div className="space-y-4">
+                          <div>
+                            <Label htmlFor="json-data">Dados JSON carregados:</Label>
+                            <Textarea
+                              id="json-data"
+                              value={jsonData}
+                              onChange={(e) => setJsonData(e.target.value)}
+                              className="min-h-[200px] font-mono text-xs"
+                            />
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <Checkbox 
+                              id="overwrite-json"
+                              checked={overwrite}
+                              onCheckedChange={(checked) => setOverwrite(checked as boolean)}
+                            />
+                            <Label htmlFor="overwrite-json" className="text-sm">
+                              Sobrescrever produtos existentes
+                            </Label>
+                          </div>
+
+                          <Button
+                            onClick={handleJsonImport}
+                            disabled={isImporting}
+                            className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
+                          >
+                            {isImporting ? (
+                              <div className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                Importando...
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <Upload className="w-4 h-4" />
+                                Importar Produtos JSON
+                              </div>
+                            )}
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+
+            {importResult && (
+              <Alert>
+                <CheckCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <strong>Importação concluída!</strong> {importResult.imported} produtos importados de {importResult.total} processados.
+                  {importResult.errors?.length > 0 && (
+                    <details className="mt-2">
+                      <summary className="cursor-pointer">Ver erros ({importResult.errors.length})</summary>
+                      <ul className="mt-1 text-xs text-red-600 space-y-1">
+                        {importResult.errors.slice(0, 5).map((error: any, index: number) => (
+                          <li key={index}>Linha {error.line}: {error.message}</li>
+                        ))}
+                        {importResult.errors.length > 5 && <li>...e mais {importResult.errors.length - 5} erros</li>}
+                      </ul>
+                    </details>
+                  )}
+                </AlertDescription>
+              </Alert>
+            )}
           </div>
         )}
       </DialogContent>
