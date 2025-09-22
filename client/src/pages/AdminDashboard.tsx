@@ -18,7 +18,7 @@ import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
   Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
-  Terminal, FileText, Upload, Brain
+  Terminal, FileText, Upload, Brain, Bot
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -491,7 +491,7 @@ export function AdminDashboard() {
             
             {/* Secondary row for mobile */}
             <div className="mt-2">
-              <TabsList className="grid w-full grid-cols-6 glassmorphism h-10">
+              <TabsList className="grid w-full grid-cols-7 glassmorphism h-10">
                 <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Database className="w-3 h-3" />
                   <span className="hidden sm:inline">Produtos</span>
@@ -512,6 +512,10 @@ export function AdminDashboard() {
                   <Edit className="w-3 h-3" />
                   <span className="hidden sm:inline">Conteúdo</span>
                 </TabsTrigger>
+                <TabsTrigger value="automation" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <Bot className="w-3 h-3" />
+                  <span className="hidden sm:inline">Automaç</span>
+                </TabsTrigger>
                 <TabsTrigger value="settings" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Shield className="w-3 h-3" />
                   <span className="hidden sm:inline">Config</span>
@@ -522,7 +526,7 @@ export function AdminDashboard() {
           
           {/* Desktop: Original layout */}
           <div className="hidden md:block">
-            <TabsList className="grid w-full grid-cols-9 glassmorphism">
+            <TabsList className="grid w-full grid-cols-10 glassmorphism">
               <TabsTrigger value="dashboard" className="flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -555,6 +559,10 @@ export function AdminDashboard() {
                 <TrendingUp className="w-4 h-4" />
                 <span>Analytics</span>
               </TabsTrigger>
+              <TabsTrigger value="automation" className="flex items-center space-x-2">
+                <Bot className="w-4 h-4" />
+                <span>Automação</span>
+              </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center space-x-2">
                 <Shield className="w-4 h-4" />
                 <span>Configurações</span>
@@ -586,6 +594,35 @@ export function AdminDashboard() {
             <ContentManagement />
           </TabsContent>
 
+
+          <TabsContent value="automation">
+            <Card className="glassmorphism border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-green-600" />
+                  Sistema de Automação
+                </CardTitle>
+                <CardDescription>
+                  Dashboard completo do sistema de automação de marketing
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Acesse o dashboard completo para gerenciar as 7 etapas do MVP, acompanhar progresso e monitorar jobs de automação.
+                  </p>
+                  <Button 
+                    onClick={() => window.open('/admin/automation?admin=true', '_blank')}
+                    className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+                    data-testid="link-automation-dashboard"
+                  >
+                    <Bot className="w-4 h-4 mr-2" />
+                    Abrir Dashboard de Automação
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           <TabsContent value="analytics">
             <Card className="glassmorphism border-0">
