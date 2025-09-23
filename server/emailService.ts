@@ -181,7 +181,7 @@ interface WelcomeEmailData {
 }
 
 export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
-  const fromEmail = 'welcome@karooma.life';
+  const fromEmail = 'contato@karooma.life';
   
   const htmlContent = `
     <!DOCTYPE html>
