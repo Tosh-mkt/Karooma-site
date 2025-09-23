@@ -181,7 +181,7 @@ interface WelcomeEmailData {
 }
 
 export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
-  const fromEmail = 'welcome@karooma.com';
+  const fromEmail = 'welcome@karooma.life';
   
   const htmlContent = `
     <!DOCTYPE html>
@@ -261,7 +261,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
         <div class="content">
           <div class="welcome-message">
             <p>Olá${data.name ? ` ${data.name}` : ''}! 👋</p>
-            <p>Que alegria ter você conosco! A Karooma é sua nova plataforma para descobrir produtos únicos, ofertas exclusivas e conteúdo valioso sobre maternidade, organização e estilo de vida.</p>
+            <p>Que alegria ter você conosco! A Karooma é sua nova plataforma para descobrir conteúdo valioso sobre cuidado familiar, organização e estilo de vida, além de recomendação de produtos selecionados e avaliados, e ofertas exclusivas mapeadas de acordo com seus interesses.</p>
           </div>
           
           <div class="benefits">
@@ -285,7 +285,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
           </div>
           
           <div class="cta-section">
-            <a href="https://karooma.com/produtos" class="cta-button">
+            <a href="https://karooma.life/produtos" class="cta-button">
               🛍️ Explore Nossa Seleção
             </a>
           </div>
@@ -298,12 +298,12 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
         <div class="footer">
           <p><strong>Karooma</strong> - Simplificando a vida das mães modernas</p>
           <div class="social-links">
-            <a href="https://karooma.com/blog">📝 Blog</a>
-            <a href="https://karooma.com/newsletter">📬 Newsletter</a>
-            <a href="https://karooma.com/sobre">ℹ️ Sobre nós</a>
+            <a href="https://karooma.life/blog">📝 Blog</a>
+            <a href="https://karooma.life/newsletter">📬 Newsletter</a>
+            <a href="https://karooma.life/sobre">ℹ️ Sobre nós</a>
           </div>
           <p>Recebeu este email porque se inscreveu em nossa newsletter. <br/>
-          Se não deseja mais receber, <a href="https://karooma.com/unsubscribe">clique aqui</a>.</p>
+          Se não deseja mais receber, <a href="https://karooma.life/unsubscribe">clique aqui</a>.</p>
         </div>
       </div>
     </body>
@@ -315,7 +315,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
     
     Olá${data.name ? ` ${data.name}` : ''}!
     
-    Que alegria ter você conosco! A Karooma é sua nova plataforma para descobrir produtos únicos, ofertas exclusivas e conteúdo valioso sobre maternidade, organização e estilo de vida.
+    Que alegria ter você conosco! A Karooma é sua nova plataforma para descobrir conteúdo valioso sobre cuidado familiar, organização e estilo de vida, além de recomendação de produtos selecionados e avaliados, e ofertas exclusivas mapeadas de acordo com seus interesses.
     
     🌟 O que você vai encontrar:
     ✓ Produtos cuidadosamente selecionados para mães e famílias
@@ -323,7 +323,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
     ✓ Conteúdo exclusivo sobre organização e produtividade
     ✓ Dicas práticas para o dia a dia da família moderna
     
-    Explore nossa seleção: https://karooma.com/produtos
+    Explore nossa seleção: https://karooma.life/produtos
     
     Dica especial: Nos próximos dias, você receberá dicas exclusivas para aproveitar ao máximo a plataforma. Fique de olho na sua caixa de entrada!
     
@@ -331,7 +331,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
     Karooma - Simplificando a vida das mães modernas
     
     Recebeu este email porque se inscreveu em nossa newsletter.
-    Para cancelar: https://karooma.com/unsubscribe
+    Para cancelar: https://karooma.life/unsubscribe
   `;
 
   const emailData: EmailData = {
