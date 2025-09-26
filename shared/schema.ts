@@ -51,6 +51,16 @@ export const verificationTokens = pgTable("verificationToken", {
   compoundKey: index().on(vt.identifier, vt.token),
 }));
 
+// Password reset tokens
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  token: varchar("token").notNull().unique(),
+  expires: timestamp("expires").notNull(),
+  used: boolean("used").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const content = pgTable("content", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   title: text("title").notNull(),
@@ -677,6 +687,15 @@ export type SelectAutomationProgress = typeof automationProgress.$inferSelect;
 export type InsertNotificationSubscription = z.infer<typeof insertNotificationSubscriptionSchema>;
 export type SelectNotificationSubscription = typeof notificationSubscriptions.$inferSelect;
 
+// Password reset token schemas
+export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({
+  id: true,
+  createdAt: true,
+});
+
+export type InsertPasswordResetToken = z.infer<typeof insertPasswordResetTokenSchema>;
+export type SelectPasswordResetToken = typeof passwordResetTokens.$inferSelect;
+
 // Automation API validation schemas
 export const startStageSchema = z.object({
   stageId: z.enum(['day_1', 'day_2', 'day_3', 'day_4', 'day_5', 'day_6', 'day_7'])
@@ -689,3 +708,16 @@ export const completeStageSchema = z.object({
 
 export type StartStageRequest = z.infer<typeof startStageSchema>;
 export type CompleteStageRequest = z.infer<typeof completeStageSchema>;
+
+// Password reset API validation schemas
+export const requestPasswordResetSchema = z.object({
+  email: z.string().email()
+});
+
+export const resetPasswordSchema = z.object({
+  token: z.string(),
+  newPassword: z.string().min(6, "Senha deve ter pelo menos 6 caracteres")
+});
+
+export type RequestPasswordReset = z.infer<typeof requestPasswordResetSchema>;
+export type ResetPassword = z.infer<typeof resetPasswordSchema>;
