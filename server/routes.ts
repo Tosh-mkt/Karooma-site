@@ -2,16 +2,17 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { db } from "./db";
-import { products } from "@shared/schema";
+import { products, users } from "@shared/schema";
+import { eq, and, gt } from "drizzle-orm";
 import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
-import { sendNewsletterNotification, logNewsletterSubscription } from "./emailService";
+import { sendNewsletterNotification, logNewsletterSubscription, sendPasswordResetEmail } from "./emailService";
 // Auth middleware will be added with NextAuth
 import {
   ObjectStorageService,
@@ -706,6 +707,89 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error making user admin:", error);
       res.status(500).json({ error: "Failed to make user admin" });
+    }
+  });
+
+  // Password Reset Routes
+  app.post('/api/auth/request-password-reset', async (req, res) => {
+    try {
+      const { email } = requestPasswordResetSchema.parse(req.body);
+      
+      // Check if user exists
+      const user = await storage.getUserByEmail(email);
+      if (!user) {
+        // Don't reveal if user exists or not for security
+        return res.json({ message: "Se o email estiver registrado, você receberá um link de recuperação." });
+      }
+
+      // Generate reset token
+      const token = crypto.randomBytes(32).toString('hex');
+      const expires = new Date(Date.now() + 3600000); // 1 hour from now
+
+      // Save token to database
+      await db.insert(passwordResetTokens).values({
+        userId: user.id,
+        token,
+        expires,
+        used: false
+      });
+
+      // Send reset email
+      await sendPasswordResetEmail(user.email!, token);
+
+      res.json({ message: "Se o email estiver registrado, você receberá um link de recuperação." });
+    } catch (error) {
+      console.error('Error requesting password reset:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Email inválido' });
+      }
+      res.status(500).json({ error: 'Erro interno do servidor' });
+    }
+  });
+
+  app.post('/api/auth/reset-password', async (req, res) => {
+    try {
+      const { token, newPassword } = resetPasswordSchema.parse(req.body);
+
+      // Find valid token
+      const [resetToken] = await db
+        .select()
+        .from(passwordResetTokens)
+        .where(
+          and(
+            eq(passwordResetTokens.token, token),
+            eq(passwordResetTokens.used, false),
+            gt(passwordResetTokens.expires, new Date())
+          )
+        );
+
+      if (!resetToken) {
+        return res.status(400).json({ error: 'Token inválido ou expirado' });
+      }
+
+      // Hash new password
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash(newPassword, saltRounds);
+
+      // Update user password
+      await db
+        .update(users)
+        .set({ passwordHash })
+        .where(eq(users.id, resetToken.userId));
+
+      // Mark token as used
+      await db
+        .update(passwordResetTokens)
+        .set({ used: true })
+        .where(eq(passwordResetTokens.id, resetToken.id));
+
+      res.json({ message: 'Senha alterada com sucesso' });
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: 'Dados inválidos' });
+      }
+      res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
 
