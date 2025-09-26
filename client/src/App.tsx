@@ -33,6 +33,8 @@ import { TempLogin } from "./pages/TempLogin";
 import { Login } from "./pages/Login";
 import { AdminLogin } from "./pages/AdminLogin";
 import { Register } from "./pages/Register";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
 import Favorites from "./pages/Favorites";
 import { PageRenderer } from "./components/PageRenderer";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
@@ -102,6 +104,8 @@ function Router() {
               <Route path="/demo/flipbook-capture" component={DemoFlipbookCapture} />
               <Route path="/login" component={Login} />
               <Route path="/register" component={Register} />
+              <Route path="/forgot-password" component={ForgotPassword} />
+              <Route path="/reset-password" component={ResetPassword} />
               <Route path="/admin/login" component={AdminLogin} />
               <Route path="/admin/temp-login" component={TempLogin} />
               

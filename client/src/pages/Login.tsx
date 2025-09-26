@@ -242,9 +242,11 @@ export function Login() {
                   <input type="checkbox" className="rounded" />
                   <span className="text-gray-600">Lembrar de mim</span>
                 </label>
-                <a href="#" className="text-sm text-purple-600 hover:underline">
-                  Esqueceu sua senha?
-                </a>
+                <Link href="/forgot-password">
+                  <span className="text-sm text-purple-600 hover:underline cursor-pointer">
+                    Esqueceu sua senha?
+                  </span>
+                </Link>
               </div>
 
               <Button
