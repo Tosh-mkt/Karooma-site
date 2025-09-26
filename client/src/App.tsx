@@ -141,6 +141,7 @@ function App() {
           <div className="custom-scrollbar">
             <Router />
             <CookieConsent />
+            <Toaster />
           </div>
         </ConsentProvider>
       </TooltipProvider>
