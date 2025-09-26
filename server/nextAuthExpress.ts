@@ -17,7 +17,12 @@ export function setupNextAuth(app: Express) {
     }
   }
   
-  app.use("/api/auth/*", ExpressAuth(expressConfig))
+  // NextAuth specific routes only - avoid intercepting our custom auth routes
+  app.use("/api/auth/signin", ExpressAuth(expressConfig))
+  app.use("/api/auth/signout", ExpressAuth(expressConfig)) 
+  app.use("/api/auth/callback", ExpressAuth(expressConfig))
+  app.use("/api/auth/csrf", ExpressAuth(expressConfig))
+  app.use("/api/auth/providers", ExpressAuth(expressConfig))
   
   // Custom session endpoint - simplified for now
   app.get("/api/auth/session", async (req: Request, res: Response) => {
