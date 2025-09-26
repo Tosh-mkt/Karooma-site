@@ -356,3 +356,159 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
 
   return await sendEmail(emailData);
 }
+
+// Email de Recuperação de Senha
+export async function sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
+  const fromEmail = 'contato@karooma.life';
+  const resetUrl = `${process.env.REPLIT_DOMAINS}/auth/reset-password?token=${token}`;
+  
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Recuperação de Senha - Karooma</title>
+      <style>
+        body { 
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+          margin: 0; padding: 0; background-color: #f8f9fa; 
+        }
+        .container { 
+          max-width: 600px; margin: 0 auto; background: white; 
+          border-radius: 16px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.1); 
+        }
+        .header { 
+          background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); 
+          color: white; padding: 40px 30px; text-align: center; 
+        }
+        .header h1 { 
+          margin: 0 0 10px 0; font-size: 28px; font-weight: 700; 
+        }
+        .header p { 
+          margin: 0; font-size: 16px; opacity: 0.9; 
+        }
+        .content { 
+          padding: 40px 30px; 
+        }
+        .reset-message { 
+          font-size: 18px; line-height: 1.6; color: #374151; margin-bottom: 30px; 
+        }
+        .warning-box { 
+          background: #fef3c7; border: 1px solid #f59e0b; 
+          padding: 20px; border-radius: 8px; margin: 20px 0; 
+          color: #92400e;
+        }
+        .cta-section { 
+          text-align: center; margin: 40px 0; 
+        }
+        .cta-button { 
+          display: inline-block; background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); 
+          color: white; text-decoration: none; padding: 16px 32px; 
+          border-radius: 8px; font-weight: 600; font-size: 16px; 
+          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); 
+        }
+        .footer { 
+          background: #f9fafb; padding: 30px; text-align: center; 
+          color: #6b7280; font-size: 14px; line-height: 1.6; 
+        }
+        .security-note { 
+          background: #f3f4f6; padding: 20px; border-radius: 8px; 
+          margin: 20px 0; font-size: 14px; color: #6b7280; 
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🔐 Recuperação de Senha</h1>
+          <p>Solicitação de alteração de senha</p>
+        </div>
+        
+        <div class="content">
+          <div class="reset-message">
+            <p>Olá! 👋</p>
+            <p>Recebemos uma solicitação para redefinir a senha da sua conta Karooma. Se você fez esta solicitação, clique no botão abaixo para criar uma nova senha.</p>
+          </div>
+          
+          <div class="warning-box">
+            <strong>⚠️ Importante:</strong> Este link é válido por apenas 1 hora por questões de segurança.
+          </div>
+          
+          <div class="cta-section">
+            <a href="${resetUrl}" class="cta-button">
+              🔑 Redefinir Minha Senha
+            </a>
+          </div>
+          
+          <div class="security-note">
+            <p><strong>🛡️ Dicas de Segurança:</strong></p>
+            <ul style="margin: 10px 0; padding-left: 20px;">
+              <li>Se você não solicitou esta alteração, ignore este email</li>
+              <li>Nunca compartilhe este link com outras pessoas</li>
+              <li>Use uma senha forte com letras, números e símbolos</li>
+              <li>Não use a mesma senha em outros sites</li>
+            </ul>
+          </div>
+          
+          <p style="font-size: 16px; color: #6b7280; line-height: 1.6;">
+            Se o botão não funcionar, copie e cole o link abaixo no seu navegador:<br/>
+            <a href="${resetUrl}" style="color: #dc2626; word-break: break-all;">${resetUrl}</a>
+          </p>
+        </div>
+        
+        <div class="footer">
+          <p><strong>Karooma</strong> - Plataforma de produtos e conteúdo familiar</p>
+          <p>Este email foi enviado automaticamente. Se você não solicitou esta alteração, pode ignorar esta mensagem com segurança.</p>
+          <p>Em caso de dúvidas, entre em contato: <a href="mailto:contato@karooma.life">contato@karooma.life</a></p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const textContent = `
+    🔐 Recuperação de Senha - Karooma
+    
+    Olá!
+    
+    Recebemos uma solicitação para redefinir a senha da sua conta Karooma. Se você fez esta solicitação, acesse o link abaixo para criar uma nova senha:
+    
+    ${resetUrl}
+    
+    ⚠️ IMPORTANTE: Este link é válido por apenas 1 hora por questões de segurança.
+    
+    🛡️ Dicas de Segurança:
+    • Se você não solicitou esta alteração, ignore este email
+    • Nunca compartilhe este link com outras pessoas  
+    • Use uma senha forte com letras, números e símbolos
+    • Não use a mesma senha em outros sites
+    
+    ---
+    Karooma - Plataforma de produtos e conteúdo familiar
+    
+    Este email foi enviado automaticamente. Se você não solicitou esta alteração, pode ignorar esta mensagem com segurança.
+    Em caso de dúvidas: contato@karooma.life
+  `;
+
+  const emailData: EmailData = {
+    to: email,
+    from: fromEmail,
+    subject: "🔐 Recuperação de Senha - Karooma",
+    text: textContent,
+    html: htmlContent
+  };
+
+  if (!mailService) {
+    // Fallback logging quando SendGrid não está configurado
+    console.log('\n🔐 ===== EMAIL DE RECUPERAÇÃO DE SENHA (SIMULADO) =====');
+    console.log(`📧 Para: ${email}`);
+    console.log(`🔗 Token: ${token}`);
+    console.log(`🌐 URL de Reset: ${resetUrl}`);
+    console.log(`📝 Assunto: ${emailData.subject}`);
+    console.log('📄 Conteúdo: Email HTML de recuperação de senha com link seguro');
+    console.log('=========================================================\n');
+    return true; // Simula sucesso para fins de teste
+  }
+
+  return await sendEmail(emailData);
+}
