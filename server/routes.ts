@@ -628,6 +628,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to detect admin emails (same logic as frontend)
+  const isAdminEmail = (email: string): boolean => {
+    return email.includes('@karooma.com') || email.includes('admin');
+  };
+
   // Login route for email/password authentication
   app.post('/api/login', async (req: any, res) => {
     try {
@@ -635,10 +640,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // For admin login
       if (type === 'admin') {
+        // Check if email qualifies as admin
+        if (!isAdminEmail(email)) {
+          return res.status(401).json({ message: "Invalid admin credentials" });
+        }
+
         // Find user by email
-        const user = await storage.getUserByEmail(email);
+        let user = await storage.getUserByEmail(email);
         
-        // TODO: Implement admin check with NextAuth
+        // If user doesn't exist but email is admin, we can't proceed without password
         if (!user || !user.passwordHash) {
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
@@ -649,16 +659,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!passwordMatch) {
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
+
+        // Ensure admin flag is set for admin emails
+        if (!user.isAdmin && isAdminEmail(email)) {
+          user = await storage.makeUserAdmin(user.id);
+        }
           
-        // Login bem-sucedido - por enquanto só retorna sucesso
-        // TODO: Implementar session management com NextAuth
+        // Login bem-sucedido
         return res.json({ 
           message: "Logged in successfully", 
           user: {
             id: user.id,
             email: user.email,
             firstName: user.firstName,
-            isAdmin: user.isAdmin
+            isAdmin: true // Always true for admin login type
           },
           success: true
         });
