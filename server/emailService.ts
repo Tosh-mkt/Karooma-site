@@ -24,8 +24,8 @@ export async function sendNewsletterNotification(data: NewsletterNotificationDat
     return false;
   }
 
-  const fromEmail = 'admin@karooma.com'; // Email remetente
-  const adminEmail = 'admin@karooma.com'; // Email do admin
+  const fromEmail = 'admin@karooma.life'; // Email remetente
+  const adminEmail = 'admin@karooma.life'; // Email do admin
 
   const categoriesText = data.categories.length > 0 
     ? data.categories.join(', ') 

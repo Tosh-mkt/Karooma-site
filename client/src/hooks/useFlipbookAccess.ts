@@ -85,7 +85,7 @@ export function useEmailFromUrl(): string | null {
     const adminParam = urlParams.get('admin');
     
     if (adminParam === 'true') {
-      setEmail('admin@karooma.com');
+      setEmail('admin@karooma.life');
     } else if (emailParam) {
       setEmail(emailParam);
     }

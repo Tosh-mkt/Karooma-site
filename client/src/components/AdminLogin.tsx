@@ -40,7 +40,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "admin@karooma.com",
+      email: "admin@karooma.life",
       password: "",
     },
   });
@@ -115,7 +115,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="admin@karooma.com"
+                        placeholder="admin@karooma.life"
                         {...field}
                       />
                     </FormControl>
@@ -155,7 +155,7 @@ export function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
 
           <div className="mt-4 text-center text-sm text-muted-foreground">
             <p>Credenciais de teste:</p>
-            <p>Email: admin@karooma.com</p>
+            <p>Email: admin@karooma.life</p>
             <p>Senha: admin123</p>
           </div>
         </CardContent>

@@ -76,7 +76,7 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
   // Check if admin override (only in development)
   if (process.env.NODE_ENV === 'development' && req.query.admin === 'true') {
     req.user = {
-      email: 'admin@karooma.com',
+      email: 'admin@karooma.life',
       isAdmin: true,
       id: 'admin'
     };

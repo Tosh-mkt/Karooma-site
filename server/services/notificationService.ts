@@ -17,7 +17,7 @@ export interface UpdateSummary {
 }
 
 export class EmailNotificationService implements NotificationService {
-  private adminEmail = "admin@karooma.com";
+  private adminEmail = "admin@karooma.life";
   
   async sendProductUnavailableAlert(product: Product): Promise<boolean> {
     const subject = `🚨 Produto Indisponível - ${product.title}`;

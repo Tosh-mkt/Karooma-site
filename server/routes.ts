@@ -2118,8 +2118,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { sendEmail } = await import('./emailService');
       
       const testResult = await sendEmail({
-        to: 'admin@karooma.com',
-        from: 'admin@karooma.com',
+        to: 'admin@karooma.life',
+        from: 'admin@karooma.life',
         subject: 'Teste SendGrid - Karooma',
         html: `
           <h2>🎉 SendGrid Configurado com Sucesso!</h2>
@@ -2497,7 +2497,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Test email data
       const testEmailData = {
-        email: 'admin@karooma.com',
+        email: 'admin@karooma.life',
         name: 'Teste Automação',
         source: 'test_route'
       };
@@ -2551,7 +2551,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Test email data
       const testEmailData = {
-        email: 'admin@karooma.com',
+        email: 'admin@karooma.life',
         name: 'Admin Karooma',
         source: 'automation_test'
       };
