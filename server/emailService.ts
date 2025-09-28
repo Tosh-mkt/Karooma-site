@@ -181,7 +181,7 @@ interface WelcomeEmailData {
 }
 
 export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
-  const fromEmail = 'contato@karooma.life';
+  const fromEmail = 'admin@karooma.life';
   
   const htmlContent = `
     <!DOCTYPE html>
@@ -359,8 +359,8 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
 
 // Email de Recuperação de Senha
 export async function sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
-  const fromEmail = 'contato@karooma.life';
-  const resetUrl = `${process.env.REPLIT_DOMAINS}/auth/reset-password?token=${token}`;
+  const fromEmail = 'admin@karooma.life';
+  const resetUrl = `${process.env.REPLIT_DOMAINS}/reset-password?token=${token}`;
   
   const htmlContent = `
     <!DOCTYPE html>
