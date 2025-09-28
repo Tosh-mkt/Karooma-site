@@ -3,9 +3,15 @@ import { MailService } from '@sendgrid/mail';
 // Configuração básica do SendGrid
 let mailService: MailService | null = null;
 
+// Email remetente verificado (deve estar configurado no SendGrid)
+const VERIFIED_SENDER_EMAIL = process.env.SENDGRID_VERIFIED_SENDER || 'admin@karooma.life';
+
 if (process.env.SENDGRID_API_KEY) {
   mailService = new MailService();
   mailService.setApiKey(process.env.SENDGRID_API_KEY);
+  console.log(`📧 SendGrid configurado com email remetente: ${VERIFIED_SENDER_EMAIL}`);
+} else {
+  console.warn('⚠️ SENDGRID_API_KEY não configurado');
 }
 
 interface NewsletterNotificationData {
@@ -24,7 +30,7 @@ export async function sendNewsletterNotification(data: NewsletterNotificationDat
     return false;
   }
 
-  const fromEmail = 'admin@karooma.life'; // Email remetente
+  const fromEmail = VERIFIED_SENDER_EMAIL;
   const adminEmail = 'admin@karooma.life'; // Email do admin
 
   const categoriesText = data.categories.length > 0 
@@ -181,7 +187,7 @@ interface WelcomeEmailData {
 }
 
 export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
-  const fromEmail = 'admin@karooma.life';
+  const fromEmail = VERIFIED_SENDER_EMAIL;
   
   const htmlContent = `
     <!DOCTYPE html>
@@ -359,7 +365,7 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
 
 // Email de Recuperação de Senha
 export async function sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
-  const fromEmail = 'admin@karooma.life';
+  const fromEmail = VERIFIED_SENDER_EMAIL;
   const resetUrl = `${process.env.REPLIT_DOMAINS}/reset-password?token=${token}`;
   
   const htmlContent = `
