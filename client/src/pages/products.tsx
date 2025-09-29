@@ -88,11 +88,18 @@ export default function Products() {
   }, [maxPrice, priceRange.length]);
 
   // Fetch user favorites
-  const { data: favorites, isLoading: favoritesLoading } = useQuery<Product[]>({
+  const { data: favorites, isLoading: favoritesLoading, error: favoritesError } = useQuery<Product[]>({
     queryKey: ["/api/favorites"],
     enabled: isAuthenticated && showFavorites,
+    retry: false, // Don't retry on 401 errors
   });
 
+  // Reset to show all products if favorites query fails or user is not authenticated
+  useEffect(() => {
+    if (showFavorites && (!isAuthenticated || favoritesError)) {
+      setShowFavorites(false);
+    }
+  }, [showFavorites, isAuthenticated, favoritesError]);
 
   // Função para lidar com mudanças nos filtros de taxonomia
   const handleTaxonomyChange = (taxonomies: string[]) => {
@@ -109,7 +116,8 @@ export default function Products() {
 
 
   // Use favorites or all products based on toggle
-  const sourceProducts = showFavorites ? favorites : products;
+  // Only show favorites if user is authenticated, showFavorites is true, and favorites are loaded
+  const sourceProducts = (showFavorites && isAuthenticated && favorites) ? favorites : products;
   
   // Produtos filtrados (taxonomias já aplicadas na query, filtrar apenas busca, preço e idade)
   const filteredProducts = useMemo(() => {
