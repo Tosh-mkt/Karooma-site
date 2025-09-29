@@ -155,11 +155,11 @@ export default function Favorites() {
       {/* Header */}
       <div className="bg-white/70 backdrop-blur-md border-b border-white/20 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0">
             <div className="flex items-center space-x-3">
               <Heart className="h-8 w-8 text-pink-500" />
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
                   Meus Favoritos
                 </h1>
                 <p className="text-gray-600 mt-1">
@@ -167,14 +167,17 @@ export default function Favorites() {
                 </p>
               </div>
             </div>
-            <Link href="/produtos">
-              <Button
-                variant="outline"
-                className="hover:bg-pink-50"
-              >
-                Ver Todos os Produtos
-              </Button>
-            </Link>
+            <div className="flex justify-end">
+              <Link href="/produtos">
+                <Button
+                  variant="outline"
+                  className="bg-gradient-to-r from-pink-500 to-purple-600 text-white border-none hover:from-pink-600 hover:to-purple-700 font-semibold px-6 py-2"
+                  data-testid="button-ver-produtos"
+                >
+                  ← Ver Todos os Produtos
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
