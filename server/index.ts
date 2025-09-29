@@ -1,12 +1,35 @@
 import express, { type Request, Response, NextFunction } from "express";
+import session from "express-session";
+import ConnectPgSimple from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
+import { pool } from "./db";
 import path from "path";
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
+
+// Configure session middleware
+const PgSession = ConnectPgSimple(session);
+app.use(session({
+  store: new PgSession({
+    pool: pool,
+    tableName: 'session', 
+    createTableIfMissing: true
+  }),
+  secret: process.env.SESSION_SECRET || process.env.AUTH_SECRET || 'dev-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  rolling: true,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax'
+  }
+}));
 
 // Anti-cache headers SUPER AGRESSIVO para forçar atualização do browser
 app.use((req, res, next) => {
