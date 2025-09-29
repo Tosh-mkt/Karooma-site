@@ -44,8 +44,8 @@ export default function Favorites() {
     enabled: isAuthenticated,
   });
 
-  // Debug simples - log direto dos dados
-  console.log("FAVORITES DEBUG:", favorites);
+  // Debug SUPER simples - só verificar se executa
+  console.log("COMPONENT EXECUTING!");
 
   // Log simples removido para evitar conflitos
 
