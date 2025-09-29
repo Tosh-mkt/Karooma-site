@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
@@ -684,6 +684,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error in login:", error);
       res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // User registration endpoint
+  app.post('/api/auth/register', async (req, res) => {
+    try {
+      const { email, password, name, firstName, lastName } = registerUserSchema.parse(req.body);
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ 
+          message: "Email já está em uso", 
+          error: "EMAIL_EXISTS" 
+        });
+      }
+
+      // Hash password
+      const saltRounds = 12;
+      const passwordHash = await bcrypt.hash(password, saltRounds);
+
+      // Create user data
+      const userData = {
+        email,
+        name: name || firstName || "",
+        firstName: firstName || name || "",
+        lastName,
+        passwordHash,
+        isAdmin: false
+      };
+
+      // Create user
+      const newUser = await storage.createUser(userData);
+
+      // Return success response (don't include password hash)
+      res.status(201).json({
+        message: "Conta criada com sucesso!",
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          isAdmin: newUser.isAdmin
+        }
+      });
+    } catch (error) {
+      console.error("Error in user registration:", error);
+      
+      // Handle validation errors
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Dados inválidos", 
+          errors: error.errors.map(e => e.message)
+        });
+      }
+      
+      res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
 
