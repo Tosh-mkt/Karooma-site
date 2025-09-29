@@ -1981,7 +1981,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   function requireAuth(req: any, res: any, next: any) {
     const sessionUser = req.session ? (req.session as any).user : null;
     if (!sessionUser || !sessionUser.id) {
-      return res.status(401).json({ message: "Authentication required" });
+      return res.status(401).json({ message: "Você precisa fazer login para favoritar produtos" });
     }
     req.sessionUserId = sessionUser.id;
     next();
@@ -2025,11 +2025,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/check/:productId", requireAuth, async (req: any, res) => {
+  app.get("/api/favorites/check/:productId", async (req: any, res) => {
     try {
-      const userId = req.sessionUserId;
+      const sessionUser = req.session ? (req.session as any).user : null;
       const { productId } = req.params;
       
+      // If user is not authenticated, return false
+      if (!sessionUser || !sessionUser.id) {
+        return res.json({ isFavorite: false });
+      }
+      
+      const userId = sessionUser.id;
       const isFavorite = await storage.isFavorite(userId, productId);
       res.json({ isFavorite });
     } catch (error) {
