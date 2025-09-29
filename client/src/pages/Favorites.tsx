@@ -227,18 +227,20 @@ export default function Favorites() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
+                  className="group"
+                  style={{ width: '264px', height: '520px' }} // Fixed dimensions like Amazon cards
                 >
-                  <Card className="group hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-white/20 overflow-hidden">
+                  <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-white/20 overflow-hidden h-full max-w-none w-full flex flex-col">
                     {/* Product Image */}
-                    <div className="relative h-48 overflow-hidden">
+                    <div className="relative overflow-hidden flex-shrink-0" style={{ height: '200px' }}>
                       {product.imageUrl ? (
                         <img
                           src={product.imageUrl}
                           alt={product.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 p-2"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-pink-100 to-purple-100 flex items-center justify-center">
+                        <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                           <ShoppingCart className="h-16 w-16 text-gray-400" />
                         </div>
                       )}
@@ -266,38 +268,44 @@ export default function Favorites() {
                       </Button>
                     </div>
 
-                    <CardHeader className="pb-2">
+                    <CardHeader className="pb-2 px-4 pt-4 flex-shrink-0">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-lg font-semibold text-gray-800 line-clamp-2">
+                          <CardTitle className="text-base font-semibold text-gray-800 line-clamp-2 leading-tight mb-3" style={{ height: '2.8em', overflow: 'hidden' }}>
                             {product.title}
                           </CardTitle>
-                          <Badge variant="secondary" className="mt-2">
+                          <Badge variant="secondary" className="text-xs">
                             {product.category}
                           </Badge>
                         </div>
                       </div>
                     </CardHeader>
 
-                    <CardContent className="pt-0">
-                      {product.description && (
-                        <CardDescription className="text-sm text-gray-600 mb-4 line-clamp-2">
-                          {product.description}
-                        </CardDescription>
-                      )}
+                    <CardContent className="pt-2 px-4 pb-4 flex-1 flex flex-col">
+                      {/* Rating */}
+                      <div className="flex items-center justify-center gap-1 mb-3" style={{ height: '24px' }}>
+                        {product.rating ? (
+                          <>
+                            <span className="text-yellow-500">★</span>
+                            <span className="text-sm text-gray-600">({product.rating})</span>
+                          </>
+                        ) : (
+                          <span className="text-sm text-gray-400">Sem avaliações</span>
+                        )}
+                      </div>
 
                       {/* Pricing */}
-                      <div className="mb-4">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-2xl font-bold text-green-600">
+                      <div className="mb-3 text-center flex-shrink-0">
+                        <div className="flex items-center justify-center space-x-2">
+                          <span className="text-xl font-bold text-red-700">
                             {formatPrice(product.currentPrice)}
                           </span>
-                          {product.originalPrice && product.originalPrice !== product.currentPrice && (
-                            <span className="text-sm text-gray-500 line-through">
-                              {formatPrice(product.originalPrice)}
-                            </span>
-                          )}
                         </div>
+                        {product.originalPrice && product.originalPrice !== product.currentPrice && (
+                          <div className="text-sm text-gray-500 line-through">
+                            De: {formatPrice(product.originalPrice)}
+                          </div>
+                        )}
                         {savings && (
                           <p className="text-sm text-green-600 font-medium">
                             Economia de {formatPrice(savings.toString())}
@@ -305,17 +313,12 @@ export default function Favorites() {
                         )}
                       </div>
 
-                      {/* Rating */}
-                      {product.rating && (
-                        <div className="flex items-center mb-4">
-                          <span className="text-yellow-500">★</span>
-                          <span className="ml-1 text-sm text-gray-600">{product.rating}</span>
-                        </div>
-                      )}
+                      {/* Spacer to push buttons to bottom */}
+                      <div className="flex-1"></div>
 
                       {/* Action Button */}
                       <Button 
-                        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 flex-shrink-0"
                         onClick={() => window.open(product.affiliateLink, '_blank')}
                       >
                         <ExternalLink className="h-4 w-4 mr-2" />
