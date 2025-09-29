@@ -168,7 +168,7 @@ export default function Favorites() {
               </div>
             </div>
             <div className="flex justify-end">
-              <Link href="/produtos">
+              <Link href="/products">
                 <Button
                   variant="outline"
                   className="bg-gradient-to-r from-pink-500 to-purple-600 text-white border-none hover:from-pink-600 hover:to-purple-700 font-semibold px-6 py-2"
@@ -213,7 +213,7 @@ export default function Favorites() {
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
               Explore nossos produtos e clique no coração para adicionar aos seus favoritos!
             </p>
-            <Link href="/produtos">
+            <Link href="/products">
               <Button>Explorar Produtos</Button>
             </Link>
           </motion.div>
