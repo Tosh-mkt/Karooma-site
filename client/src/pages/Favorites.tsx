@@ -42,20 +42,20 @@ export default function Favorites() {
   const { data: favorites = [], isLoading } = useQuery<FavoriteWithProduct[]>({
     queryKey: ["/api/favorites"],
     enabled: isAuthenticated,
-    onSuccess: (data) => {
-      console.log("🔍 [FRONTEND DEBUG] Favorites data received:", data);
-      if (data.length > 0) {
-        console.log("🔍 [FRONTEND DEBUG] First favorite product:", {
-          id: data[0].product.id,
-          title: data[0].product.title,
-          currentPrice: data[0].product.currentPrice,
-          currentPriceType: typeof data[0].product.currentPrice,
-          rating: data[0].product.rating,
-          ratingType: typeof data[0].product.rating
-        });
-      }
-    }
   });
+
+  // Debug log dos dados recebidos (React Query V5 compatível)
+  console.log("🔍 [FRONTEND DEBUG] Favorites data received:", favorites);
+  if (favorites.length > 0) {
+    console.log("🔍 [FRONTEND DEBUG] First favorite product:", {
+      id: favorites[0].product.id,
+      title: favorites[0].product.title,
+      currentPrice: favorites[0].product.currentPrice,
+      currentPriceType: typeof favorites[0].product.currentPrice,
+      rating: favorites[0].product.rating,
+      ratingType: typeof favorites[0].product.rating
+    });
+  }
 
   const removeFavoriteMutation = useMutation({
     mutationFn: async (productId: string) => {
