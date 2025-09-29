@@ -42,6 +42,19 @@ export default function Favorites() {
   const { data: favorites = [], isLoading } = useQuery<FavoriteWithProduct[]>({
     queryKey: ["/api/favorites"],
     enabled: isAuthenticated,
+    onSuccess: (data) => {
+      console.log("🔍 [FRONTEND DEBUG] Favorites data received:", data);
+      if (data.length > 0) {
+        console.log("🔍 [FRONTEND DEBUG] First favorite product:", {
+          id: data[0].product.id,
+          title: data[0].product.title,
+          currentPrice: data[0].product.currentPrice,
+          currentPriceType: typeof data[0].product.currentPrice,
+          rating: data[0].product.rating,
+          ratingType: typeof data[0].product.rating
+        });
+      }
+    }
   });
 
   const removeFavoriteMutation = useMutation({
@@ -71,12 +84,28 @@ export default function Favorites() {
   });
 
   const formatPrice = (price: string | null) => {
-    if (!price) return "Preço não disponível";
+    console.log("🔍 [FRONTEND DEBUG] formatPrice called with:", {
+      price,
+      priceType: typeof price,
+      isNull: price === null,
+      isUndefined: price === undefined,
+      isFalsy: !price,
+      stringLength: price ? price.length : 0
+    });
+    
+    if (!price) {
+      console.log("🔍 [FRONTEND DEBUG] Price is falsy, returning 'Preço não disponível'");
+      return "Preço não disponível";
+    }
+    
     const numPrice = parseFloat(price);
-    return new Intl.NumberFormat("pt-BR", {
+    const formatted = new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(numPrice);
+    
+    console.log("🔍 [FRONTEND DEBUG] Price formatted successfully:", { price, numPrice, formatted });
+    return formatted;
   };
 
   const calculateSavings = (original: string | null, current: string | null) => {
