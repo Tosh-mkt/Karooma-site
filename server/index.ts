@@ -1,23 +1,20 @@
 import express, { type Request, Response, NextFunction } from "express";
 import session from "express-session";
-import ConnectPgSimple from "connect-pg-simple";
+import MemoryStore from "memorystore";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
-import { pool } from "./db";
 import path from "path";
 
 const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
-// Configure session middleware
-const PgSession = ConnectPgSimple(session);
+// Configure session middleware with MemoryStore (compatible with Neon serverless)
+const MemStore = MemoryStore(session);
 app.use(session({
-  store: new PgSession({
-    pool: pool,
-    tableName: 'session', 
-    createTableIfMissing: true
+  store: new MemStore({
+    checkPeriod: 86400000 // prune expired entries every 24h
   }),
   secret: process.env.SESSION_SECRET || process.env.AUTH_SECRET || 'dev-secret-key',
   resave: false,
