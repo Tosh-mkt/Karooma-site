@@ -2005,7 +2005,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/favorites", requireAuth, async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
+      console.log("🔍 [DEBUG] Fetching favorites for userId:", userId);
+      
       const favorites = await storage.getUserFavorites(userId);
+      console.log("🔍 [DEBUG] Raw favorites from storage:", JSON.stringify(favorites, null, 2));
+      
+      // Log individual product data to check decimal conversion
+      if (favorites.length > 0) {
+        const firstProduct = favorites[0].product;
+        console.log("🔍 [DEBUG] First product data:", {
+          id: firstProduct.id,
+          title: firstProduct.title,
+          currentPrice: firstProduct.currentPrice,
+          currentPriceType: typeof firstProduct.currentPrice,
+          originalPrice: firstProduct.originalPrice,
+          originalPriceType: typeof firstProduct.originalPrice,
+          rating: firstProduct.rating,
+          ratingType: typeof firstProduct.rating,
+          imageUrl: firstProduct.imageUrl
+        });
+      }
+      
       res.json(favorites);
     } catch (error) {
       console.error("Error fetching favorites:", error);
