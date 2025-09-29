@@ -285,18 +285,27 @@ export default function Products() {
               {/* Favorites Toggle */}
               <div className="flex justify-center mb-6">
                 {isAuthenticated ? (
-                  <GradientButton
-                    variant={showFavorites ? "primary" : "glass"}
-                    onClick={() => {
-                      setShowFavorites(!showFavorites);
-                      setSelectedCategory("all"); // Reset category filter when switching
-                    }}
-                    size="sm"
-                    className="mx-2"
-                  >
-                    <Heart className={`w-4 h-4 mr-2 ${showFavorites ? 'fill-current' : ''}`} />
-                    {showFavorites ? "Ver Todos os Produtos" : "Meus Favoritos"}
-                  </GradientButton>
+                  <div className="flex gap-3">
+                    <GradientButton
+                      variant={showFavorites ? "primary" : "glass"}
+                      onClick={() => {
+                        setShowFavorites(!showFavorites);
+                        setSelectedCategory("all"); // Reset category filter when switching
+                      }}
+                      size="sm"
+                    >
+                      <Heart className={`w-4 h-4 mr-2 ${showFavorites ? 'fill-current' : ''}`} />
+                      {showFavorites ? "Ver Todos os Produtos" : "Filtrar Favoritos"}
+                    </GradientButton>
+                    <GradientButton
+                      variant="primary"
+                      onClick={() => window.location.href = '/favoritos'}
+                      size="sm"
+                    >
+                      <Heart className="w-4 h-4 mr-2 fill-current" />
+                      Meus Favoritos
+                    </GradientButton>
+                  </div>
                 ) : (
                   <GradientButton
                     variant="glass"
