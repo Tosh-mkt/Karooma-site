@@ -3,12 +3,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ExternalLink, Trash2, ShoppingCart } from "lucide-react";
+import { Heart, ExternalLink, Trash2, ShoppingCart, ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
+import RecommendationModal from "@/components/RecommendationModal";
 
 interface Product {
   id: string;
@@ -38,6 +39,8 @@ export default function Favorites() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [removingId, setRemovingId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const { data: favorites = [], isLoading } = useQuery<FavoriteWithProduct[]>({
     queryKey: ["/api/favorites"],
@@ -147,6 +150,7 @@ export default function Favorites() {
   }
 
   return (
+    <>
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
       {/* Header */}
       <div className="bg-white/70 backdrop-blur-md border-b border-white/20 sticky top-0 z-40">
@@ -241,15 +245,17 @@ export default function Favorites() {
                         />
                       ) : (
                         <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                          <ShoppingCart className="h-16 w-16 text-gray-400" />
+                          <ImageIcon className="w-16 h-16 text-gray-400" />
                         </div>
                       )}
                       
                       {/* Discount Badge */}
                       {product.discount && (
-                        <Badge className="absolute top-2 left-2 bg-red-500 text-white">
-                          -{product.discount}%
-                        </Badge>
+                        <div className="absolute top-2 left-2">
+                          <Badge className="bg-red-500 text-white font-semibold">
+                            -{product.discount}% OFF
+                          </Badge>
+                        </div>
                       )}
 
                       {/* Remove from Favorites Button */}
@@ -316,9 +322,26 @@ export default function Favorites() {
                       {/* Spacer to push buttons to bottom */}
                       <div className="flex-1"></div>
 
+                      {/* Why We Recommend Button */}
+                      <div className="mb-2 flex-shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 text-sm py-2"
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setIsModalOpen(true);
+                          }}
+                          data-testid={`button-why-recommend-${product.id}`}
+                        >
+                          💡 Porque Indicamos?
+                        </Button>
+                      </div>
+
                       {/* Action Button */}
                       <Button 
-                        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 flex-shrink-0"
+                        size="sm"
+                        className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-sm py-2.5 flex-shrink-0"
                         onClick={() => window.open(product.affiliateLink, '_blank')}
                       >
                         <ExternalLink className="h-4 w-4 mr-2" />
@@ -333,5 +356,18 @@ export default function Favorites() {
         )}
       </div>
     </div>
+    
+    {/* Recommendation Modal */}
+    {selectedProduct && (
+      <RecommendationModal 
+        product={selectedProduct}
+        isOpen={isModalOpen}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedProduct(null);
+        }}
+      />
+    )}
+    </>
   );
 }
