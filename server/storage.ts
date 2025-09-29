@@ -913,6 +913,12 @@ export class DatabaseStorage implements IStorage {
           tags: products.tags,
           evaluators: products.evaluators,
           introduction: products.introduction,
+          nutritionistEvaluation: products.nutritionistEvaluation,
+          organizerEvaluation: products.organizerEvaluation,
+          designEvaluation: products.designEvaluation,
+          karoomaTeamEvaluation: products.karoomaTeamEvaluation,
+          categoryTags: products.categoryTags,
+          searchTags: products.searchTags,
           asin: products.asin,
           brand: products.brand,
           reviewCount: products.reviewCount,
@@ -925,6 +931,8 @@ export class DatabaseStorage implements IStorage {
           updateFrequency: products.updateFrequency,
           autoCheckEnabled: products.autoCheckEnabled,
           failedChecks: products.failedChecks,
+          unavailableSince: products.unavailableSince,
+          amazonData: products.amazonData,
           createdAt: products.createdAt,
           updatedAt: products.updatedAt
         }
