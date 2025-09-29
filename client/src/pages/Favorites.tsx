@@ -202,6 +202,16 @@ export default function Favorites() {
           >
             {favorites.map((favorite, index) => {
               const product = favorite.product;
+              
+              // Debug log simples
+              console.log("🔍 [FAV] Product data:", {
+                title: product?.title,
+                price: product?.currentPrice,
+                priceType: typeof product?.currentPrice,
+                rating: product?.rating,
+                ratingType: typeof product?.rating
+              });
+              
               const savings = calculateSavings(product.originalPrice, product.currentPrice);
               
               return (
