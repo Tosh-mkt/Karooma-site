@@ -678,8 +678,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
-      // For regular user login (can be extended later)
-      return res.status(401).json({ message: "User login not implemented yet" });
+      // For regular user login
+      if (type === 'user') {
+        // Find user by email
+        const user = await storage.getUserByEmail(email);
+        
+        if (!user || !user.passwordHash) {
+          return res.status(401).json({ message: "Credenciais inválidas" });
+        }
+        
+        // Verify password
+        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+        
+        if (!passwordMatch) {
+          return res.status(401).json({ message: "Credenciais inválidas" });
+        }
+          
+        // Login bem-sucedido
+        return res.json({ 
+          message: "Login realizado com sucesso", 
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            isAdmin: user.isAdmin || false
+          },
+          success: true
+        });
+      }
+      
+      return res.status(400).json({ message: "Tipo de login inválido" });
       
     } catch (error) {
       console.error("Error in login:", error);

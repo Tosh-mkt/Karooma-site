@@ -97,12 +97,69 @@ export function Login() {
     });
   };
 
+  const registerMutation = useMutation({
+    mutationFn: async ({ email, password, name }: { email: string; password: string; name: string }) => {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password, name, firstName: name }),
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Registration failed");
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data: any) => {
+      toast({
+        title: "Conta criada com sucesso!",
+        description: `Bem-vinda${data.user?.firstName ? `, ${data.user.firstName}` : ''}! Agora você pode fazer login.`,
+      });
+      
+      // Switch to login mode and pre-fill email
+      setIsSignUp(false);
+      setAdminEmail(data.user?.email || "");
+      setUserEmail("");
+      setUserPassword("");
+      setUserName("");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Erro no cadastro",
+        description: error.message || "Não foi possível criar sua conta. Tente novamente.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleSignUp = (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Funcionalidade em desenvolvimento",
-      description: "Registro de usuário será implementado em breve. Use o Google por enquanto.",
-      variant: "default",
+    if (!userEmail.trim() || !userPassword.trim() || !userName.trim()) {
+      toast({
+        title: "Campos obrigatórios",
+        description: "Por favor, preencha todos os campos.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (userPassword.length < 6) {
+      toast({
+        title: "Senha muito curta",
+        description: "A senha deve ter pelo menos 6 caracteres.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    registerMutation.mutate({ 
+      email: userEmail, 
+      password: userPassword, 
+      name: userName 
     });
   };
 
@@ -158,9 +215,14 @@ export function Login() {
               </Button>
             </Link>
             
-            <CardTitle className="text-xl font-outfit">Acesse sua conta</CardTitle>
+            <CardTitle className="text-xl font-outfit">
+              {!isSignUp ? "Acesse sua conta" : "Crie sua conta"}
+            </CardTitle>
             <CardDescription className="text-gray-600">
-              Escolha como você quer entrar na plataforma
+              {!isSignUp 
+                ? "Escolha como você quer entrar na plataforma"
+                : "Preencha os dados abaixo para criar sua conta"
+              }
             </CardDescription>
           </CardHeader>
           
@@ -191,79 +253,173 @@ export function Login() {
               </div>
             </div>
 
-            {/* Formulário Principal - Estilo Toolify.ai */}
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Digite seu endereço de email"
-                  value={adminEmail}
-                  onChange={(e) => setAdminEmail(e.target.value)}
-                  className="h-12"
-                  required
-                  data-testid="input-email"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Senha</Label>
-                <div className="relative">
+            {/* Toggle entre Login e Registro */}
+            {!isSignUp ? (
+              // Login Form
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
                   <Input
-                    id="password"
-                    type={showAdminPassword ? "text" : "password"}
-                    placeholder="Digite sua senha"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    className="h-12 pr-10"
+                    id="email"
+                    type="email"
+                    placeholder="Digite seu endereço de email"
+                    value={adminEmail}
+                    onChange={(e) => setAdminEmail(e.target.value)}
+                    className="h-12"
                     required
-                    data-testid="input-password"
+                    data-testid="input-email"
                   />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="absolute right-0 top-0 h-full px-3"
-                    onClick={() => setShowAdminPassword(!showAdminPassword)}
-                    data-testid="button-toggle-password"
-                  >
-                    {showAdminPassword ? (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
-                    ) : (
-                      <Eye className="w-4 h-4 text-gray-400" />
-                    )}
-                  </Button>
                 </div>
-              </div>
 
-              <div className="flex items-center justify-between">
-                <label className="flex items-center space-x-2 text-sm">
-                  <input type="checkbox" className="rounded" />
-                  <span className="text-gray-600">Lembrar de mim</span>
-                </label>
-                <Link href="/forgot-password">
-                  <span className="text-sm text-purple-600 hover:underline cursor-pointer">
-                    Esqueceu sua senha?
-                  </span>
-                </Link>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Senha</Label>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showAdminPassword ? "text" : "password"}
+                      placeholder="Digite sua senha"
+                      value={adminPassword}
+                      onChange={(e) => setAdminPassword(e.target.value)}
+                      className="h-12 pr-10"
+                      required
+                      data-testid="input-password"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3"
+                      onClick={() => setShowAdminPassword(!showAdminPassword)}
+                      data-testid="button-toggle-password"
+                    >
+                      {showAdminPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-purple-600 hover:bg-purple-700 h-12"
-                disabled={loginMutation.isPending}
-                data-testid="button-submit"
-              >
-                {loginMutation.isPending ? "Entrando..." : "Entrar"}
-              </Button>
-            </form>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center space-x-2 text-sm">
+                    <input type="checkbox" className="rounded" />
+                    <span className="text-gray-600">Lembrar de mim</span>
+                  </label>
+                  <Link href="/forgot-password">
+                    <span className="text-sm text-purple-600 hover:underline cursor-pointer">
+                      Esqueceu sua senha?
+                    </span>
+                  </Link>
+                </div>
 
+                <Button
+                  type="submit"
+                  className="w-full bg-purple-600 hover:bg-purple-700 h-12"
+                  disabled={loginMutation.isPending}
+                  data-testid="button-submit"
+                >
+                  {loginMutation.isPending ? "Entrando..." : "Entrar"}
+                </Button>
+              </form>
+            ) : (
+              // Registration Form
+              <form onSubmit={handleSignUp} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Nome</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Digite seu nome completo"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    className="h-12"
+                    required
+                    data-testid="input-name"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="register-email">Email</Label>
+                  <Input
+                    id="register-email"
+                    type="email"
+                    placeholder="Digite seu endereço de email"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    className="h-12"
+                    required
+                    data-testid="input-register-email"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="register-password">Senha</Label>
+                  <div className="relative">
+                    <Input
+                      id="register-password"
+                      type={showUserPassword ? "text" : "password"}
+                      placeholder="Digite uma senha (mínimo 6 caracteres)"
+                      value={userPassword}
+                      onChange={(e) => setUserPassword(e.target.value)}
+                      className="h-12 pr-10"
+                      required
+                      minLength={6}
+                      data-testid="input-register-password"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3"
+                      onClick={() => setShowUserPassword(!showUserPassword)}
+                      data-testid="button-toggle-register-password"
+                    >
+                      {showUserPassword ? (
+                        <EyeOff className="w-4 h-4 text-gray-400" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-400" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full bg-purple-600 hover:bg-purple-700 h-12"
+                  disabled={registerMutation.isPending}
+                  data-testid="button-register"
+                >
+                  {registerMutation.isPending ? "Criando conta..." : "Criar conta"}
+                </Button>
+              </form>
+            )}
+
+            {/* Toggle Link */}
             <div className="text-center text-sm text-gray-600">
-              Não tem uma conta?{" "}
-              <a href="#" className="text-purple-600 hover:underline">
-                Criar conta
-              </a>
+              {!isSignUp ? (
+                <>
+                  Não tem uma conta?{" "}
+                  <button 
+                    onClick={() => setIsSignUp(true)} 
+                    className="text-purple-600 hover:underline cursor-pointer"
+                    data-testid="link-sign-up"
+                  >
+                    Criar conta
+                  </button>
+                </>
+              ) : (
+                <>
+                  Já tem uma conta?{" "}
+                  <button 
+                    onClick={() => setIsSignUp(false)} 
+                    className="text-purple-600 hover:underline cursor-pointer"
+                    data-testid="link-sign-in"
+                  >
+                    Fazer login
+                  </button>
+                </>
+              )}
             </div>
           </CardContent>
         </Card>
