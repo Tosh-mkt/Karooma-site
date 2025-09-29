@@ -243,6 +243,15 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
+// Schema específico para registro de usuários
+export const registerUserSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  firstName: z.string().min(1, "Nome é obrigatório").optional(),
+  lastName: z.string().optional(),
+});
+
 export const insertContentSchema = createInsertSchema(content).omit({
   id: true,
   views: true,
@@ -311,6 +320,7 @@ export const insertNewsletterAdvancedSchema = createInsertSchema(newsletterSubsc
 
 export type UpsertUser = z.infer<typeof upsertUserSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
+export type RegisterUser = z.infer<typeof registerUserSchema>;
 export type User = typeof users.$inferSelect;
 export type Content = typeof content.$inferSelect;
 export type InsertContent = z.infer<typeof insertContentSchema>;
