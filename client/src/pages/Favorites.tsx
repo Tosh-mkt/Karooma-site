@@ -44,16 +44,7 @@ export default function Favorites() {
     enabled: isAuthenticated,
   });
 
-  // Debug log simples dos dados recebidos
-  console.log("🔍 [FRONTEND] Favorites length:", favorites?.length || 0);
-  if (favorites && favorites.length > 0) {
-    const firstFav = favorites[0];
-    console.log("🔍 [FRONTEND] First favorite:", {
-      productTitle: firstFav.product?.title,
-      currentPrice: firstFav.product?.currentPrice,
-      rating: firstFav.product?.rating
-    });
-  }
+  // Log simples removido para evitar conflitos
 
   const removeFavoriteMutation = useMutation({
     mutationFn: async (productId: string) => {
@@ -81,28 +72,36 @@ export default function Favorites() {
     },
   });
 
-  const formatPrice = (price: string | null) => {
-    console.log("🔍 [PRICE] formatPrice input:", price, typeof price);
+  const formatPrice = (price: string | null | undefined | any) => {
+    // Garantir que price seja uma string válida
+    const priceStr = price ? String(price).trim() : null;
     
-    if (!price) {
-      console.log("🔍 [PRICE] Price is falsy, returning default");
+    if (!priceStr || priceStr === 'null' || priceStr === 'undefined') {
       return "Preço não disponível";
     }
     
-    const numPrice = parseFloat(price);
-    const formatted = new Intl.NumberFormat("pt-BR", {
+    const numPrice = parseFloat(priceStr);
+    if (isNaN(numPrice)) {
+      return "Preço não disponível";
+    }
+    
+    return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
     }).format(numPrice);
-    
-    console.log("🔍 [PRICE] Formatted result:", formatted);
-    return formatted;
   };
 
-  const calculateSavings = (original: string | null, current: string | null) => {
-    if (!original || !current) return null;
-    const originalPrice = parseFloat(original);
-    const currentPrice = parseFloat(current);
+  const calculateSavings = (original: string | null | undefined | any, current: string | null | undefined | any) => {
+    const originalStr = original ? String(original).trim() : null;
+    const currentStr = current ? String(current).trim() : null;
+    
+    if (!originalStr || !currentStr || originalStr === 'null' || currentStr === 'null') return null;
+    
+    const originalPrice = parseFloat(originalStr);
+    const currentPrice = parseFloat(currentStr);
+    
+    if (isNaN(originalPrice) || isNaN(currentPrice)) return null;
+    
     const savings = originalPrice - currentPrice;
     return savings > 0 ? savings : null;
   };
