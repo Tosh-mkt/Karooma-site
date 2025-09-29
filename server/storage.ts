@@ -894,7 +894,40 @@ export class DatabaseStorage implements IStorage {
         userId: favorites.userId,
         productId: favorites.productId,
         createdAt: favorites.createdAt,
-        product: products
+        product: {
+          id: products.id,
+          title: products.title,
+          description: products.description,
+          category: products.category,
+          imageUrl: products.imageUrl,
+          currentPrice: products.currentPrice,
+          originalPrice: products.originalPrice,
+          affiliateLink: products.affiliateLink,
+          productLink: products.productLink,
+          rating: products.rating,
+          discount: products.discount,
+          featured: products.featured,
+          expertReview: products.expertReview,
+          teamEvaluation: products.teamEvaluation,
+          benefits: products.benefits,
+          tags: products.tags,
+          evaluators: products.evaluators,
+          introduction: products.introduction,
+          asin: products.asin,
+          brand: products.brand,
+          reviewCount: products.reviewCount,
+          isPrime: products.isPrime,
+          availability: products.availability,
+          bestSellerRank: products.bestSellerRank,
+          status: products.status,
+          lastChecked: products.lastChecked,
+          lastUpdated: products.lastUpdated,
+          updateFrequency: products.updateFrequency,
+          autoCheckEnabled: products.autoCheckEnabled,
+          failedChecks: products.failedChecks,
+          createdAt: products.createdAt,
+          updatedAt: products.updatedAt
+        }
       })
       .from(favorites)
       .innerJoin(products, eq(favorites.productId, products.id))
