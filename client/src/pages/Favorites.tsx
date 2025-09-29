@@ -167,13 +167,14 @@ export default function Favorites() {
                 </p>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => window.history.back()}
-              className="hover:bg-pink-50"
-            >
-              Voltar
-            </Button>
+            <Link href="/produtos">
+              <Button
+                variant="outline"
+                className="hover:bg-pink-50"
+              >
+                Ver Todos os Produtos
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -209,7 +210,7 @@ export default function Favorites() {
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
               Explore nossos produtos e clique no coração para adicionar aos seus favoritos!
             </p>
-            <Link href="/">
+            <Link href="/produtos">
               <Button>Explorar Produtos</Button>
             </Link>
           </motion.div>
