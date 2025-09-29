@@ -664,16 +664,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!user.isAdmin && isAdminEmail(email)) {
           user = await storage.makeUserAdmin(user.id);
         }
+
+        // Set session for backend authentication
+        const userData = {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          isAdmin: true // Always true for admin login type
+        };
+        
+        if (req.session) {
+          (req.session as any).user = userData;
+        }
           
         // Login bem-sucedido
         return res.json({ 
           message: "Logged in successfully", 
-          user: {
-            id: user.id,
-            email: user.email,
-            firstName: user.firstName,
-            isAdmin: true // Always true for admin login type
-          },
+          user: userData,
           success: true
         });
       }
@@ -693,18 +700,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (!passwordMatch) {
           return res.status(401).json({ message: "Credenciais inválidas" });
         }
+
+        // Set session for backend authentication
+        const userData = {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          isAdmin: user.isAdmin || false
+        };
+        
+        if (req.session) {
+          (req.session as any).user = userData;
+        }
           
         // Login bem-sucedido
         return res.json({ 
           message: "Login realizado com sucesso", 
-          user: {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            isAdmin: user.isAdmin || false
-          },
+          user: userData,
           success: true
         });
       }
