@@ -44,6 +44,9 @@ export default function Favorites() {
     enabled: isAuthenticated,
   });
 
+  // Debug simples - log direto dos dados
+  console.log("FAVORITES DEBUG:", favorites);
+
   // Log simples removido para evitar conflitos
 
   const removeFavoriteMutation = useMutation({
@@ -72,19 +75,31 @@ export default function Favorites() {
     },
   });
 
-  const formatPrice = (price: string | null | undefined | any) => {
-    // Garantir que price seja uma string válida
-    const priceStr = price ? String(price).trim() : null;
+  const formatPrice = (price: any) => {
+    console.log("FORMAT PRICE CALLED:", price, typeof price);
     
-    if (!priceStr || priceStr === 'null' || priceStr === 'undefined') {
+    // Se é null ou undefined
+    if (price == null) {
       return "Preço não disponível";
     }
     
-    const numPrice = parseFloat(priceStr);
-    if (isNaN(numPrice)) {
+    // Converter para string e limpar
+    const cleanPrice = String(price).trim();
+    
+    // Se está vazio ou é literalmente 'null'/'undefined' 
+    if (!cleanPrice || cleanPrice === 'null' || cleanPrice === 'undefined') {
       return "Preço não disponível";
     }
     
+    // Tentar converter para número
+    const numPrice = parseFloat(cleanPrice);
+    
+    // Se não é um número válido
+    if (isNaN(numPrice) || numPrice <= 0) {
+      return "Preço não disponível";
+    }
+    
+    // Formatar em reais
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
@@ -202,15 +217,7 @@ export default function Favorites() {
           >
             {favorites.map((favorite, index) => {
               const product = favorite.product;
-              
-              // Debug log simples
-              console.log("🔍 [FAV] Product data:", {
-                title: product?.title,
-                price: product?.currentPrice,
-                priceType: typeof product?.currentPrice,
-                rating: product?.rating,
-                ratingType: typeof product?.rating
-              });
+              console.log("PRODUCT IN RENDER:", product);
               
               const savings = calculateSavings(product.originalPrice, product.currentPrice);
               
