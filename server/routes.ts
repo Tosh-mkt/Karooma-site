@@ -1977,8 +1977,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Middleware to extract user ID from session
+  function requireAuth(req: any, res: any, next: any) {
+    const sessionUser = req.session ? (req.session as any).user : null;
+    if (!sessionUser || !sessionUser.id) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    req.sessionUserId = sessionUser.id;
+    next();
+  }
+
   // Favorites routes (protected by session)
-  app.get("/api/favorites", async (req: any, res) => {
+  app.get("/api/favorites", requireAuth, async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const favorites = await storage.getUserFavorites(userId);
@@ -1989,7 +1999,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/favorites/:productId", async (req: any, res) => {
+  app.post("/api/favorites/:productId", requireAuth, async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const { productId } = req.params;
@@ -2002,7 +2012,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/favorites/:productId", async (req: any, res) => {
+  app.delete("/api/favorites/:productId", requireAuth, async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const { productId } = req.params;
@@ -2015,7 +2025,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/favorites/check/:productId", async (req: any, res) => {
+  app.get("/api/favorites/check/:productId", requireAuth, async (req: any, res) => {
     try {
       const userId = req.sessionUserId;
       const { productId } = req.params;
