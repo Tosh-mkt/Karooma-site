@@ -46,7 +46,7 @@ export default function Favorites() {
 
   const removeFavoriteMutation = useMutation({
     mutationFn: async (productId: string) => {
-      return apiRequest(`/api/favorites/${productId}`, "DELETE");
+      return apiRequest("DELETE", `/api/favorites/${productId}`);
     },
     onMutate: (productId) => {
       setRemovingId(productId);
