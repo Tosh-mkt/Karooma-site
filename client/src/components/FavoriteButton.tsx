@@ -36,7 +36,7 @@ export default function FavoriteButton({
   // Add to favorites mutation
   const addToFavoritesMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/favorites/${productId}`, "POST");
+      return apiRequest("POST", `/api/favorites/${productId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/favorites/check/${productId}`] });
@@ -60,7 +60,7 @@ export default function FavoriteButton({
   // Remove from favorites mutation
   const removeFromFavoritesMutation = useMutation({
     mutationFn: async () => {
-      return apiRequest(`/api/favorites/${productId}`, "DELETE");
+      return apiRequest("DELETE", `/api/favorites/${productId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [`/api/favorites/check/${productId}`] });
