@@ -44,16 +44,14 @@ export default function Favorites() {
     enabled: isAuthenticated,
   });
 
-  // Debug log dos dados recebidos (React Query V5 compatível)
-  console.log("🔍 [FRONTEND DEBUG] Favorites data received:", favorites);
-  if (favorites.length > 0) {
-    console.log("🔍 [FRONTEND DEBUG] First favorite product:", {
-      id: favorites[0].product.id,
-      title: favorites[0].product.title,
-      currentPrice: favorites[0].product.currentPrice,
-      currentPriceType: typeof favorites[0].product.currentPrice,
-      rating: favorites[0].product.rating,
-      ratingType: typeof favorites[0].product.rating
+  // Debug log simples dos dados recebidos
+  console.log("🔍 [FRONTEND] Favorites length:", favorites?.length || 0);
+  if (favorites && favorites.length > 0) {
+    const firstFav = favorites[0];
+    console.log("🔍 [FRONTEND] First favorite:", {
+      productTitle: firstFav.product?.title,
+      currentPrice: firstFav.product?.currentPrice,
+      rating: firstFav.product?.rating
     });
   }
 
@@ -84,17 +82,10 @@ export default function Favorites() {
   });
 
   const formatPrice = (price: string | null) => {
-    console.log("🔍 [FRONTEND DEBUG] formatPrice called with:", {
-      price,
-      priceType: typeof price,
-      isNull: price === null,
-      isUndefined: price === undefined,
-      isFalsy: !price,
-      stringLength: price ? price.length : 0
-    });
+    console.log("🔍 [PRICE] formatPrice input:", price, typeof price);
     
     if (!price) {
-      console.log("🔍 [FRONTEND DEBUG] Price is falsy, returning 'Preço não disponível'");
+      console.log("🔍 [PRICE] Price is falsy, returning default");
       return "Preço não disponível";
     }
     
@@ -104,7 +95,7 @@ export default function Favorites() {
       currency: "BRL",
     }).format(numPrice);
     
-    console.log("🔍 [FRONTEND DEBUG] Price formatted successfully:", { price, numPrice, formatted });
+    console.log("🔍 [PRICE] Formatted result:", formatted);
     return formatted;
   };
 
