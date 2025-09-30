@@ -205,17 +205,44 @@ function DashboardOverview() {
         </motion.div>
       </div>
 
-      {/* Recent Activity */}
-      <Card className="glassmorphism border-0">
-        <CardHeader className="px-3 py-3 md:px-6 md:py-6">
-          <CardTitle className="flex items-center text-sm md:text-base">
-            <Activity className="w-4 h-4 md:w-5 md:h-5 mr-2 text-purple-500" />
-            Atividade Recente
-          </CardTitle>
-          <CardDescription className="text-xs md:text-sm">
-            Eventos em tempo real via SSE
-          </CardDescription>
-        </CardHeader>
+      {/* Quick Links */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card className="glassmorphism border-0 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          onClick={() => window.location.href = '/admin/roadmap'}
+        >
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="flex items-center text-base md:text-lg">
+              <Rocket className="w-5 h-5 mr-2 text-purple-600" />
+              Roadmap de Funcionalidades
+            </CardTitle>
+            <CardDescription className="text-sm">
+              Visualize e planeje futuras implementações
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 pb-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Acompanhe o planejamento de Web Push Notifications, automações de marketing e outras funcionalidades futuras.
+            </p>
+            <Button variant="outline" className="w-full bg-white hover:bg-purple-50" onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = '/admin/roadmap';
+            }}>
+              <Rocket className="w-4 h-4 mr-2" />
+              Ver Roadmap Completo
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="glassmorphism border-0">
+          <CardHeader className="px-3 py-3 md:px-6 md:py-6">
+            <CardTitle className="flex items-center text-sm md:text-base">
+              <Activity className="w-4 h-4 md:w-5 md:h-5 mr-2 text-purple-500" />
+              Atividade Recente
+            </CardTitle>
+            <CardDescription className="text-xs md:text-sm">
+              Eventos em tempo real via SSE
+            </CardDescription>
+          </CardHeader>
         <CardContent className="px-3 md:px-6">
           {events.length > 0 ? (
             <div className="space-y-2 md:space-y-3 max-h-48 md:max-h-60 overflow-y-auto">
@@ -247,6 +274,7 @@ function DashboardOverview() {
           )}
         </CardContent>
       </Card>
+    </div>
     </div>
   );
 }
