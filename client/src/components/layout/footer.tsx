@@ -124,7 +124,7 @@ export default function Footer() {
         >
           <div className="text-gray-400 font-inter text-sm space-y-1">
             <p>© 2024 Karooma. Todos os direitos reservados.</p>
-            <p className="text-xs">💜 Como associada da Amazon, a Karooma recebe uma comissão quando você compra produtos que recomendamos (sem custo extra para você!).</p>
+            <p className="text-xs">💜 Como associada da Amazon, a Karooma recebe uma comissão quando você compra produtos que recomendamos (sem custo extra para você!). Isto nos auxilia a manter a estrutura e continuar pesquisando soluções para facilitar a sua vida e da sua família.</p>
           </div>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <motion.div whileHover={{ scale: 1.05 }}>
