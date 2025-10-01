@@ -1,158 +1,143 @@
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Rocket, Instagram, Youtube, Twitter } from "lucide-react";
-import { FaTiktok } from "react-icons/fa";
+import { MapPin, Mail, Lock, Info, Sparkles } from "lucide-react";
 import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
 import karoomaLogo from "@assets/LOGO_KAROOMA_TIPO_1753945361411.png";
 
 export default function Footer() {
-  const footerSections = [
-    {
-      title: "Conteúdo",
-      links: [
-        { label: "Últimos Vídeos", href: "/videos" },
-        { label: "Artigos do Blog", href: "/blog" },
-        { label: "Tutoriais", href: "/videos?category=tutorial" },
-        { label: "Reviews", href: "/videos?category=review" },
-      ]
-    },
-    {
-      title: "Produtos",
-      links: [
-        { label: "Tecnologia", href: "/products?category=tech" },
-        { label: "Design", href: "/products?category=design" },
-        { label: "Cursos Online", href: "/products?category=courses" },
-        { label: "Equipamentos", href: "/products?category=equipment" },
-      ]
-    },
-    {
-      title: "Contato",
-      links: [
-        { label: "Sobre Nós", href: "/about" },
-        { label: "contato@karooma.life", href: "mailto:contato@karooma.life" },
-        { label: "Colaborações", href: "/contact" },
-        { label: "Suporte", href: "/support" },
-        { label: "Parcerias", href: "/partnerships" },
-      ]
-    }
-  ];
-
-  const socialLinks = [
-    { icon: Instagram, href: "#", label: "Instagram" },
-    { icon: Youtube, href: "#", label: "YouTube" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: FaTiktok, href: "#", label: "TikTok", isReactIcon: true },
-  ];
-
   return (
-    <footer className="bg-gray-900 text-white py-16">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
-          {/* Brand Section */}
-          <div>
-            <motion.div 
-              className="flex items-center space-x-3 mb-4"
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="w-10 h-10 flex items-center justify-center">
-                <img 
-                  src={karoomaIcon} 
-                  alt="Karooma Icon" 
-                  className="w-full h-full object-contain"
-                />
-              </div>
-              <img 
-                src={karoomaLogo} 
-                alt="Karooma" 
-                className="h-6 object-contain brightness-0 invert"
-              />
-            </motion.div>
-            <p className="text-gray-400 font-inter mb-4">
-              Sua plataforma completa para conteúdo digital e descobertas incríveis com Karooma.
-            </p>
-            <div className="flex space-x-4">
-              {socialLinks.map((social, index) => (
-                <motion.a
-                  key={social.label}
-                  href={social.href}
-                  className="text-gray-400 hover:text-pink-500 transition-colors duration-300"
-                  whileHover={{ scale: 1.2, rotate: 10 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  {social.isReactIcon ? (
-                    <social.icon className="text-xl" />
-                  ) : (
-                    <social.icon className="w-5 h-5" />
-                  )}
-                </motion.a>
-              ))}
-            </div>
+    <footer className="bg-gray-900 text-white py-12">
+      <div className="max-w-6xl mx-auto px-4">
+        {/* Logo Section */}
+        <motion.div 
+          className="flex items-center justify-center space-x-3 mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+        >
+          <div className="w-10 h-10 flex items-center justify-center">
+            <img 
+              src={karoomaIcon} 
+              alt="Karooma Icon" 
+              className="w-full h-full object-contain"
+            />
           </div>
+          <img 
+            src={karoomaLogo} 
+            alt="Karooma" 
+            className="h-6 object-contain brightness-0 invert"
+          />
+        </motion.div>
 
-          {/* Footer Sections */}
-          {footerSections.map((section, index) => (
-            <motion.div
-              key={section.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <h4 className="font-poppins font-bold text-lg mb-4">{section.title}</h4>
-              <ul className="space-y-3">
-                {section.links.map((link) => (
-                  <li key={link.label}>
-                    <Link href={link.href}>
-                      <motion.span 
-                        className="text-gray-400 hover:text-white transition-colors duration-300 font-inter cursor-pointer"
-                        whileHover={{ x: 5 }}
-                      >
-                        {link.label}
-                      </motion.span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </motion.div>
-          ))}
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+          {/* Empresa Section */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.1 }}
+            className="space-y-4"
+          >
+            <h4 className="font-poppins font-bold text-lg mb-4 text-pink-400">
+              Empresa
+            </h4>
+            
+            <div className="flex items-start space-x-3 text-gray-300">
+              <MapPin className="w-5 h-5 text-pink-400 flex-shrink-0 mt-1" />
+              <div className="font-inter text-sm leading-relaxed">
+                <p>Rua Comendador Torlogo Dauntre 74</p>
+                <p>Sala 1207</p>
+                <p>Campinas, 13025-270</p>
+                <p>São Paulo, Brasil</p>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-3 text-gray-300">
+              <Mail className="w-5 h-5 text-pink-400 flex-shrink-0" />
+              <a 
+                href="mailto:contato@karooma.life"
+                className="font-inter text-sm hover:text-pink-400 transition-colors duration-300"
+              >
+                contato@karooma.life
+              </a>
+            </div>
+          </motion.div>
+
+          {/* Ajuda Section */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="space-y-4"
+          >
+            <h4 className="font-poppins font-bold text-lg mb-4 text-pink-400">
+              Precisa de Ajuda?
+            </h4>
+            
+            <Link href="/#custom-content">
+              <motion.div
+                className="flex items-center space-x-3 text-gray-300 hover:text-pink-400 transition-colors duration-300 cursor-pointer group"
+                whileHover={{ x: 5 }}
+              >
+                <Sparkles className="w-5 h-5 text-pink-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="font-inter text-sm">
+                  Qual assunto te ajudaria?
+                </span>
+              </motion.div>
+            </Link>
+
+            <Link href="/about">
+              <motion.div
+                className="flex items-center space-x-3 text-gray-300 hover:text-pink-400 transition-colors duration-300 cursor-pointer group"
+                whileHover={{ x: 5 }}
+              >
+                <Info className="w-5 h-5 text-pink-400 flex-shrink-0 group-hover:scale-110 transition-transform" />
+                <span className="font-inter text-sm">
+                  Sobre a Karooma
+                </span>
+              </motion.div>
+            </Link>
+          </motion.div>
         </div>
 
-        {/* Copyright Section */}
+        {/* Privacy Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="border-t border-gray-800 pt-8 mb-8"
+        >
+          <div className="flex items-start space-x-3 mb-4">
+            <Lock className="w-5 h-5 text-pink-400 flex-shrink-0 mt-1" />
+            <div className="space-y-3">
+              <h5 className="font-poppins font-bold text-pink-400">
+                Sua privacidade é nossa prioridade.
+              </h5>
+              <p className="text-gray-300 font-inter text-sm leading-relaxed max-w-3xl">
+                Respeitamos seus dados e os usamos apenas para melhorar sua jornada em nosso site. 
+                Seja para uma experiência de pesquisa mais fluida ou para receber conteúdos que 
+                realmente interessam a você. Não vendemos, alugamos ou compartilhamos suas 
+                informações com ninguém.
+              </p>
+              <Link href="/privacidade">
+                <motion.span
+                  className="inline-flex items-center text-pink-400 hover:text-pink-300 font-inter text-sm font-medium cursor-pointer"
+                  whileHover={{ x: 5 }}
+                >
+                  Leia nossa Política Completa →
+                </motion.span>
+              </Link>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Copyright */}
         <motion.div 
-          className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between"
+          className="text-center text-gray-400 font-inter text-sm"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
         >
-          <div className="text-gray-400 font-inter text-sm space-y-1">
-            <p>© 2024 Karooma. Todos os direitos reservados.</p>
-            <p className="text-xs">💜 Como associada da Amazon, a Karooma recebe uma comissão quando você compra produtos que recomendamos (sem custo extra para você!). Isto nos auxilia a manter a estrutura e continuar pesquisando soluções para facilitar a sua vida e da sua família.</p>
-          </div>
-          <div className="flex space-x-6 mt-4 md:mt-0">
-            <motion.div whileHover={{ scale: 1.05 }}>
-              <Link 
-                href="/privacidade" 
-                className="text-gray-400 hover:text-white transition-colors duration-300 text-sm font-inter"
-              >
-                Privacidade
-              </Link>
-            </motion.div>
-            <motion.a
-              href="#"
-              className="text-gray-400 hover:text-white transition-colors duration-300 text-sm font-inter"
-              whileHover={{ scale: 1.05 }}
-            >
-              Termos
-            </motion.a>
-            <motion.button
-              onClick={() => {
-                // Dispara evento customizado para reabrir banner de cookies
-                window.dispatchEvent(new CustomEvent("reopen-cookie-banner"));
-              }}
-              className="text-gray-400 hover:text-white transition-colors duration-300 text-sm font-inter cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-            >
-              Cookies
-            </motion.button>
-          </div>
+          <p>© 2024 Karooma. Todos os direitos reservados.</p>
         </motion.div>
       </div>
     </footer>
