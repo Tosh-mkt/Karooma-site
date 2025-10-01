@@ -8,7 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
-import karoomaLogo from "@assets/LOGO_KAROOMA_TIPO_1753945361411.png";
+import karoomaLogo from "@assets/logo_karooma_outline_BK_1759316294770.png";
 
 export default function Footer() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
@@ -34,7 +34,7 @@ export default function Footer() {
             <img 
               src={karoomaLogo} 
               alt="Karooma" 
-              className="h-6 object-contain brightness-0 invert"
+              className="h-6 object-contain"
             />
           </motion.div>
 
