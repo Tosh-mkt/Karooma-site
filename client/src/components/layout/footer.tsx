@@ -93,7 +93,7 @@ export default function Footer() {
               </motion.div>
             </Link>
 
-            <Link href="/about">
+            <Link href="/sobre">
               <motion.div
                 className="flex items-center space-x-2 text-gray-300 hover:text-pink-400 transition-colors duration-300 cursor-pointer group"
                 whileHover={{ x: 3 }}
