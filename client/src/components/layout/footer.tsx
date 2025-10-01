@@ -8,7 +8,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
-import karoomaLogo from "@assets/logo_karooma_outline_BK_1759317262002.png";
+import karoomaLogo from "@assets/logo_karooma_outline_WH_1759324660082.png";
 
 export default function Footer() {
   const [isPrivacyOpen, setIsPrivacyOpen] = useState(false);
