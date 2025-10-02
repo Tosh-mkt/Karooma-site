@@ -1,0 +1,87 @@
+CATEGORIA DE PRODUTO	observação de valor agregado do produto	LINK DO PRODUTO	LINK AFILIADO	DADOS EXTRAÍDOS DA PÁGINA (BROWSER COMET)	ANÁLISE KAROOMA	ASIN	Scrape_Status	title	image_url	price	user_rating_stars	user_rating_count	description_about_this_item	seller_name
+até 1 ano		https://www.amazon.com.br/Brinquedo-Sensorial-Montessori-Kidino-Atividades/dp/B0CWXFD4ZM/ref=sr_1_5?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=16G3R8RO4FARD&dib=eyJ2IjoiMSJ9.-R1r0uLXUCyTArFLgMZUNjpMm2uUQvB9bamfj9KE5na7r9FSWbAM0peupqOx7sTilOnfaD_ve1zDzj-rCNV3B37ZpfHjsgl-khQv1ve6iGUyY-XWgM3nNphDe_5qFd216I3tbG6honAplOGn98dRokJqfnKDw0YOPityeIueHJJ0CWWVXVe3KFgQbLdq20sqxEiY1qXlyMrDcvObY3gtr-jmkK2C6nskBozOC8y3y-LJNlXKvGuVSSdA6e-IgABRZnJDIGUigI5uBZOXo8GaZREg7ZXzEfzA4xANsV-YLrI.F5G8efvVGmKIggyTJiMSYmBtIRvBl6LqDay7DSSiyqc&dib_tag=se&keywords=brinquedos%2Bmontessori&qid=1759130675&refinements=p_n_condition-type%3A13862762011%2Cp_n_g-1004151746091%3A16747582011&rnid=16747575011&sprefix=brinquedos%2Bmontessori%2Caps%2C437&sr=8-5&th=1	https://amzn.to/4pMwVYT	"```markdown
+## 1. Nome do Produto
+Oikos - Escorredor de Pratos de Ferro e Bambu Branco
+
+## 2. Descrição e Características
+Esse é o escorredor de pratos de ferro e madeira branco da OIKOS.  
+- **Design minimalista e versátil**: além de funcional, é decorativo. O toque de madeira dá um charme na decoração da cozinha, e a combinação dos tons neutros transforma o ambiente, deixando tudo cheio de bossa. Funciona em diferentes estilos de decoração, da mais minimalista à mais moderna.
+- **Funcional e espaçoso**: deixa pratos, panelas, copos e talheres mais bem acomodados. Suas divisões permitem que os itens fiquem na vertical, otimizando ainda mais espaço.
+- **Feito de ferro**: proporciona muita resistência e durabilidade.
+- **Variedade**: disponível também na cor preta.
+- **Detalhe em madeira**: a pega de madeira facilita a movimentação e o transporte do escorredor com mais conforto.
+
+## 3. Especificações Técnicas
+- **Marca:** OIKOS
+- **Modelo:** COZ03361BRC
+- **Cor:** Branco
+- **Material:** Ferro (peças em madeira)
+- **Número de unidades:** 1
+- **Dimensões do produto:** 36 x 27 x 9 cm
+- **Peso:** 560 g
+- **Dimensões do pacote:** 35.2 x 26.4 x 8.2 centímetros
+- **Voltagem:** Não aplicável
+- **Potência:** Não aplicável
+- **Tipo de fonte de energia:** Não aplicável
+- **Características especiais:** Dobrável
+- **Tipo de suporte ou fixação:** Montagem no chão
+- **Registro no Inmetro:** Não aplicável
+- **Funciona com baterias:** Não
+- **Código/Número da peça:** COZ03361BRC
+- **ASIN:** B0BLZND4CV
+- **EAN:** 7908192512123
+- **Informações do fabricante:** OIKOS
+- **Disponível para compra desde:** 10 novembro 2022
+
+## 4. Informações de Segurança
+**Não mencionado** (a página não traz certificações, informações sobre materiais livres de toxinas, recomendações específicas de segurança ou limpeza).
+
+## 5. Avaliação Geral
+- **Nota média:** 4,8 de 5 estrelas
+- **Número de avaliações:** 9 classificações de clientes
+- **Percentuais por estrela:**
+    - 5 estrelas: 92%
+    - 4 estrelas: 8%
+    - 3 estrelas ou menos: não mencionado
+
+## 6. Comentários Relevantes dos Usuários
+
+**Prós**
+- Produto bonito, elegante e bem acabado (recorrente em elogios).
+- O espaço interno acomoda diversos tipos de louças.
+- Material considerado resistente e de boa qualidade.
+- Facilita a organização da cozinha.
+
+**Contras**
+- Alguns usuários mencionam que a bandeja de água não retém totalmente o líquido, podendo vazar.
+- Um cliente relata que o produto parece menor do que o esperado.
+- Não são citadas reclamações de ferrugem ou quebra.
+
+## 7. (Opcional) Observações Adicionais
+- Política de devolução: disponível pelo padrão Amazon (link “Política de devolução” aparece na página).
+- Não é “Escolha da Amazon” nem aparece ranking de vendas específico.
+- O produto está listado como “dobrável”, facilitando guardar quando não está em uso.
+- Não há menção a acessórios extras ou promoções.
+```
+**[1]
+
+[1](https://www.amazon.com.br/Oikos-Escorredor-Pratos-Ferro-Bambu/dp/B0BLZND4CV/ref=sr_1_16?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=P7O9HRCNW91R&dib=eyJ2IjoiMSJ9.KEAxbZce-zUM4sFa7K_rnSTbNzw84g3BViobcREdAd4zmtVBDKZZ6Z-KxGu20XhJ0_dli2OgC6_yRy5M9T8taACgzUCrYORHksu8datke3F6hnij0zSwP0OH_AyD9NR7GRtT3iKvgpxI1--P3yKjrxH1FueeppYADKs-Seb32M_jqlXhIncdBYgRN5oKSL_rcvhz_7wwuW4Bz2GLYrNKVu_I4meoZbbGOrwa75IihTAoY-6yXPVYo2ehknbKeZfc50k5c4jSbDfGTp-rx8pXmNgHPfC82TowA-BydOh2HQk.xv27ajtD3_e0af3FnmcB1wSyUB152OdaoVGGECFUgDw&dib_tag=se&keywords=ESCORREDOR%2BDE%2BLOU%C3%87A&m=A1ZZFT5FULY4LN&qid=1756183803&refinements=p_6%3AA1ZZFT5FULY4LN&rnid=15137643011&sprefix=escorredor%2Bde%2Blou%C3%A7a%2Caps%2C216&sr=8-16&ufe=app_do%3Aamzn1.fos.6d798eae-cadf-45de-946a-f477d47705b9&xpid=WuciLLmDSB3cc&th=1)"	"{
+  ""nome_produto"": ""Escorredor de Louça Oikos Ferro e Bambu"",
+  ""introducao"": ""A Curadoria KAROOMA, com sua equipe de especialistas, analisou o Escorredor de Louça Oikos para avaliar como este item pode transformar a rotina da cozinha, unindo funcionalidade e design para mães que buscam praticidade e estética."",
+  ""link_produto"": ""https://www.amazon.com.br/Oikos-Escorredor-Pratos-Ferro-Bambu/dp/B0BLZND4CV/ref=sr_1_16?__mk_pt_BR=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=P7O9HRCNW91R&dib=eyJ2IjoiMSJ9.KEAxbZce-zUM4sFa7K_rnSTbNzw84g3BViobcREdAd4zmtVBDKZZ6Z-KxGu20XhJ0_dli2OgC6_yRy5M9T8taACgzUCrYORHksu8datke3F6hnij0zSwP0OH_AyD9NR7GRtT3iKvgpxI1--P3yKjrxH1FueeppYADKs-Seb32M_jqlXhIncdBYgRN5oKSL_rcvhz_7wwW4Bz2GLYrNKVu_I4meoZbbGOrwa75IihTAoY-6yXPVYo2ehknbKeZfc50k5c4jSbDfGTp-rx8pXmNgHPfC82TowA-BydOh2HQk.xv27ajtD3_e0af3FnmcB1wSyUB152OdaoVGGECFUgDw&dib_tag=se&keywords=ESCORREDOR%2BDE%2BLOU%C3%87A&m=A1ZZFT5FULY4LN&qid=1756183803&refinements=p_6%3AA1ZZFT5FULY4LN&rnid=15137643011&sprefix=escorredor%2Bde%2Blou%C3%A7a%2Caps%2C216&sr=8-16&ufe=app_do%3Aamzn1.fos.6d798eae-cadf-45de-946a-f477d47705b9&xpid=WuciLLmDSB3cc&th=1"",
+  ""link_afiliado"": ""https://amzn.to/4pMwVYT"",
+  ""especialistas_selecionados"": ""Organização Doméstica Profissional, Design e Usabilidade, Manutenção Doméstica"",
+  ""avaliacao_nutricao"": null,
+  ""avaliacao_organizacao"": ""Prós: Sua estrutura com divisões otimiza o espaço, permitindo acomodar diversos tipos de louças e talheres, o que facilita a organização e o fluxo na cozinha. A função dobrável é um diferencial importante para otimizar o espaço em cozinhas pequenas. Contras: A ausência de uma bandeja eficiente pode causar vazamentos de água, comprometendo a limpeza e a organização da bancada."",
+  ""avaliacao_design"": ""Prós: O design minimalista e a combinação de ferro e bambu conferem um toque moderno e elegante à cozinha. A pega de madeira facilita o manuseio e o transporte. O material de ferro oferece durabilidade e resistência. Contras: A percepção de que o produto é menor do que o esperado pode ser uma limitação para quem tem um grande volume de louças."",
+  ""avaliacao_psicologia"": null,
+  ""avaliacao_bem_estar"": null,
+  ""avaliacao_experiencias"": null,
+  ""avaliacao_karooma"": ""O Escorredor de Louça da Oikos é um produto que atende a duas grandes necessidades na cozinha: organização e estética. Sua durabilidade e design elegante, aliados à funcionalidade de otimizar o espaço, fazem dele uma ótima escolha para mães que querem uma cozinha prática e bonita. A Curadoria KAROOMA considera este um excelente investimento, mas recomenda atenção ao problema da bandeja de água."",
+  ""tags_categorias"": ""#CozinhaOrganizada #DesignDeCozinha #LouçaLimpa #PraticidadeNaCozinha #DecoraçãoFuncional"",
+  ""tags_filtros"": ""organizacao/cozinha, decorar-e-brilhar/cozinha""
+}"	B0CWXFD4ZM	Sucesso	Brinquedo Sensorial Bebe Infantil Montessori Kidino Cubo De Atividades Educativo 6 Em 1	https://m.media-amazon.com/images/I/51ncRT8qPqL._AC_SY300_SX300_QL70_ML2_.jpg	R$45,00	4,4 de 5 estrelas	442 avaliações de clientes	"Estimulação Sensorial: Com 6 faces de atividades, cada uma oferece uma nova experiência sensorial, desde cores vibrantes até texturas diversas, ideal para o desenvolvimento da percepção visual e tátil.
+Educativo: Cada atividade é pensada para ensinar conceitos básicos de forma lúdica, como números, letras e animais, incentivando a curiosidade natural da criança.
+Portátil: Seu design compacto e a possibilidade de armazenamento interno tornam o cubo fácil de transportar, perfeito para viagens ou visitas a amigos e familiares.
+Desenvolvimento de Habilidades: Ajuda no aprimoramento da coordenação motora fina, resolução de problemas e reconhecimento de formas e cores.
+Dimensões: 10(a)x10(l)x15(c)"	N/A
