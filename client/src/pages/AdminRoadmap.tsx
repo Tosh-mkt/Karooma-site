@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Clock, Rocket, Zap, Bell, Mail, MessageSquare, TrendingUp, Target, AlertCircle } from "lucide-react";
+import { CheckCircle2, Clock, Rocket, Zap, Bell, Mail, MessageSquare, TrendingUp, Target, AlertCircle, Plug2, Sheet } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface RoadmapItem {
@@ -112,6 +112,36 @@ const roadmapItems: RoadmapItem[] = [
     ],
     roi: "Campanhas mais direcionadas e efetivas",
     icon: Target
+  },
+  {
+    id: "sendgrid-connector",
+    title: "Migrar para SendGrid Connector",
+    description: "Substituir integração manual do SendGrid por Replit Connector para gerenciamento automático de credenciais, autenticação única e reutilização entre projetos. Elimina necessidade de gerenciar API keys manualmente.",
+    status: "planned",
+    priority: "low",
+    category: "Infrastructure",
+    estimatedDays: "30-45 minutos",
+    prerequisites: [
+      "✅ SendGrid configurado e funcionando",
+      "✅ Sistema de email welcome"
+    ],
+    roi: "Melhor segurança, menos manutenção de keys",
+    icon: Plug2
+  },
+  {
+    id: "google-sheets-connector",
+    title: "Migrar para Google Sheets Connector",
+    description: "Migrar de API pública CSV para Google Sheets Connector autenticado. Permite acesso a planilhas privadas, maior confiabilidade e recursos avançados de leitura/escrita de dados.",
+    status: "planned",
+    priority: "low",
+    category: "Infrastructure",
+    estimatedDays: "1 hora",
+    prerequisites: [
+      "✅ Sistema de importação funcionando",
+      "✅ Merge de JSON + colunas implementado"
+    ],
+    roi: "Acesso a planilhas privadas, mais robusto",
+    icon: Sheet
   }
 ];
 
