@@ -347,23 +347,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "URL do Google Sheets é obrigatória" });
       }
 
-      // Importar função de autenticação do Google Sheets
-      const { loadSpreadsheetData, extractSpreadsheetId } = await import('./google-sheets-client');
+      // Converter URL do Google Sheets para CSV export
+      let csvUrl = sheetsUrl;
+      let gid = null;
       
       // Extrair spreadsheet ID do URL
-      const spreadsheetId = extractSpreadsheetId(sheetsUrl);
-      if (!spreadsheetId) {
+      const spreadsheetIdMatch = sheetsUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+      if (!spreadsheetIdMatch) {
         return res.status(400).json({ error: "URL do Google Sheets inválida" });
       }
-
-      // Carregar dados da planilha usando API autenticada
-      const rows = await loadSpreadsheetData(spreadsheetId, sheetName);
       
-      if (rows.length < 2) {
+      const spreadsheetId = spreadsheetIdMatch[1];
+      
+      // Se há um nome de aba especificado, tentar obter o GID
+      if (sheetName) {
+        try {
+          // Fazer requisição para obter a lista de abas
+          const sheetsListUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`;
+          const sheetsListResponse = await fetch(sheetsListUrl);
+          const sheetsListText = await sheetsListResponse.text();
+          
+          // Procurar pelo GID da aba especificada
+          const gidMatch = sheetsListText.match(new RegExp(`"sheet":"${sheetName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"[^}]*"sheetId":([0-9]+)`, 'i'));
+          if (gidMatch) {
+            gid = gidMatch[1];
+          }
+        } catch (error) {
+          console.warn('Não foi possível obter o GID da aba especificada:', error);
+        }
+      }
+      
+      // Construir URL do CSV
+      if (gid) {
+        csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`;
+      } else {
+        csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`;
+      }
+
+      // Fazer requisição para o Google Sheets
+      const response = await fetch(csvUrl);
+      if (!response.ok) {
+        throw new Error(`Erro ao acessar Google Sheets: ${response.status}`);
+      }
+
+      const csvText = await response.text();
+      
+      // Parser CSV robusto que lida com campos entre aspas e vírgulas internas
+      const parseCSVLine = (line: string): string[] => {
+        const fields: string[] = [];
+        let currentField = '';
+        let insideQuotes = false;
+        let i = 0;
+        
+        while (i < line.length) {
+          const char = line[i];
+          
+          if (char === '"') {
+            if (insideQuotes && line[i + 1] === '"') {
+              currentField += '"';
+              i += 2;
+            } else {
+              insideQuotes = !insideQuotes;
+              i++;
+            }
+          } else if (char === ',' && !insideQuotes) {
+            fields.push(currentField.trim());
+            currentField = '';
+            i++;
+          } else {
+            currentField += char;
+            i++;
+          }
+        }
+        
+        fields.push(currentField.trim());
+        return fields;
+      };
+      
+      // Processar CSV para extrair dados de TODAS as colunas + merge com JSON
+      const lines = csvText.split('\n').filter(line => line.trim());
+      if (lines.length < 2) {
         return res.status(400).json({ error: "Planilha não contém dados suficientes" });
       }
 
-      const headers = rows[0];
+      const headers = parseCSVLine(lines[0]);
       const data = [];
 
       // Mapeamento de nomes de colunas (tanto português quanto inglês)
@@ -410,8 +477,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Processar cada linha e fazer merge dos dados
-      for (let i = 1; i < rows.length; i++) {
-        const row = rows[i];
+      for (let i = 1; i < lines.length; i++) {
+        const row = parseCSVLine(lines[i]);
         
         // Criar objeto do produto com dados das colunas normais
         const productData: any = {};
