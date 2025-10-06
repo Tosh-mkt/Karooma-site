@@ -532,6 +532,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
               productData.searchTags = jsonData.tags_filtros || jsonData.searchTags || '';
               productData.evaluators = jsonData.especialistas_selecionados || jsonData.evaluators || '';
               
+              // CRÍTICO: Extrair categoria de tags_filtros se não houver categoria explícita
+              if (!productData.category && productData.searchTags) {
+                // tags_filtros formato: "organizacao/cozinha, decorar-e-brilhar/cozinha"
+                // Extrair primeira parte antes da "/" ou vírgula
+                const firstTag = productData.searchTags.split(/[,\/]/)[0].trim();
+                if (firstTag) {
+                  productData.category = firstTag;
+                  if (i < 3) {
+                    console.log(`🏷️ Categoria extraída de tags_filtros: "${firstTag}" (linha ${i + 2})`);
+                  }
+                }
+              }
+              
             } catch (jsonError) {
               if (i < 3) {
                 console.warn(`⚠️ JSON inválido na linha ${i + 2}:`, jsonError);
@@ -568,6 +581,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             console.log(`✅ Linha ${i + 2} adicionada:`, { 
               title: productData.title?.substring(0, 30), 
               asin: productData.asin,
+              category: productData.category,
               hasAffiliate: !!productData.affiliateLink,
               fromJson: hasJsonData 
             });
