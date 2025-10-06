@@ -366,7 +366,12 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
 // Email de Recuperação de Senha
 export async function sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
   const fromEmail = VERIFIED_SENDER_EMAIL;
-  const resetUrl = `${process.env.REPLIT_DOMAINS}/reset-password?token=${token}`;
+  
+  // Usar o primeiro domínio da lista ou fallback para localhost
+  const domains = process.env.REPLIT_DOMAINS || 'http://localhost:5000';
+  const primaryDomain = domains.split(',')[0].trim();
+  const baseUrl = primaryDomain.startsWith('http') ? primaryDomain : `https://${primaryDomain}`;
+  const resetUrl = `${baseUrl}/reset-password?token=${token}`;
   
   const htmlContent = `
     <!DOCTYPE html>
