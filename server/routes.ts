@@ -447,7 +447,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('📊 Total de linhas:', lines.length);
       const data = [];
 
-      // Mapeamento de nomes de colunas (tanto português quanto inglês)
+      // Mapeamento de nomes de colunas (tanto português quanto inglês)  
       const columnMapping = {
         asin: ['ASIN', 'asin'],
         title: ['title', 'nome', 'nome_produto', 'Título', 'produto'],
@@ -461,6 +461,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         productLink: ['LINK DO PRODUTO', 'product_link', 'link_produto'],
         affiliateLink: ['LINK AFILIADO', 'affiliate_link', 'link_afiliado']
       };
+      
+      console.log('🎯 ESTRATÉGIA: Priorizar JSON completo sobre colunas individuais');
 
       // Buscar coluna que contém JSON (análise Karooma)
       let jsonColumnIndex = -1;
@@ -494,66 +496,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (let i = 1; i < lines.length; i++) {
         const row = parseCSVLine(lines[i]);
         
-        // Log primeira linha para debug
-        if (i === 1) {
-          console.log('🔍 Primeira linha (row):', row.slice(0, 10));
-          console.log('🔍 Headers vs Row length:', headers.length, 'vs', row.length);
-        }
-        
-        // Criar objeto do produto com dados das colunas normais
+        // Criar objeto do produto vazio
         const productData: any = {};
         
-        // Mapear cada coluna para o campo correspondente
-        headers.forEach((header, index) => {
-          const value = row[index] || '';
-          
-          // Log primeira linha para debug
-          if (i === 1 && index < 10) {
-            console.log(`🔍 Col ${index}: "${header}" = "${value}"`);
-          }
-          
-          // Verificar em qual campo esse header se encaixa
-          for (const [field, possibleNames] of Object.entries(columnMapping)) {
-            if (possibleNames.some(name => header.trim() === name || header.toLowerCase().includes(name.toLowerCase()))) {
-              productData[field] = value;
-              if (i === 1) {
-                console.log(`✅ Mapeado: ${header} → ${field} = "${value}"`);
-              }
-              break;
-            }
-          }
-        });
-        
-        // Se há coluna JSON, fazer merge com os dados
+        // ESTRATÉGIA NOVA: Processar JSON PRIMEIRO (prioridade máxima)
         if (jsonColumnIndex !== -1 && row.length > jsonColumnIndex) {
-          const jsonText = row[jsonColumnIndex].trim();
+          const jsonText = row[jsonColumnIndex]?.trim() || '';
           if (jsonText && (jsonText.startsWith('{') || jsonText.startsWith('\"{'))) {
             try {
               // Remover aspas externas se houver
               const cleanJsonText = jsonText.startsWith('\"') ? jsonText.slice(1, -1) : jsonText;
               const jsonData = JSON.parse(cleanJsonText);
               
-              // Fazer merge: dados JSON têm prioridade sobre colunas normais para campos específicos
-              productData.introduction = jsonData.introducao || jsonData.introduction || productData.introduction;
-              productData.affiliateLink = jsonData.link_afiliado || jsonData.affiliateLink || productData.affiliateLink;
-              productData.productLink = jsonData.link_produto || jsonData.productLink || productData.productLink;
-              productData.nutritionistEvaluation = jsonData.avaliacao_nutricao || jsonData.nutritionistEvaluation;
-              productData.organizerEvaluation = jsonData.avaliacao_organizacao || jsonData.organizerEvaluation;
-              productData.designEvaluation = jsonData.avaliacao_design || jsonData.designEvaluation;
-              productData.karoomaTeamEvaluation = jsonData.avaliacao_karooma || jsonData.karoomaTeamEvaluation;
-              productData.categoryTags = jsonData.tags_categorias || jsonData.categoryTags;
-              productData.searchTags = jsonData.tags_filtros || jsonData.searchTags;
-              productData.evaluators = jsonData.especialistas_selecionados || jsonData.evaluators;
+              if (i === 1) {
+                console.log('📦 JSON encontrado na linha 1:', Object.keys(jsonData));
+              }
               
-              // Se o JSON tem nome_produto e não temos title das colunas, usar do JSON
-              if (!productData.title && jsonData.nome_produto) {
-                productData.title = jsonData.nome_produto;
+              // Extrair TODOS os campos do JSON primeiro
+              productData.title = jsonData.nome_produto || jsonData.title || '';
+              productData.asin = jsonData.asin || '';
+              productData.introduction = jsonData.introducao || jsonData.introduction || '';
+              productData.affiliateLink = jsonData.link_afiliado || jsonData.affiliateLink || '';
+              productData.productLink = jsonData.link_produto || jsonData.productLink || '';
+              productData.imageUrl = jsonData.image_url || jsonData.imageUrl || '';
+              productData.price = jsonData.price || jsonData.preco || '';
+              productData.rating = jsonData.rating || jsonData.avaliacao || '';
+              productData.reviewCount = jsonData.review_count || jsonData.num_avaliacoes || '';
+              productData.description = jsonData.description || jsonData.descricao || '';
+              productData.seller = jsonData.seller || jsonData.vendedor || '';
+              productData.category = jsonData.category || jsonData.categoria || '';
+              productData.nutritionistEvaluation = jsonData.avaliacao_nutricao || jsonData.nutritionistEvaluation || '';
+              productData.organizerEvaluation = jsonData.avaliacao_organizacao || jsonData.organizerEvaluation || '';
+              productData.designEvaluation = jsonData.avaliacao_design || jsonData.designEvaluation || '';
+              productData.karoomaTeamEvaluation = jsonData.avaliacao_karooma || jsonData.karoomaTeamEvaluation || '';
+              productData.categoryTags = jsonData.tags_categorias || jsonData.categoryTags || '';
+              productData.searchTags = jsonData.tags_filtros || jsonData.searchTags || '';
+              productData.evaluators = jsonData.especialistas_selecionados || jsonData.evaluators || '';
+              
+              if (i === 1) {
+                console.log('✅ Dados extraídos do JSON:', { 
+                  title: productData.title, 
+                  asin: productData.asin,
+                  hasImage: !!productData.imageUrl 
+                });
               }
             } catch (jsonError) {
-              console.warn(`Erro ao processar JSON na linha ${i + 1}:`, jsonError);
+              console.warn(`❌ Erro ao processar JSON na linha ${i + 1}:`, jsonError);
             }
           }
         }
+        
+        // FALLBACK: Só mapear colunas individuais se JSON não forneceu os dados
+        headers.forEach((header, index) => {
+          const value = row[index] || '';
+          
+          // Verificar em qual campo esse header se encaixa
+          for (const [field, possibleNames] of Object.entries(columnMapping)) {
+            if (possibleNames.some(name => header.trim() === name || header.toLowerCase().includes(name.toLowerCase()))) {
+              // Só usar coluna individual se JSON não forneceu esse campo
+              if (!productData[field]) {
+                productData[field] = value;
+              }
+              break;
+            }
+          }
+        });
         
         // Adicionar apenas se tiver dados essenciais
         if (productData.title || productData.asin) {
