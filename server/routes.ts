@@ -431,6 +431,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const headers = parseCSVLine(lines[0]);
+      console.log('📋 Headers encontrados:', headers);
+      console.log('📊 Total de linhas:', lines.length);
       const data = [];
 
       // Mapeamento de nomes de colunas (tanto português quanto inglês)
@@ -529,7 +531,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Adicionar apenas se tiver dados essenciais
         if (productData.title || productData.asin) {
+          console.log(`✅ Produto ${i} adicionado:`, { title: productData.title, asin: productData.asin });
           data.push(productData);
+        } else {
+          console.log(`❌ Produto ${i} ignorado (sem title/asin):`, Object.keys(productData));
         }
       }
 
