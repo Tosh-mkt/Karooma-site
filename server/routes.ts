@@ -719,7 +719,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Helper function to detect admin emails (same logic as frontend)
   const isAdminEmail = (email: string): boolean => {
-    return email.includes('@karooma.com') || email.includes('admin');
+    return email.includes('@karooma.life') || email.includes('admin');
   };
 
   // Login route for email/password authentication

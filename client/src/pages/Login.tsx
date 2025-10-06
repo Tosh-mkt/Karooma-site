@@ -89,7 +89,7 @@ export function Login() {
     }
     
     // Detecta automaticamente se é admin baseado no email
-    const isAdmin = adminEmail.includes('@karooma.com') || adminEmail.includes('admin');
+    const isAdmin = adminEmail.includes('@karooma.life') || adminEmail.includes('admin');
     loginMutation.mutate({ 
       email: adminEmail, 
       password: adminPassword, 

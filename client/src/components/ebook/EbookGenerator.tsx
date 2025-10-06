@@ -294,8 +294,8 @@ function EbookFinalPage({ template }: { template: EbookTemplate }) {
             Receba mais guias práticos, dicas e estratégias direto no seu email
           </p>
           <div className="text-lg font-semibold">
-            📧 newsletter@karooma.com<br />
-            🌐 www.karooma.com
+            📧 newsletter@karooma.life<br />
+            🌐 www.karooma.life
           </div>
         </div>
       </div>

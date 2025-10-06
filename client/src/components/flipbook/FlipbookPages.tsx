@@ -398,8 +398,8 @@ export function FinalPage({ colorScheme }: FlipbookPageProps) {
               Continue com a Karooma
             </h3>
             <p className="text-sm opacity-90">
-              📧 newsletter@karooma.com<br />
-              🌐 www.karooma.com
+              📧 newsletter@karooma.life<br />
+              🌐 www.karooma.life
             </p>
           </div>
         </motion.div>
