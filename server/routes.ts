@@ -494,6 +494,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (let i = 1; i < lines.length; i++) {
         const row = parseCSVLine(lines[i]);
         
+        // Log primeira linha para debug
+        if (i === 1) {
+          console.log('🔍 Primeira linha (row):', row.slice(0, 10));
+          console.log('🔍 Headers vs Row length:', headers.length, 'vs', row.length);
+        }
+        
         // Criar objeto do produto com dados das colunas normais
         const productData: any = {};
         
@@ -501,10 +507,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         headers.forEach((header, index) => {
           const value = row[index] || '';
           
+          // Log primeira linha para debug
+          if (i === 1 && index < 10) {
+            console.log(`🔍 Col ${index}: "${header}" = "${value}"`);
+          }
+          
           // Verificar em qual campo esse header se encaixa
           for (const [field, possibleNames] of Object.entries(columnMapping)) {
             if (possibleNames.some(name => header.trim() === name || header.toLowerCase().includes(name.toLowerCase()))) {
               productData[field] = value;
+              if (i === 1) {
+                console.log(`✅ Mapeado: ${header} → ${field} = "${value}"`);
+              }
               break;
             }
           }
