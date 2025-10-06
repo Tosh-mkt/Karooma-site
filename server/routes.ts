@@ -646,16 +646,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       for (const productData of jsonData) {
         try {
           // Normalizar dados do produto
+          const normalizedCurrentPrice = normalizePrice(productData.currentPrice || productData.precoAtual || productData.preco || productData.price || '');
+          const normalizedOriginalPrice = normalizePrice(productData.originalPrice || productData.precoOriginal || '');
+          const normalizedRating = normalizePrice(productData.rating || productData.avaliacao || '');
+          const normalizedDiscount = normalizePrice(productData.discount || productData.desconto || '');
+          
           const product: any = {
             title: productData.title || productData.nome || productData.name,
             description: productData.description || productData.descricao,
             category: productData.category || productData.categoria,
             imageUrl: productData.imageUrl || productData.imagem || productData.image,
-            currentPrice: normalizePrice(productData.currentPrice || productData.precoAtual || productData.preco || productData.price || ''),
-            originalPrice: normalizePrice(productData.originalPrice || productData.precoOriginal || ''),
+            currentPrice: normalizedCurrentPrice || null,
+            originalPrice: normalizedOriginalPrice || null,
             affiliateLink: productData.affiliateLink || productData.linkAfiliado || productData.link,
             productLink: productData.productLink || productData.linkProduto,
-            rating: normalizePrice(productData.rating || productData.avaliacao || '') || '0',
+            rating: normalizedRating ? parseFloat(normalizedRating) : null,
             featured: productData.featured === true || productData.destaque === true,
             introduction: productData.introduction || productData.introducao,
             nutritionistEvaluation: productData.nutritionistEvaluation || productData.avaliacaoNutricionista || productData.avaliacao_nutricao,
@@ -671,15 +676,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
             brand: productData.brand || productData.seller || productData.seller_name
           };
           
-          // Adicionar discount apenas se existir
-          const discountValue = parseFloat(normalizePrice(productData.discount || productData.desconto || '') || '0');
-          if (discountValue > 0) {
+          // Adicionar discount apenas se existir e for válido
+          const discountValue = normalizedDiscount ? parseFloat(normalizedDiscount) : null;
+          if (discountValue && discountValue > 0) {
             product.discount = discountValue;
           }
           
-          // Adicionar reviewCount apenas se existir
-          const reviewCountValue = parseInt(productData.reviewCount || productData.user_rating_count || '0');
-          if (reviewCountValue > 0) {
+          // Adicionar reviewCount apenas se existir e for válido
+          const reviewCountStr = productData.reviewCount || productData.user_rating_count || '';
+          const reviewCountValue = reviewCountStr ? parseInt(String(reviewCountStr).replace(/\D/g, '')) : null;
+          if (reviewCountValue && reviewCountValue > 0) {
             product.reviewCount = reviewCountValue;
           }
 
