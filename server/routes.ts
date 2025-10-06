@@ -21,7 +21,7 @@ import {
 import bcrypt from "bcryptjs";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 import AmazonPAAPIService from "./services/amazonApi";
-import { parse } from "csv-parse/sync";
+import Papa from "papaparse";
 import { getBlogTemplate, generateContentSuggestions, type BlogCategory } from "@shared/blog-template";
 import { blogValidator } from "./blog-validator";
 import path from "path";
@@ -405,19 +405,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const csvText = await response.text();
       
-      // Usar csv-parse para processar CSV corretamente (respeitando multi-linha dentro de aspas)
-      const records = parse(csvText, {
-        skip_empty_lines: true,
-        relax_column_count: true, // Permite linhas com número variável de colunas
-        trim: true,
-        quote: '"',
-        escape: '"'
+      // Usar papaparse para processar CSV corretamente (lida perfeitamente com multi-linha)
+      const parseResult = Papa.parse(csvText, {
+        header: false, // Vamos processar headers manualmente
+        skipEmptyLines: true,
+        quoteChar: '"',
+        escapeChar: '"',
+        delimiter: ',',
+        newline: '\n'
       });
       
-      if (records.length < 2) {
+      if (!parseResult.data || parseResult.data.length < 2) {
         return res.status(400).json({ error: "Planilha não contém dados suficientes" });
       }
 
+      const records = parseResult.data as string[][];
       const headers = records[0]; // Primeira linha são os headers
       const dataRows = records.slice(1); // Restante são os dados
       
@@ -426,7 +428,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const data = [];
 
       // Mapeamento de nomes de colunas (tanto português quanto inglês)  
-      const columnMapping = {
+      const columnMapping: Record<string, string[]> = {
         asin: ['ASIN', 'asin'],
         title: ['title', 'nome', 'nome_produto', 'Título', 'produto'],
         imageUrl: ['image_url', 'imagem', 'foto', 'url_imagem'],
@@ -478,31 +480,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Processar cada linha e fazer merge dos dados
+      let productsWithJson = 0;
+      let productsWithoutJson = 0;
+      
       for (let i = 0; i < dataRows.length; i++) {
         const row = dataRows[i];
         
+        // Pular linhas completamente vazias
+        if (!row || row.every((cell: string) => !cell || cell.trim() === '')) {
+          continue;
+        }
+        
         // Criar objeto do produto vazio
         const productData: any = {};
+        let hasJsonData = false;
         
-        // ESTRATÉGIA NOVA: Processar JSON PRIMEIRO (prioridade máxima)
+        // ESTRATÉGIA: Processar JSON PRIMEIRO (prioridade máxima)
         if (jsonColumnIndex !== -1 && row.length > jsonColumnIndex) {
           const jsonText = row[jsonColumnIndex]?.trim() || '';
-          
-          if (i === 0) {
-            console.log('🔍 JSON RAW na primeira linha (primeiros 300 chars):', jsonText.substring(0, 300));
-          }
           
           if (jsonText && (jsonText.startsWith('{') || jsonText.startsWith('\"{'))) {
             try {
               // Remover aspas externas se houver
               const cleanJsonText = jsonText.startsWith('\"') ? jsonText.slice(1, -1) : jsonText;
               const jsonData = JSON.parse(cleanJsonText);
+              hasJsonData = true;
+              productsWithJson++;
               
               if (i === 0) {
                 console.log('📦 JSON parseado com sucesso! Chaves:', Object.keys(jsonData));
               }
               
-              // Extrair TODOS os campos do JSON primeiro
+              // Extrair TODOS os campos do JSON primeiro (prioridade)
               productData.title = jsonData.nome_produto || jsonData.title || '';
               productData.asin = jsonData.asin || '';
               productData.introduction = jsonData.introducao || jsonData.introduction || '';
@@ -523,48 +532,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
               productData.searchTags = jsonData.tags_filtros || jsonData.searchTags || '';
               productData.evaluators = jsonData.especialistas_selecionados || jsonData.evaluators || '';
               
-              if (i === 0) {
-                console.log('✅ Dados extraídos do JSON da primeira linha:', { 
-                  title: productData.title, 
-                  asin: productData.asin,
-                  hasImage: !!productData.imageUrl,
-                  hasPrice: !!productData.price 
-                });
-              }
             } catch (jsonError) {
-              console.warn(`❌ Erro ao processar JSON na linha ${i + 1}:`, jsonError);
+              if (i < 3) {
+                console.warn(`⚠️ JSON inválido na linha ${i + 2}:`, jsonError);
+              }
             }
           }
         }
         
-        // FALLBACK: Só mapear colunas individuais se JSON não forneceu os dados
-        headers.forEach((header, index) => {
+        // FALLBACK: Mapear colunas individuais (G-N) para preencher lacunas
+        headers.forEach((header: string, index: number) => {
           const value = row[index] || '';
           
           // Verificar em qual campo esse header se encaixa
           for (const [field, possibleNames] of Object.entries(columnMapping)) {
-            if (possibleNames.some(name => header.trim() === name || header.toLowerCase().includes(name.toLowerCase()))) {
+            if (possibleNames.some((name: string) => header.trim() === name || header.toLowerCase().includes(name.toLowerCase()))) {
               // Só usar coluna individual se JSON não forneceu esse campo
-              if (!productData[field]) {
-                productData[field] = value;
+              if (!productData[field] || productData[field] === '') {
+                productData[field] = value.trim();
               }
               break;
             }
           }
         });
         
-        // Adicionar apenas se tiver dados essenciais
-        if (productData.title || productData.asin) {
-          if (i === 0) {
-            console.log(`✅ Primeira linha adicionada:`, { title: productData.title, asin: productData.asin });
+        if (!hasJsonData) {
+          productsWithoutJson++;
+        }
+        
+        // VALIDAÇÃO: Adicionar apenas se tiver title E (affiliateLink OU asin)
+        const hasValidData = productData.title && (productData.affiliateLink || productData.asin);
+        
+        if (hasValidData) {
+          if (i < 2) {
+            console.log(`✅ Linha ${i + 2} adicionada:`, { 
+              title: productData.title?.substring(0, 30), 
+              asin: productData.asin,
+              hasAffiliate: !!productData.affiliateLink,
+              fromJson: hasJsonData 
+            });
           }
           data.push(productData);
         } else {
-          if (i < 3) {
-            console.log(`❌ Linha ${i + 1} ignorada (sem title/asin):`, { keys: Object.keys(productData) });
+          if (i < 2) {
+            console.log(`❌ Linha ${i + 2} ignorada:`, { 
+              hasTitle: !!productData.title, 
+              hasAsin: !!productData.asin, 
+              hasAffiliate: !!productData.affiliateLink 
+            });
           }
         }
       }
+      
+      console.log(`\n📊 RESUMO DO PROCESSAMENTO:`);
+      console.log(`   ✅ Total de produtos válidos: ${data.length}`);
+      console.log(`   📦 Com dados JSON: ${productsWithJson}`);
+      console.log(`   📋 Apenas colunas: ${productsWithoutJson}`);
 
       res.json({ 
         success: true, 
