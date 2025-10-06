@@ -74,12 +74,17 @@ async function getCredentials() {
     }
     
     console.log(`✅ Credenciais obtidas com sucesso`);
-    console.log(`📧 Email remetente: ${connectionSettings.settings.from_email}`);
+    console.log(`📧 Email retornado pela integração: ${connectionSettings.settings.from_email}`);
+    
+    // IMPORTANTE: Usar sempre um email VERIFICADO no SendGrid
+    // Os emails verificados são: contato@karooma.life, admin@karooma.life, welcome@karooma.life
+    const verifiedSenderEmail = 'admin@karooma.life';
+    console.log(`📧 Email que será usado (verificado): ${verifiedSenderEmail}`);
     console.log('===================================\n');
     
     return {
       apiKey: connectionSettings.settings.api_key, 
-      email: connectionSettings.settings.from_email
+      email: verifiedSenderEmail  // Usar email verificado ao invés do retornado pela integração
     };
   } catch (error: any) {
     console.error('❌ ERRO ao obter credenciais SendGrid:');
