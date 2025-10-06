@@ -70,9 +70,17 @@ export function requireFlipbookAccess(flipbookId: string) {
  * This should be called before requireFlipbookAccess
  */
 export function extractUserInfo(req: Request, res: Response, next: NextFunction) {
-  // For now, we'll extract from query params or headers
-  // In production, this would come from your auth system
-  
+  // Extract user from session (set by login)
+  if (req.session && (req.session as any).user) {
+    const sessionUser = (req.session as any).user;
+    req.user = {
+      email: sessionUser.email,
+      isAdmin: sessionUser.isAdmin || false,
+      id: sessionUser.id
+    };
+    return next();
+  }
+
   // Check if admin override (only in development)
   if (process.env.NODE_ENV === 'development' && req.query.admin === 'true') {
     req.user = {
@@ -83,7 +91,7 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
     return next();
   }
 
-  // Extract from query params (temporary - replace with real auth)
+  // Extract from query params (fallback - replace with real auth)
   const email = req.query.email as string;
   if (email) {
     req.user = {
