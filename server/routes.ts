@@ -647,6 +647,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return normalized;
       };
 
+      // Função para extrair categoria de categoryTags ou searchTags
+      const extractCategory = (productData: any): string => {
+        // Tentar categoria direta primeiro
+        if (productData.category || productData.categoria) {
+          return productData.category || productData.categoria;
+        }
+        
+        // Extrair do categoryTags (ex: "aprender-e-brincar" ou "aprender-e-brincar/familia")
+        const categoryTags = productData.categoryTags || productData.tagsCategoria || productData.tags_categorias || '';
+        if (categoryTags) {
+          // Pegar o primeiro valor antes da "/" ou vírgula
+          const firstTag = categoryTags.split(/[,\/]/)[0].trim();
+          if (firstTag) return firstTag;
+        }
+        
+        // Extrair do searchTags como fallback
+        const searchTags = productData.searchTags || productData.tagsBusca || productData.tags_filtros || '';
+        if (searchTags) {
+          const firstTag = searchTags.split(/[,\/]/)[0].trim();
+          if (firstTag) return firstTag;
+        }
+        
+        // Categoria padrão se nada foi encontrado
+        return 'geral';
+      };
+
       // Processar e inserir produtos
       const insertedProducts = [];
       for (const productData of jsonData) {
@@ -660,7 +686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const product: any = {
             title: productData.title || productData.nome || productData.name,
             description: productData.description || productData.descricao,
-            category: productData.category || productData.categoria,
+            category: extractCategory(productData),
             imageUrl: productData.imageUrl || productData.imagem || productData.image,
             currentPrice: normalizedCurrentPrice || null,
             originalPrice: normalizedOriginalPrice || null,
