@@ -351,6 +351,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       let csvUrl = sheetsUrl;
       let gid = null;
       
+      // Tentar extrair GID diretamente da URL (se o usuário colou o link da aba)
+      const gidInUrlMatch = sheetsUrl.match(/[#&]gid=([0-9]+)/);
+      if (gidInUrlMatch) {
+        gid = gidInUrlMatch[1];
+        console.log('🔗 GID encontrado na URL:', gid);
+      }
+      
       // Extrair spreadsheet ID do URL
       const spreadsheetIdMatch = sheetsUrl.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
       if (!spreadsheetIdMatch) {
@@ -359,8 +366,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const spreadsheetId = spreadsheetIdMatch[1];
       
-      // Se há um nome de aba especificado, tentar obter o GID
-      if (sheetName) {
+      // Se não encontrou GID na URL e há um nome de aba especificado, tentar obter o GID
+      if (!gid && sheetName) {
         try {
           // Fazer requisição para obter a lista de abas
           const sheetsListUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`;
@@ -371,17 +378,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const gidMatch = sheetsListText.match(new RegExp(`"sheet":"${sheetName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"[^}]*"sheetId":([0-9]+)`, 'i'));
           if (gidMatch) {
             gid = gidMatch[1];
+            console.log('🔍 GID encontrado por nome da aba:', gid);
+          } else {
+            console.warn('⚠️ GID não encontrado para aba:', sheetName);
           }
         } catch (error) {
-          console.warn('Não foi possível obter o GID da aba especificada:', error);
+          console.warn('❌ Erro ao buscar GID:', error);
         }
       }
       
       // Construir URL do CSV
       if (gid) {
         csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`;
+        console.log('✅ URL CSV com GID:', csvUrl);
       } else {
         csvUrl = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv`;
+        console.log('⚠️ URL CSV SEM GID (primeira aba):', csvUrl);
       }
 
       // Fazer requisição para o Google Sheets
