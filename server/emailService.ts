@@ -172,23 +172,50 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
       ...(data.html && { html: data.html })
     };
     
-    console.log(`📤 Tentando enviar email via SendGrid:`);
+    console.log('\n📤 ===== ENVIANDO EMAIL VIA SENDGRID =====');
     console.log(`   Para: ${data.to}`);
     console.log(`   De: ${data.from}`);
     console.log(`   Assunto: ${data.subject}`);
+    console.log(`   Tem conteúdo HTML: ${!!data.html}`);
+    console.log(`   Tem conteúdo texto: ${!!data.text}`);
     
     const response = await client.send(emailData);
     
     console.log(`✅ SendGrid Response:`, JSON.stringify(response, null, 2));
-    console.log(`✅ Email enviado com sucesso: ${data.subject} para ${data.to}`);
+    console.log(`✅ Email enviado com sucesso!`);
+    console.log('==========================================\n');
     return true;
   } catch (error: any) {
-    console.error('❌ Erro ao enviar email via SendGrid:');
-    console.error('   Para:', data.to);
-    console.error('   Assunto:', data.subject);
-    console.error('   Error details:', error);
-    console.error('   Response body:', error?.response?.body);
-    console.error('   Response headers:', error?.response?.headers);
+    console.error('\n❌ ===== ERRO AO ENVIAR EMAIL VIA SENDGRID =====');
+    console.error(`   Para: ${data.to}`);
+    console.error(`   De: ${data.from}`);
+    console.error(`   Assunto: ${data.subject}`);
+    console.error(`\n🔴 Detalhes do erro:`);
+    console.error(`   Código HTTP: ${error?.code || 'N/A'}`);
+    console.error(`   Mensagem: ${error?.message || 'N/A'}`);
+    
+    if (error?.response) {
+      console.error(`\n📋 Response do SendGrid:`);
+      console.error(`   Status: ${error.response.statusCode || 'N/A'}`);
+      console.error(`   Headers:`, JSON.stringify(error.response.headers, null, 2));
+      
+      if (error.response.body) {
+        console.error(`   Body:`, JSON.stringify(error.response.body, null, 2));
+        
+        // Se houver erros específicos no body
+        if (error.response.body.errors && Array.isArray(error.response.body.errors)) {
+          console.error(`\n⚠️ Erros específicos do SendGrid:`);
+          error.response.body.errors.forEach((err: any, index: number) => {
+            console.error(`   ${index + 1}. ${err.message || JSON.stringify(err)}`);
+            if (err.field) console.error(`      Campo: ${err.field}`);
+            if (err.help) console.error(`      Ajuda: ${err.help}`);
+          });
+        }
+      }
+    }
+    
+    console.error(`\n📚 Stack trace:`, error?.stack);
+    console.error('================================================\n');
     return false;
   }
 }
