@@ -21,6 +21,7 @@ import {
 import bcrypt from "bcryptjs";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 import AmazonPAAPIService from "./services/amazonApi";
+import { parse } from "csv-parse/sync";
 import { getBlogTemplate, generateContentSuggestions, type BlogCategory } from "@shared/blog-template";
 import { blogValidator } from "./blog-validator";
 import path from "path";
@@ -404,47 +405,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const csvText = await response.text();
       
-      // Parser CSV robusto que lida com campos entre aspas e vírgulas internas
-      const parseCSVLine = (line: string): string[] => {
-        const fields: string[] = [];
-        let currentField = '';
-        let insideQuotes = false;
-        let i = 0;
-        
-        while (i < line.length) {
-          const char = line[i];
-          
-          if (char === '"') {
-            if (insideQuotes && line[i + 1] === '"') {
-              currentField += '"';
-              i += 2;
-            } else {
-              insideQuotes = !insideQuotes;
-              i++;
-            }
-          } else if (char === ',' && !insideQuotes) {
-            fields.push(currentField.trim());
-            currentField = '';
-            i++;
-          } else {
-            currentField += char;
-            i++;
-          }
-        }
-        
-        fields.push(currentField.trim());
-        return fields;
-      };
+      // Usar csv-parse para processar CSV corretamente (respeitando multi-linha dentro de aspas)
+      const records = parse(csvText, {
+        skip_empty_lines: true,
+        relax_column_count: true, // Permite linhas com número variável de colunas
+        trim: true,
+        quote: '"',
+        escape: '"'
+      });
       
-      // Processar CSV para extrair dados de TODAS as colunas + merge com JSON
-      const lines = csvText.split('\n').filter(line => line.trim());
-      if (lines.length < 2) {
+      if (records.length < 2) {
         return res.status(400).json({ error: "Planilha não contém dados suficientes" });
       }
 
-      const headers = parseCSVLine(lines[0]);
+      const headers = records[0]; // Primeira linha são os headers
+      const dataRows = records.slice(1); // Restante são os dados
+      
       console.log('📋 Headers encontrados:', headers);
-      console.log('📊 Total de linhas:', lines.length);
+      console.log('📊 Total de linhas de dados:', dataRows.length);
       const data = [];
 
       // Mapeamento de nomes de colunas (tanto português quanto inglês)  
@@ -500,8 +478,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Processar cada linha e fazer merge dos dados
-      for (let i = 1; i < lines.length; i++) {
-        const row = parseCSVLine(lines[i]);
+      for (let i = 0; i < dataRows.length; i++) {
+        const row = dataRows[i];
         
         // Criar objeto do produto vazio
         const productData: any = {};
@@ -510,8 +488,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (jsonColumnIndex !== -1 && row.length > jsonColumnIndex) {
           const jsonText = row[jsonColumnIndex]?.trim() || '';
           
-          if (i === 1) {
-            console.log('🔍 JSON RAW na linha 1 (primeiros 200 chars):', jsonText.substring(0, 200));
+          if (i === 0) {
+            console.log('🔍 JSON RAW na primeira linha (primeiros 300 chars):', jsonText.substring(0, 300));
           }
           
           if (jsonText && (jsonText.startsWith('{') || jsonText.startsWith('\"{'))) {
@@ -520,7 +498,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const cleanJsonText = jsonText.startsWith('\"') ? jsonText.slice(1, -1) : jsonText;
               const jsonData = JSON.parse(cleanJsonText);
               
-              if (i === 1) {
+              if (i === 0) {
                 console.log('📦 JSON parseado com sucesso! Chaves:', Object.keys(jsonData));
               }
               
@@ -545,11 +523,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
               productData.searchTags = jsonData.tags_filtros || jsonData.searchTags || '';
               productData.evaluators = jsonData.especialistas_selecionados || jsonData.evaluators || '';
               
-              if (i === 1) {
-                console.log('✅ Dados extraídos do JSON:', { 
+              if (i === 0) {
+                console.log('✅ Dados extraídos do JSON da primeira linha:', { 
                   title: productData.title, 
                   asin: productData.asin,
-                  hasImage: !!productData.imageUrl 
+                  hasImage: !!productData.imageUrl,
+                  hasPrice: !!productData.price 
                 });
               }
             } catch (jsonError) {
@@ -576,10 +555,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         // Adicionar apenas se tiver dados essenciais
         if (productData.title || productData.asin) {
-          console.log(`✅ Produto ${i} adicionado:`, { title: productData.title, asin: productData.asin });
+          if (i === 0) {
+            console.log(`✅ Primeira linha adicionada:`, { title: productData.title, asin: productData.asin });
+          }
           data.push(productData);
         } else {
-          console.log(`❌ Produto ${i} ignorado (sem title/asin):`, Object.keys(productData));
+          if (i < 3) {
+            console.log(`❌ Linha ${i + 1} ignorada (sem title/asin):`, { keys: Object.keys(productData) });
+          }
         }
       }
 
