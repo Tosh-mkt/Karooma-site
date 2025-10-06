@@ -675,18 +675,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Processar e inserir produtos
       const insertedProducts = [];
-      for (const productData of jsonData) {
+      for (let i = 0; i < jsonData.length; i++) {
+        const productData = jsonData[i];
         try {
+          // Log detalhado do primeiro produto para debug
+          if (i === 0) {
+            console.log('🔍 DEBUG - Primeiro produto recebido:');
+            console.log('  Keys:', Object.keys(productData));
+            console.log('  categoryTags:', productData.categoryTags);
+            console.log('  searchTags:', productData.searchTags);
+            console.log('  category:', productData.category);
+          }
+          
           // Normalizar dados do produto
           const normalizedCurrentPrice = normalizePrice(productData.currentPrice || productData.precoAtual || productData.preco || productData.price || '');
           const normalizedOriginalPrice = normalizePrice(productData.originalPrice || productData.precoOriginal || '');
           const normalizedRating = normalizePrice(productData.rating || productData.avaliacao || '');
           const normalizedDiscount = normalizePrice(productData.discount || productData.desconto || '');
           
+          const extractedCategory = extractCategory(productData);
+          if (i === 0) {
+            console.log('  ✅ Categoria extraída:', extractedCategory);
+          }
+          
           const product: any = {
             title: productData.title || productData.nome || productData.name,
             description: productData.description || productData.descricao,
-            category: extractCategory(productData),
+            category: extractedCategory,
             imageUrl: productData.imageUrl || productData.imagem || productData.image,
             currentPrice: normalizedCurrentPrice || null,
             originalPrice: normalizedOriginalPrice || null,
