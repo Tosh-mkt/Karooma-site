@@ -471,10 +471,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const columnNumber = parseInt(jsonColumn);
         if (!isNaN(columnNumber) && columnNumber > 0 && columnNumber <= headers.length) {
           jsonColumnIndex = columnNumber - 1;
+          console.log(`✅ Coluna JSON detectada: Número ${jsonColumn} (índice ${jsonColumnIndex})`);
         } else {
           for (let i = 0; i < headers.length; i++) {
             if (headers[i].toLowerCase().includes(jsonColumn.toLowerCase())) {
               jsonColumnIndex = i;
+              console.log(`✅ Coluna JSON detectada: "${headers[i]}" (índice ${i})`);
               break;
             }
           }
@@ -487,9 +489,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           const header = headers[i].toLowerCase();
           if (jsonColumnNames.some(name => header.includes(name))) {
             jsonColumnIndex = i;
+            console.log(`✅ Coluna JSON detectada automaticamente: "${headers[i]}" (índice ${i})`);
             break;
           }
         }
+      }
+      
+      if (jsonColumnIndex === -1) {
+        console.warn('⚠️ Coluna JSON não encontrada!');
       }
 
       // Processar cada linha e fazer merge dos dados
@@ -502,6 +509,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // ESTRATÉGIA NOVA: Processar JSON PRIMEIRO (prioridade máxima)
         if (jsonColumnIndex !== -1 && row.length > jsonColumnIndex) {
           const jsonText = row[jsonColumnIndex]?.trim() || '';
+          
+          if (i === 1) {
+            console.log('🔍 JSON RAW na linha 1 (primeiros 200 chars):', jsonText.substring(0, 200));
+          }
+          
           if (jsonText && (jsonText.startsWith('{') || jsonText.startsWith('\"{'))) {
             try {
               // Remover aspas externas se houver
@@ -509,7 +521,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               const jsonData = JSON.parse(cleanJsonText);
               
               if (i === 1) {
-                console.log('📦 JSON encontrado na linha 1:', Object.keys(jsonData));
+                console.log('📦 JSON parseado com sucesso! Chaves:', Object.keys(jsonData));
               }
               
               // Extrair TODOS os campos do JSON primeiro
