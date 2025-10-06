@@ -48,7 +48,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     >
       <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-white/20 overflow-hidden h-full max-w-none w-full flex flex-col">
         {/* Product Image */}
-        <div className="relative h-48 overflow-hidden" style={{ height: '200px' }}>
+        <div 
+          className="relative h-48 overflow-hidden cursor-pointer" 
+          style={{ height: '200px' }}
+          onClick={() => window.open(product.affiliateLink, '_blank')}
+          data-testid={`image-product-${product.id}`}
+        >
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
