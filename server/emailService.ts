@@ -170,11 +170,23 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
       ...(data.html && { html: data.html })
     };
     
-    await mailService.send(emailData);
-    console.log(`✅ Email enviado: ${data.subject} para ${data.to}`);
+    console.log(`📤 Tentando enviar email via SendGrid:`);
+    console.log(`   Para: ${data.to}`);
+    console.log(`   De: ${data.from}`);
+    console.log(`   Assunto: ${data.subject}`);
+    
+    const response = await mailService.send(emailData);
+    
+    console.log(`✅ SendGrid Response:`, JSON.stringify(response, null, 2));
+    console.log(`✅ Email enviado com sucesso: ${data.subject} para ${data.to}`);
     return true;
-  } catch (error) {
-    console.error('❌ Erro ao enviar email:', error);
+  } catch (error: any) {
+    console.error('❌ Erro ao enviar email via SendGrid:');
+    console.error('   Para:', data.to);
+    console.error('   Assunto:', data.subject);
+    console.error('   Error details:', error);
+    console.error('   Response body:', error?.response?.body);
+    console.error('   Response headers:', error?.response?.headers);
     return false;
   }
 }
