@@ -82,7 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/import-products", extractUserInfo, async (req: any, res) => {
     try {
       // Verificar se o usuário está autenticado e é admin
-      if (!req.user || !req.user.isAdmin) {
+      if (!checkIsAdmin(req.user)) {
         return res.status(403).json({ error: "Acesso negado. Somente administradores podem importar produtos." });
       }
 
@@ -337,7 +337,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/load-google-sheets", extractUserInfo, async (req: any, res) => {
     try {
       // Verificar se o usuário está autenticado e é admin
-      if (!req.user || !req.user.isAdmin) {
+      if (!checkIsAdmin(req.user)) {
         return res.status(403).json({ error: "Acesso negado. Somente administradores podem carregar dados." });
       }
 
@@ -554,7 +554,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/admin/import-json-products", extractUserInfo, async (req: any, res) => {
     try {
       // Verificar se o usuário está autenticado e é admin
-      if (!req.user || !req.user.isAdmin) {
+      if (!checkIsAdmin(req.user)) {
         return res.status(403).json({ error: "Acesso negado. Somente administradores podem importar produtos." });
       }
 
@@ -720,6 +720,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Helper function to detect admin emails (same logic as frontend)
   const isAdminEmail = (email: string): boolean => {
     return email.includes('@karooma.life') || email.includes('admin');
+  };
+
+  // Helper function to check if user is admin (by flag or email)
+  const checkIsAdmin = (user: any): boolean => {
+    if (!user) return false;
+    return user.isAdmin || (user.email && isAdminEmail(user.email));
   };
 
   // Login route for email/password authentication
@@ -2554,7 +2560,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Automation API routes
   app.get("/api/admin/automation/progress", extractUserInfo, async (req: any, res) => {
     // Check admin authorization
-    if (!req.user || !req.user.isAdmin) {
+    if (!checkIsAdmin(req.user)) {
       return res.status(403).json({ error: "Acesso negado. Somente administradores podem acessar dados de automação." });
     }
     try {
@@ -2568,7 +2574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/automation/initialize", extractUserInfo, async (req: any, res) => {
     // Check admin authorization
-    if (!req.user || !req.user.isAdmin) {
+    if (!checkIsAdmin(req.user)) {
       return res.status(403).json({ error: "Acesso negado. Somente administradores podem inicializar automações." });
     }
     try {
@@ -2612,7 +2618,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/automation/start-stage", extractUserInfo, async (req: any, res) => {
     // Check admin authorization
-    if (!req.user || !req.user.isAdmin) {
+    if (!checkIsAdmin(req.user)) {
       return res.status(403).json({ error: "Acesso negado. Somente administradores podem iniciar etapas." });
     }
     
@@ -2647,7 +2653,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/automation/complete-stage", extractUserInfo, async (req: any, res) => {
     // Check admin authorization
-    if (!req.user || !req.user.isAdmin) {
+    if (!checkIsAdmin(req.user)) {
       return res.status(403).json({ error: "Acesso negado. Somente administradores podem completar etapas." });
     }
     
@@ -2684,7 +2690,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/automation/jobs", extractUserInfo, async (req: any, res) => {
     // Check admin authorization
-    if (!req.user || !req.user.isAdmin) {
+    if (!checkIsAdmin(req.user)) {
       return res.status(403).json({ error: "Acesso negado. Somente administradores podem acessar jobs de automação." });
     }
     try {
@@ -2749,7 +2755,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Execute Day 1 Welcome Email Automation
   app.post("/api/admin/automation/execute-welcome-email", extractUserInfo, async (req: any, res) => {
     // Check admin authorization
-    if (!req.user || !req.user.isAdmin) {
+    if (!checkIsAdmin(req.user)) {
       return res.status(403).json({ error: "Acesso negado. Somente administradores podem executar automações." });
     }
     

@@ -31,6 +31,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Migrations**: Drizzle Kit
 
 ## Key Components
+- **Admin Authentication System**: Dual-layer validation system that recognizes admin users by email pattern (@karooma.life domain or containing 'admin') OR database flag. Uses `checkIsAdmin()` helper function across all 8 admin endpoints. Automatically promotes qualifying emails to admin status on login.
 - **Content Management System**: Supports videos, blog posts, featured content. Includes an administrative panel, LLM integration for automated content generation (ChatGPT, Claude, Gemini), a 5-part template system for content structure, a prompt generator, and compartmentalized LLM output. Features category-based organization, YouTube embedding, Unsplash image integration, view tracking, real-time preview, and tooltip guidance. Blog posts support exactly two independent image fields (heroImageUrl and footerImageUrl).
 - **Affiliate Product System**: Dynamic product cards with pricing, ratings, discounts. Organized categorization, external link tracking for affiliate commissions, and featured product promotion.
 - **Newsletter System**: Email capture and toast notifications.
@@ -38,6 +39,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Flipbook Access Control System**: Email-based authorization system with database table `authorized_flipbook_users`, middleware authentication, API routes, a frontend guard component, and an admin interface.
 - **Marketing Automation System**: An ultra-lean, MVP-first approach focusing on email welcome, lead magnet delivery (SendGrid), web push notifications (Service Worker), and a price alert system. Uses a PostgreSQL-based job queue (`automation_jobs` table) and progress tracking (`automation_progress` table).
 - **Web Push Notifications System**: Native PWA push notifications for direct user engagement, focusing on price alerts, new content, abandoned cart recovery, and flash deals. Features a `push_subscriptions` table for managing user preferences and tokens.
+- **Google Sheets Import System**: Hybrid product import system that merges JSON data from a dedicated column with regular spreadsheet columns (ASIN, title, image_url, price, rating, etc.). Supports both Portuguese and English field names, CSV public API method for data fetching, bilingual compatibility.
 
 ## Blog Content Standards
 - **Target Persona**: Cláudia, a working mother seeking practical solutions.
