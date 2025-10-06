@@ -1,17 +1,15 @@
-import { MailService } from '@sendgrid/mail';
+import { getUncachableSendGridClient } from './sendgridClient';
 
-// Configuração básica do SendGrid
-let mailService: MailService | null = null;
-
-// Email remetente verificado (deve estar configurado no SendGrid)
-const VERIFIED_SENDER_EMAIL = process.env.SENDGRID_VERIFIED_SENDER || 'admin@karooma.life';
-
-if (process.env.SENDGRID_API_KEY) {
-  mailService = new MailService();
-  mailService.setApiKey(process.env.SENDGRID_API_KEY);
-  console.log(`📧 SendGrid configurado com email remetente: ${VERIFIED_SENDER_EMAIL}`);
-} else {
-  console.warn('⚠️ SENDGRID_API_KEY não configurado');
+// Função helper para obter cliente e email do SendGrid
+async function getSendGridClient() {
+  try {
+    const { client, fromEmail } = await getUncachableSendGridClient();
+    console.log(`📧 SendGrid cliente obtido com sucesso. Email remetente: ${fromEmail}`);
+    return { client, fromEmail };
+  } catch (error) {
+    console.warn('⚠️ SendGrid não configurado ou erro ao obter credenciais:', error);
+    return null;
+  }
 }
 
 interface NewsletterNotificationData {
@@ -25,12 +23,13 @@ interface NewsletterNotificationData {
 
 // Enviar notificação para o administrador sobre nova inscrição na newsletter
 export async function sendNewsletterNotification(data: NewsletterNotificationData): Promise<boolean> {
-  if (!mailService) {
+  const sendgrid = await getSendGridClient();
+  if (!sendgrid) {
     console.log('SendGrid não configurado. Notificação via email desabilitada.');
     return false;
   }
 
-  const fromEmail = VERIFIED_SENDER_EMAIL;
+  const { client, fromEmail } = sendgrid;
   const adminEmail = 'admin@karooma.life'; // Email do admin
 
   const categoriesText = data.categories.length > 0 
@@ -118,7 +117,7 @@ export async function sendNewsletterNotification(data: NewsletterNotificationDat
   `;
 
   try {
-    await mailService.send({
+    await client.send({
       to: adminEmail,
       from: fromEmail,
       subject: `📬 Nova inscrição newsletter: ${data.email}`,
@@ -156,10 +155,13 @@ interface EmailData {
 }
 
 export async function sendEmail(data: EmailData): Promise<boolean> {
-  if (!mailService) {
+  const sendgrid = await getSendGridClient();
+  if (!sendgrid) {
     console.log('SendGrid não configurado. Email não enviado:', data.subject);
     return false;
   }
+
+  const { client } = sendgrid;
 
   try {
     const emailData: any = {
@@ -175,7 +177,7 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
     console.log(`   De: ${data.from}`);
     console.log(`   Assunto: ${data.subject}`);
     
-    const response = await mailService.send(emailData);
+    const response = await client.send(emailData);
     
     console.log(`✅ SendGrid Response:`, JSON.stringify(response, null, 2));
     console.log(`✅ Email enviado com sucesso: ${data.subject} para ${data.to}`);
@@ -199,7 +201,18 @@ interface WelcomeEmailData {
 }
 
 export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
-  const fromEmail = VERIFIED_SENDER_EMAIL;
+  const sendgrid = await getSendGridClient();
+  if (!sendgrid) {
+    console.log('\n🎉 ===== EMAIL DE BOAS-VINDAS (SIMULADO - SendGrid não configurado) =====');
+    console.log(`📧 Para: ${data.email}`);
+    if (data.name) console.log(`👤 Nome: ${data.name}`);
+    if (data.source) console.log(`📍 Fonte: ${data.source}`);
+    console.log('📄 Conteúdo: Email HTML de boas-vindas com benefícios e CTA');
+    console.log('==============================================\n');
+    return true; // Simula sucesso para fins de teste
+  }
+
+  const { fromEmail } = sendgrid;
   
   const htmlContent = `
     <!DOCTYPE html>
@@ -360,24 +373,22 @@ export async function sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean>
     html: htmlContent
   };
 
-  if (!mailService) {
-    // Fallback logging quando SendGrid não está configurado
-    console.log('\n🎉 ===== EMAIL DE BOAS-VINDAS (SIMULADO) =====');
-    console.log(`📧 Para: ${data.email}`);
-    if (data.name) console.log(`👤 Nome: ${data.name}`);
-    if (data.source) console.log(`📍 Fonte: ${data.source}`);
-    console.log(`📝 Assunto: ${emailData.subject}`);
-    console.log('📄 Conteúdo: Email HTML de boas-vindas com benefícios e CTA');
-    console.log('==============================================\n');
-    return true; // Simula sucesso para fins de teste
-  }
-
   return await sendEmail(emailData);
 }
 
 // Email de Recuperação de Senha
 export async function sendPasswordResetEmail(email: string, token: string): Promise<boolean> {
-  const fromEmail = VERIFIED_SENDER_EMAIL;
+  const sendgrid = await getSendGridClient();
+  if (!sendgrid) {
+    console.log('\n🔐 ===== EMAIL DE RECUPERAÇÃO DE SENHA (SIMULADO - SendGrid não configurado) =====');
+    console.log(`📧 Para: ${email}`);
+    console.log(`🔗 Token: ${token}`);
+    console.log('📄 Conteúdo: Email HTML de recuperação de senha com link seguro');
+    console.log('=========================================================\n');
+    return true; // Simula sucesso para fins de teste
+  }
+
+  const { fromEmail } = sendgrid;
   
   // Usar o primeiro domínio da lista ou fallback para localhost
   const domains = process.env.REPLIT_DOMAINS || 'http://localhost:5000';
@@ -520,18 +531,6 @@ export async function sendPasswordResetEmail(email: string, token: string): Prom
     text: textContent,
     html: htmlContent
   };
-
-  if (!mailService) {
-    // Fallback logging quando SendGrid não está configurado
-    console.log('\n🔐 ===== EMAIL DE RECUPERAÇÃO DE SENHA (SIMULADO) =====');
-    console.log(`📧 Para: ${email}`);
-    console.log(`🔗 Token: ${token}`);
-    console.log(`🌐 URL de Reset: ${resetUrl}`);
-    console.log(`📝 Assunto: ${emailData.subject}`);
-    console.log('📄 Conteúdo: Email HTML de recuperação de senha com link seguro');
-    console.log('=========================================================\n');
-    return true; // Simula sucesso para fins de teste
-  }
 
   return await sendEmail(emailData);
 }

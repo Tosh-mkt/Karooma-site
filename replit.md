@@ -75,5 +75,14 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 ## Third-party Integrations
 - **LLMs**: ChatGPT, Claude, Gemini (for content generation)
 - **Media**: YouTube, Unsplash
-- **Email Service**: SendGrid (for email welcome system)
+- **Email Service**: SendGrid via Replit native integration (automated token management, newsletter notifications, welcome emails, password reset)
 - **Storage**: Google Cloud Storage
+
+## Email System Implementation
+- **Integration Type**: Replit native SendGrid connector (`getUncachableSendGridClient()`)
+- **Token Management**: Automatic token rotation and renewal
+- **Client Pattern**: Never cached - fresh client requested for each email operation
+- **Sender Email**: Automatically configured via integration settings
+- **Implementation Files**: `server/sendgridClient.ts`, `server/emailService.ts`
+- **Email Features**: Newsletter admin notifications, user welcome emails, password reset emails
+- **Fallback**: Console logging when SendGrid unavailable for development
