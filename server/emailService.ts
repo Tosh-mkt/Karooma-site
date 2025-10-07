@@ -152,6 +152,7 @@ interface EmailData {
   subject: string;
   text?: string;
   html?: string;
+  disableClickTracking?: boolean;
 }
 
 export async function sendEmail(data: EmailData): Promise<boolean> {
@@ -169,7 +170,13 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
       from: data.from,
       subject: data.subject,
       ...(data.text && { text: data.text }),
-      ...(data.html && { html: data.html })
+      ...(data.html && { html: data.html }),
+      trackingSettings: {
+        clickTracking: {
+          enable: !data.disableClickTracking,
+          enableText: false
+        }
+      }
     };
     
     console.log('\n📤 ===== ENVIANDO EMAIL VIA SENDGRID =====');
@@ -178,6 +185,7 @@ export async function sendEmail(data: EmailData): Promise<boolean> {
     console.log(`   Assunto: ${data.subject}`);
     console.log(`   Tem conteúdo HTML: ${!!data.html}`);
     console.log(`   Tem conteúdo texto: ${!!data.text}`);
+    console.log(`   Click Tracking: ${!data.disableClickTracking ? 'ATIVADO' : 'DESATIVADO'}`);
     
     const response = await client.send(emailData);
     
@@ -556,7 +564,8 @@ export async function sendPasswordResetEmail(email: string, token: string): Prom
     from: fromEmail,
     subject: "🔐 Recuperação de Senha - Karooma",
     text: textContent,
-    html: htmlContent
+    html: htmlContent,
+    disableClickTracking: true
   };
 
   return await sendEmail(emailData);
