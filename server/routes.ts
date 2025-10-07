@@ -1040,19 +1040,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Password Reset Routes
   app.post('/api/auth/request-password-reset', async (req, res) => {
+    console.log('\n🔐 ===== REQUISIÇÃO DE RECUPERAÇÃO DE SENHA =====');
+    console.log('📧 Email recebido:', req.body.email);
+    
     try {
       const { email } = requestPasswordResetSchema.parse(req.body);
+      console.log('✅ Email validado:', email);
       
       // Check if user exists
       const user = await storage.getUserByEmail(email);
       if (!user) {
+        console.log('⚠️ Usuário não encontrado para o email:', email);
         // Don't reveal if user exists or not for security
         return res.json({ message: "Se o email estiver registrado, você receberá um link de recuperação." });
       }
 
+      console.log('✅ Usuário encontrado:', user.id, user.email);
+
       // Generate reset token
       const token = crypto.randomBytes(32).toString('hex');
       const expires = new Date(Date.now() + 3600000); // 1 hour from now
+      console.log('🔑 Token gerado:', token.substring(0, 10) + '...');
 
       // Save token to database
       await db.insert(passwordResetTokens).values({
@@ -1061,16 +1069,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
         expires,
         used: false
       });
+      console.log('💾 Token salvo no banco de dados');
 
       // Send reset email
-      await sendPasswordResetEmail(user.email!, token);
+      console.log('📤 Tentando enviar email de recuperação...');
+      const emailSent = await sendPasswordResetEmail(user.email!, token);
+      console.log('📧 Resultado do envio de email:', emailSent ? 'SUCESSO ✅' : 'FALHA ❌');
 
+      console.log('✅ Processo concluído com sucesso');
+      console.log('================================================\n');
+      
       res.json({ message: "Se o email estiver registrado, você receberá um link de recuperação." });
     } catch (error) {
-      console.error('Error requesting password reset:', error);
+      console.error('❌ ERRO na recuperação de senha:', error);
       if (error instanceof z.ZodError) {
+        console.error('   Tipo: Validação de email inválida');
         return res.status(400).json({ error: 'Email inválido' });
       }
+      console.error('   Tipo: Erro interno do servidor');
       res.status(500).json({ error: 'Erro interno do servidor' });
     }
   });
