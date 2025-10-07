@@ -110,8 +110,15 @@ export default function Navigation() {
                 variant="outline"
                 size="sm"
                 className="border-gray-300 hover:bg-gray-50"
-                onClick={() => {
-                  setUser(null); // Clear user data
+                onClick={async () => {
+                  try {
+                    // Call logout API to destroy session
+                    await fetch('/api/logout', { method: 'POST' });
+                  } catch (error) {
+                    console.error('Erro ao fazer logout:', error);
+                  }
+                  // Clear user data
+                  setUser(null);
                   window.location.href = '/';
                 }}
               >
@@ -214,9 +221,16 @@ export default function Navigation() {
                     )}
                     <motion.div
                       className="flex items-center space-x-2 border-2 border-gray-300 text-gray-700 px-4 py-3 rounded-lg hover:bg-gray-50 cursor-pointer"
-                      onClick={() => {
+                      onClick={async () => {
                         setIsOpen(false);
-                        setUser(null); // Clear user data
+                        try {
+                          // Call logout API to destroy session
+                          await fetch('/api/logout', { method: 'POST' });
+                        } catch (error) {
+                          console.error('Erro ao fazer logout:', error);
+                        }
+                        // Clear user data
+                        setUser(null);
                         window.location.href = '/';
                       }}
                       whileHover={{ x: 10 }}

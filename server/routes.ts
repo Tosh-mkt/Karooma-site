@@ -979,6 +979,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Logout route - destroy session
+  app.post('/api/logout', (req: any, res) => {
+    console.log('🚪 ===== LOGOUT =====');
+    console.log('👤 Usuário antes do logout:', req.session ? (req.session as any).user : 'sem sessão');
+    
+    if (req.session) {
+      req.session.destroy((err: any) => {
+        if (err) {
+          console.error('❌ Erro ao destruir sessão:', err);
+          return res.status(500).json({ error: 'Erro ao fazer logout' });
+        }
+        console.log('✅ Sessão destruída com sucesso');
+        console.log('========================\n');
+        res.json({ message: 'Logout realizado com sucesso' });
+      });
+    } else {
+      console.log('⚠️ Nenhuma sessão ativa para destruir');
+      console.log('========================\n');
+      res.json({ message: 'Nenhuma sessão ativa' });
+    }
+  });
+
   // User registration endpoint
   app.post('/api/auth/register', async (req, res) => {
     try {
