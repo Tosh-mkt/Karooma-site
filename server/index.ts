@@ -11,6 +11,10 @@ const app = express();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
+// Trust proxy - required for secure cookies to work behind reverse proxy (Replit)
+// Use 'true' to trust all proxies in the chain (load balancer + internal routing)
+app.set('trust proxy', true);
+
 // Configure session middleware with PostgreSQL store (production-ready)
 const PgStore = connectPgSimple(session);
 app.use(session({
