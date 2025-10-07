@@ -337,10 +337,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Endpoint para carregar dados do Google Sheets
   app.post("/api/admin/load-google-sheets", extractUserInfo, async (req: any, res) => {
     try {
+      console.log('📊 ===== REQUISIÇÃO GOOGLE SHEETS =====');
+      console.log('👤 req.user:', req.user ? JSON.stringify(req.user, null, 2) : 'não disponível');
+      console.log('🔐 isAdmin (req.user.isAdmin):', req.user?.isAdmin);
+      console.log('📧 Email (req.user.email):', req.user?.email);
+      console.log('✅ isAdminEmail check:', req.user?.email ? isAdminEmail(req.user.email) : false);
+      console.log('🔑 checkIsAdmin result:', checkIsAdmin(req.user));
+      
       // Verificar se o usuário está autenticado e é admin
       if (!checkIsAdmin(req.user)) {
+        console.log('❌ ACESSO NEGADO - usuário não é admin');
+        console.log('=======================================\n');
         return res.status(403).json({ error: "Acesso negado. Somente administradores podem carregar dados." });
       }
+      
+      console.log('✅ Acesso permitido - usuário é admin');
+      console.log('=======================================\n');
 
       const { sheetsUrl, sheetName, jsonColumn } = req.body;
       
@@ -850,18 +862,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password, type } = req.body;
 
+      console.log('🔐 ===== PROCESSO DE LOGIN =====');
+      console.log('📧 Email:', email);
+      console.log('🔑 Tipo:', type);
+
       // For admin login
       if (type === 'admin') {
         // Check if email qualifies as admin
         if (!isAdminEmail(email)) {
+          console.log('❌ Email não é admin:', email);
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
+
+        console.log('✅ Email identificado como admin');
 
         // Find user by email
         let user = await storage.getUserByEmail(email);
         
+        console.log('👤 Usuário encontrado:', user ? `${user.email} (ID: ${user.id})` : 'não encontrado');
+        
         // If user doesn't exist but email is admin, we can't proceed without password
         if (!user || !user.passwordHash) {
+          console.log('❌ Usuário não existe ou sem senha');
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
         
@@ -869,13 +891,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const passwordMatch = await bcrypt.compare(password, user.passwordHash);
         
         if (!passwordMatch) {
+          console.log('❌ Senha incorreta');
           return res.status(401).json({ message: "Invalid admin credentials" });
         }
 
+        console.log('✅ Senha válida');
+
         // Ensure admin flag is set for admin emails
         if (!user.isAdmin && isAdminEmail(email)) {
+          console.log('🔧 Promovendo usuário a admin no banco de dados');
           user = await storage.makeUserAdmin(user.id);
         }
+
+        console.log('👑 Status admin do usuário:', user.isAdmin);
 
         // Set session for backend authentication
         const userData = {
@@ -885,11 +913,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           isAdmin: true // Always true for admin login type
         };
         
+        console.log('💾 Salvando dados na sessão:', JSON.stringify(userData, null, 2));
+        
         if (req.session) {
           (req.session as any).user = userData;
+          console.log('✅ Sessão salva');
+        } else {
+          console.log('⚠️ Sessão não disponível!');
         }
           
         // Login bem-sucedido
+        console.log('✅ Login admin bem-sucedido');
+        console.log('=====================================\n');
+        
         return res.json({ 
           message: "Logged in successfully", 
           user: userData,

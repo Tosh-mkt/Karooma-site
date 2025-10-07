@@ -70,6 +70,11 @@ export function requireFlipbookAccess(flipbookId: string) {
  * This should be called before requireFlipbookAccess
  */
 export function extractUserInfo(req: Request, res: Response, next: NextFunction) {
+  console.log('🔍 ===== EXTRAINDO INFO DO USUÁRIO (extractUserInfo) =====');
+  console.log('📍 URL:', req.method, req.path);
+  console.log('🔑 Session existe?', !!req.session);
+  console.log('👤 Session user:', req.session ? JSON.stringify((req.session as any).user, null, 2) : 'não disponível');
+  
   // Extract user from session (set by login)
   if (req.session && (req.session as any).user) {
     const sessionUser = (req.session as any).user;
@@ -78,6 +83,8 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
       isAdmin: sessionUser.isAdmin || false,
       id: sessionUser.id
     };
+    console.log('✅ Usuário extraído da sessão:', JSON.stringify(req.user, null, 2));
+    console.log('=========================================================\n');
     return next();
   }
 
@@ -88,6 +95,8 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
       isAdmin: true,
       id: 'admin'
     };
+    console.log('🔓 Admin override ativado (dev mode)');
+    console.log('=========================================================\n');
     return next();
   }
 
@@ -99,7 +108,11 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
       isAdmin: false,
       id: 'user_' + email.replace('@', '_').replace('.', '_')
     };
+    console.log('📧 Usuário extraído de query params:', email);
+  } else {
+    console.log('⚠️ Nenhum usuário encontrado na sessão');
   }
 
+  console.log('=========================================================\n');
   next();
 }
