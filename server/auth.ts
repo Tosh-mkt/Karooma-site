@@ -7,6 +7,7 @@ if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
 }
 
 export const authConfig = {
+  debug: true, // Enable debug logging
   trustHost: true, // Required for Replit's reverse proxy environment
   adapter: DrizzleAdapter(db),
   secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || "fallback-secret-for-development",
