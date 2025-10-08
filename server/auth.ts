@@ -47,7 +47,7 @@ export const authConfig = {
     },
   },
   session: {
-    strategy: "database",
+    strategy: "database" as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
