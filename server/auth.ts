@@ -38,15 +38,6 @@ export const authConfig = {
       }
       return session;
     },
-    async jwt({ token, user }: { token: any; user?: any }) {
-      if (user) {
-        token.id = user.id;
-        token.isAdmin = user.isAdmin || false;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
-      }
-      return token;
-    },
   },
   session: {
     strategy: "database" as const,
