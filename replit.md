@@ -87,3 +87,15 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Implementation Files**: `server/sendgridClient.ts`, `server/emailService.ts`
 - **Email Features**: Newsletter admin notifications, user welcome emails, password reset emails
 - **Fallback**: Console logging when SendGrid unavailable for development
+
+## Google OAuth Configuration
+- **Provider**: Google OAuth 2.0 via NextAuth (@auth/express)
+- **Express Mount Path**: `/api/auth/*` (no explicit basePath in authConfig)
+- **Login Route**: `/api/auth/signin/google`
+- **Callback Route**: `/api/auth/callback/google`
+- **Required Google Cloud Console Configuration**:
+  - Authorized redirect URIs: `https://karooma.life/api/auth/callback/google`
+  - Authorized JavaScript origins: `https://karooma.life`
+- **Environment Variables**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_URL` (production: `https://karooma.life`)
+- **Session Management**: NextAuth uses its own `sessions` table via Drizzle adapter (separate from Express session store)
+- **Admin Auto-Promotion**: Users with @karooma.life emails are automatically promoted to admin status on login
