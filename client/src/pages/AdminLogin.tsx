@@ -78,7 +78,7 @@ export function AdminLogin() {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = `/api/auth/google?type=admin`;
+    window.location.href = `/api/auth/signin/google`;
   };
 
   return (

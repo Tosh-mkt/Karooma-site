@@ -106,7 +106,7 @@ export function Register() {
   };
 
   const handleGoogleSignup = () => {
-    window.location.href = "/api/auth/google?type=register";
+    window.location.href = "/api/auth/signin/google";
   };
 
   return (
