@@ -3,13 +3,7 @@ import { authConfig } from "./auth"
 import type { Express } from "express"
 
 export function setupNextAuth(app: Express) {
-  // Setup NextAuth with Express - handle all auth routes
-  app.use("/api/auth/*", async (req, res, next) => {
-    try {
-      return await ExpressAuth(authConfig)(req, res, next);
-    } catch (error) {
-      console.error("[NextAuth Error]:", error);
-      next(error);
-    }
-  });
+  // Setup NextAuth with Express - use direct middleware mounting
+  // The :nextauth* param format is handled internally by ExpressAuth
+  app.use("/api/auth/*", ExpressAuth(authConfig));
 }

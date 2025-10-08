@@ -90,12 +90,12 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 
 ## Google OAuth Configuration
 - **Provider**: Google OAuth 2.0 via NextAuth (@auth/express)
-- **Express Mount Path**: `/api/auth/*` (no explicit basePath in authConfig)
-- **Login Route**: `/api/auth/signin/google`
-- **Callback Route**: `/api/auth/callback/google`
+- **Express Mount Path**: `/api/auth/*` (standard ExpressAuth middleware mounting)
+- **TrustHost**: Set to `true` for Replit's reverse proxy environment
+- **Available Routes**: `/api/auth/signin/google`, `/api/auth/callback/google`, `/api/auth/session`, `/api/auth/signout`
 - **Required Google Cloud Console Configuration**:
   - Authorized redirect URIs: `https://karooma.life/api/auth/callback/google`
   - Authorized JavaScript origins: `https://karooma.life`
-- **Environment Variables**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_URL` (production: `https://karooma.life`)
+- **Environment Variables**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET` (or `AUTH_SECRET`)
 - **Session Management**: NextAuth uses its own `sessions` table via Drizzle adapter (separate from Express session store)
 - **Admin Auto-Promotion**: Users with @karooma.life emails are automatically promoted to admin status on login
