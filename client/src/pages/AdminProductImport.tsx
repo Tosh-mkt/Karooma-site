@@ -30,6 +30,11 @@ export function AdminProductImport() {
   const [jsonPreview, setJsonPreview] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("csv");
   
+  // Estados para importação por ASIN
+  const [asinData, setAsinData] = useState("");
+  const [asinPreview, setAsinPreview] = useState<any[]>([]);
+  const [isImportingAsin, setIsImportingAsin] = useState(false);
+  
   const { toast } = useToast();
 
   const sampleCsvFormat = `Título,Descrição,Categoria,Imagem,Preço Atual,Preço Original,Link Afiliado,Avaliação,Desconto,Destaque,Avaliação Especialista,Benefícios,Tags
@@ -48,6 +53,25 @@ export function AdminProductImport() {
     designEvaluation: "Avaliação de design...",
     featured: true
   };
+
+  const sampleAsinFormat = [
+    {
+      asin: "B08N5WRWNW",
+      category: "Alimentação",
+      introduction: "Descrição introdutória do produto...",
+      nutritionistEvaluation: "Análise nutricional detalhada...",
+      organizerEvaluation: "Avaliação sobre organização e praticidade...",
+      designEvaluation: "Análise de design e usabilidade...",
+      benefits: "Benefício 1, Benefício 2, Benefício 3",
+      featured: true
+    },
+    {
+      asin: "B09ABCDEFG",
+      category: "Casa e Jardim",
+      introduction: "Outro produto...",
+      featured: false
+    }
+  ];
 
   const loadFromGoogleSheets = async () => {
     if (!sheetsUrl.trim()) {
@@ -180,12 +204,97 @@ export function AdminProductImport() {
     }
   };
 
+  const handleAsinImport = async () => {
+    if (!asinData.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, cole o JSON com os ASINs e análises.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    let parsedData;
+    try {
+      parsedData = JSON.parse(asinData);
+      if (!Array.isArray(parsedData)) {
+        throw new Error("Dados devem ser um array");
+      }
+    } catch (error) {
+      toast({
+        title: "Erro de formato",
+        description: "Os dados JSON são inválidos. Verifique a formatação.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImportingAsin(true);
+    try {
+      const response = await apiRequest("POST", "/api/admin/import-by-asin", { 
+        productsData: parsedData
+      });
+      const result = await response.json();
+
+      setImportResult(result);
+      
+      toast({
+        title: "Importação ASIN concluída!",
+        description: `${result.imported} novos produtos, ${result.updated} atualizados, ${result.failed} falharam de ${result.total} processados.`,
+      });
+
+      if (result.imported > 0 || result.updated > 0) {
+        setAsinData("");
+        setAsinPreview([]);
+      }
+
+    } catch (error: any) {
+      console.error("Erro na importação ASIN:", error);
+      toast({
+        title: "Erro na importação",
+        description: error.message || "Erro ao importar produtos por ASIN.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImportingAsin(false);
+    }
+  };
+
+  const previewAsinData = () => {
+    try {
+      const parsed = JSON.parse(asinData);
+      if (Array.isArray(parsed)) {
+        setAsinPreview(parsed.slice(0, 3));
+        toast({
+          title: "Preview gerado",
+          description: `Mostrando preview de ${Math.min(3, parsed.length)} produtos.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erro ao gerar preview",
+        description: "Verifique se o JSON está formatado corretamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const downloadSampleCSV = () => {
     const blob = new Blob([sampleCsvFormat], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = 'formato-exemplo-produtos.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const downloadSampleAsin = () => {
+    const blob = new Blob([JSON.stringify(sampleAsinFormat, null, 2)], { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'formato-asin-exemplo.json';
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -209,7 +318,7 @@ export function AdminProductImport() {
 
         {/* Tabs para métodos de importação */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="csv" className="flex items-center gap-2">
               <FileSpreadsheet className="h-4 w-4" />
               Importação CSV
@@ -217,6 +326,10 @@ export function AdminProductImport() {
             <TabsTrigger value="json" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
               Google Sheets JSON
+            </TabsTrigger>
+            <TabsTrigger value="asin" className="flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              Importar por ASIN
             </TabsTrigger>
           </TabsList>
 

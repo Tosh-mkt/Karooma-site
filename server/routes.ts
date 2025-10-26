@@ -2481,6 +2481,188 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Importação por ASIN + Análises Karooma
+  app.post("/api/admin/import-by-asin", extractUserInfo, async (req: any, res) => {
+    try {
+      // Verificar se usuário é admin
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+
+      const { productsData } = req.body;
+      
+      if (!Array.isArray(productsData) || productsData.length === 0) {
+        return res.status(400).json({ error: "productsData deve ser um array com pelo menos um produto" });
+      }
+
+      const results = {
+        total: productsData.length,
+        imported: 0,
+        updated: 0,
+        failed: 0,
+        errors: [] as string[]
+      };
+
+      for (const productInput of productsData) {
+        try {
+          const { asin, ...karoomaData } = productInput;
+
+          if (!asin) {
+            results.failed++;
+            results.errors.push(`Produto sem ASIN`);
+            continue;
+          }
+
+          // Buscar dados da Amazon PA API
+          const amazonResult = await amazonService.getProductByASIN(asin);
+
+          if (!amazonResult.success || !amazonResult.product) {
+            results.failed++;
+            results.errors.push(`ASIN ${asin}: ${amazonResult.error || 'Produto não encontrado'}`);
+            continue;
+          }
+
+          const amazonProduct = amazonResult.product;
+
+          // Verificar se já existe produto com este ASIN
+          const existingProducts = await storage.getAllProducts();
+          const existingProduct = existingProducts.find(p => p.asin === asin);
+
+          // Combinar dados da Amazon + Análises Karooma
+          const productData: any = {
+            title: amazonProduct.title,
+            description: karoomaData.description || amazonProduct.title,
+            category: karoomaData.category || 'geral',
+            imageUrl: amazonProduct.imageUrl || null,
+            currentPrice: amazonProduct.currentPrice?.toString() || null,
+            originalPrice: amazonProduct.originalPrice?.toString() || null,
+            affiliateLink: amazonProduct.productUrl,
+            rating: amazonProduct.rating?.toString() || null,
+            discount: amazonProduct.originalPrice && amazonProduct.currentPrice
+              ? Math.round(((amazonProduct.originalPrice - amazonProduct.currentPrice) / amazonProduct.originalPrice) * 100).toString()
+              : null,
+            featured: karoomaData.featured || false,
+            brand: amazonProduct.brand || null,
+            asin: asin,
+            // Análises Karooma
+            introduction: karoomaData.introduction || null,
+            nutritionistEvaluation: karoomaData.nutritionistEvaluation || null,
+            organizerEvaluation: karoomaData.organizerEvaluation || null,
+            designEvaluation: karoomaData.designEvaluation || null,
+            benefits: karoomaData.benefits || null,
+            karoomaTeamEvaluation: karoomaData.karoomaTeamEvaluation || null,
+            categoryTags: karoomaData.categoryTags || null,
+            searchTags: karoomaData.searchTags || null,
+            // Dados Amazon
+            isPrime: amazonProduct.isPrime || false,
+            reviewCount: amazonProduct.reviewCount || 0,
+            availability: amazonProduct.availability || 'available',
+            productStatus: 'active'
+          };
+
+          if (existingProduct) {
+            // Atualizar produto existente
+            await storage.updateProduct(existingProduct.id, productData);
+            results.updated++;
+          } else {
+            // Criar novo produto
+            await storage.createProduct(productData);
+            results.imported++;
+          }
+
+        } catch (error) {
+          results.failed++;
+          results.errors.push(`Erro ao processar ASIN ${productInput.asin || 'desconhecido'}: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+
+      res.json(results);
+    } catch (error) {
+      console.error("Erro na importação por ASIN:", error);
+      res.status(500).json({ error: "Erro ao importar produtos", message: String(error) });
+    }
+  });
+
+  // Sincronização em massa com Amazon
+  app.post("/api/admin/sync-products-amazon", extractUserInfo, async (req: any, res) => {
+    try {
+      // Verificar se usuário é admin
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+
+      const { productIds, syncAll = false } = req.body;
+
+      // Buscar produtos a sincronizar
+      let productsToSync;
+      if (syncAll) {
+        productsToSync = await storage.getAllProducts();
+      } else if (Array.isArray(productIds) && productIds.length > 0) {
+        const allProducts = await storage.getAllProducts();
+        productsToSync = allProducts.filter(p => productIds.includes(p.id));
+      } else {
+        return res.status(400).json({ error: "Forneça productIds ou syncAll=true" });
+      }
+
+      // Filtrar apenas produtos com ASIN
+      const productsWithASIN = productsToSync.filter(p => p.asin);
+
+      const results = {
+        total: productsWithASIN.length,
+        updated: 0,
+        failed: 0,
+        errors: [] as string[]
+      };
+
+      for (const product of productsWithASIN) {
+        try {
+          if (!product.asin) continue;
+
+          // Buscar dados atualizados da Amazon
+          const amazonResult = await amazonService.getProductByASIN(product.asin);
+
+          if (!amazonResult.success || !amazonResult.product) {
+            results.failed++;
+            results.errors.push(`${product.title} (${product.asin}): ${amazonResult.error || 'Erro ao buscar'}`);
+            continue;
+          }
+
+          const amazonProduct = amazonResult.product;
+
+          // Atualizar apenas dados da Amazon, preservando análises Karooma
+          const updateData: any = {
+            title: amazonProduct.title,
+            imageUrl: amazonProduct.imageUrl || product.imageUrl,
+            currentPrice: amazonProduct.currentPrice?.toString() || product.currentPrice,
+            originalPrice: amazonProduct.originalPrice?.toString() || product.originalPrice,
+            rating: amazonProduct.rating?.toString() || product.rating,
+            isPrime: amazonProduct.isPrime,
+            reviewCount: amazonProduct.reviewCount || 0,
+            availability: amazonProduct.availability,
+            updatedAt: new Date()
+          };
+
+          // Recalcular desconto se tiver ambos os preços
+          if (amazonProduct.originalPrice && amazonProduct.currentPrice) {
+            updateData.discount = Math.round(((amazonProduct.originalPrice - amazonProduct.currentPrice) / amazonProduct.originalPrice) * 100).toString();
+          }
+
+          await storage.updateProduct(product.id, updateData);
+          results.updated++;
+
+        } catch (error) {
+          results.failed++;
+          results.errors.push(`${product.title}: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+
+      res.json(results);
+    } catch (error) {
+      console.error("Erro na sincronização em massa:", error);
+      res.status(500).json({ error: "Erro ao sincronizar produtos", message: String(error) });
+    }
+  });
+
   // Rota para atualizar configuração de frequência de produtos
   app.put("/api/admin/products/:id/update-frequency", async (req, res) => {
     try {
