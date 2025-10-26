@@ -78,6 +78,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Media**: YouTube, Unsplash
 - **Email Service**: SendGrid via Replit native integration (automated token management, newsletter notifications, welcome emails, password reset)
 - **Storage**: Google Cloud Storage
+- **Amazon PA API**: Product Advertising API v5 for real-time product data (prices, ratings, availability, images)
 
 ## Email System Implementation
 - **Integration Type**: Replit native SendGrid connector (`getUncachableSendGridClient()`)
@@ -92,6 +93,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Provider**: Google OAuth 2.0 via NextAuth (@auth/express)
 - **Express Mount Path**: `/api/auth/*` (standard ExpressAuth middleware mounting)
 - **TrustHost**: Set to `true` for Replit's reverse proxy environment
+- **Secret**: Configured via `NEXTAUTH_SECRET` or `AUTH_SECRET` (auto-generated for development)
 - **Available Routes**: `/api/auth/signin/google`, `/api/auth/callback/google`, `/api/auth/session`, `/api/auth/signout`
 - **Required Google Cloud Console Configuration**:
   - Authorized redirect URIs: `https://karooma.life/api/auth/callback/google`
@@ -99,3 +101,26 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Environment Variables**: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `NEXTAUTH_SECRET` (or `AUTH_SECRET`)
 - **Session Management**: NextAuth uses its own `sessions` table via Drizzle adapter (separate from Express session store)
 - **Admin Auto-Promotion**: Users with @karooma.life emails are automatically promoted to admin status on login
+
+## Amazon PA API Integration
+- **API Version**: Product Advertising API v5
+- **Host**: `webservices.amazon.com`
+- **Region**: `us-east-1`
+- **Signature**: AWS Signature Version 4 using @smithy/signature-v4
+- **Environment Variables**: `AMAZON_ACCESS_KEY`, `AMAZON_SECRET_KEY`, `AMAZON_PARTNER_TAG` (karoom-20)
+- **Service Implementation**: `server/services/amazonApi.ts` (AmazonPAAPIService class)
+- **Key Features**:
+  - Real-time product data fetching by ASIN
+  - Batch processing (up to 10 ASINs per request with rate limiting)
+  - Automatic affiliate link generation with partner tag
+  - Price tracking (current and original pricing)
+  - Availability status (available, unavailable, limited)
+  - Product ratings and review counts
+  - Prime eligibility detection
+  - Category path extraction
+- **Admin Endpoints**:
+  - `/api/admin/import-by-asin`: Import products by ASIN with Karooma curator analysis (JSON format)
+  - `/api/admin/sync-products-amazon`: Bulk sync all products with ASINs to update prices, availability, ratings
+- **Import System**: Hybrid approach combining Amazon PA API data (title, price, image, rating) with Karooma curator analysis (nutritionist, organizer, design evaluations)
+- **Duplicate Handling**: ASIN-based deduplication - updates existing products or creates new ones
+- **Admin UI**: Three import tabs (CSV, Google Sheets JSON, ASIN Import) with real-time preview and "Sync with Amazon" button

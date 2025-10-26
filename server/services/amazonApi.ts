@@ -1,4 +1,7 @@
 import crypto from "crypto";
+import { SignatureV4 } from "@smithy/signature-v4";
+import { Sha256 } from "@aws-crypto/sha256-js";
+import { HttpRequest } from "@smithy/protocol-http";
 
 // Interface para configuração da PA API
 interface AmazonPAAPIConfig {
@@ -235,58 +238,63 @@ export class AmazonPAAPIService {
   }
 
   /**
-   * Faz request para a PA API com assinatura
+   * Faz request para a PA API com assinatura AWS4
    */
   private async makeApiRequest(operation: string, payload: any): Promise<any> {
-    const timestamp = new Date().toISOString();
     const host = this.config.host;
+    const region = this.config.region;
     const path = '/paapi5/getitems';
-    
-    const headers = {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Host': host,
-      'X-Amz-Date': timestamp,
-      'X-Amz-Target': `com.amazon.paapi5.v1.ProductAdvertisingAPIv1.${operation}`
-    };
-
     const body = JSON.stringify(payload);
-    
-    // Aqui você implementaria a assinatura AWS4
-    // Por simplicidade, estou retornando um mock - você precisará implementar a assinatura real
-    console.log('Amazon PA API Request:', { operation, payload, headers });
-    
-    // MOCK RESPONSE - Substitua pela implementação real
-    return this.getMockResponse(payload.ItemIds[0]);
-  }
 
-  /**
-   * Mock response para desenvolvimento
-   */
-  private getMockResponse(asin: string): any {
-    return {
-      ItemsResult: {
-        Items: [{
-          ItemInfo: {
-            Title: { DisplayValue: `Produto Mock ${asin}` },
-            ByLineInfo: { Brand: { DisplayValue: 'Marca Exemplo' } }
-          },
-          Images: {
-            Primary: { Medium: { URL: 'https://via.placeholder.com/300x300' } }
-          },
-          Offers: {
-            Listings: [{
-              Price: { Amount: 5999 }, // $59.99 em centavos
-              DeliveryInfo: { IsPrimeEligible: true },
-              Availability: { MaxOrderQuantity: 30 }
-            }]
-          },
-          CustomerReviews: {
-            StarRating: { Value: 4.5 },
-            Count: 123
-          }
-        }]
+    // Create HttpRequest for signing
+    const request = new HttpRequest({
+      method: 'POST',
+      protocol: 'https:',
+      hostname: host,
+      path: path,
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Content-Encoding': 'amz-1.0',
+        'Host': host,
+        'X-Amz-Target': `com.amazon.paapi5.v1.ProductAdvertisingAPIv1.${operation}`
+      },
+      body: body
+    });
+
+    // Sign the request with AWS Signature V4
+    const signer = new SignatureV4({
+      credentials: {
+        accessKeyId: this.config.accessKey,
+        secretAccessKey: this.config.secretKey
+      },
+      region: region,
+      service: 'ProductAdvertisingAPI',
+      sha256: Sha256
+    });
+
+    try {
+      const signedRequest = await signer.sign(request);
+
+      // Make the actual HTTP request
+      const url = `https://${host}${path}`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: signedRequest.headers as Record<string, string>,
+        body: body
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Amazon PA API error: ${response.status} - ${errorText}`);
       }
-    };
+
+      const data = await response.json();
+      return data;
+
+    } catch (error) {
+      console.error('Error making Amazon PA API request:', error);
+      throw error;
+    }
   }
 
   /**

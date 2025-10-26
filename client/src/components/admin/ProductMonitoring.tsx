@@ -52,6 +52,8 @@ interface MonitoringStatus {
 
 export function ProductMonitoring() {
   const [selectedFrequency, setSelectedFrequency] = useState<'high' | 'medium' | 'low' | undefined>();
+  const [syncProgress, setSyncProgress] = useState<{total: number, current: number, updated: number, failed: number} | null>(null);
+  const [isSyncing, setIsSyncing] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -94,6 +96,43 @@ export function ProductMonitoring() {
     },
   });
 
+  // Função para sincronização em massa com Amazon
+  const syncAllProductsWithAmazon = async () => {
+    setIsSyncing(true);
+    setSyncProgress({ total: 0, current: 0, updated: 0, failed: 0 });
+
+    try {
+      const response = await apiRequest('POST', '/api/admin/sync-products-amazon', {});
+      const result = await response.json();
+
+      setSyncProgress({
+        total: result.total,
+        current: result.total,
+        updated: result.updated,
+        failed: result.failed
+      });
+
+      toast({
+        title: "Sincronização concluída",
+        description: `${result.updated} produtos atualizados com sucesso, ${result.failed} falharam.`,
+      });
+
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/products'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/products/by-status/active'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/products/by-status/inactive'] });
+
+    } catch (error: any) {
+      toast({
+        title: "Erro na sincronização",
+        description: error.message || "Erro ao sincronizar produtos com Amazon",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSyncing(false);
+      setTimeout(() => setSyncProgress(null), 5000);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -128,7 +167,22 @@ export function ProductMonitoring() {
             <span className="text-xs md:text-sm">Atualizar</span>
           </Button>
           <Button
-            onClick={() => runUpdateMutation.mutate()}
+            variant="outline"
+            size="sm"
+            onClick={syncAllProductsWithAmazon}
+            disabled={isSyncing || !monitoringStatus?.apiConfigured}
+            className="w-full sm:w-auto border-blue-600 text-blue-600 hover:bg-blue-50"
+            data-testid="button-sync-amazon"
+          >
+            {isSyncing ? (
+              <RefreshCw className="w-3 h-3 md:w-4 md:h-4 mr-2 animate-spin" />
+            ) : (
+              <Database className="w-3 h-3 md:w-4 md:h-4 mr-2" />
+            )}
+            <span className="text-xs md:text-sm">Sincronizar com Amazon</span>
+          </Button>
+          <Button
+            onClick={() => runUpdateMutation.mutate(undefined)}
             disabled={runUpdateMutation.isPending}
             className="bg-gradient-to-r from-purple-600 to-pink-600 w-full sm:w-auto"
             size="sm"
@@ -227,6 +281,46 @@ export function ProductMonitoring() {
             Configure as credenciais da PA API para habilitar as atualizações automáticas de produtos.
           </AlertDescription>
         </Alert>
+      )}
+
+      {/* Progresso da Sincronização */}
+      {syncProgress && (
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-blue-900">
+              <Database className="w-5 h-5 animate-pulse" />
+              Sincronizando com Amazon PA API
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Progresso</span>
+                <span className="font-medium">
+                  {syncProgress.current} / {syncProgress.total} produtos
+                </span>
+              </div>
+              <Progress 
+                value={syncProgress.total > 0 ? (syncProgress.current / syncProgress.total) * 100 : 0} 
+                className="h-2"
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-green-600">{syncProgress.updated}</p>
+                <p className="text-xs text-gray-600">Atualizados</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-blue-600">{syncProgress.current}</p>
+                <p className="text-xs text-gray-600">Processados</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-red-600">{syncProgress.failed}</p>
+                <p className="text-xs text-gray-600">Falharam</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       <Tabs defaultValue="jobs" className="w-full">
