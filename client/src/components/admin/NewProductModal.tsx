@@ -801,7 +801,7 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="csv" className="flex items-center gap-2">
                   <FileSpreadsheet className="w-4 h-4" />
                   Importação CSV
@@ -809,6 +809,10 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
                 <TabsTrigger value="sheets" className="flex items-center gap-2">
                   <Database className="w-4 h-4" />
                   Google Sheets JSON
+                </TabsTrigger>
+                <TabsTrigger value="asin" className="flex items-center gap-2">
+                  <ExternalLink className="w-4 h-4" />
+                  Importar por ASIN
                 </TabsTrigger>
               </TabsList>
 
@@ -1006,6 +1010,95 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
                         </div>
                       )}
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="asin" className="space-y-6">
+                <Card className="glassmorphism border-0">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h4 className="font-semibold mb-2 text-blue-900">🚀 Como funciona:</h4>
+                      <ol className="text-sm text-blue-800 space-y-1">
+                        <li>1. Você fornece o <strong>ASIN</strong> + suas <strong>análises Karooma</strong> em formato JSON</li>
+                        <li>2. O sistema busca automaticamente na <strong>Amazon PA API</strong>: título, preço, imagem, rating</li>
+                        <li>3. Combina dados técnicos da Amazon com sua curadoria Karooma</li>
+                        <li>4. Se o ASIN já existe: <strong>atualiza</strong>. Se não existe: <strong>cria</strong> novo produto</li>
+                      </ol>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="asin-data">Cole o JSON com ASINs e Análises:</Label>
+                      <Textarea
+                        id="asin-data"
+                        placeholder='[
+  {
+    "asin": "B08N5WRWNW",
+    "category": "Alimentação",
+    "introduction": "Descrição introdutória...",
+    "nutritionistEvaluation": "Análise nutricional...",
+    "organizerEvaluation": "Avaliação de organização...",
+    "designEvaluation": "Análise de design...",
+    "benefits": "Benefício 1, Benefício 2",
+    "featured": true
+  }
+]'
+                        value={asinData}
+                        onChange={(e) => {
+                          setAsinData(e.target.value);
+                          try {
+                            const parsed = JSON.parse(e.target.value);
+                            if (Array.isArray(parsed)) {
+                              setAsinPreview(parsed.slice(0, 3));
+                            }
+                          } catch (error) {
+                            setAsinPreview([]);
+                          }
+                        }}
+                        className="min-h-[250px] font-mono text-xs"
+                      />
+                    </div>
+
+                    {asinPreview.length > 0 && (
+                      <Alert>
+                        <CheckCircle className="h-4 w-4" />
+                        <AlertDescription>
+                          <strong>Preview:</strong> {asinPreview.length} produtos detectados no JSON.
+                          <div className="mt-2 space-y-1">
+                            {asinPreview.map((product, index) => (
+                              <div key={index} className="text-sm bg-gray-100 p-2 rounded">
+                                <strong>ASIN:</strong> {product.asin} | <strong>Categoria:</strong> {product.category || 'N/A'}
+                              </div>
+                            ))}
+                          </div>
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    <Alert variant="default" className="bg-yellow-50 border-yellow-200">
+                      <AlertCircle className="h-4 w-4 text-yellow-600" />
+                      <AlertDescription className="text-yellow-800">
+                        <strong>Nota importante:</strong> Enquanto isso, a importação por ASIN ainda funciona para importar produtos novos - o sistema está bloqueado em massa que está esperando o bloqueio da Amazon expirar.
+                      </AlertDescription>
+                    </Alert>
+
+                    <Button
+                      onClick={handleAsinImport}
+                      disabled={isImportingAsin || !asinData.trim()}
+                      className="w-full bg-gradient-to-r from-purple-600 to-pink-600"
+                    >
+                      {isImportingAsin ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Importando via Amazon PA API...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <ExternalLink className="w-4 h-4" />
+                          Importar por ASIN
+                        </div>
+                      )}
+                    </Button>
                   </CardContent>
                 </Card>
               </TabsContent>
