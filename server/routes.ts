@@ -2614,7 +2614,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         errors: [] as string[]
       };
 
-      for (const product of productsWithASIN) {
+      for (let i = 0; i < productsWithASIN.length; i++) {
+        const product = productsWithASIN[i];
+        
         try {
           if (!product.asin) continue;
 
@@ -2653,6 +2655,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         } catch (error) {
           results.failed++;
           results.errors.push(`${product.title}: ${error instanceof Error ? error.message : String(error)}`);
+        }
+
+        // Rate limiting: aguardar 1.5 segundos entre requisições para evitar erro 429
+        // Amazon PA API tem limite de ~1 req/seg para contas novas
+        if (i < productsWithASIN.length - 1) {
+          await new Promise(resolve => setTimeout(resolve, 1500));
         }
       }
 
