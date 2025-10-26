@@ -63,6 +63,11 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
   const [overwrite, setOverwrite] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [importResult, setImportResult] = useState<any>(null);
+  
+  // ASIN Import states
+  const [asinData, setAsinData] = useState("");
+  const [asinPreview, setAsinPreview] = useState<any[]>([]);
+  const [isImportingAsin, setIsImportingAsin] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -266,6 +271,62 @@ export function NewProductModal({ open, onOpenChange }: NewProductModalProps) {
       });
     } finally {
       setIsLoadingSheets(false);
+    }
+  };
+
+  const handleAsinImport = async () => {
+    if (!asinData.trim()) {
+      toast({
+        title: "Erro",
+        description: "Por favor, cole o JSON com os ASINs e análises.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    let parsedData;
+    try {
+      parsedData = JSON.parse(asinData);
+      if (!Array.isArray(parsedData)) {
+        throw new Error("JSON deve ser um array de produtos");
+      }
+    } catch (error) {
+      toast({
+        title: "Erro de formato",
+        description: "JSON inválido. Deve ser um array de objetos com ASIN e análises.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsImportingAsin(true);
+    try {
+      const response = await apiRequest("POST", "/api/admin/import-by-asin", { 
+        products: parsedData 
+      });
+      const result = await response.json();
+
+      toast({
+        title: "Importação ASIN concluída!",
+        description: `${result.created} produtos criados, ${result.updated} atualizados de ${result.total} processados.`,
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/products'] });
+      
+      setTimeout(() => {
+        onOpenChange(false);
+        setMode("choice");
+        setAsinData("");
+        setAsinPreview([]);
+      }, 2000);
+    } catch (error: any) {
+      console.error("Erro na importação ASIN:", error);
+      toast({
+        title: "Erro na importação",
+        description: error.message || "Erro ao importar produtos por ASIN.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImportingAsin(false);
     }
   };
 
