@@ -628,6 +628,134 @@ export function AdminProductImport() {
               </Card>
             )}
           </TabsContent>
+
+          {/* Tab ASIN - Nova funcionalidade */}
+          <TabsContent value="asin" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ExternalLink className="h-5 w-5" />
+                  Importação por ASIN + Análises Karooma
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-semibold mb-2 text-blue-900">🚀 Como funciona:</h4>
+                  <ol className="text-sm text-blue-800 space-y-1">
+                    <li>1. Você fornece o <strong>ASIN</strong> + suas <strong>análises Karooma</strong> em formato JSON</li>
+                    <li>2. O sistema busca automaticamente na <strong>Amazon PA API</strong>: título, preço, imagem, rating</li>
+                    <li>3. Combina dados técnicos da Amazon com sua curadoria Karooma</li>
+                    <li>4. Se o ASIN já existe: <strong>atualiza</strong>. Se não existe: <strong>cria</strong> novo produto</li>
+                  </ol>
+                </div>
+
+                <Separator />
+
+                <div>
+                  <h4 className="font-semibold mb-2">📋 Formato JSON:</h4>
+                  <div className="bg-gray-50 p-3 rounded font-mono text-xs overflow-x-auto">
+                    <pre>{JSON.stringify(sampleAsinFormat, null, 2)}</pre>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={downloadSampleAsin}
+                    className="flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Baixar formato de exemplo
+                  </Button>
+                  <Badge variant="secondary">JSON com ASIN + Análises</Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  Cole o JSON com ASINs e Análises
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Textarea
+                  placeholder={`Cole aqui o JSON com ASINs e análises...
+
+Exemplo:
+[
+  {
+    "asin": "B08N5WRWNW",
+    "category": "Alimentação",
+    "introduction": "Descrição do produto...",
+    "nutritionistEvaluation": "Análise nutricional...",
+    "organizerEvaluation": "Análise de organização...",
+    "designEvaluation": "Análise de design...",
+    "featured": true
+  }
+]`}
+                  value={asinData}
+                  onChange={(e) => setAsinData(e.target.value)}
+                  className="min-h-[300px] font-mono text-sm"
+                  data-testid="textarea-asin-data"
+                />
+
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={previewAsinData}
+                    disabled={!asinData.trim()}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Gerar Preview
+                  </Button>
+                </div>
+
+                {asinPreview.length > 0 && (
+                  <div className="border-t pt-4">
+                    <h4 className="font-semibold mb-2">Preview dos produtos:</h4>
+                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                      {asinPreview.map((product, index) => (
+                        <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                          <Badge variant="secondary">ASIN: {product.asin}</Badge>
+                          <Badge variant="outline">{product.category || 'Geral'}</Badge>
+                          {product.featured && <Badge variant="default">Destaque</Badge>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    <strong>Verificação automática de duplicatas:</strong> Se um produto com o mesmo ASIN já existir, 
+                    ele será atualizado. Caso contrário, será criado um novo produto.
+                  </AlertDescription>
+                </Alert>
+
+                <Button 
+                  onClick={handleAsinImport}
+                  disabled={!asinData.trim() || isImportingAsin}
+                  className="w-full"
+                  data-testid="button-import-asin"
+                >
+                  {isImportingAsin ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Buscando na Amazon e Importando...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Importar por ASIN
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         {/* Resultado da importação */}
