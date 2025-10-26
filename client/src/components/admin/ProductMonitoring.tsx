@@ -102,7 +102,9 @@ export function ProductMonitoring() {
     setSyncProgress({ total: 0, current: 0, updated: 0, failed: 0 });
 
     try {
-      const response = await apiRequest('POST', '/api/admin/sync-products-amazon', {});
+      const response = await apiRequest('POST', '/api/admin/sync-products-amazon', { 
+        syncAll: true 
+      });
       const result = await response.json();
 
       setSyncProgress({
