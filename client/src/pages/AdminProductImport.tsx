@@ -640,12 +640,12 @@ export function AdminProductImport() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-semibold mb-2 text-blue-900">🚀 Como funciona:</h4>
+                  <h4 className="font-semibold mb-2 text-blue-900">🚀 Importação Rápida por ASIN:</h4>
                   <ol className="text-sm text-blue-800 space-y-1">
-                    <li>1. Você fornece o <strong>ASIN</strong> + suas <strong>análises Karooma</strong> em formato JSON</li>
-                    <li>2. O sistema busca automaticamente na <strong>Amazon PA API</strong>: título, preço, imagem, rating</li>
-                    <li>3. Combina dados técnicos da Amazon com sua curadoria Karooma</li>
-                    <li>4. Se o ASIN já existe: <strong>atualiza</strong>. Se não existe: <strong>cria</strong> novo produto</li>
+                    <li>✅ <strong>Formato Simples:</strong> Você pode colar apenas uma lista de ASINs (ou ASINs + categoria)</li>
+                    <li>✅ <strong>Análises Opcionais:</strong> Adicione nutritionistEvaluation, designEvaluation, etc. depois se quiser</li>
+                    <li>🤖 O sistema busca automaticamente: <strong>título, preço, imagem, rating</strong> da Amazon PA API</li>
+                    <li>📦 Se o ASIN já existe: <strong>atualiza</strong>. Se não existe: <strong>cria</strong> novo produto</li>
                   </ol>
                 </div>
 
@@ -681,14 +681,19 @@ export function AdminProductImport() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <Textarea
-                  placeholder={`Cole aqui o JSON com ASINs e análises...
+                  placeholder={`FORMATO SIMPLES (só ASIN + categoria opcional):
+[
+  { "asin": "B08N5WRWNW", "category": "Alimentação" },
+  { "asin": "B09ABCDEFG", "category": "Casa e Jardim" },
+  { "asin": "B07XYZ1234" }
+]
 
-Exemplo:
+FORMATO COMPLETO (com análises Karooma):
 [
   {
     "asin": "B08N5WRWNW",
     "category": "Alimentação",
-    "introduction": "Descrição do produto...",
+    "introduction": "Descrição...",
     "nutritionistEvaluation": "Análise nutricional...",
     "organizerEvaluation": "Análise de organização...",
     "designEvaluation": "Análise de design...",
