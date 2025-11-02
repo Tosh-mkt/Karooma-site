@@ -671,6 +671,27 @@ export const notificationSubscriptions = pgTable("notification_subscriptions", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// User alerts for price drops and promotions
+export const userAlerts = pgTable("user_alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  type: varchar("type", { length: 20 }).notNull(), // 'product' or 'category'
+  productId: varchar("product_id").references(() => products.id, { onDelete: "cascade" }),
+  category: text("category"), // Category name for category-based alerts
+  minDiscountPercent: integer("min_discount_percent").default(20), // Minimum discount % to trigger
+  notifyEmail: boolean("notify_email").default(true),
+  notifyPush: boolean("notify_push").default(true),
+  isActive: boolean("is_active").default(true),
+  lastChecked: timestamp("last_checked"),
+  lastNotified: timestamp("last_notified"), // When last notification was sent
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_user_alerts_user_id").on(table.userId),
+  index("idx_user_alerts_type").on(table.type),
+  index("idx_user_alerts_active").on(table.isActive),
+]);
+
 // Zod schemas for automation system
 export const insertAutomationJobSchema = createInsertSchema(automationJobs).omit({
   id: true,
@@ -690,12 +711,22 @@ export const insertNotificationSubscriptionSchema = createInsertSchema(notificat
   updatedAt: true,
 });
 
+export const insertUserAlertSchema = createInsertSchema(userAlerts).omit({
+  id: true,
+  lastChecked: true,
+  lastNotified: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertAutomationJob = z.infer<typeof insertAutomationJobSchema>;
 export type SelectAutomationJob = typeof automationJobs.$inferSelect;
 export type InsertAutomationProgress = z.infer<typeof insertAutomationProgressSchema>;
 export type SelectAutomationProgress = typeof automationProgress.$inferSelect;
 export type InsertNotificationSubscription = z.infer<typeof insertNotificationSubscriptionSchema>;
 export type SelectNotificationSubscription = typeof notificationSubscriptions.$inferSelect;
+export type InsertUserAlert = z.infer<typeof insertUserAlertSchema>;
+export type SelectUserAlert = typeof userAlerts.$inferSelect;
 
 // Password reset token schemas
 export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({
