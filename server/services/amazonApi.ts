@@ -37,6 +37,26 @@ interface PAAPIResponse {
   timestamp: Date;
 }
 
+// Interface para parâmetros de busca (SearchItems)
+interface SearchItemsParams {
+  keywords?: string;
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  minDiscountPercent?: number;
+  sortBy?: 'Price:LowToHigh' | 'Price:HighToLow' | 'Featured' | 'Relevance';
+  itemCount?: number;
+}
+
+// Interface para resposta de busca
+interface SearchItemsResponse {
+  success: boolean;
+  products?: AmazonProduct[];
+  totalResults?: number;
+  error?: string;
+  timestamp: Date;
+}
+
 export class AmazonPAAPIService {
   private config: AmazonPAAPIConfig;
 
@@ -158,6 +178,127 @@ export class AmazonPAAPIService {
   }
 
   /**
+   * Busca produtos por palavras-chave e filtros (SearchItems)
+   */
+  async searchItems(params: SearchItemsParams): Promise<SearchItemsResponse> {
+    if (!this.isConfigured()) {
+      return {
+        success: false,
+        error: 'Amazon PA API not configured',
+        timestamp: new Date()
+      };
+    }
+
+    try {
+      const requestPayload: any = {
+        Keywords: params.keywords || '',
+        Resources: [
+          "Images.Primary.Medium",
+          "ItemInfo.Title",
+          "ItemInfo.ByLineInfo.Brand",
+          "Offers.Listings.Price",
+          "Offers.Listings.SavingBasis",
+          "Offers.Listings.Savings",
+          "Offers.Listings.DeliveryInfo.IsPrimeEligible",
+          "Offers.Listings.Availability.MaxOrderQuantity",
+          "Offers.Listings.Availability.Message",
+          "CustomerReviews.Count",
+          "CustomerReviews.StarRating",
+          "BrowseNodeInfo.BrowseNodes"
+        ],
+        PartnerTag: this.config.partnerTag,
+        PartnerType: "Associates",
+        Marketplace: "www.amazon.com",
+        ItemCount: params.itemCount || 10
+      };
+
+      // Adicionar categoria (SearchIndex) se fornecida
+      if (params.category) {
+        requestPayload.SearchIndex = this.mapCategoryToSearchIndex(params.category);
+      }
+
+      // Adicionar filtros de preço
+      if (params.minPrice) {
+        requestPayload.MinPrice = Math.round(params.minPrice * 100); // Converter para centavos
+      }
+      if (params.maxPrice) {
+        requestPayload.MaxPrice = Math.round(params.maxPrice * 100);
+      }
+
+      // Adicionar ordenação
+      if (params.sortBy) {
+        requestPayload.SortBy = params.sortBy;
+      }
+
+      const response = await this.makeApiRequest('SearchItems', requestPayload);
+      
+      if (response.SearchResult && response.SearchResult.Items && response.SearchResult.Items.length > 0) {
+        const products = response.SearchResult.Items.map((item: any) => {
+          const asin = item.ASIN;
+          return this.mapAmazonItemToProduct(item, asin);
+        });
+
+        // Filtrar por desconto mínimo se especificado
+        let filteredProducts = products;
+        if (params.minDiscountPercent) {
+          filteredProducts = products.filter((product: AmazonProduct) => {
+            if (product.currentPrice && product.originalPrice) {
+              const discount = Math.round(((product.originalPrice - product.currentPrice) / product.originalPrice) * 100);
+              return discount >= (params.minDiscountPercent || 0);
+            }
+            return false;
+          });
+        }
+        
+        return {
+          success: true,
+          products: filteredProducts,
+          totalResults: response.SearchResult.TotalResultCount || filteredProducts.length,
+          timestamp: new Date()
+        };
+      } else {
+        return {
+          success: false,
+          error: 'No products found',
+          timestamp: new Date()
+        };
+      }
+    } catch (error) {
+      console.error('Amazon PA API SearchItems error:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown search error',
+        timestamp: new Date()
+      };
+    }
+  }
+
+  /**
+   * Mapeia nossas categorias para SearchIndex da Amazon
+   */
+  private mapCategoryToSearchIndex(category: string): string {
+    const categoryMap: Record<string, string> = {
+      'alimentação': 'Grocery',
+      'bebê': 'Baby',
+      'brinquedos': 'ToysAndGames',
+      'casa': 'HomeAndKitchen',
+      'cozinha': 'HomeAndKitchen',
+      'eletrônicos': 'Electronics',
+      'beleza': 'Beauty',
+      'moda': 'Fashion',
+      'esportes': 'SportsAndOutdoors',
+      'livros': 'Books',
+      'saúde': 'HealthPersonalCare',
+      'jardim': 'LawnAndGarden',
+      'pet': 'PetSupplies',
+      'escritório': 'OfficeProducts'
+    };
+
+    const categoryLower = category.toLowerCase();
+    return categoryMap[categoryLower] || 'All';
+  }
+
+  /**
    * Mapeia item da Amazon para nossa interface de produto
    */
   private mapAmazonItemToProduct(item: any, asin: string): AmazonProduct {
@@ -243,7 +384,13 @@ export class AmazonPAAPIService {
   private async makeApiRequest(operation: string, payload: any): Promise<any> {
     const host = this.config.host;
     const region = this.config.region;
-    const path = '/paapi5/getitems';
+    
+    // Determinar o path correto baseado na operação
+    const pathMap: Record<string, string> = {
+      'GetItems': '/paapi5/getitems',
+      'SearchItems': '/paapi5/searchitems'
+    };
+    const path = pathMap[operation] || '/paapi5/getitems';
     const body = JSON.stringify(payload);
 
     // Create HttpRequest for signing
