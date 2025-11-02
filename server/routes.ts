@@ -3194,6 +3194,113 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User Alerts Routes
+  app.get("/api/alerts", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const alerts = await storage.getUserAlerts(req.user.id);
+      
+      // Enrich alerts with product information
+      const enrichedAlerts = await Promise.all(alerts.map(async (alert) => {
+        if (alert.type === 'product' && alert.productId) {
+          const product = await storage.getProduct(alert.productId);
+          return { ...alert, product };
+        }
+        return alert;
+      }));
+
+      res.json(enrichedAlerts);
+    } catch (error) {
+      console.error("Erro ao buscar alertas:", error);
+      res.status(500).json({ error: "Erro ao buscar alertas" });
+    }
+  });
+
+  app.post("/api/alerts", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const { type, productId, category, minDiscountPercent, notifyEmail, notifyPush } = req.body;
+
+      // Validação básica
+      if (!type || (type !== 'product' && type !== 'category')) {
+        return res.status(400).json({ error: "Tipo de alerta inválido" });
+      }
+
+      if (type === 'product' && !productId) {
+        return res.status(400).json({ error: "productId é obrigatório para alertas de produto" });
+      }
+
+      if (type === 'category' && !category) {
+        return res.status(400).json({ error: "category é obrigatório para alertas de categoria" });
+      }
+
+      // Verificar se já existe alerta similar
+      const existingAlerts = await storage.getUserAlerts(req.user.id);
+      const duplicate = existingAlerts.find(alert => 
+        alert.type === type && 
+        (type === 'product' ? alert.productId === productId : alert.category === category)
+      );
+
+      if (duplicate) {
+        return res.status(400).json({ error: "Você já possui um alerta para este item" });
+      }
+
+      const alert = await storage.createUserAlert({
+        userId: req.user.id,
+        type,
+        productId: productId || null,
+        category: category || null,
+        minDiscountPercent: minDiscountPercent || 20,
+        notifyEmail: notifyEmail !== false,
+        notifyPush: notifyPush !== false,
+        isActive: true
+      });
+
+      res.json(alert);
+    } catch (error) {
+      console.error("Erro ao criar alerta:", error);
+      res.status(500).json({ error: "Erro ao criar alerta" });
+    }
+  });
+
+  app.patch("/api/alerts/:id", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const { id } = req.params;
+      const updates = req.body;
+
+      const alert = await storage.updateUserAlert(id, req.user.id, updates);
+      res.json(alert);
+    } catch (error) {
+      console.error("Erro ao atualizar alerta:", error);
+      res.status(500).json({ error: "Erro ao atualizar alerta" });
+    }
+  });
+
+  app.delete("/api/alerts/:id", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const { id } = req.params;
+      await storage.deleteUserAlert(id, req.user.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro ao deletar alerta:", error);
+      res.status(500).json({ error: "Erro ao deletar alerta" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -22,6 +22,8 @@ import {
   type InsertTaxonomy,
   type ProductTaxonomy,
   type InsertProductTaxonomy,
+  type SelectUserAlert,
+  type InsertUserAlert,
   users,
   content,
   products,
@@ -35,6 +37,7 @@ import {
   cookieConsents,
   taxonomies,
   productTaxonomies,
+  userAlerts,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -95,6 +98,15 @@ export interface IStorage {
   addToFavorites(userId: string, productId: string): Promise<Favorite>;
   removeFromFavorites(userId: string, productId: string): Promise<void>;
   isFavorite(userId: string, productId: string): Promise<boolean>;
+  
+  // User Alerts methods
+  getUserAlerts(userId: string): Promise<any[]>;
+  createUserAlert(data: any): Promise<any>;
+  deleteUserAlert(alertId: string, userId: string): Promise<void>;
+  updateUserAlert(alertId: string, userId: string, data: any): Promise<any>;
+  getActiveAlerts(): Promise<any[]>;
+  updateAlertLastChecked(alertId: string): Promise<void>;
+  updateAlertLastNotified(alertId: string): Promise<void>;
   
   // Pages methods
   getAllPages(): Promise<Page[]>;
@@ -1590,6 +1602,78 @@ export class DatabaseStorage implements IStorage {
       .where(eq(automationWorkflows.id, id))
       .returning();
     return results[0];
+  }
+
+  // User Alerts methods
+  async getUserAlerts(userId: string): Promise<SelectUserAlert[]> {
+    const alerts = await db
+      .select()
+      .from(userAlerts)
+      .where(eq(userAlerts.userId, userId))
+      .orderBy(desc(userAlerts.createdAt));
+    
+    return alerts;
+  }
+
+  async createUserAlert(data: InsertUserAlert): Promise<SelectUserAlert> {
+    const [alert] = await db
+      .insert(userAlerts)
+      .values({
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    return alert;
+  }
+
+  async deleteUserAlert(alertId: string, userId: string): Promise<void> {
+    await db
+      .delete(userAlerts)
+      .where(
+        and(
+          eq(userAlerts.id, alertId),
+          eq(userAlerts.userId, userId)
+        )
+      );
+  }
+
+  async updateUserAlert(alertId: string, userId: string, data: Partial<InsertUserAlert>): Promise<SelectUserAlert> {
+    const [alert] = await db
+      .update(userAlerts)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(
+        and(
+          eq(userAlerts.id, alertId),
+          eq(userAlerts.userId, userId)
+        )
+      )
+      .returning();
+    return alert;
+  }
+
+  async getActiveAlerts(): Promise<SelectUserAlert[]> {
+    return await db
+      .select()
+      .from(userAlerts)
+      .where(eq(userAlerts.isActive, true));
+  }
+
+  async updateAlertLastChecked(alertId: string): Promise<void> {
+    await db
+      .update(userAlerts)
+      .set({ lastChecked: new Date() })
+      .where(eq(userAlerts.id, alertId));
+  }
+
+  async updateAlertLastNotified(alertId: string): Promise<void> {
+    await db
+      .update(userAlerts)
+      .set({ lastNotified: new Date() })
+      .where(eq(userAlerts.id, alertId));
   }
 }
 
