@@ -570,3 +570,144 @@ export async function sendPasswordResetEmail(email: string, token: string): Prom
 
   return await sendEmail(emailData);
 }
+
+interface PriceAlertData {
+  email: string;
+  name: string;
+  productTitle: string;
+  currentPrice?: number;
+  originalPrice?: number;
+  discountPercent: number;
+  productUrl: string;
+  imageUrl?: string;
+  alertType: 'product' | 'category';
+}
+
+export async function sendPriceAlertEmail(data: PriceAlertData): Promise<boolean> {
+  const sendgrid = await getSendGridClient();
+  if (!sendgrid) {
+    console.log('SendGrid não configurado. Email de alerta desabilitado.');
+    return false;
+  }
+
+  const { client, fromEmail } = sendgrid;
+
+  const priceText = data.currentPrice 
+    ? `R$ ${data.currentPrice.toFixed(2)}` 
+    : 'Preço não disponível';
+  
+  const originalPriceText = data.originalPrice 
+    ? `R$ ${data.originalPrice.toFixed(2)}` 
+    : '';
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>Alerta de Promoção - Karooma</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; padding: 32px 24px; text-align: center; }
+        .header h1 { margin: 0 0 8px 0; font-size: 32px; font-weight: 700; }
+        .discount-badge { display: inline-block; background: #fef3c7; color: #92400e; padding: 8px 16px; border-radius: 20px; font-size: 20px; font-weight: 700; margin-top: 8px; }
+        .product-section { padding: 24px; }
+        .product-image { width: 100%; max-width: 300px; height: auto; border-radius: 8px; margin: 0 auto 16px; display: block; }
+        .product-title { font-size: 20px; font-weight: 600; color: #111827; margin-bottom: 16px; line-height: 1.4; }
+        .price-section { background: #f3f4f6; padding: 16px; border-radius: 8px; margin: 16px 0; }
+        .original-price { text-decoration: line-through; color: #9ca3af; font-size: 16px; }
+        .current-price { font-size: 32px; font-weight: 700; color: #059669; margin: 8px 0; }
+        .savings { color: #dc2626; font-weight: 600; font-size: 18px; }
+        .cta-button { display: block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-align: center; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 18px; margin: 24px 0; }
+        .cta-button:hover { opacity: 0.9; }
+        .alert-type { background: #dbeafe; color: #1e40af; padding: 8px 16px; border-radius: 6px; display: inline-block; font-size: 14px; font-weight: 600; }
+        .footer { padding: 20px 24px; background: #f9fafb; text-align: center; color: #6b7280; font-size: 14px; line-height: 1.6; }
+        .unsubscribe { color: #9ca3af; font-size: 12px; margin-top: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>🔥 Alerta de Promoção!</h1>
+          <div class="discount-badge">${data.discountPercent}% OFF</div>
+        </div>
+        
+        <div class="product-section">
+          <div class="alert-type">
+            ${data.alertType === 'product' ? '🎯 Alerta de Produto' : '📂 Alerta de Categoria'}
+          </div>
+          
+          ${data.imageUrl ? `
+          <img src="${data.imageUrl}" alt="${data.productTitle}" class="product-image" />
+          ` : ''}
+          
+          <h2 class="product-title">${data.productTitle}</h2>
+          
+          <div class="price-section">
+            ${originalPriceText ? `<div class="original-price">De: ${originalPriceText}</div>` : ''}
+            <div class="current-price">${priceText}</div>
+            ${originalPriceText ? `<div class="savings">Economize ${data.discountPercent}%!</div>` : ''}
+          </div>
+          
+          <a href="${data.productUrl}" class="cta-button">
+            Ver Produto na Amazon →
+          </a>
+          
+          <p style="color: #6b7280; font-size: 14px; text-align: center; margin-top: 16px;">
+            ⚡ Promoções podem acabar a qualquer momento. Aproveite enquanto está disponível!
+          </p>
+        </div>
+        
+        <div class="footer">
+          <p>Olá ${data.name}! 👋</p>
+          <p>Este alerta foi criado por você no Karooma. Encontramos uma promoção que corresponde aos seus critérios!</p>
+          <div class="unsubscribe">
+            Para gerenciar seus alertas, acesse Meus Alertas no seu perfil Karooma.
+          </div>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const textContent = `
+    🔥 ALERTA DE PROMOÇÃO - ${data.discountPercent}% OFF!
+    
+    Olá ${data.name}!
+    
+    Encontramos uma promoção que você vai adorar:
+    
+    📦 ${data.productTitle}
+    
+    💰 Preço: ${priceText}
+    ${originalPriceText ? `De: ${originalPriceText}\n` : ''}${originalPriceText ? `Economize ${data.discountPercent}%!\n` : ''}
+    🎯 Tipo: ${data.alertType === 'product' ? 'Alerta de Produto' : 'Alerta de Categoria'}
+    
+    🛒 Ver produto: ${data.productUrl}
+    
+    ⚡ Esta promoção pode acabar a qualquer momento. Aproveite!
+    
+    ---
+    Este alerta foi criado por você no Karooma.
+    Para gerenciar seus alertas, acesse Meus Alertas no seu perfil.
+    
+    Karooma - Simplificando a vida familiar
+  `;
+
+  try {
+    await client.send({
+      to: data.email,
+      from: fromEmail,
+      subject: `🔥 ${data.discountPercent}% OFF: ${data.productTitle}`,
+      text: textContent,
+      html: htmlContent,
+    });
+    
+    console.log(`✅ Email de alerta enviado para ${data.email}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Erro ao enviar email de alerta:', error);
+    return false;
+  }
+}

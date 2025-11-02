@@ -4,6 +4,7 @@ import connectPgSimple from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
+import { startAlertScheduler } from "./jobs/scheduler";
 import { pool } from "./db";
 import path from "path";
 
@@ -138,6 +139,14 @@ app.get('/api/images/:filename(*)', (req, res) => {
       log('Product update jobs initialized successfully');
     } catch (error) {
       log('Failed to initialize product update jobs:', String(error));
+    }
+    
+    // Inicializar scheduler de alertas de preço
+    try {
+      startAlertScheduler();
+      log('Alert scheduler initialized successfully');
+    } catch (error) {
+      log('Failed to initialize alert scheduler:', String(error));
     }
   });
 })();
