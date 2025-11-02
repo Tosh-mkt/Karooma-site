@@ -37,6 +37,7 @@ import { Register } from "./pages/Register";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
 import Favorites from "./pages/Favorites";
+import MyAlerts from "./pages/MyAlerts";
 import { PageRenderer } from "./components/PageRenderer";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 
@@ -95,6 +96,7 @@ function Router() {
               <Route path="/filtros-vertical" component={TestFiltersVertical} />
               <Route path="/filtros-sidebar" component={TestFiltersSidebar} />
               <Route path="/favoritos" component={Favorites} />
+              <Route path="/alertas" component={MyAlerts} />
 
               <Route path="/admin/dashboard" component={AdminDashboard} />
               <Route path="/admin/import-products" component={AdminProductImport} />
