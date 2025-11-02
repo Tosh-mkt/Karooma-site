@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ExternalLink, ImageIcon } from "lucide-react";
+import { ExternalLink, ImageIcon, Bell } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Product } from "@shared/schema";
 import { useState } from "react";
 import FavoriteButton from "@/components/FavoriteButton";
 import RecommendationModal from "@/components/RecommendationModal";
+import AlertModal from "@/components/AlertModal";
 
 interface ProductCardProps {
   product: Product;
@@ -16,6 +17,7 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const formatPrice = (price: string | number) => {
     const numPrice = typeof price === 'string' ? parseFloat(price) : price;
@@ -142,6 +144,20 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             </Button>
           </div>
 
+          {/* Alert Button */}
+          <div className="mb-2 flex-shrink-0">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 text-sm py-2"
+              onClick={() => setIsAlertModalOpen(true)}
+              data-testid={`button-create-alert-${product.id}`}
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              Avisar quando baixar
+            </Button>
+          </div>
+
           {/* Action Buttons */}
           <div className="flex gap-2 flex-shrink-0">
             <Button 
@@ -169,6 +185,15 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         }}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+      />
+
+      {/* Alert Modal */}
+      <AlertModal
+        isOpen={isAlertModalOpen}
+        onClose={() => setIsAlertModalOpen(false)}
+        productId={product.id}
+        productTitle={product.title}
+        type="product"
       />
     </motion.div>
   );
