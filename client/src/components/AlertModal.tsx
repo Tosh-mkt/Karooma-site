@@ -85,11 +85,34 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
         });
       } else {
         setNotifyPush(false);
-        toast({
-          title: "Erro ao ativar notificações",
-          description: "Permita notificações no navegador para continuar.",
-          variant: "destructive",
-        });
+        
+        // Verificar se foi bloqueado ou apenas não permitido
+        if (permission === 'denied') {
+          toast({
+            title: "🔒 Notificações bloqueadas",
+            description: (
+              <div className="space-y-2 text-sm mt-2">
+                <p className="font-semibold">Como desbloquear (Chrome):</p>
+                <ol className="list-decimal list-inside space-y-1 text-xs">
+                  <li>Clique no cadeado 🔒 na barra de endereço</li>
+                  <li>Procure "Notificações"</li>
+                  <li>Altere para "Permitir"</li>
+                  <li>Recarregue a página (F5)</li>
+                  <li>Tente ativar novamente</li>
+                </ol>
+                <p className="text-xs text-gray-500 mt-2">💡 Dica: Você também pode ir em chrome://settings/content/notifications</p>
+              </div>
+            ),
+            variant: "destructive",
+            duration: 15000,
+          });
+        } else {
+          toast({
+            title: "❌ Erro ao ativar notificações",
+            description: "Permita notificações quando o navegador solicitar. Tente novamente!",
+            variant: "destructive",
+          });
+        }
       }
     } else {
       setNotifyPush(enabled);
