@@ -50,6 +50,22 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
     }
   }, [isSubscribed]);
 
+  // Tentar criar subscription automaticamente quando permissão muda para granted
+  useEffect(() => {
+    const tryAutoSubscribe = async () => {
+      if (isAuthenticated && permission === 'granted' && !isSubscribed && isOpen) {
+        console.log('🔔 Permissão concedida, tentando criar subscription automaticamente...');
+        const success = await subscribe();
+        if (success) {
+          console.log('✅ Subscription criada automaticamente!');
+          setNotifyPush(true);
+        }
+      }
+    };
+
+    tryAutoSubscribe();
+  }, [permission, isSubscribed, isAuthenticated, isOpen]);
+
   // Criar alerta
   const createAlertMutation = useMutation({
     mutationFn: async (data: any) => {
