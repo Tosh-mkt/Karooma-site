@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Bell, Loader2 } from "lucide-react";
 
 interface AlertModalProps {
@@ -22,7 +23,7 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
   const { toast } = useToast();
   const [minDiscountPercent, setMinDiscountPercent] = useState(20);
   const [notifyEmail, setNotifyEmail] = useState(true);
-  const [notifyPush, setNotifyPush] = useState(true);
+  const [notifyPush, setNotifyPush] = useState(false);
 
   // Verificar se o usuário está autenticado
   const { data: session } = useQuery<any>({ 
@@ -32,6 +33,16 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
   });
 
   const isAuthenticated = !!session?.user;
+
+  // Push notifications hook
+  const { isSupported, permission, isSubscribed, subscribe } = usePushNotifications();
+
+  // Sincronizar notifyPush com isSubscribed
+  useEffect(() => {
+    if (isSubscribed) {
+      setNotifyPush(true);
+    }
+  }, [isSubscribed]);
 
   // Criar alerta
   const createAlertMutation = useMutation({
@@ -54,6 +65,30 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
       });
     },
   });
+
+  const handlePushToggle = async (enabled: boolean) => {
+    if (!isAuthenticated) return;
+
+    if (enabled && !isSubscribed) {
+      const success = await subscribe();
+      if (success) {
+        setNotifyPush(true);
+        toast({
+          title: "✅ Notificações push ativadas!",
+          description: "Você receberá notificações push quando houver promoções.",
+        });
+      } else {
+        setNotifyPush(false);
+        toast({
+          title: "Erro ao ativar notificações",
+          description: "Permita notificações no navegador para continuar.",
+          variant: "destructive",
+        });
+      }
+    } else {
+      setNotifyPush(enabled);
+    }
+  };
 
   const handleCreateAlert = () => {
     if (!isAuthenticated) {
@@ -142,14 +177,19 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
               </div>
 
               <div className="flex items-center justify-between space-x-2 p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">🔔 Notificação Push</span>
-                  <span className="text-xs text-gray-500">(em breve)</span>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">🔔 Notificação Push</span>
+                    {!isSupported && <span className="text-xs text-gray-500">(não suportado)</span>}
+                  </div>
+                  {isSupported && permission === 'denied' && (
+                    <span className="text-xs text-red-500">Permissão negada. Ative nas configurações do navegador.</span>
+                  )}
                 </div>
                 <Switch
                   checked={notifyPush}
-                  onCheckedChange={setNotifyPush}
-                  disabled
+                  onCheckedChange={handlePushToggle}
+                  disabled={!isSupported || permission === 'denied'}
                   data-testid="switch-notify-push"
                 />
               </div>

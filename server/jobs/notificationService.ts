@@ -1,7 +1,8 @@
 import { db } from "../db";
-import { users } from "../../shared/schema";
-import { eq } from "drizzle-orm";
+import { users, pushSubscriptions } from "../../shared/schema";
+import { eq, and } from "drizzle-orm";
 import { sendPriceAlertEmail } from "../emailService";
+import { pushNotificationService } from "../services/pushNotificationService";
 
 interface PromotionAlert {
   alertId: string;
@@ -129,15 +130,56 @@ async function sendPushNotification(
     data?: any;
   }
 ): Promise<void> {
-  // TODO: Implementar integração com Web Push API
-  // Por enquanto, apenas log
-  console.log(`[PUSH] ${notification.title} - ${notification.body}`);
-  
-  // Em uma implementação real, você buscaria as push subscriptions do usuário
-  // e usaria web-push para enviar a notificação
-  // Exemplo:
-  // const subscriptions = await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId));
-  // for (const sub of subscriptions) {
-  //   await webpush.sendNotification(sub.subscription, JSON.stringify(notification));
-  // }
+  try {
+    // Buscar todas as push subscriptions ativas do usuário
+    const userSubscriptions = await db
+      .select()
+      .from(pushSubscriptions)
+      .where(
+        and(
+          eq(pushSubscriptions.userId, userId),
+          eq(pushSubscriptions.isActive, true)
+        )
+      );
+
+    if (userSubscriptions.length === 0) {
+      console.log(`⚠️  Nenhuma push subscription ativa para usuário ${userId}`);
+      return;
+    }
+
+    // Enviar notificação para todas as subscriptions do usuário
+    const subscriptionObjects = userSubscriptions.map(sub => ({
+      endpoint: sub.endpoint,
+      keys: {
+        p256dh: sub.p256dh,
+        auth: sub.auth
+      }
+    }));
+
+    const results = await pushNotificationService.sendToMultiple(
+      subscriptionObjects,
+      {
+        title: notification.title,
+        body: notification.body,
+        icon: notification.icon,
+        url: notification.url,
+        data: notification.data
+      }
+    );
+
+    // Remover subscriptions inválidas
+    if (results.invalidSubscriptions.length > 0) {
+      console.log(`🧹 Removendo ${results.invalidSubscriptions.length} subscriptions inválidas`);
+      for (const endpoint of results.invalidSubscriptions) {
+        await db
+          .delete(pushSubscriptions)
+          .where(eq(pushSubscriptions.endpoint, endpoint));
+      }
+    }
+
+    console.log(`📨 Push enviado: ${results.sent} sucesso, ${results.failed} falhas`);
+  } catch (error) {
+    console.error('Erro ao enviar push notification:', error);
+    throw error;
+  }
 }
