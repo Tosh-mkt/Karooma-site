@@ -5,8 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Link } from "wouter";
@@ -17,11 +15,8 @@ import {
   ArrowLeft, 
   Shield, 
   User,
-  Chrome,
-  Lock,
   UserPlus
 } from "lucide-react";
-import { FaGoogle } from "react-icons/fa";
 import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
 
 export function Login() {
