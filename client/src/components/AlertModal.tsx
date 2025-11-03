@@ -86,33 +86,31 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
       } else {
         setNotifyPush(false);
         
-        // Verificar se foi bloqueado ou apenas não permitido
-        if (permission === 'denied') {
-          toast({
-            title: "🔒 Notificações bloqueadas",
-            description: (
-              <div className="space-y-2 text-sm mt-2">
-                <p className="font-semibold">Como desbloquear (Chrome):</p>
-                <ol className="list-decimal list-inside space-y-1 text-xs">
-                  <li>Clique no cadeado 🔒 na barra de endereço</li>
-                  <li>Procure "Notificações"</li>
-                  <li>Altere para "Permitir"</li>
-                  <li>Recarregue a página (F5)</li>
-                  <li>Tente ativar novamente</li>
-                </ol>
-                <p className="text-xs text-gray-500 mt-2">💡 Dica: Você também pode ir em chrome://settings/content/notifications</p>
+        // Sempre mostrar instruções detalhadas quando falhar
+        toast({
+          title: "🔔 Como ativar notificações push",
+          description: (
+            <div className="space-y-2 text-sm mt-2">
+              <p className="font-semibold text-white">Siga estes passos:</p>
+              <ol className="list-decimal list-inside space-y-1.5 text-xs text-white">
+                <li>Clique no cadeado 🔒 (ou ⓘ) na barra de endereço</li>
+                <li>Procure por "Notificações"</li>
+                <li>Altere para "Permitir"</li>
+                <li>Recarregue a página (tecle F5)</li>
+                <li>Clique novamente no toggle</li>
+              </ol>
+              <div className="mt-3 pt-2 border-t border-white/20">
+                <p className="text-xs text-white/90 font-medium">💡 Atalho rápido:</p>
+                <p className="text-xs text-white/80 mt-1">
+                  Cole no navegador:<br/>
+                  <code className="bg-black/30 px-1 py-0.5 rounded">chrome://settings/content/notifications</code>
+                </p>
               </div>
-            ),
-            variant: "destructive",
-            duration: 15000,
-          });
-        } else {
-          toast({
-            title: "❌ Erro ao ativar notificações",
-            description: "Permita notificações quando o navegador solicitar. Tente novamente!",
-            variant: "destructive",
-          });
-        }
+            </div>
+          ),
+          variant: "destructive",
+          duration: 20000,
+        });
       }
     } else {
       setNotifyPush(enabled);
