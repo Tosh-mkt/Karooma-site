@@ -24,6 +24,8 @@ import {
   type InsertProductTaxonomy,
   type SelectUserAlert,
   type InsertUserAlert,
+  type SelectPushSubscription,
+  type InsertPushSubscription,
   users,
   content,
   products,
@@ -38,6 +40,7 @@ import {
   taxonomies,
   productTaxonomies,
   userAlerts,
+  pushSubscriptions,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -107,6 +110,12 @@ export interface IStorage {
   getActiveAlerts(): Promise<any[]>;
   updateAlertLastChecked(alertId: string): Promise<void>;
   updateAlertLastNotified(alertId: string): Promise<void>;
+  
+  // Push Subscription methods
+  getUserPushSubscriptions(userId: string): Promise<any[]>;
+  createPushSubscription(data: any): Promise<any>;
+  deletePushSubscription(endpoint: string): Promise<void>;
+  getPushSubscriptionByEndpoint(endpoint: string): Promise<any | undefined>;
   
   // Pages methods
   getAllPages(): Promise<Page[]>;
@@ -1674,6 +1683,52 @@ export class DatabaseStorage implements IStorage {
       .update(userAlerts)
       .set({ lastNotified: new Date() })
       .where(eq(userAlerts.id, alertId));
+  }
+
+  // Push Subscription methods
+  async getUserPushSubscriptions(userId: string): Promise<SelectPushSubscription[]> {
+    const subscriptions = await db
+      .select()
+      .from(pushSubscriptions)
+      .where(eq(pushSubscriptions.userId, userId));
+    return subscriptions;
+  }
+
+  async createPushSubscription(data: InsertPushSubscription): Promise<SelectPushSubscription> {
+    const [subscription] = await db
+      .insert(pushSubscriptions)
+      .values({
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .onConflictDoUpdate({
+        target: pushSubscriptions.endpoint,
+        set: {
+          p256dh: data.p256dh,
+          auth: data.auth,
+          userAgent: data.userAgent,
+          isActive: true,
+          updatedAt: new Date()
+        }
+      })
+      .returning();
+    return subscription;
+  }
+
+  async deletePushSubscription(endpoint: string): Promise<void> {
+    await db
+      .delete(pushSubscriptions)
+      .where(eq(pushSubscriptions.endpoint, endpoint));
+  }
+
+  async getPushSubscriptionByEndpoint(endpoint: string): Promise<SelectPushSubscription | undefined> {
+    const [subscription] = await db
+      .select()
+      .from(pushSubscriptions)
+      .where(eq(pushSubscriptions.endpoint, endpoint))
+      .limit(1);
+    return subscription;
   }
 }
 

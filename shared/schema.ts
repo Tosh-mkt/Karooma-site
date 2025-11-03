@@ -692,6 +692,21 @@ export const userAlerts = pgTable("user_alerts", {
   index("idx_user_alerts_active").on(table.isActive),
 ]);
 
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  userAgent: text("user_agent"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_push_subscriptions_user_id").on(table.userId),
+  index("idx_push_subscriptions_endpoint").on(table.endpoint),
+]);
+
 // Zod schemas for automation system
 export const insertAutomationJobSchema = createInsertSchema(automationJobs).omit({
   id: true,
@@ -719,6 +734,12 @@ export const insertUserAlertSchema = createInsertSchema(userAlerts).omit({
   updatedAt: true,
 });
 
+export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export type InsertAutomationJob = z.infer<typeof insertAutomationJobSchema>;
 export type SelectAutomationJob = typeof automationJobs.$inferSelect;
 export type InsertAutomationProgress = z.infer<typeof insertAutomationProgressSchema>;
@@ -727,6 +748,8 @@ export type InsertNotificationSubscription = z.infer<typeof insertNotificationSu
 export type SelectNotificationSubscription = typeof notificationSubscriptions.$inferSelect;
 export type InsertUserAlert = z.infer<typeof insertUserAlertSchema>;
 export type SelectUserAlert = typeof userAlerts.$inferSelect;
+export type InsertPushSubscription = z.infer<typeof insertPushSubscriptionSchema>;
+export type SelectPushSubscription = typeof pushSubscriptions.$inferSelect;
 
 // Password reset token schemas
 export const insertPasswordResetTokenSchema = createInsertSchema(passwordResetTokens).omit({

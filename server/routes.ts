@@ -3301,6 +3301,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Push Notifications routes
+  app.get("/api/push/vapid-public-key", (req, res) => {
+    const { pushNotificationService } = require("./services/pushNotificationService");
+    res.json({ publicKey: pushNotificationService.getPublicKey() });
+  });
+
+  app.post("/api/push/subscribe", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const subscription = req.body;
+      const { endpoint, keys } = subscription;
+
+      if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
+        return res.status(400).json({ error: "Dados de inscrição inválidos" });
+      }
+
+      const pushSubscription = await storage.createPushSubscription({
+        userId: req.user.id,
+        endpoint: endpoint,
+        p256dh: keys.p256dh,
+        auth: keys.auth,
+        userAgent: req.get('user-agent') || null,
+        isActive: true
+      });
+
+      console.log('✅ Push subscription salva:', { userId: req.user.id, endpoint });
+      res.json(pushSubscription);
+    } catch (error) {
+      console.error("Erro ao salvar inscrição push:", error);
+      res.status(500).json({ error: "Erro ao salvar inscrição" });
+    }
+  });
+
+  app.post("/api/push/unsubscribe", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ error: "Não autenticado" });
+      }
+
+      const { endpoint } = req.body;
+
+      if (!endpoint) {
+        return res.status(400).json({ error: "Endpoint é obrigatório" });
+      }
+
+      await storage.deletePushSubscription(endpoint);
+      console.log('✅ Push subscription removida:', { userId: req.user.id, endpoint });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro ao remover inscrição push:", error);
+      res.status(500).json({ error: "Erro ao remover inscrição" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
