@@ -39,7 +39,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Image Upload System**: Google Cloud Storage integration with direct upload, file validation, automatic markdown insertion, and public ACL. Specifically for blog posts, it supports two independent image fields (Hero and Footer).
 - **Flipbook Access Control System**: Email-based authorization system with database table `authorized_flipbook_users`, middleware authentication, API routes, a frontend guard component, and an admin interface.
 - **Marketing Automation System**: An ultra-lean, MVP-first approach focusing on email welcome, lead magnet delivery (SendGrid), web push notifications (Service Worker), and a price alert system. Uses a PostgreSQL-based job queue (`automation_jobs` table) and progress tracking (`automation_progress` table).
-- **Web Push Notifications System**: Native PWA push notifications for direct user engagement, focusing on price alerts, new content, abandoned cart recovery, and flash deals. Features a `push_subscriptions` table for managing user preferences and tokens.
+- **Web Push Notifications System**: Native PWA push notifications for direct user engagement with browser-native notifications. Features `push_subscriptions` table for managing VAPID subscriptions, service worker (`public/sw.js`) for background notification handling, VAPID key authentication, React hook (`usePushNotifications`) for subscription management, integration with alert system for automatic push when promotions are detected. Users can enable/disable push notifications per alert via AlertModal. Backend uses `web-push` library with auto-cleanup of invalid subscriptions. Sends notifications even when site is closed.
 - **Google Sheets Import System**: Hybrid product import system that merges JSON data from a dedicated column with regular spreadsheet columns (ASIN, title, image_url, price, rating, etc.). Supports both Portuguese and English field names, CSV public API method for data fetching, bilingual compatibility.
 - **Price Alert System**: Personalized user alert system that monitors products and categories for promotions, sending automated notifications via email (SendGrid) and web push when discounts are detected. Features product-specific and category-based alerts, configurable discount thresholds, automated job scheduler (node-cron running every 2 hours), Amazon PA API integration for real-time price checking, user preference management (email/push notifications toggle), and dedicated MyAlerts page for alert management. Backend implements batched API requests to minimize rate limiting, frontend provides modal-based alert creation on product cards, and the system includes promotional email templates with product images and pricing details.
 
@@ -73,6 +73,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Fonts**: Google Fonts (Fredoka One, Poppins, Inter)
 - **Icons**: Lucide React icons
 - **Session Management**: `connect-pg-simple` for PostgreSQL sessions
+- **Push Notifications**: `web-push` for Web Push API v3 (VAPID)
 
 ## Third-party Integrations
 - **LLMs**: ChatGPT, Claude, Gemini (for content generation)
@@ -125,3 +126,18 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 - **Import System**: Hybrid approach combining Amazon PA API data (title, price, image, rating) with Karooma curator analysis (nutritionist, organizer, design evaluations)
 - **Duplicate Handling**: ASIN-based deduplication - updates existing products or creates new ones
 - **Admin UI**: Three import tabs (CSV, Google Sheets JSON, ASIN Import) with real-time preview and "Sync with Amazon" button
+
+## Web Push Notifications Implementation
+- **Service Worker**: `public/sw.js` handles push events and notification clicks
+- **VAPID Keys**: Statically configured in `server/services/pushNotificationService.ts`
+- **Database Table**: `push_subscriptions` stores user subscriptions (endpoint, p256dh, auth keys)
+- **Frontend Hook**: `client/src/hooks/usePushNotifications.ts` manages subscription lifecycle
+- **Backend Service**: `server/services/pushNotificationService.ts` sends notifications via web-push
+- **Integration Points**:
+  - AlertModal: Toggle for enabling push per alert
+  - Alert Checker: Auto-sends push when promotions detected (runs every 2 hours)
+  - Notification Service: `server/jobs/notificationService.ts` coordinates email + push delivery
+- **API Endpoints**:
+  - `GET /api/push/vapid-public-key`: Returns public VAPID key for subscription
+  - `POST /api/push/subscribe`: Saves user's push subscription
+  - `POST /api/push/unsubscribe`: Removes user's push subscription

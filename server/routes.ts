@@ -29,6 +29,7 @@ import express from "express";
 import { flipbookGenerator } from "./services/flipbookGenerator";
 import { insertFlipbookSchema, insertCookieConsentSchema } from "@shared/schema";
 import { extractUserInfo } from "./middleware/flipbookAuth";
+import { pushNotificationService } from "./services/pushNotificationService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
@@ -3303,7 +3304,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Push Notifications routes
   app.get("/api/push/vapid-public-key", (req, res) => {
-    const { pushNotificationService } = require("./services/pushNotificationService");
     res.json({ publicKey: pushNotificationService.getPublicKey() });
   });
 
