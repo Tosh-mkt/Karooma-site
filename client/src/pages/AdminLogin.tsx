@@ -45,7 +45,7 @@ export function AdminLogin() {
         description: `Bem-vindo, ${data.user?.firstName || 'Admin'}!`,
       });
       
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/session-user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/session"] });
       queryClient.invalidateQueries({ queryKey: ["/api/auth/user"] });
       
       setTimeout(() => {

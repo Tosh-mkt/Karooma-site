@@ -20,11 +20,11 @@ export function useAuth() {
     setIsLoading(false);
   }, []);
 
-  // Get NextAuth session as fallback
+  // Get session as fallback
   const { data: session, isLoading: sessionLoading } = useQuery({
-    queryKey: ["/api/auth/session"],
+    queryKey: ["/api/session"],
     retry: false,
-    enabled: !localUser, // Only try NextAuth if no local user
+    enabled: !localUser, // Only try session if no local user
   });
 
   const user = localUser || (session as any)?.user;

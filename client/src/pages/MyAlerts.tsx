@@ -39,7 +39,7 @@ export default function MyAlerts() {
 
   // Verificar autenticação
   const { data: session } = useQuery<any>({ 
-    queryKey: ['/api/auth/session'],
+    queryKey: ['/api/session'],
     retry: false 
   });
 
@@ -111,7 +111,7 @@ export default function MyAlerts() {
             Crie alertas de preço e receba notificações quando seus produtos favoritos entrarem em promoção!
           </p>
           <Button 
-            onClick={() => window.location.href = '/api/auth/signin/google'}
+            onClick={() => window.location.href = '/login'}
             className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
           >
             Fazer Login

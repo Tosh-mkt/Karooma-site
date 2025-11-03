@@ -26,7 +26,7 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
 
   // Verificar se o usuário está autenticado
   const { data: session } = useQuery<any>({ 
-    queryKey: ['/api/auth/session'],
+    queryKey: ['/api/session'],
     retry: false,
     refetchOnWindowFocus: false
   });
@@ -97,7 +97,7 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
           <div className="py-6 text-center">
             <p className="text-gray-600 mb-4">Faça login para criar alertas de preço e receber notificações quando houver promoções!</p>
             <Button 
-              onClick={() => window.location.href = '/api/auth/signin/google'}
+              onClick={() => window.location.href = '/login'}
               className="bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
             >
               Fazer Login

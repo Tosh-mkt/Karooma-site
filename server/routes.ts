@@ -1060,13 +1060,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get current session user
-  app.get('/api/auth/session-user', async (req: any, res) => {
+  app.get('/api/session', async (req: any, res) => {
     try {
       const sessionUser = req.session ? (req.session as any).user : null;
       if (!sessionUser) {
         return res.status(401).json({ message: "Not logged in" });
       }
-      res.json(sessionUser);
+      res.json({ user: sessionUser });
     } catch (error) {
       res.status(500).json({ error: "Failed to get session user" });
     }

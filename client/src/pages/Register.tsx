@@ -55,7 +55,7 @@ export function Register() {
         description: `Bem-vinda à Karooma, ${data.user?.firstName}!`,
       });
       
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/session-user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/session"] });
       
       setTimeout(() => {
         window.location.href = "/";

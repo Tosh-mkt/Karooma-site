@@ -38,7 +38,7 @@ export function TempLogin() {
       });
       
       // Invalidate auth queries to refresh user data
-      queryClient.invalidateQueries({ queryKey: ["/api/auth/session-user"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/session"] });
       
       // Redirect to admin if is admin, otherwise home
       setTimeout(() => {
