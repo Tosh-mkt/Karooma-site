@@ -31,7 +31,43 @@ export function usePushNotifications() {
     };
 
     checkSupport();
-  }, []);
+    
+    // Verificar permissão quando a aba ganha foco novamente
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && 'Notification' in window) {
+        const newPermission = Notification.permission;
+        if (newPermission !== permission) {
+          console.log(`Permissão mudou: ${permission} → ${newPermission}`);
+          setPermission(newPermission);
+          // Re-verificar subscription quando permissão muda
+          if (isSupported) {
+            checkSubscription();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Verificar periodicamente a cada 2 segundos (para detectar mudanças)
+    const intervalId = setInterval(() => {
+      if ('Notification' in window) {
+        const newPermission = Notification.permission;
+        if (newPermission !== permission) {
+          console.log(`Permissão mudou: ${permission} → ${newPermission}`);
+          setPermission(newPermission);
+          if (isSupported) {
+            checkSubscription();
+          }
+        }
+      }
+    }, 2000);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(intervalId);
+    };
+  }, [permission, isSupported]);
 
   const { data: publicKey } = useQuery<{ publicKey: string }>({
     queryKey: ['/api/push/vapid-public-key'],
