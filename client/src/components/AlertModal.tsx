@@ -8,7 +8,13 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { Bell, Loader2 } from "lucide-react";
+import { Bell, Loader2, HelpCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface AlertModalProps {
   isOpen: boolean;
@@ -177,13 +183,31 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
               </div>
 
               <div className="flex items-center justify-between space-x-2 p-3 bg-gray-50 rounded-lg">
-                <div className="flex flex-col gap-1">
+                <div className="flex flex-col gap-1 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">🔔 Notificação Push</span>
                     {!isSupported && <span className="text-xs text-gray-500">(não suportado)</span>}
+                    {isSupported && permission === 'denied' && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <HelpCircle className="h-4 w-4 text-red-500 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p className="font-semibold mb-2">Como ativar notificações:</p>
+                            <ol className="text-xs space-y-1 list-decimal list-inside">
+                              <li>Clique no ícone 🔒 ou ⓘ ao lado da URL</li>
+                              <li>Procure por "Notificações"</li>
+                              <li>Altere para "Permitir"</li>
+                              <li>Recarregue a página</li>
+                            </ol>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
                   </div>
                   {isSupported && permission === 'denied' && (
-                    <span className="text-xs text-red-500">Permissão negada. Ative nas configurações do navegador.</span>
+                    <span className="text-xs text-red-500">Permissão negada. Clique no ícone ⓘ para ver como permitir.</span>
                   )}
                 </div>
                 <Switch
