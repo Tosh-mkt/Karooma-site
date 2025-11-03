@@ -97,7 +97,7 @@ export default function AlertModal({ isOpen, onClose, productId, productTitle, c
                 <li>Procure por "Notificações"</li>
                 <li>Altere para "Permitir"</li>
                 <li>Recarregue a página (tecle F5)</li>
-                <li>Clique novamente no toggle</li>
+                <li>Clique novamente no botão para ativar</li>
               </ol>
               <div className="mt-3 pt-2 border-t border-white/20">
                 <p className="text-xs text-white/90 font-medium">💡 Atalho rápido:</p>
