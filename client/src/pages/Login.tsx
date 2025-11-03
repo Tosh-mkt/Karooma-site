@@ -163,10 +163,6 @@ export function Login() {
     });
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = '/api/auth/signin/google';
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center p-4">
       <motion.div
@@ -227,32 +223,6 @@ export function Login() {
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Google Login Principal */}
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Button
-                onClick={handleGoogleLogin}
-                className="w-full bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 shadow-sm"
-                size="lg"
-                disabled={loginMutation.isPending}
-                data-testid="button-google-login"
-              >
-                <FaGoogle className="w-5 h-5 mr-3 text-red-500" />
-                Continuar com Google
-              </Button>
-            </motion.div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">ou continue com</span>
-              </div>
-            </div>
-
             {/* Toggle entre Login e Registro */}
             {!isSignUp ? (
               // Login Form

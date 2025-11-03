@@ -105,10 +105,6 @@ export function Register() {
     registerMutation.mutate({ firstName, lastName, email, password });
   };
 
-  const handleGoogleSignup = () => {
-    window.location.href = "/api/auth/signin/google";
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 flex items-center justify-center p-4">
       <motion.div
@@ -140,26 +136,6 @@ export function Register() {
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Google Signup */}
-            <Button
-              onClick={handleGoogleSignup}
-              variant="outline"
-              className="w-full border-2 hover:bg-gray-50 transition-colors"
-              disabled={registerMutation.isPending}
-            >
-              <FaGoogle className="w-5 h-5 mr-3 text-red-500" />
-              Continuar com Google
-            </Button>
-            
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">ou</span>
-              </div>
-            </div>
-
             {/* Registration Form */}
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

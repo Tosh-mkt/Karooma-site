@@ -77,10 +77,6 @@ export function AdminLogin() {
     loginMutation.mutate({ email, password });
   };
 
-  const handleGoogleLogin = () => {
-    window.location.href = `/api/auth/signin/google`;
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-orange-50 flex items-center justify-center p-4">
       <motion.div
@@ -112,26 +108,6 @@ export function AdminLogin() {
           </CardHeader>
           
           <CardContent className="space-y-6">
-            {/* Google Login */}
-            <Button
-              onClick={handleGoogleLogin}
-              variant="outline"
-              className="w-full border-2 hover:bg-gray-50 transition-colors"
-              disabled={loginMutation.isPending}
-            >
-              <FaGoogle className="w-5 h-5 mr-3 text-red-500" />
-              Continuar com Google
-            </Button>
-            
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">ou</span>
-              </div>
-            </div>
-
             {/* Login Form */}
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
