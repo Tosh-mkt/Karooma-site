@@ -100,6 +100,17 @@ app.get('/api/images/:filename(*)', (req, res) => {
   });
 });
 
+// Serve sw.js (Service Worker) com content-type correto
+app.get('/sw.js', (req, res) => {
+  const filepath = path.resolve(process.cwd(), 'public', 'sw.js');
+  res.contentType('application/javascript');
+  res.sendFile(filepath, (err) => {
+    if (err) {
+      res.status(404).send('Service Worker not found');
+    }
+  });
+});
+
 (async () => {
   const server = await registerRoutes(app);
 
