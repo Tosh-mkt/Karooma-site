@@ -17,6 +17,7 @@ if (!secret) {
 export const authConfig = {
   trustHost: true,
   secret,
+  adapter: DrizzleAdapter(db),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
