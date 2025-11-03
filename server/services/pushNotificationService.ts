@@ -1,7 +1,15 @@
 import webPush from 'web-push';
 
-const VAPID_PUBLIC_KEY = 'BFZnro_v7UvyFjOorowFQYn3sfM_mLSpcGhfQQJPj0DEEWFhMbenz2SCfruk47nWSC1PyAvtsLXCLIWgZd8pVxM';
-const VAPID_PRIVATE_KEY = 'um0rPnuBV1e-YexMZQ9gcfUofjcYi_BJaOO9XQedZOk';
+// VAPID keys from environment variables
+// For production, set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY environment variables
+// Generate new keys with: npx web-push generate-vapid-keys
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY || 'BFZnro_v7UvyFjOorowFQYn3sfM_mLSpcGhfQQJPj0DEEWFhMbenz2SCfruk47nWSC1PyAvtsLXCLIWgZd8pVxM';
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY || 'um0rPnuBV1e-YexMZQ9gcfUofjcYi_BJaOO9XQedZOk';
+
+// Warn if using fallback keys in production
+if (!process.env.VAPID_PUBLIC_KEY || !process.env.VAPID_PRIVATE_KEY) {
+  console.warn('⚠️  WARNING: Using default VAPID keys. Set VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY environment variables for production.');
+}
 
 webPush.setVapidDetails(
   'mailto:admin@karooma.life',

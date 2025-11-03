@@ -129,7 +129,7 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
 
 ## Web Push Notifications Implementation
 - **Service Worker**: `public/sw.js` handles push events and notification clicks
-- **VAPID Keys**: Statically configured in `server/services/pushNotificationService.ts`
+- **VAPID Keys**: Configured via environment variables (`VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`) with fallback for development. Generate new keys with: `npx web-push generate-vapid-keys`
 - **Database Table**: `push_subscriptions` stores user subscriptions (endpoint, p256dh, auth keys)
 - **Frontend Hook**: `client/src/hooks/usePushNotifications.ts` manages subscription lifecycle
 - **Backend Service**: `server/services/pushNotificationService.ts` sends notifications via web-push
@@ -141,3 +141,4 @@ Image management: Two independent image fields per blog post - Hero (beginning) 
   - `GET /api/push/vapid-public-key`: Returns public VAPID key for subscription
   - `POST /api/push/subscribe`: Saves user's push subscription
   - `POST /api/push/unsubscribe`: Removes user's push subscription
+- **Security**: VAPID keys should be set as environment secrets for production to prevent credential exposure
