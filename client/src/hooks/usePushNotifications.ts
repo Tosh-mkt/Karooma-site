@@ -73,7 +73,13 @@ export function usePushNotifications() {
   };
 
   const subscribe = async (): Promise<boolean> => {
-    if (!isSupported || !publicKey) {
+    if (!isSupported) {
+      console.error('Push notifications não suportadas');
+      return false;
+    }
+    
+    if (!publicKey) {
+      console.error('VAPID public key não carregada');
       return false;
     }
 
@@ -81,39 +87,50 @@ export function usePushNotifications() {
       const permissionGranted = permission === 'granted' || await requestPermission();
       
       if (!permissionGranted) {
-        console.log('Permissão negada');
+        console.log('Permissão negada pelo usuário');
         return false;
       }
+
+      console.log('✅ Permissão concedida, registrando service worker...');
 
       let registration = await navigator.serviceWorker.getRegistration();
       
       if (!registration) {
+        console.log('Registrando service worker...');
         registration = await navigator.serviceWorker.register('/sw.js', {
           scope: '/'
         });
         await navigator.serviceWorker.ready;
+        console.log('✅ Service worker registrado');
+      } else {
+        console.log('✅ Service worker já registrado');
       }
 
       const existingSubscription = await registration.pushManager.getSubscription();
       
       if (existingSubscription) {
+        console.log('✅ Já existe subscription, atualizando no servidor...');
         await subscriptionMutation.mutateAsync(existingSubscription);
         setIsSubscribed(true);
         return true;
       }
 
+      console.log('Criando nova subscription push...');
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(publicKey.publicKey)
       });
 
+      console.log('✅ Subscription criada, salvando no servidor...');
       await subscriptionMutation.mutateAsync(subscription);
       setIsSubscribed(true);
       
-      console.log('✅ Inscrito em push notifications');
+      console.log('✅ Inscrito em push notifications com sucesso!');
       return true;
-    } catch (error) {
-      console.error('Erro ao se inscrever em push:', error);
+    } catch (error: any) {
+      console.error('❌ Erro ao se inscrever em push:', error);
+      console.error('Tipo de erro:', error.name);
+      console.error('Mensagem:', error.message);
       return false;
     }
   };
