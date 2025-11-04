@@ -1742,6 +1742,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Mission Routes
+  app.post("/api/admin/missions", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+      const missionData = req.body;
+      const mission = await storage.createMission(missionData);
+      res.json(mission);
+    } catch (error) {
+      console.error("Error creating mission:", error);
+      res.status(500).json({ error: "Failed to create mission" });
+    }
+  });
+
+  app.put("/api/admin/missions/:id", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+      const { id } = req.params;
+      const missionData = req.body;
+      const mission = await storage.updateMission(id, missionData);
+      res.json(mission);
+    } catch (error) {
+      console.error("Error updating mission:", error);
+      res.status(500).json({ error: "Failed to update mission" });
+    }
+  });
+
+  app.delete("/api/admin/missions/:id", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+      const { id } = req.params;
+      await storage.deleteMission(id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting mission:", error);
+      res.status(500).json({ error: "Failed to delete mission" });
+    }
+  });
+
   // Endpoint padronizado para importar produto - PROCESSO GARANTIDO SEM AJUSTES
   app.post("/api/products/import", async (req, res) => {
     try {
