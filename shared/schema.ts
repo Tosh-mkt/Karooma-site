@@ -231,6 +231,29 @@ export const productTaxonomies = pgTable("product_taxonomies", {
   index("idx_product_taxonomies_primary").on(table.isPrimary),
 ]);
 
+// Tabela de Missões Resolvidas - conceito Vida Leve Coletiva
+export const missions = pgTable("missions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(), // Ex: "Organize sua manhã em 10 minutos"
+  slug: varchar("slug", { length: 200 }).notNull().unique(), // URL amigável
+  category: varchar("category", { length: 100 }).notNull(), // Organização, Alimentação, Educação, etc.
+  understandingText: text("understanding_text").notNull(), // Texto empático sobre o problema
+  bonusTip: text("bonus_tip"), // Dica extra prática
+  inspirationalQuote: text("inspirational_quote"), // Frase emocional da marca
+  productAsins: text("product_asins").array(), // Lista de ASINs dos produtos da solução
+  heroImageUrl: text("hero_image_url"), // Imagem principal da missão
+  metaDescription: text("meta_description"), // SEO
+  featured: boolean("featured").default(false), // Destaque na home
+  views: integer("views").default(0), // Contador de visualizações
+  isPublished: boolean("is_published").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_missions_category").on(table.category),
+  index("idx_missions_featured").on(table.featured),
+  index("idx_missions_published").on(table.isPublished),
+]);
+
 export const upsertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
@@ -739,6 +762,16 @@ export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions
   createdAt: true,
   updatedAt: true,
 });
+
+export const insertMissionSchema = createInsertSchema(missions).omit({
+  id: true,
+  views: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertMission = z.infer<typeof insertMissionSchema>;
+export type SelectMission = typeof missions.$inferSelect;
 
 export type InsertAutomationJob = z.infer<typeof insertAutomationJobSchema>;
 export type SelectAutomationJob = typeof automationJobs.$inferSelect;
