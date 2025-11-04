@@ -1458,6 +1458,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== MISSION ADMIN ROUTES =====
+  app.get("/api/admin/missions", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Access denied. Admin only." });
+      }
+      const missions = await storage.getAllMissions();
+      res.json(missions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch missions" });
+    }
+  });
+
+  app.post("/api/admin/missions", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Access denied. Admin only." });
+      }
+      const mission = await storage.createMission(req.body);
+      res.status(201).json(mission);
+    } catch (error) {
+      console.error("Error creating mission:", error);
+      res.status(500).json({ error: "Failed to create mission" });
+    }
+  });
+
+  app.patch("/api/admin/missions/:id", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Access denied. Admin only." });
+      }
+      const { id } = req.params;
+      const mission = await storage.updateMission(id, req.body);
+      res.json(mission);
+    } catch (error) {
+      console.error("Error updating mission:", error);
+      res.status(500).json({ error: "Failed to update mission" });
+    }
+  });
+
+  app.delete("/api/admin/missions/:id", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Access denied. Admin only." });
+      }
+      const { id } = req.params;
+      await storage.deleteMission(id);
+      res.json({ message: "Mission deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete mission" });
+    }
+  });
+
   // ===== BLOG TEMPLATE SYSTEM ENDPOINTS =====
   
   // Obter template para uma categoria específica
@@ -1631,6 +1684,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ error: "Failed to create product" });
       }
+    }
+  });
+
+  // Mission routes - Missões Resolvidas (Vida Leve Coletiva concept)
+  app.get("/api/missions", async (req, res) => {
+    try {
+      const missions = await storage.getPublishedMissions();
+      res.json(missions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch missions" });
+    }
+  });
+
+  app.get("/api/missions/featured", async (req, res) => {
+    try {
+      const missions = await storage.getFeaturedMissions();
+      res.json(missions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch featured missions" });
+    }
+  });
+
+  app.get("/api/missions/category/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const missions = await storage.getMissionsByCategory(category);
+      res.json(missions);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch missions by category" });
+    }
+  });
+
+  app.get("/api/missions/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const mission = await storage.getMissionBySlug(slug);
+      if (!mission) {
+        return res.status(404).json({ error: "Mission not found" });
+      }
+      
+      // Increment views
+      await storage.incrementMissionViews(mission.id);
+      
+      // Fetch products if mission has ASINs
+      let products = [];
+      if (mission.productAsins && mission.productAsins.length > 0) {
+        const allProducts = await storage.getAllProducts();
+        products = allProducts.filter(p => 
+          p.asin && mission.productAsins?.includes(p.asin)
+        );
+      }
+      
+      res.json({ ...mission, products });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch mission" });
     }
   });
 
