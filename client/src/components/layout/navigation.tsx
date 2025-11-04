@@ -19,6 +19,7 @@ export default function Navigation() {
     { href: "/", label: "Início", id: "home" },
     { href: "/sobre", label: "Sobre", id: "about" },
     { href: "/blog", label: "Blog", id: "blog" },
+    { href: "/missoes", label: "Missões", id: "missions" },
     { href: "/products", label: "Facilitam a Vida", id: "life-hacks" },
   ];
 
