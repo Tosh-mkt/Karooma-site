@@ -26,6 +26,8 @@ import {
   type InsertUserAlert,
   type SelectPushSubscription,
   type InsertPushSubscription,
+  type SelectMission,
+  type InsertMission,
   users,
   content,
   products,
@@ -41,6 +43,7 @@ import {
   productTaxonomies,
   userAlerts,
   pushSubscriptions,
+  missions,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -171,6 +174,18 @@ export interface IStorage {
   getAutomationJobs(): Promise<SelectAutomationJob[]>;
   createAutomationJob(data: InsertAutomationJob): Promise<SelectAutomationJob>;
   updateAutomationJob(id: string, data: Partial<InsertAutomationJob>): Promise<SelectAutomationJob>;
+  
+  // Mission methods
+  getAllMissions(): Promise<SelectMission[]>;
+  getPublishedMissions(): Promise<SelectMission[]>;
+  getFeaturedMissions(): Promise<SelectMission[]>;
+  getMissionById(id: string): Promise<SelectMission | undefined>;
+  getMissionBySlug(slug: string): Promise<SelectMission | undefined>;
+  getMissionsByCategory(category: string): Promise<SelectMission[]>;
+  createMission(data: InsertMission): Promise<SelectMission>;
+  updateMission(id: string, data: Partial<InsertMission>): Promise<SelectMission>;
+  deleteMission(id: string): Promise<void>;
+  incrementMissionViews(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -1729,6 +1744,98 @@ export class DatabaseStorage implements IStorage {
       .where(eq(pushSubscriptions.endpoint, endpoint))
       .limit(1);
     return subscription;
+  }
+
+  // Mission methods
+  async getAllMissions(): Promise<SelectMission[]> {
+    return await db.select().from(missions).orderBy(desc(missions.createdAt));
+  }
+
+  async getPublishedMissions(): Promise<SelectMission[]> {
+    return await db
+      .select()
+      .from(missions)
+      .where(eq(missions.isPublished, true))
+      .orderBy(desc(missions.createdAt));
+  }
+
+  async getFeaturedMissions(): Promise<SelectMission[]> {
+    return await db
+      .select()
+      .from(missions)
+      .where(and(
+        eq(missions.isPublished, true),
+        eq(missions.featured, true)
+      ))
+      .orderBy(desc(missions.createdAt));
+  }
+
+  async getMissionById(id: string): Promise<SelectMission | undefined> {
+    const [mission] = await db
+      .select()
+      .from(missions)
+      .where(eq(missions.id, id))
+      .limit(1);
+    return mission;
+  }
+
+  async getMissionBySlug(slug: string): Promise<SelectMission | undefined> {
+    const [mission] = await db
+      .select()
+      .from(missions)
+      .where(eq(missions.slug, slug))
+      .limit(1);
+    return mission;
+  }
+
+  async getMissionsByCategory(category: string): Promise<SelectMission[]> {
+    return await db
+      .select()
+      .from(missions)
+      .where(and(
+        eq(missions.category, category),
+        eq(missions.isPublished, true)
+      ))
+      .orderBy(desc(missions.createdAt));
+  }
+
+  async createMission(data: InsertMission): Promise<SelectMission> {
+    const [mission] = await db
+      .insert(missions)
+      .values({
+        id: randomUUID(),
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    return mission;
+  }
+
+  async updateMission(id: string, data: Partial<InsertMission>): Promise<SelectMission> {
+    const [mission] = await db
+      .update(missions)
+      .set({
+        ...data,
+        updatedAt: new Date()
+      })
+      .where(eq(missions.id, id))
+      .returning();
+    return mission;
+  }
+
+  async deleteMission(id: string): Promise<void> {
+    await db.delete(missions).where(eq(missions.id, id));
+  }
+
+  async incrementMissionViews(id: string): Promise<void> {
+    const mission = await this.getMissionById(id);
+    if (mission) {
+      await db
+        .update(missions)
+        .set({ views: (mission.views || 0) + 1 })
+        .where(eq(missions.id, id));
+    }
   }
 }
 
