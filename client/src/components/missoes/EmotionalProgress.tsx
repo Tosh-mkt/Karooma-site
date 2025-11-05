@@ -2,14 +2,14 @@ import { motion } from "framer-motion";
 import { Leaf } from "lucide-react";
 
 interface Props {
-  currentStep: number;
+  currentSection: number;
   totalSteps: number;
   onComplete?: () => void;
 }
 
-export function EmotionalProgress({ currentStep, totalSteps, onComplete }: Props) {
-  const progress = (currentStep / totalSteps) * 100;
-  const isComplete = currentStep === totalSteps;
+export function EmotionalProgress({ currentSection, totalSteps, onComplete }: Props) {
+  const progress = (currentSection / totalSteps) * 100;
+  const isComplete = currentSection === totalSteps;
 
   return (
     <div className="sticky top-20 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700 py-4">
@@ -20,7 +20,7 @@ export function EmotionalProgress({ currentStep, totalSteps, onComplete }: Props
               Sua jornada de leveza
             </span>
             <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
-              {currentStep} de {totalSteps}
+              {currentSection} de {totalSteps}
             </span>
           </div>
           
