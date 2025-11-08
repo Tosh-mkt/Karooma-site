@@ -148,9 +148,31 @@ export default function DiagnosticoResultadoPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="mb-12"
+          className="mb-8"
         >
           <RadarChart scores={scores} />
+        </motion.div>
+
+        {/* Explicação do Gráfico */}
+        <motion.div
+          className="bg-purple-50/80 dark:bg-purple-900/20 backdrop-blur-xl rounded-2xl p-6 mb-12 border border-purple-200/50 dark:border-purple-700/50"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          <div className="flex items-start gap-3">
+            <div className="text-2xl mt-0.5">💡</div>
+            <div>
+              <h3 className="font-semibold text-purple-900 dark:text-purple-200 mb-2">
+                Como interpretar seu gráfico:
+              </h3>
+              <p className="text-sm text-purple-800 dark:text-purple-300 leading-relaxed">
+                <strong>Quanto mais próximo do centro</strong>, mais atenção essa área precisa. 
+                <strong> Quanto mais afastado do centro</strong>, melhor está essa área da sua rotina. 
+                Áreas "menores" no gráfico são oportunidades para trazer mais leveza ao seu dia a dia!
+              </p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Personalized Analysis */}
