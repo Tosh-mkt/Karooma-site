@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
@@ -1690,7 +1690,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Mission routes - Missões Resolvidas (Vida Leve Coletiva concept)
   app.get("/api/missions", async (req, res) => {
     try {
-      const missions = await storage.getPublishedMissions();
+      // Aceitar filtro por áreas do diagnóstico via query params
+      const diagnosticAreas = req.query.diagnosticAreas 
+        ? (Array.isArray(req.query.diagnosticAreas) 
+            ? req.query.diagnosticAreas 
+            : [req.query.diagnosticAreas])
+        : undefined;
+      
+      const missions = await storage.getPublishedMissions(diagnosticAreas as string[] | undefined);
       res.json(missions);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch missions" });
@@ -3507,6 +3514,92 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao remover inscrição push:", error);
       res.status(500).json({ error: "Erro ao remover inscrição" });
+    }
+  });
+
+  // Diagnostic Routes - Mom Routine Assessment
+  app.post("/api/diagnostics", extractUserInfo, async (req: any, res) => {
+    try {
+      const validatedData = insertDiagnosticSchema.parse(req.body);
+      
+      // Se tiver userId no body, use-o; senão, use do usuário autenticado (opcional)
+      const diagnosticData = {
+        ...validatedData,
+        userId: validatedData.userId || req.user?.id || null
+      };
+
+      const diagnostic = await storage.createDiagnostic(diagnosticData);
+      
+      console.log('✅ Diagnóstico criado:', { 
+        userId: diagnosticData.userId, 
+        userName: diagnosticData.userName 
+      });
+      
+      res.json(diagnostic);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos", 
+          details: error.errors 
+        });
+      }
+      console.error("Erro ao criar diagnóstico:", error);
+      res.status(500).json({ error: "Erro ao salvar diagnóstico" });
+    }
+  });
+
+  // Rota mais específica ANTES da rota genérica :id para evitar shadowing
+  app.get("/api/diagnostics/latest", extractUserInfo, async (req: any, res) => {
+    try {
+      const userId = req.query.userId || req.user?.id;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "userId é obrigatório" });
+      }
+
+      const diagnostic = await storage.getLatestDiagnostic(userId);
+      
+      if (!diagnostic) {
+        return res.status(404).json({ error: "Nenhum diagnóstico encontrado" });
+      }
+
+      res.json(diagnostic);
+    } catch (error) {
+      console.error("Erro ao buscar último diagnóstico:", error);
+      res.status(500).json({ error: "Erro ao buscar diagnóstico" });
+    }
+  });
+
+  app.get("/api/diagnostics", extractUserInfo, async (req: any, res) => {
+    try {
+      const userId = req.query.userId || req.user?.id;
+      
+      if (!userId) {
+        return res.status(400).json({ error: "userId é obrigatório" });
+      }
+
+      const diagnostics = await storage.getDiagnosticsByUser(userId);
+      res.json(diagnostics);
+    } catch (error) {
+      console.error("Erro ao buscar diagnósticos:", error);
+      res.status(500).json({ error: "Erro ao buscar diagnósticos" });
+    }
+  });
+
+  // Rota genérica :id DEPOIS das rotas específicas para evitar shadowing
+  app.get("/api/diagnostics/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const diagnostic = await storage.getDiagnosticById(id);
+      
+      if (!diagnostic) {
+        return res.status(404).json({ error: "Diagnóstico não encontrado" });
+      }
+
+      res.json(diagnostic);
+    } catch (error) {
+      console.error("Erro ao buscar diagnóstico:", error);
+      res.status(500).json({ error: "Erro ao buscar diagnóstico" });
     }
   });
 

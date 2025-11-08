@@ -13,6 +13,8 @@ import BlogPost from "./pages/blog-post";
 import Products from "./pages/products";
 import Missoes from "./pages/missoes";
 import MissaoDetalhes from "./pages/missao-detalhes";
+import Diagnostico from "./pages/diagnostico";
+import DiagnosticoResultado from "./pages/diagnostico-resultado";
 import Landing from "./pages/landing";
 import TestFiltersClean from "./pages/test-filters-clean";
 import TestFiltersHierarchical from "./pages/test-filters-hierarchical";
@@ -96,6 +98,8 @@ function Router() {
               <Route path="/products" component={Products} />
               <Route path="/missoes" component={Missoes} />
               <Route path="/missoes/:slug" component={MissaoDetalhes} />
+              <Route path="/diagnostico" component={Diagnostico} />
+              <Route path="/diagnostico/resultado" component={DiagnosticoResultado} />
               <Route path="/filtros-hierarquia" component={TestFiltersClean} />
               <Route path="/filtros-cascata" component={TestFiltersHierarchical} />
               <Route path="/filtros-vertical" component={TestFiltersVertical} />

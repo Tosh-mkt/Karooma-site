@@ -28,6 +28,8 @@ import {
   type InsertPushSubscription,
   type SelectMission,
   type InsertMission,
+  type SelectDiagnostic,
+  type InsertDiagnostic,
   users,
   content,
   products,
@@ -44,6 +46,7 @@ import {
   userAlerts,
   pushSubscriptions,
   missions,
+  diagnostics,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -58,7 +61,7 @@ import {
 import type { ConversionData, ModalTriggerData, ConversionMetrics, ThemePerformance, PostConversionReport } from "@shared/analytics";
 import { randomUUID } from "crypto";
 import { db } from "./db";
-import { eq, desc, and, isNull } from "drizzle-orm";
+import { eq, desc, and, isNull, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -177,7 +180,7 @@ export interface IStorage {
   
   // Mission methods
   getAllMissions(): Promise<SelectMission[]>;
-  getPublishedMissions(): Promise<SelectMission[]>;
+  getPublishedMissions(diagnosticAreas?: string[]): Promise<SelectMission[]>;
   getFeaturedMissions(): Promise<SelectMission[]>;
   getMissionById(id: string): Promise<SelectMission | undefined>;
   getMissionBySlug(slug: string): Promise<SelectMission | undefined>;
@@ -186,6 +189,12 @@ export interface IStorage {
   updateMission(id: string, data: Partial<InsertMission>): Promise<SelectMission>;
   deleteMission(id: string): Promise<void>;
   incrementMissionViews(id: string): Promise<void>;
+  
+  // Diagnostic methods
+  createDiagnostic(data: InsertDiagnostic): Promise<SelectDiagnostic>;
+  getDiagnosticById(id: string): Promise<SelectDiagnostic | undefined>;
+  getDiagnosticsByUser(userId: string): Promise<SelectDiagnostic[]>;
+  getLatestDiagnostic(userId: string): Promise<SelectDiagnostic | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -1751,7 +1760,20 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(missions).orderBy(desc(missions.createdAt));
   }
 
-  async getPublishedMissions(): Promise<SelectMission[]> {
+  async getPublishedMissions(diagnosticAreas?: string[]): Promise<SelectMission[]> {
+    // Filtrar por áreas do diagnóstico se fornecido
+    if (diagnosticAreas && diagnosticAreas.length > 0) {
+      return await db
+        .select()
+        .from(missions)
+        .where(and(
+          eq(missions.isPublished, true),
+          sql`${missions.diagnosticAreas} && ${sql.placeholder('areas')}`
+        ))
+        .bind({ areas: diagnosticAreas })
+        .orderBy(desc(missions.createdAt));
+    }
+
     return await db
       .select()
       .from(missions)
@@ -1836,6 +1858,46 @@ export class DatabaseStorage implements IStorage {
         .set({ views: (mission.views || 0) + 1 })
         .where(eq(missions.id, id));
     }
+  }
+
+  // Diagnostic methods
+  async createDiagnostic(data: InsertDiagnostic): Promise<SelectDiagnostic> {
+    const [diagnostic] = await db
+      .insert(diagnostics)
+      .values({
+        id: randomUUID(),
+        ...data,
+        createdAt: new Date()
+      })
+      .returning();
+    return diagnostic;
+  }
+
+  async getDiagnosticById(id: string): Promise<SelectDiagnostic | undefined> {
+    const [diagnostic] = await db
+      .select()
+      .from(diagnostics)
+      .where(eq(diagnostics.id, id))
+      .limit(1);
+    return diagnostic;
+  }
+
+  async getDiagnosticsByUser(userId: string): Promise<SelectDiagnostic[]> {
+    return await db
+      .select()
+      .from(diagnostics)
+      .where(eq(diagnostics.userId, userId))
+      .orderBy(desc(diagnostics.createdAt));
+  }
+
+  async getLatestDiagnostic(userId: string): Promise<SelectDiagnostic | undefined> {
+    const [diagnostic] = await db
+      .select()
+      .from(diagnostics)
+      .where(eq(diagnostics.userId, userId))
+      .orderBy(desc(diagnostics.createdAt))
+      .limit(1);
+    return diagnostic;
   }
 }
 

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit, Plus, Eye, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
@@ -67,6 +68,7 @@ export default function AdminMissoes() {
     bonusTip: "",
     inspirationalQuote: "",
     productAsins: "",
+    diagnosticAreas: [] as string[],
     heroImageUrl: "",
   });
 
@@ -79,6 +81,7 @@ export default function AdminMissoes() {
       bonusTip: "",
       inspirationalQuote: "",
       productAsins: "",
+      diagnosticAreas: [],
       heroImageUrl: "",
     });
   };
@@ -89,6 +92,7 @@ export default function AdminMissoes() {
     const payload = {
       ...formData,
       productAsins: formData.productAsins.split(',').map(s => s.trim()).filter(Boolean),
+      diagnosticAreas: formData.diagnosticAreas,
     };
 
     if (editingMission) {
@@ -108,6 +112,7 @@ export default function AdminMissoes() {
       bonusTip: mission.bonusTip || "",
       inspirationalQuote: mission.inspirationalQuote || "",
       productAsins: mission.productAsins?.join(', ') || "",
+      diagnosticAreas: mission.diagnosticAreas || [],
       heroImageUrl: mission.heroImageUrl || "",
     });
     setIsCreateOpen(true);
@@ -126,6 +131,15 @@ export default function AdminMissoes() {
     "Educação",
     "Segurança",
     "Desenvolvimento"
+  ];
+
+  const diagnosticAreasOptions = [
+    { value: "cargaMental", label: "🧠 Carga Mental", description: "Ajuda a reduzir sobrecarga mental" },
+    { value: "tempoDaCasa", label: "🏠 Tempo da Casa", description: "Reduz tempo gasto em tarefas domésticas" },
+    { value: "tempoDeQualidade", label: "❤️ Tempo de Qualidade", description: "Libera mais tempo para a família" },
+    { value: "alimentacao", label: "🍽️ Alimentação", description: "Facilita planejamento e preparo de refeições" },
+    { value: "gestaoDaCasa", label: "📋 Gestão da Casa", description: "Melhora organização e controle doméstico" },
+    { value: "logisticaInfantil", label: "👶 Logística Infantil", description: "Simplifica rotina com crianças" },
   ];
 
   if (isLoading) {
@@ -253,6 +267,36 @@ export default function AdminMissoes() {
                     rows={3}
                   />
                   <p className="text-sm text-gray-500">Cole os ASINs dos produtos que resolvem esta missão</p>
+                </div>
+
+                <div className="space-y-3">
+                  <Label>Áreas do Diagnóstico que esta Missão Resolve</Label>
+                  <p className="text-sm text-gray-500">Marque as áreas onde esta missão ajuda a mãe</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {diagnosticAreasOptions.map((area) => (
+                      <div key={area.value} className="flex items-start space-x-3 rounded-lg border p-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <Checkbox
+                          id={area.value}
+                          checked={formData.diagnosticAreas.includes(area.value)}
+                          onCheckedChange={(checked) => {
+                            setFormData(prev => ({
+                              ...prev,
+                              diagnosticAreas: checked
+                                ? [...prev.diagnosticAreas, area.value]
+                                : prev.diagnosticAreas.filter(a => a !== area.value)
+                            }));
+                          }}
+                          data-testid={`checkbox-area-${area.value}`}
+                        />
+                        <div className="flex-1">
+                          <Label htmlFor={area.value} className="font-medium cursor-pointer">
+                            {area.label}
+                          </Label>
+                          <p className="text-xs text-gray-500 mt-1">{area.description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <div className="space-y-2">

@@ -241,6 +241,7 @@ export const missions = pgTable("missions", {
   bonusTip: text("bonus_tip"), // Dica extra prática
   inspirationalQuote: text("inspirational_quote"), // Frase emocional da marca
   productAsins: text("product_asins").array(), // Lista de ASINs dos produtos da solução
+  diagnosticAreas: text("diagnostic_areas").array(), // Áreas do diagnóstico que esta missão resolve: cargaMental, tempoDaCasa, tempoDeQualidade, alimentacao, gestaoDaCasa, logisticaInfantil
   heroImageUrl: text("hero_image_url"), // Imagem principal da missão
   metaDescription: text("meta_description"), // SEO
   featured: boolean("featured").default(false), // Destaque na home
@@ -730,6 +731,26 @@ export const pushSubscriptions = pgTable("push_subscriptions", {
   index("idx_push_subscriptions_endpoint").on(table.endpoint),
 ]);
 
+// Diagnostic results for mom routine assessment (radar chart)
+export const diagnostics = pgTable("diagnostics", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "cascade" }),
+  userName: varchar("user_name"), // Nome para personalização "Seu panorama está pronto, Ana!"
+  // Scores das 6 áreas da vida materna (0-5)
+  cargaMental: decimal("carga_mental", { precision: 3, scale: 2 }).notNull(), // Mental Load
+  tempoDaCasa: decimal("tempo_da_casa", { precision: 3, scale: 2 }).notNull(), // House Time
+  tempoDeQualidade: decimal("tempo_de_qualidade", { precision: 3, scale: 2 }).notNull(), // Quality Time
+  alimentacao: decimal("alimentacao", { precision: 3, scale: 2 }).notNull(), // Nutrition
+  gestaoDaCasa: decimal("gestao_da_casa", { precision: 3, scale: 2 }).notNull(), // House Management
+  logisticaInfantil: decimal("logistica_infantil", { precision: 3, scale: 2 }).notNull(), // Child Logistics
+  // Metadata
+  quizAnswers: text("quiz_answers"), // JSON com respostas do quiz
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_diagnostics_user_id").on(table.userId),
+  index("idx_diagnostics_created_at").on(table.createdAt),
+]);
+
 // Zod schemas for automation system
 export const insertAutomationJobSchema = createInsertSchema(automationJobs).omit({
   id: true,
@@ -763,6 +784,11 @@ export const insertPushSubscriptionSchema = createInsertSchema(pushSubscriptions
   updatedAt: true,
 });
 
+export const insertDiagnosticSchema = createInsertSchema(diagnostics).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertMissionSchema = createInsertSchema(missions).omit({
   id: true,
   views: true,
@@ -772,6 +798,8 @@ export const insertMissionSchema = createInsertSchema(missions).omit({
 
 export type InsertMission = z.infer<typeof insertMissionSchema>;
 export type SelectMission = typeof missions.$inferSelect;
+export type InsertDiagnostic = z.infer<typeof insertDiagnosticSchema>;
+export type SelectDiagnostic = typeof diagnostics.$inferSelect;
 
 export type InsertAutomationJob = z.infer<typeof insertAutomationJobSchema>;
 export type SelectAutomationJob = typeof automationJobs.$inferSelect;
