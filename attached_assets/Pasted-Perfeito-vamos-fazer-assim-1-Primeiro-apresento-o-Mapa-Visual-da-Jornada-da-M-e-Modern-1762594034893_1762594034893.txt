@@ -1,0 +1,200 @@
+Perfeito 🌿 — vamos fazer assim:
+
+1️⃣ **Primeiro, apresento o Mapa Visual da Jornada da Mãe Moderna**, mostrando os principais momentos do dia e os pontos de sobrecarga por categoria.
+2️⃣ **Depois, o Questionário Diagnóstico**, estruturado em blocos e perguntas rápidas, pronto para aplicação digital ou impressa.
+
+---
+
+## 🧭 Mapa Visual da Jornada da Mãe Moderna
+
+**Objetivo:** visualizar os principais períodos do dia, as tarefas simultâneas e os pontos de sobrecarga física, mental e emocional.
+
+---
+
+### 🌅 **Manhã (5h às 9h) — “Hora do Caos”**
+
+| Áreas envolvidas         | Atividades típicas                                                                        | Picos de sobrecarga                         | Soluções rápidas                                                        |
+| ------------------------ | ----------------------------------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------- |
+| **Casa e Filhos**        | Preparar café, organizar lancheiras, acordar filhos, arrumar camas, despachar para escola | Alta carga mental, pressa, esquecimentos    | Estação escolar pronta à noite anterior, cardápio fixo de café da manhã |
+| **Autocuidado**          | Banho rápido, maquiagem, checagem de mensagens                                            | Falta de tempo para si                      | Acordar 15 min antes dos filhos, preparar roupa e bolsa no dia anterior |
+| **Trabalho e Logística** | Saída para trabalho, trânsito, levar filhos à escola                                      | Ansiedade, atrasos, sensação de descontrole | Roteiro fixo de deslocamento, agenda de lembretes automáticos           |
+
+---
+
+### ☀️ **Meio do Dia (9h às 14h) — “Hora da Produtividade Forçada”**
+
+| Áreas envolvidas           | Atividades típicas                | Picos de sobrecarga         | Soluções rápidas                                         |
+| -------------------------- | --------------------------------- | --------------------------- | -------------------------------------------------------- |
+| **Trabalho / Home Office** | Reuniões, entregas, pausas curtas | Foco reduzido, interrupções | Técnica Pomodoro (25/5), fones com cancelamento de ruído |
+| **Casa**                   | Limpeza leve, lavanderia, almoço  | Sobrecarga física e mental  | Planejamento semanal de refeições, produtos concentrados |
+| **Saúde / Alimentação**    | Almoço rápido, pouca pausa        | Falta de autocuidado        | Refeições prontas e saudáveis (meal prep)                |
+
+---
+
+### 🌇 **Tarde (14h às 18h) — “Hora das Demandas Cruzadas”**
+
+| Áreas envolvidas     | Atividades típicas                                       | Picos de sobrecarga  | Soluções rápidas                                            |
+| -------------------- | -------------------------------------------------------- | -------------------- | ----------------------------------------------------------- |
+| **Filhos**           | Buscar na escola, ajudar em tarefas, lanche              | Cansaço, impaciência | Agenda de atividades visível, dividir apoio com parceiro(a) |
+| **Casa**             | Organização pós-escola, dobrar roupas, pequenas limpezas | Falta de energia     | Dividir cômodos por dia, usar timer de 10 min               |
+| **Gestão doméstica** | Pagamentos, compras, e-mails                             | Sobrecarga mental    | Aplicativo financeiro e lista de compras digital            |
+
+---
+
+### 🌙 **Noite (18h às 22h) — “Hora do Pico Emocional”**
+
+| Áreas envolvidas               | Atividades típicas                           | Picos de sobrecarga            | Soluções rápidas                                         |
+| ------------------------------ | -------------------------------------------- | ------------------------------ | -------------------------------------------------------- |
+| **Família e Relacionamentos**  | Jantar, banho das crianças, lição, histórias | Exaustão e irritabilidade      | Revezamento de banho e jantar, rituais curtos de conexão |
+| **Casa**                       | Cozinha, arrumação final                     | Sensação de repetição infinita | Limpeza compartilhada e música ambiente                  |
+| **Autocuidado / Saúde Mental** | Tentativa de relaxar, insônia                | Falta de tempo pessoal         | Desconexão digital, aromaterapia, leitura leve           |
+
+---
+
+### 🌌 **Madrugada (22h às 5h) — “Hora do Silêncio (ou do Desespero)”**
+
+| Áreas envolvidas        | Atividades típicas                           | Picos de sobrecarga         | Soluções rápidas                                |
+| ----------------------- | -------------------------------------------- | --------------------------- | ----------------------------------------------- |
+| **Sono / Autocuidado**  | Dormir, cuidar de bebês, responder mensagens | Insônia, exaustão           | Ritual noturno fixo, quarto escuro e silencioso |
+| **Planejamento mental** | Pensamentos acelerados, culpa                | Sobrecarga mental invisível | Escrita breve (journaling), lista de gratidão   |
+
+---
+
+## 🧩 Mapa de Sobrecarga (Resumo Visual)
+
+| Período do dia | Sobrecarga Física                                      | Sobrecarga Mental | Sobrecarga Emocional |
+| -------------- | ------------------------------------------------------ | ----------------- | -------------------- |
+| 🌅 Manhã       | 🔴 Alta                                                | 🔴 Alta           | 🟠 Média             |
+| ☀️ Meio do dia | 🟠 Média                                               | 🔴 Alta           | 🟠 Média             |
+| 🌇 Tarde       | 🟠 Média                                               | 🟠 Média          | 🔴 Alta              |
+| 🌙 Noite       | 🟠 Média                                               | 🔴 Alta           | 🔴 Alta              |
+| 🌌 Madrugada   | 🟢 Baixa (ideal) / 🔴 Alta (casos com insônia ou bebê) | 🔴 Alta           | 🔴 Alta              |
+
+---
+
+## 🧾 QUESTIONÁRIO DIAGNÓSTICO — **Rotinas e Sobrecargas da Mãe Moderna**
+
+**Objetivo:** identificar as áreas que mais impactam no equilíbrio entre casa, trabalho e vida pessoal.
+
+---
+
+### 🧘‍♀️ **1. Autocuidado e Saúde**
+
+1. Você consegue dormir de forma reparadora (sem interrupções ou insônia)?
+   ☐ Sempre ☐ Às vezes ☐ Raramente ☐ Nunca
+2. Consegue reservar um tempo para cuidar de si (exercício, leitura, banho tranquilo)?
+   ☐ Diariamente ☐ 1–2x por semana ☐ Raramente ☐ Nunca
+3. Alimenta-se de forma equilibrada e sem pular refeições?
+   ☐ Sim, regularmente ☐ Às vezes ☐ Quase nunca ☐ Nunca
+
+---
+
+### 🧒 **2. Cuidado com Filhos**
+
+1. A rotina escolar das crianças é previsível e bem organizada?
+   ☐ Sim ☐ Parcialmente ☐ Não
+2. Você sente que consegue aproveitar tempo de qualidade com seus filhos?
+   ☐ Frequentemente ☐ Às vezes ☐ Raramente ☐ Quase nunca
+3. As tarefas de banho, alimentação e sono das crianças são exaustivas?
+   ☐ Sim, sempre ☐ Às vezes ☐ Não muito ☐ Não
+
+---
+
+### 🏡 **3. Casa e Organização Doméstica**
+
+1. Sua casa costuma estar organizada conforme o esperado?
+   ☐ Sim ☐ Às vezes ☐ Quase nunca ☐ Nunca
+2. Você sente que a limpeza e arrumação consomem tempo demais?
+   ☐ Sim ☐ Um pouco ☐ Não
+3. Há tarefas que você gostaria de delegar ou automatizar (lavanderia, louça, etc.)?
+   ☐ Sim ☐ Não
+
+---
+
+### 💼 **4. Trabalho e Gestão do Tempo**
+
+1. Consegue se concentrar no trabalho sem interrupções domésticas?
+   ☐ Sim, na maior parte do tempo ☐ Às vezes ☐ Raramente
+2. Sente que falta tempo no dia para cumprir tudo?
+   ☐ Sim, sempre ☐ Às vezes ☐ Não
+3. Usa algum método de planejamento (agenda, planner, app)?
+   ☐ Sim ☐ Não
+
+---
+
+### 🌿 **5. Gestão Doméstica e Documentação**
+
+1. Suas contas, documentos e comprovantes estão organizados?
+   ☐ Sim ☐ Parcialmente ☐ Não
+2. Você mantém organizadas as informações médicas da família (exames, receitas, sintomas)?
+   ☐ Sim, digitalmente ☐ Em papel ☐ Misturado ☐ Não organizo
+3. Consegue localizar rapidamente documentos importantes (cartão de vacina, exames, atestados)?
+   ☐ Sempre ☐ Às vezes ☐ Raramente ☐ Nunca
+
+---
+
+### ✈️ **6. Saídas, Viagens e Logística**
+
+1. Consegue planejar saídas e deslocamentos sem imprevistos?
+   ☐ Sim ☐ Às vezes ☐ Não
+2. Organizar viagens familiares costuma gerar estresse?
+   ☐ Sempre ☐ Às vezes ☐ Não
+3. Há um responsável definido por documentos e malas da família?
+   ☐ Sim ☐ Não
+
+---
+
+### ❤️ **7. Relacionamentos e Vida Social**
+
+1. Você sente que há tempo para o casal conversar ou estar junto?
+   ☐ Frequentemente ☐ Às vezes ☐ Raramente ☐ Nunca
+2. Consegue manter contato com amigos e familiares próximos?
+   ☐ Sim ☐ Um pouco ☐ Não
+3. Sente-se emocionalmente apoiada?
+   ☐ Sim, plenamente ☐ Parcialmente ☐ Não
+
+---
+
+### 🌸 **8. Desenvolvimento Pessoal e Futuro**
+
+1. Você sente que está evoluindo pessoalmente (estudos, hobbies, metas)?
+   ☐ Sim ☐ Um pouco ☐ Não
+2. Tem clareza sobre seus objetivos e sonhos para o futuro?
+   ☐ Sim ☐ Parcialmente ☐ Não
+3. Costuma refletir ou anotar metas pessoais?
+   ☐ Sim ☐ Raramente ☐ Nunca
+
+---
+
+### 📊 **Escala de Sobrecarga (resumo final do diagnóstico)**
+
+Marque de 1 a 5 quanto sente sobrecarga em cada área:
+
+| Área                          | 1 (leve) | 2 | 3 | 4 | 5 (alta) |
+| ----------------------------- | -------- | - | - | - | -------- |
+| Autocuidado e saúde           | ☐        | ☐ | ☐ | ☐ | ☐        |
+| Filhos                        | ☐        | ☐ | ☐ | ☐ | ☐        |
+| Casa e tarefas                | ☐        | ☐ | ☐ | ☐ | ☐        |
+| Trabalho e tempo              | ☐        | ☐ | ☐ | ☐ | ☐        |
+| Gestão doméstica / documentos | ☐        | ☐ | ☐ | ☐ | ☐        |
+| Logística externa             | ☐        | ☐ | ☐ | ☐ | ☐        |
+| Relacionamentos               | ☐        | ☐ | ☐ | ☐ | ☐        |
+| Desenvolvimento pessoal       | ☐        | ☐ | ☐ | ☐ | ☐        |
+
+---
+
+### 💡 **Uso sugerido**
+
+* Aplicar o questionário digitalmente (ex.: Google Forms, Typeform).
+* Gerar um **índice de sobrecarga geral**, com alertas por área.
+* Combinar com o **mapa visual** para planejar soluções personalizadas.
+
+---
+
+Posso agora gerar para você:
+
+1. 📊 uma **versão em Excel ou PDF** com o questionário + mapa visual, pronta para impressão ou formulário digital,
+   ou
+2. 🎨 uma **versão gráfica visual (linha do tempo ilustrada)** com cores de sobrecarga e categorias.
+
+👉 Qual formato prefere que eu monte primeiro — **Excel/PDF completo** ou a **linha do tempo ilustrada**?

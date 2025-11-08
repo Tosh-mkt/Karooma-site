@@ -1,0 +1,206 @@
+Excelente\! Essa é a parte mais impactante do seu diagnóstico e a que mais vai gerar valor percebido para o usuário.
+
+Criar um gráfico de radar (ou *spider chart*) é a melhor forma visual de mostrar ao usuário onde estão os "furos" no seu "balde" de energia. Como você tem um perfil "vibe coding" e de design, vamos focar na opção que te dá mais controle e um resultado mais profissional.
+
+Seus 8 eixos (baseados na "Escala de Sobrecarga" de 1 a 5) serão:
+
+1.  Autocuidado e saúde
+2.  Filhos
+3.  Casa e tarefas
+4.  Trabalho e tempo
+5.  Gestão doméstica / documentos
+6.  Logística externa
+7.  Relacionamentos
+8.  Desenvolvimento pessoal
+
+Aqui estão as 3 principais formas de implementar isso, da mais recomendada para a mais simples.
+
+-----
+
+### 🚀 Opção 1: O "Vibe Coding" (Recomendada)
+
+Esta é a solução mais elegante, flexível e profissional. Você usa uma biblioteca JavaScript gratuita (como a **Chart.js**) para desenhar o gráfico diretamente na sua página de resultados.
+
+**Ferramenta:** [Chart.js](https://www.chartjs.org/) (Gratuita, open-source, linda)
+**Conceito:** Sua ferramenta de formulário (Typeform, Google Forms, ou seu app do Replit) irá redirecionar o usuário para a sua "Página de Resultados" no `karooma.life` e passar as 8 pontuações pela URL. Um script nessa página irá ler as pontuações e desenhar o gráfico.
+
+#### Fluxo Visual da Solução
+
+```mermaid
+graph TD
+    A[📝 Formulário Preenchido] -- "s1=5, s2=4, s3=2..." --> B(🔗 Redireciona para URL);
+    B --> C[🌐 Página de Resultados];
+    C -- 1. Carrega --> D[📜 Script Chart.js];
+    D -- 2. Lê dados da URL --> E[🎨 Elemento <canvas>];
+    E -- 3. Desenha --> F(📊 Gráfico de Radar Renderizado!);
+
+    style A fill:#C1E1FF,stroke:#333,stroke-width:2px
+    style F fill:#D4FFC1,stroke:#333,stroke-width:2px
+```
+
+#### Passo a Passo Prático:
+
+**1. Configure seu Formulário:**
+No seu Google Forms, Typeform ou app, configure-o para que, ao ser enviado, ele redirecione para a sua página de resultados com os dados na URL.
+**Exemplo de URL de Redirecionamento:**
+`https://karooma.life/diagnostico-resultado?s1=5&s2=3&s3=4&s4=2&s5=5&s6=1&s7=3&s8=4`
+*(Onde `s1` é a pontuação do Autocuidado, `s2` dos Filhos, etc.)*
+
+**2. O Código da sua Página de Resultados:**
+Copie e cole este código-fonte na sua "Página de Resultados" no `karooma.life`.
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seu Diagnóstico de Sobrecarga - Karooma.life</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Apenas para centralizar o gráfico na página */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: sans-serif;
+            flex-direction: column;
+        }
+        #chart-container {
+            width: 90%;
+            max-width: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Seu Mapa de Sobrecarga</h1>
+    <div id="chart-container">
+        <canvas id="meuGraficoRadar"></canvas>
+    </div>
+
+    <script>
+        // 3. O Script Mágico
+        document.addEventListener("DOMContentLoaded", function() {
+            
+            // Pega os parâmetros da URL
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Pega cada pontuação (de 1 a 5). Se faltar, usa 0 como padrão.
+            const s1 = parseInt(urlParams.get('s1')) || 0;
+            const s2 = parseInt(urlParams.get('s2')) || 0;
+            const s3 = parseInt(urlParams.get('s3')) || 0;
+            const s4 = parseInt(urlParams.get('s4')) || 0;
+            const s5 = parseInt(urlParams.get('s5')) || 0;
+            const s6 = parseInt(urlParams.get('s6')) || 0;
+            const s7 = parseInt(urlParams.get('s7')) || 0;
+            const s8 = parseInt(urlParams.get('s8')) || 0;
+
+            const dadosDoUsuario = [s1, s2, s3, s4, s5, s6, s7, s8];
+
+            // Pega o elemento <canvas>
+            const ctx = document.getElementById('meuGraficoRadar').getContext('2d');
+
+            // 4. Cria o Gráfico
+            new Chart(ctx, {
+                type: 'radar', // Tipo do gráfico
+                data: {
+                    labels: [
+                        'Autocuidado',
+                        'Filhos',
+                        'Casa e Tarefas',
+                        'Trabalho e Tempo',
+                        'Gestão/Documentos',
+                        'Logística Externa',
+                        'Relacionamentos',
+                        'Dev. Pessoal'
+                    ],
+                    datasets: [{
+                        label: 'Nível de Sobrecarga',
+                        // Os dados vêm da URL
+                        data: dadosDoUsuario,
+                        fill: true,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
+                    }]
+                },
+                options: {
+                    // Configura a escala para ir de 0 a 5
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            ticks: {
+                                stepSize: 1 // Mostra números 0, 1, 2, 3, 4, 5
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+```
+
+-----
+
+### 🧩 Opção 2: A Imagem Dinâmica (O "Hack" Rápido)
+
+Se você não quiser mexer com JavaScript, pode usar um serviço que gera imagens de gráficos "on-the-fly" a partir de uma URL.
+
+**Ferramenta:** [Image-Charts](https://www.image-charts.com/) (Tem um plano gratuito generoso)
+**Conceito:** Você constrói uma URL longa que contém todos os dados e rótulos. O Typeform (ou seu app) só precisa preencher os números das pontuações no meio dessa URL e, em seguida, redirecionar o usuário para ela (ou exibi-la como uma imagem na página de resultados).
+
+**Exemplo Prático:**
+A URL ficaria parecida com esta (é longa\!):
+
+```
+https://image-charts.com/chart
+?cht=r
+&chd=t:5,3,4,2,5,1,3,4
+&chs=500x500
+&chdl=Sobrecarga
+&chxl=0:|Autocuidado|Filhos|Casa|Trabalho|Docs|Logística|Relac.|Pessoal
+&chxt=x
+&chxr=1,0,5
+&chxt=y
+&chm=B,FF993380,0,0,0
+&chco=FF0000
+```
+
+  * `chd=t:5,3,4,2,5,1,3,4` \<- Esta é a parte que seu formulário teria que preencher dinamicamente.
+  * **Vantagem:** Muito rápido de implementar, não exige script.
+  * **Desvantagem:** Menos controle sobre o design, depende de um serviço externo.
+
+-----
+
+### 🔌 Opção 3: O Plugin (Integrado ao WordPress)
+
+Se o `karooma.life` é em WordPress, você pode usar um plugin de formulário avançado que tenha funcionalidade de gráficos.
+
+**Ferramenta:** **Formidable Forms** (o melhor para isso) ou **Gravity Forms** (com um add-on de gráficos).
+**Conceito:** Você constrói o formulário *dentro* do plugin. Em seguida, na página de confirmação (resultados), você insere um "shortcode" especial do plugin que diz: "Pegue os dados que *acabaram de ser enviados* e mostre-os como um gráfico de radar."
+
+  * **Vantagem:** Tudo fica dentro do seu WordPress; fácil de gerenciar.
+  * **Desvantagem:** Geralmente são plugins pagos; curva de aprendizado para configurar os gráficos.
+
+Eu recomendo fortemente a **Opção 1**. Ela se alinha perfeitamente com seu perfil "vibe coding", te dá controle total sobre o design (cores, fontes, etc.), é gratuita e o resultado é extremamente profissional para o usuário.
+
+-----
+
+Já que os dados do usuário (nome, e-mail e pontuações) estarão disponíveis na página de resultados (seja pela URL ou pelo formulário), o próximo passo é usar essa informação.
+
+Gostaria de ver como conectar essa "Página de Resultados" ao seu N8N para, por exemplo, enviar um e-mail de follow-up diferente com base na *pior* pontuação do usuário? (Ex: Se "Autocuidado" for 5, enviar o e-mail sobre "Ritual Noturno").

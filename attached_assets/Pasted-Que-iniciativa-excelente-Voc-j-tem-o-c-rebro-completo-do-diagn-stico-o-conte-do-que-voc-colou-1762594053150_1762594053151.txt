@@ -1,0 +1,128 @@
+Que iniciativa excelente. Você já tem o "cérebro" completo do diagnóstico (o conteúdo que você colou). Minha função agora é transformar isso em uma **ferramenta de geração de leads** prática e visual para o `karooma.life`, alinhada com seu estilo "vibe coding" e suas metas de automação.
+
+Este não é apenas um questionário; é a principal porta de entrada para seu funil.
+
+Vamos estruturar a implementação disto como um fluxo de trabalho, do clique inicial à conversão.
+
+### 🗺️ Fluxo de Trabalho Visual: O Diagnóstico como Funil
+
+Para que essa página funcione, ela precisa seguir uma jornada clara. Com base no seu perfil, este é o fluxo visual ideal para transformar um visitante em um lead:
+
+```mermaid
+graph TD
+    A[📢 Chamada no YouTube/Instagram] --> B(📍 Página de Diagnóstico no Karooma.life);
+    B --> C{📝 Usuário preenche o questionário};
+    C --> D[🔒 Tela de Captura de E-mail];
+    D -- Envia --> E[📈 Página de Resultados Personalizados];
+    D -- Envia --> F[🤖 Automação (N8N)];
+    F --> G[📧 E-mail de Boas-vindas com Resultados];
+    E --> H(🎯 CTA: Produtos Afiliados / E-books);
+
+    style A fill:#FFDDC1,stroke:#333,stroke-width:2px
+    style B fill:#C1E1FF,stroke:#333,stroke-width:2px
+    style C fill:#C1E1FF,stroke:#333,stroke-width:2px
+    style D fill:#FFC1C1,stroke:#333,stroke-width:2px
+    style E fill:#D4FFC1,stroke:#333,stroke-width:2px
+    style F fill:#F0C1FF,stroke:#333,stroke-width:2px
+    style G fill:#F0C1FF,stroke:#333,stroke-width:2px
+    style H fill:#D4FFC1,stroke:#333,stroke-width:2px
+```
+
+-----
+
+### 🛠️ Plano de Implementação Prático (Passo a Passo)
+
+Aqui está como construir cada etapa desse fluxo, mantendo seu estilo "vibe coding" em mente.
+
+#### Etapa 1: Escolher a Ferramenta para o Questionário
+
+Você tem o conteúdo, agora precisa da plataforma.
+
+  * **Opção 1: O Simples (No-Code Rápido)**
+
+      * **Ferramenta:** **Typeform** ou **Google Forms**.
+      * **Como:** Crie o questionário usando as 8 seções que você listou. Você pode incorporar (embedar) o formulário diretamente em uma página do `karooma.life`.
+      * **Vantagem:** Rápido de implementar e coletar dados. O Typeform é visualmente mais atraente.
+
+  * **Opção 2: O Integrado (Plugin de Quiz)**
+
+      * **Ferramenta:** Se seu site usa Wordpress, um plugin como **Gravity Forms** ou **Quiz Cat**.
+      * **Como:** Permite mais controle sobre o design e a lógica (ex: "se respondeu X, mostre Y").
+      * **Vantagem:** Mantém o usuário 100% dentro do seu site.
+
+  * **Opção 3: O "Vibe Coding" (Customizado)**
+
+      * **Ferramenta:** Usar **Replit** para criar um micro-app web (talvez com HTML/CSS/JS simples ou um framework leve).
+      * **Como:** Você teria controle total sobre a experiência. O front-end envia os dados para um backend simples (talvez um webhook do N8N).
+      * **Vantagem:** Totalmente personalizado e uma ótima forma de conectar suas ferramentas.
+
+#### Etapa 2: Construir a Página de Diagnóstico (Página 1)
+
+1.  **Título (Headline):** "Diagnóstico de Sobrecarga para Pais Ocupados: Descubra o que mais drena sua energia."
+2.  **Subtítulo:** "Responda estas perguntas rápidas (3 min) e receba um mapa visual das suas áreas de maior sobrecarga."
+3.  **O Questionário:** Insira aqui as 8 seções do "QUESTIONÁRIO DIAGNÓSTICO" que você forneceu.
+      * *Dica Visual:* Use uma seção por "página" do formulário para não sobrecarregar o usuário.
+
+#### Etapa 3: Criar a "Tela de Captura" (O Ponto de Conversão)
+
+Esta é a etapa *mais importante* para sua meta de geração de leads.
+
+> **NÃO** mostre os resultados imediatamente.
+>
+> Após o usuário clicar em "Concluir" no questionário, ele deve ver uma tela que diz:
+>
+> **"Quase lá\! Seu diagnóstico está sendo calculado."**
+>
+> "Para onde devemos enviar seu **Mapa de Sobrecarga** personalizado?"
+>
+>   * `[Campo: Primeiro Nome]`
+>   * `[Campo: Melhor E-mail]`
+>   * `[Botão: Ver meus Resultados Agora!]`
+
+#### Etapa 4: Desenhar a Página de Resultados (Página 2)
+
+Esta é a "página de obrigado" que o usuário vê *após* inserir o e-mail. Aqui é onde você entrega valor imediato.
+
+1.  **Agradecimento:** "Obrigado, [Nome]\! Aqui está seu Diagnóstico."
+2.  **A Entrega Visual (A Grande Sacada):**
+      * Lembro que você queria criar um questionário que gerasse um **gráfico de radar** (baseado em nossas conversas anteriores). Este é o momento perfeito\!
+      * Use a "📊 **Escala de Sobrecarga**" (os 8 itens de 1 a 5) como os eixos do seu gráfico.
+      * **[Exemplo de Imagem de um Gráfico de Radar com 8 eixos]**
+      * Os eixos seriam: Autocuidado, Filhos, Casa, Trabalho, Gestão Doméstica, Logística, Relacionamentos, Dev. Pessoal.
+      * Visualmente, o usuário verá imediatamente quais áreas estão "maiores" (mais sobrecarregadas).
+3.  **Interpretação:**
+      * "Seu gráfico mostra que suas áreas de maior sobrecarga são **[Área 1]** e **[Área 2]**."
+4.  **A Solução (Seu CTA):**
+      * "Com base nisso, aqui estão suas soluções prioritárias:"
+      * **Para [Área 1 - Ex: Casa e Tarefas]:** "Recomendamos nosso [Guia de Automação Doméstica] (Link para produto afiliado da Amazon) ou o [E-book de Meal Prep]."
+      * **Para [Área 2 - Ex: Autocuidado]:** "Veja este [App de Meditação] (Link afiliado) ou nosso [Jogo de Cartas para Conexão em Família]."
+
+#### Etapa 5: Automatizar o Follow-up (Sua "Equipe de IA")
+
+Aqui é onde seu interesse em **N8N** entra em jogo.
+
+1.  **Trigger (Gatilho):** O envio do formulário (via Webhook do Typeform, Replit ou plugin).
+2.  **Workflow no N8N:**
+      * **Nó 1 (Webhook):** Recebe os dados (nome, e-mail, respostas).
+      * **Nó 2 (Google Sheets):** Salva o novo lead em uma planilha.
+      * **Nó 3 (Gmail / Ferramenta de E-mail):** Envia o "E-mail de Boas-vindas".
+3.  **O E-mail de Boas-vindas:**
+      * **Assunto:** Seu Diagnóstico Karooma.life está aqui\!
+      * **Corpo:** "Olá [Nome], obrigado por fazer o diagnóstico. Como prometido, aqui está um resumo (pode até anexar o gráfico). Sua área de maior sobrecarga é [Área 1]. O primeiro passo para resolver isso é..." (Dê uma dica rápida e um link de volta para o site).
+
+-----
+
+### 🚀 Etapa 6: Promover seu Diagnóstico (Geração de Leads)
+
+Agora, use isso para alimentar suas metas do YouTube e Instagram:
+
+  * **Conteúdo para YouTube/Instagram:**
+      * **Título do Short/Reel:** "Você é um pai/mãe sobrecarregado(a)? 5 sinais de que sua rotina está no limite."
+      * **CTA no Vídeo:** "Eu criei um diagnóstico gratuito de 2 minutos para você descobrir *exatamente* qual área da sua vida precisa de ajuda primeiro. O link está na bio/descrição\! Faça o teste\!"
+  * **Link na Bio:** Seu link na bio *deve* levar direto para esta página de diagnóstico.
+
+Com esta estrutura, você não está apenas dando informação; você está capturando um lead qualificado, entendendo sua dor principal (baseado nas respostas) e oferecendo uma solução direcionada (seus produtos).
+
+-----
+
+Como próximo passo, você gostaria que eu detalhasse como transformar a "Escala de Sobrecarga" de 8 pontos em um **gráfico de radar** visual para a página de resultados? (Posso sugerir ferramentas ou até mesmo o código JS para isso, se você for pelo caminho do "vibe coding").
