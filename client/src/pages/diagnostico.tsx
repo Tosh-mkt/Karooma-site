@@ -123,12 +123,22 @@ const questions: Question[] = [
   },
 ];
 
-const responseOptions = [
+// Para perguntas POSITIVAS: triste→feliz (quanto mais frequente, melhor!)
+const responseOptionsPositive = [
   { value: 1, label: 'Nunca', emoji: '😰' },
   { value: 2, label: 'Raramente', emoji: '😟' },
   { value: 3, label: 'Às vezes', emoji: '😐' },
   { value: 4, label: 'Frequentemente', emoji: '🙂' },
   { value: 5, label: 'Sempre', emoji: '😊' },
+];
+
+// Para perguntas NEGATIVAS: feliz→triste (quanto mais frequente, pior!)
+const responseOptionsNegative = [
+  { value: 1, label: 'Nunca', emoji: '😊' },
+  { value: 2, label: 'Raramente', emoji: '🙂' },
+  { value: 3, label: 'Às vezes', emoji: '😐' },
+  { value: 4, label: 'Frequentemente', emoji: '😟' },
+  { value: 5, label: 'Sempre', emoji: '😰' },
 ];
 
 export default function DiagnosticoPage() {
@@ -344,7 +354,7 @@ export default function DiagnosticoPage() {
 
             {/* Response Options */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-              {responseOptions.map((option) => (
+              {(question.sentiment === 'negative' ? responseOptionsNegative : responseOptionsPositive).map((option) => (
                 <motion.button
                   key={option.value}
                   onClick={() => handleAnswer(option.value)}
