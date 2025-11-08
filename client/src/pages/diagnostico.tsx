@@ -12,6 +12,7 @@ interface Question {
   area: keyof DiagnosticAreas;
   question: string;
   icon: string;
+  sentiment: 'positive' | 'negative';
 }
 
 interface DiagnosticAreas {
@@ -26,28 +27,100 @@ interface DiagnosticAreas {
 // 12 perguntas (2 por área)
 const questions: Question[] = [
   // Carga Mental
-  { id: 1, area: 'cargaMental', question: 'Com que frequência você se sente sobrecarregada mentalmente com tudo que precisa lembrar e organizar?', icon: '🧠' },
-  { id: 2, area: 'cargaMental', question: 'Você consegue delegar tarefas ou sente que precisa fazer tudo sozinha?', icon: '🧠' },
+  { 
+    id: 1, 
+    area: 'cargaMental', 
+    question: 'Com que frequência você se sente sobrecarregada mentalmente com tudo que precisa lembrar e organizar?', 
+    icon: '🧠',
+    sentiment: 'negative'
+  },
+  { 
+    id: 2, 
+    area: 'cargaMental', 
+    question: 'Com que frequência você sente que precisa fazer tudo sozinha sem conseguir delegar?', 
+    icon: '🧠',
+    sentiment: 'negative'
+  },
   
   // Tempo da Casa
-  { id: 3, area: 'tempoDaCasa', question: 'Quanto tempo você gasta diariamente cuidando da casa (limpeza, organização)?', icon: '🏠' },
-  { id: 4, area: 'tempoDaCasa', question: 'Você se sente satisfeita com a organização da sua casa?', icon: '🏠' },
+  { 
+    id: 3, 
+    area: 'tempoDaCasa', 
+    question: 'Você sente que passa tempo excessivo cuidando da casa (limpeza, organização)?', 
+    icon: '🏠',
+    sentiment: 'negative'
+  },
+  { 
+    id: 4, 
+    area: 'tempoDaCasa', 
+    question: 'Você se sente satisfeita com a organização da sua casa?', 
+    icon: '🏠',
+    sentiment: 'positive'
+  },
   
   // Tempo de Qualidade
-  { id: 5, area: 'tempoDeQualidade', question: 'Você consegue ter momentos de qualidade com seus filhos diariamente?', icon: '❤️' },
-  { id: 6, area: 'tempoDeQualidade', question: 'Você reserva tempo para autocuidado e momentos para você mesma?', icon: '❤️' },
+  { 
+    id: 5, 
+    area: 'tempoDeQualidade', 
+    question: 'Você consegue ter momentos de qualidade com seus filhos diariamente?', 
+    icon: '❤️',
+    sentiment: 'positive'
+  },
+  { 
+    id: 6, 
+    area: 'tempoDeQualidade', 
+    question: 'Você reserva tempo para autocuidado e momentos para você mesma?', 
+    icon: '❤️',
+    sentiment: 'positive'
+  },
   
   // Alimentação
-  { id: 7, area: 'alimentacao', question: 'Com que frequência você consegue planejar refeições saudáveis para a família?', icon: '🍽️' },
-  { id: 8, area: 'alimentacao', question: 'Você se sente estressada na hora das refeições com as crianças?', icon: '🍽️' },
+  { 
+    id: 7, 
+    area: 'alimentacao', 
+    question: 'Com que frequência você consegue planejar refeições saudáveis para a família?', 
+    icon: '🍽️',
+    sentiment: 'positive'
+  },
+  { 
+    id: 8, 
+    area: 'alimentacao', 
+    question: 'Você se sente estressada na hora das refeições com as crianças?', 
+    icon: '🍽️',
+    sentiment: 'negative'
+  },
   
   // Gestão da Casa
-  { id: 9, area: 'gestaoDaCasa', question: 'Você tem um sistema para gerenciar contas, compras e tarefas domésticas?', icon: '📋' },
-  { id: 10, area: 'gestaoDaCasa', question: 'Você consegue manter as rotinas da casa funcionando de forma tranquila?', icon: '📋' },
+  { 
+    id: 9, 
+    area: 'gestaoDaCasa', 
+    question: 'Você tem um sistema para gerenciar contas, compras e tarefas domésticas?', 
+    icon: '📋',
+    sentiment: 'positive'
+  },
+  { 
+    id: 10, 
+    area: 'gestaoDaCasa', 
+    question: 'Você consegue manter as rotinas da casa funcionando de forma tranquila?', 
+    icon: '📋',
+    sentiment: 'positive'
+  },
   
   // Logística Infantil
-  { id: 11, area: 'logisticaInfantil', question: 'As manhãs com as crianças (acordar, vestir, café, escola) fluem tranquilamente?', icon: '👶' },
-  { id: 12, area: 'logisticaInfantil', question: 'Você consegue gerenciar os horários e atividades das crianças sem estresse?', icon: '👶' },
+  { 
+    id: 11, 
+    area: 'logisticaInfantil', 
+    question: 'As manhãs com as crianças (acordar, vestir, café, escola) fluem tranquilamente?', 
+    icon: '👶',
+    sentiment: 'positive'
+  },
+  { 
+    id: 12, 
+    area: 'logisticaInfantil', 
+    question: 'Você consegue gerenciar os horários e atividades das crianças sem estresse?', 
+    icon: '👶',
+    sentiment: 'positive'
+  },
 ];
 
 const responseOptions = [
@@ -115,7 +188,15 @@ export default function DiagnosticoPage() {
 
     allAnswers.forEach((answer, index) => {
       const question = questions[index];
-      scores[question.area].push(answer);
+      
+      // Inverter scores para perguntas negativas
+      // Pergunta negativa: "Sempre sobrecarregada" (5) → Score 1 (crítico)
+      // Pergunta positiva: "Sempre organizada" (5) → Score 5 (ótimo)
+      const adjustedScore = question.sentiment === 'negative' 
+        ? 6 - answer  // Inverte: 1→5, 2→4, 3→3, 4→2, 5→1
+        : answer;      // Mantém: 1→1, 2→2, ..., 5→5
+      
+      scores[question.area].push(adjustedScore);
     });
 
     return scores;
