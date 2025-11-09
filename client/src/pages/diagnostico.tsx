@@ -277,7 +277,7 @@ export default function DiagnosticoPage() {
                 Diagnóstico de Rotina Materna
               </h1>
               <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-                Descubra quais áreas da sua vida precisam de mais leveza! ✨
+                Descubra quais áreas da sua vida precisam de mais leveza e receba missões sob medida para trazer mais tranquilidade ao seu dia a dia ✨
               </p>
             </div>
 
