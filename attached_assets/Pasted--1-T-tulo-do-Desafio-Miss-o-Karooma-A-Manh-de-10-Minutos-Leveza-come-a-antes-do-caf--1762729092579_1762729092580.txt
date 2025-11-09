@@ -1,0 +1,88 @@
+# 1. Título do Desafio
+
+**Missão Karooma: A Manhã de 10 Minutos**
+*“Leveza começa antes do café.”*
+
+# 2. Objetivos Práticos
+
+Esta missão foi desenhada para transformar a manhã caótica em um ritual de 10 minutos focado e calmo. Os objetivos são:
+
+* Reduzir a carga mental e o estresse reativo logo ao acordar.
+* Eliminar a "fadiga de decisão" matinal (ex: O que vestir? Onde estão as chaves?).
+* Criar uma rotina previsível que "pilote" a saída de casa, em vez de depender da memória.
+* Garantir que o essencial (chaves, lancheiras, mochilas) esteja pronto e à mão.
+* Começar o dia com uma sensação de controle e calma, e não de atraso.
+
+# 3. Resumo do Dilema e Complexidades
+
+O dilema da mãe super ocupada é o *despertador*. Do momento em que ele toca (geralmente com um alarme estridente), dispara uma contagem regressiva caótica. É uma mãe tentando se vestir, enquanto pensa na lancheira que esqueceu de fazer, procura a chave do carro que sumiu, gerencia crianças sonolentas e o café que ainda nem foi passado.
+
+A complexidade não está nas tarefas em si (vestir, pegar chaves, sair), mas em executá-las *simultaneamente* e *sob extrema pressão de tempo*. A sensação é de começar o dia já "devendo" 10 pontos de energia e paciência. Tentar "acordar mais cedo" muitas vezes falha, pois o sono é um recurso igualmente escasso.
+
+# 4. Possíveis Workflows e a Solução Adotada
+
+* **Workflow A: "A Otimista" (Acordar 1h mais cedo):** A solução óbvia de tentar resolver o problema com *mais tempo*.
+    * **Falha:** Para a mãe em privação de sono, "1h mais cedo" é irreal. O botão "soneca" vence, e a culpa se soma ao caos quando o plano falha.
+
+* **Workflow B: "A Reativa" (Fazer tudo na hora):** É o caos atual. Depende da sorte, da cooperação de crianças sonolentas e da memória de curto prazo.
+    * **Falha:** Altamente estressante, imprevisível e a principal fonte da sensação de "estar sempre atrasada".
+
+* **Workflow C: "A Estrategista" (O Adotado):** A batalha da manhã se vence na noite anterior.
+    * **Por que é a melhor:** Esta missão é contraintuitiva. Os "10 minutos da manhã" só são possíveis porque movemos 90% das *decisões* e *tarefas* da manhã (alta pressão) para a noite (baixa pressão). É uma mudança de "organizar" para "executar". Os 10 minutos da manhã não são para *preparar*, mas para *pilotar* o que já foi preparado.
+
+# 5. Etapas de Implementação com Produtos e Soluções Associadas
+
+Esta missão é dividida em duas fases: o "Setup Noturno" e a "Execução Matinal".
+
+### Fase 1: O "Setup" Noturno (Os 15 minutos que compram 1 hora)
+
+*Esta é a parte mais importante da missão. Faça-a na noite anterior, após o jantar ou antes de relaxar.*
+
+* **Etapa 1: Criar a "Estação de Saída"**
+    * **Ação:** Defina um local físico perto da porta de saída (um aparador, uma prateleira). Este é o seu "ponto de lançamento".
+    * **Ação:** Coloque ali tudo o que *tem* que sair de casa com você: chaves, carteira, óculos de sol, fones de ouvido.
+    * **Solução/Produto Associado:** Uma **Bandeja Organizadora de Entrada** (ou "Caixa de Saída"). Não precisa ser complexo; uma bela bandeja de vime, madeira ou couro já serve para "ancorar" visualmente os itens essenciais.
+
+* **Etapa 2: Preparar os "Kits"**
+    * **Ação:** Mochilas e Lancheiras. Deixe-as 90% prontas. O que for seco (biscoitos, frutas que não precisam de refrigeração, talheres, guardanapos) já fica dentro da lancheira. O que for de geladeira (iogurte, sanduíche) fica na geladeira, mas *junto* e visível.
+    * **Ação:** Roupas. Separe a sua roupa *completa* (incluindo roupa íntima e meias) e a das crianças. Deixe-as visíveis e prontas para vestir. Isso elimina a fadiga de decisão.
+
+* **Etapa 3: Preparar o "Combustível"**
+    * **Ação:** Deixe o seu "Cantinho do Café" (veja a Missão 2) semi-pronto. A caneca ao lado da cafeteira, a cápsula ou o pó já medido.
+    * **Ação:** Deixe um copo de água ao lado da sua cama.
+
+### Fase 2: A Manhã de 10 Minutos (A Execução)
+
+* **Etapa 4: O Despertar Gentil (Minuto 0-1)**
+    * **Ação:** Acordar com calma. O ideal é ser despertada não pelo pânico, mas por um sinal gentil.
+    * **Solução/Produto Associado:** **Despertador Silencioso (de Luz / Sunrise)**. Estes aparelhos simulam o nascer do sol, aumentando a luz do quarto gradualmente *antes* de qualquer som. Isso acorda o corpo de forma biológica e reduz o "susto" do alarme, que já inicia o dia com adrenalina. Se não for possível, um alarme vibratório no relógio de pulso também funciona.
+
+* **Etapa 5: O Check-in Pessoal (Minuto 1-5)**
+    * **Ação:** Beba o copo d'água (hidratação imediata). Lave o rosto. Passe seu protetor solar. Respire fundo 3 vezes. Este é o seu micro-autocuidado.
+
+* **Etapa 6: O "Lançamento" (Minuto 5-10)**
+    * **Ação:** Ative o café (que já estava pré-pronto).
+    * **Ação:** Vista-se (com a roupa que já estava separada).
+    * **Ação:** Olhe seu checklist.
+    * **Solução/Produto Associado:** **Planner Matinal (Formato Bloco/Checklist)**. Não é um diário. É um bloco de notas simples, idealmente semanal, com um checklist visível na bancada: [ ] Pegar lancheira (Geladeira), [ ] Pegar Mochila, [ ] Pegar Chaves (Estação de Saída).
+    * **Ação Final:** Pegue os itens da geladeira, coloque na lancheira. Pegue os itens da "Estação de Saída". Saia pela porta.
+
+# 6. Lista de ASIN dos Produtos para Pesquisa
+
+*Nota: Os ASINs da Amazon são voláteis. Estes são exemplos de *tipos* de produtos que cumprem a função. Use os termos de busca para encontrar os mais adequados no momento da implementação.*
+
+1.  **Planner Matinal (Bloco Semanal):**
+    * *Termo de Busca:* "Planner semanal bloco destacável"
+    * *Exemplo ASIN:* B09NBLM8C3 (Planner Bloco Semanal A5)
+
+2.  **Bandeja Organizadora de Entrada (Caixa de Saída):**
+    * *Termo de Busca:* "Bandeja couro organizadora entrada" ou "Caixa organizadora bambu pequena"
+    * *Exemplo ASIN:* B08K3V3S2Q (Bandeja de Couro PU, tipo porta-objetos)
+
+3.  **Despertador de Luz (Sunrise):**
+    * *Termo de Busca:* "Despertador luz nascer do sol" ou "Sunrise alarm clock"
+    * *Exemplo ASIN:* B08P1KP35R (Um modelo popular de despertador que simula o amanhecer)
+
+# 7. Descrição da Imagem de Referência para Cabeçalho
+
+Um aparador de entrada em madeira clara, banhado por uma luz suave de início de manhã. Sobre ele, uma "Estação de Saída" perfeitamente organizada, mas realista: uma bandeja de vime ou couro onde descansam um par de chaves, óculos de sol e uma carteira. Ao lado, um pequeno planner em bloco com um checklist visível. Em primeiro plano, levemente desfocada, a mão de uma mulher segurando uma caneca de café, passando pela cena. A paleta de cores é serena (brancos, beges, um toque de verde de uma pequena planta). A imagem transmite a sensação de "pronto para sair", com calma e controle.
