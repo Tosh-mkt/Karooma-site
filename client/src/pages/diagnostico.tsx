@@ -94,7 +94,7 @@ const questions: Question[] = [
   { 
     id: 9, 
     area: 'gestaoDaCasa', 
-    question: 'Você tem um sistema para gerenciar contas, compras e tarefas domésticas?', 
+    question: 'Com que frequência você consegue manter as contas, compras e tarefas domésticas organizadas?', 
     icon: '📋',
     sentiment: 'positive'
   },
