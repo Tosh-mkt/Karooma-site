@@ -63,106 +63,182 @@ export function RadarChart({ scores, className = '' }: RadarChartProps) {
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
     >
-      {/* Gradiente de fundo suave */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 dark:from-pink-950/20 dark:via-purple-950/20 dark:to-cyan-950/20 rounded-3xl blur-3xl opacity-40" />
+      {/* Fundo escuro para destacar o glow */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 rounded-3xl" />
       
       <div className="relative">
-        <ResponsiveContainer width="100%" height={500}>
-          <RechartsRadar data={data}>
-            {/* Grid circular */}
-            <PolarGrid 
-              stroke="#e5e7eb" 
-              strokeWidth={1.5}
-              strokeDasharray="0"
-            />
-            
-            {/* Eixos radiais (invisíveis, apenas para estrutura) */}
-            <PolarRadiusAxis 
-              angle={90} 
-              domain={[0, 5]} 
-              tick={false}
-              axisLine={false}
-            />
-            
-            {/* Labels das áreas com ícones */}
-            <PolarAngleAxis 
-              dataKey="area" 
-              tick={(props) => {
-                const { payload, x, y, textAnchor } = props;
-                const item = data.find(d => d.area === payload.value);
-                
-                return (
-                  <g transform={`translate(${x},${y})`}>
-                    {/* Ícone */}
-                    <text
-                      x={0}
-                      y={-20}
-                      textAnchor={textAnchor}
-                      className="text-2xl"
-                    >
-                      {item?.icon}
-                    </text>
-                    {/* Label */}
-                    <text
-                      x={0}
-                      y={10}
-                      textAnchor={textAnchor}
-                      className="text-sm font-medium fill-gray-700 dark:fill-gray-300"
-                      style={{ whiteSpace: 'pre-line' }}
-                    >
-                      {payload.value}
-                    </text>
-                  </g>
-                );
-              }}
-              stroke="#6b7280"
-            />
-            
-            {/* Área preenchida com gradiente Karooma */}
-            <Radar
-              name="Scores"
-              dataKey="value"
-              stroke="url(#radarGradient)"
-              fill="url(#radarFill)"
-              fillOpacity={0.6}
-              strokeWidth={3}
-              dot={{
-                fill: '#f472b6',
-                stroke: '#fff',
-                strokeWidth: 2,
-                r: 6
-              }}
-              animationDuration={1200}
-              animationEasing="ease-out"
-            />
-            
-            {/* Definições de gradientes */}
-            <defs>
-              <linearGradient id="radarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#ec4899" />
-                <stop offset="50%" stopColor="#a855f7" />
-                <stop offset="100%" stopColor="#06b6d4" />
-              </linearGradient>
-              
-              <radialGradient id="radarFill">
-                <stop offset="0%" stopColor="#ec4899" stopOpacity="0.8" />
-                <stop offset="50%" stopColor="#a855f7" stopOpacity="0.6" />
-                <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.4" />
-              </radialGradient>
-            </defs>
-          </RechartsRadar>
-        </ResponsiveContainer>
+        {/* SVG Overlay com camadas de Aurora */}
+        <svg 
+          className="absolute inset-0 w-full h-full pointer-events-none" 
+          viewBox="0 0 500 500"
+          style={{ zIndex: 0 }}
+        >
+          <defs>
+            {/* Filtro de Glow/Aurora */}
+            <filter id="auroraGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="15" result="blur" />
+              <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 2 0" result="glow" />
+              <feMerge>
+                <feMergeNode in="glow" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
 
-        {/* Logo Karooma.life no centro */}
+            {/* Gradientes Radiantes para as camadas */}
+            <radialGradient id="auroraPink">
+              <stop offset="0%" stopColor="#ec4899" stopOpacity="0.8" />
+              <stop offset="50%" stopColor="#ec4899" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#ec4899" stopOpacity="0" />
+            </radialGradient>
+
+            <radialGradient id="auroraPurple">
+              <stop offset="0%" stopColor="#a855f7" stopOpacity="0.7" />
+              <stop offset="50%" stopColor="#a855f7" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#a855f7" stopOpacity="0" />
+            </radialGradient>
+
+            <radialGradient id="auroraCyan">
+              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.6" />
+              <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+
+          {/* Camadas concêntricas com animação de pulso */}
+          <motion.circle
+            cx="250"
+            cy="250"
+            r="180"
+            fill="url(#auroraCyan)"
+            filter="url(#auroraGlow)"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5, ease: "easeOut" }}
+          />
+          
+          <motion.circle
+            cx="250"
+            cy="250"
+            r="130"
+            fill="url(#auroraPurple)"
+            filter="url(#auroraGlow)"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5, delay: 0.2, ease: "easeOut" }}
+          />
+          
+          <motion.circle
+            cx="250"
+            cy="250"
+            r="80"
+            fill="url(#auroraPink)"
+            filter="url(#auroraGlow)"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5, delay: 0.4, ease: "easeOut" }}
+          />
+        </svg>
+
+        {/* Recharts Radar (sobre as camadas de glow) */}
+        <div className="relative" style={{ zIndex: 1 }}>
+          <ResponsiveContainer width="100%" height={500}>
+            <RechartsRadar data={data}>
+              {/* Grid circular sutil */}
+              <PolarGrid 
+                stroke="#ffffff20" 
+                strokeWidth={1}
+                strokeDasharray="0"
+              />
+              
+              {/* Eixos radiais (invisíveis) */}
+              <PolarRadiusAxis 
+                angle={90} 
+                domain={[0, 5]} 
+                tick={false}
+                axisLine={false}
+              />
+              
+              {/* Labels das áreas com ícones */}
+              <PolarAngleAxis 
+                dataKey="area" 
+                tick={(props) => {
+                  const { payload, x, y, textAnchor } = props;
+                  const item = data.find(d => d.area === payload.value);
+                  
+                  return (
+                    <g transform={`translate(${x},${y})`}>
+                      {/* Ícone */}
+                      <text
+                        x={0}
+                        y={-20}
+                        textAnchor={textAnchor}
+                        className="text-2xl"
+                      >
+                        {item?.icon}
+                      </text>
+                      {/* Label */}
+                      <text
+                        x={0}
+                        y={10}
+                        textAnchor={textAnchor}
+                        className="text-sm font-semibold fill-white dark:fill-white"
+                        style={{ whiteSpace: 'pre-line' }}
+                      >
+                        {payload.value}
+                      </text>
+                    </g>
+                  );
+                }}
+                stroke="#ffffff40"
+              />
+              
+              {/* Área preenchida com gradiente vibrante */}
+              <Radar
+                name="Scores"
+                dataKey="value"
+                stroke="url(#radarStroke)"
+                fill="url(#radarFillGradient)"
+                fillOpacity={0.5}
+                strokeWidth={3}
+                dot={{
+                  fill: '#ffffff',
+                  stroke: '#ec4899',
+                  strokeWidth: 3,
+                  r: 7
+                }}
+                animationDuration={1500}
+                animationEasing="ease-out"
+              />
+              
+              {/* Definições de gradientes para o polígono */}
+              <defs>
+                <linearGradient id="radarStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#ec4899" />
+                  <stop offset="50%" stopColor="#a855f7" />
+                  <stop offset="100%" stopColor="#06b6d4" />
+                </linearGradient>
+                
+                <radialGradient id="radarFillGradient">
+                  <stop offset="0%" stopColor="#ec4899" stopOpacity="0.8" />
+                  <stop offset="50%" stopColor="#a855f7" stopOpacity="0.6" />
+                  <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.4" />
+                </radialGradient>
+              </defs>
+            </RechartsRadar>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Logo Karooma.life no centro (círculo dark) */}
         <motion.div 
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, duration: 0.5 }}
+          transition={{ delay: 0.6, duration: 0.5, type: "spring", stiffness: 200 }}
+          style={{ zIndex: 2 }}
         >
-          <div className="bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 rounded-full p-1 shadow-lg">
-            <div className="bg-white dark:bg-gray-900 rounded-full px-6 py-3">
-              <span className="text-xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 bg-clip-text text-transparent whitespace-nowrap">
+          <div className="bg-gradient-to-br from-pink-500 via-purple-500 to-cyan-500 rounded-full p-0.5 shadow-2xl">
+            <div className="bg-gray-900 dark:bg-gray-950 rounded-full px-8 py-4 shadow-inner">
+              <span className="text-2xl font-bold bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent whitespace-nowrap">
                 Karooma.life
               </span>
             </div>
