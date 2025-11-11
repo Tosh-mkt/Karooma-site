@@ -18,6 +18,33 @@ interface FloatingActionMenuProps {
 }
 
 export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProps) {
+  // DEBUG VERSION - Simple red box to test visibility
+  return (
+    <div 
+      style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        width: '80px',
+        height: '80px',
+        backgroundColor: 'red',
+        borderRadius: '50%',
+        zIndex: 9999,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        fontSize: '14px',
+        fontWeight: 'bold',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+      }}
+      onClick={() => alert('Botão clicado!')}
+    >
+      TESTE
+    </div>
+  );
+  
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
 
