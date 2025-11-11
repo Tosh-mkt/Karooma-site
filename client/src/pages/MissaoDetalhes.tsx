@@ -1,13 +1,13 @@
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, AlertCircle, Volume2, VolumeX } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, AlertCircle } from "lucide-react";
 import { MissionHero } from "@/components/missoes/MissionHero";
 import { MissionMeta } from "@/components/missoes/MissionMeta";
 import { TaskProgress } from "@/components/missoes/TaskProgress";
 import { WhyMattersCard } from "@/components/missoes/WhyMattersCard";
 import { TestimonialsList } from "@/components/missoes/TestimonialsList";
 import { MissionProducts } from "@/components/missoes/MissionProducts";
+import { FloatingActionMenu } from "@/components/missoes/FloatingActionMenu";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAudioNarration } from "@/hooks/useAudioNarration";
@@ -60,6 +60,20 @@ export default function MissaoDetalhes() {
     });
   };
 
+  const handleScrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const offset = 80; // Header offset
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-green-900/10 flex items-center justify-center">
@@ -94,59 +108,39 @@ export default function MissaoDetalhes() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-green-900/10">
-      <MissionHero
-        title={data.title}
-        understandingText={data.understandingText}
-        heroImageUrl={data.heroImageUrl}
-        category={data.category}
-        onAudioToggle={isSupported ? handleAudioToggle : undefined}
-        isAudioPlaying={isPlaying}
-      />
+      <div id="hero">
+        <MissionHero
+          title={data.title}
+          understandingText={data.understandingText}
+          heroImageUrl={data.heroImageUrl}
+          category={data.category}
+          onAudioToggle={isSupported ? handleAudioToggle : undefined}
+          isAudioPlaying={isPlaying}
+        />
+      </div>
       
       <div className="container mx-auto px-4 py-8 space-y-8">
         <MissionMeta
           category={data.category}
         />
         
-        <TaskProgress slug={slug!} />
+        <div id="tasks">
+          <TaskProgress slug={slug!} />
+        </div>
         
-        <WhyMattersCard text={data.bonusTip} />
+        <div id="why-matters">
+          <WhyMattersCard text={data.bonusTip} />
+        </div>
         
         <TestimonialsList slug={slug!} />
         
-        <MissionProducts products={data.products} />
+        <div id="products">
+          <MissionProducts products={data.products} />
+        </div>
       </div>
 
-      {/* Floating Audio Button - Responsive positioning */}
-      {isSupported && (
-        <AnimatePresence>
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50"
-          >
-            <Button
-              onClick={handleAudioToggle}
-              size="lg"
-              className={`
-                h-14 w-14 md:h-16 md:w-16 rounded-full shadow-2xl transition-all duration-300
-                ${isPlaying 
-                  ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 animate-pulse' 
-                  : 'bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
-                }
-              `}
-              data-testid="button-floating-audio"
-            >
-              {isPlaying ? (
-                <VolumeX className="w-6 h-6 md:w-7 md:h-7 text-white" />
-              ) : (
-                <Volume2 className="w-6 h-6 md:w-7 md:h-7 text-white" />
-              )}
-            </Button>
-          </motion.div>
-        </AnimatePresence>
-      )}
+      {/* Floating Action Menu */}
+      <FloatingActionMenu onScrollToSection={handleScrollToSection} />
     </div>
   );
 }
