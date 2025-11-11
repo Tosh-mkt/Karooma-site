@@ -179,30 +179,30 @@ export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProp
         </AnimatePresence>
 
         {/* Main Toggle Button */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+        <Button
+          onClick={() => setIsExpanded(!isExpanded)}
+          size="lg"
+          style={{ 
+            display: 'flex',
+            opacity: 1,
+            transform: 'scale(1)',
+            visibility: 'visible'
+          }}
+          className={`
+            h-14 w-14 md:h-16 md:w-16 rounded-full shadow-2xl transition-all duration-300
+            ${isExpanded 
+              ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rotate-45' 
+              : 'bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
+            }
+          `}
+          data-testid="button-floating-menu-toggle"
         >
-          <Button
-            onClick={() => setIsExpanded(!isExpanded)}
-            size="lg"
-            className={`
-              h-14 w-14 md:h-16 md:w-16 rounded-full shadow-2xl transition-all duration-300
-              ${isExpanded 
-                ? 'bg-gradient-to-br from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rotate-45' 
-                : 'bg-gradient-to-br from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700'
-              }
-            `}
-            data-testid="button-floating-menu-toggle"
-          >
-            {isExpanded ? (
-              <X className="w-6 h-6 md:w-7 md:h-7 text-white" />
-            ) : (
-              <Plus className="w-6 h-6 md:w-7 md:h-7 text-white" />
-            )}
-          </Button>
-        </motion.div>
+          {isExpanded ? (
+            <X className="w-6 h-6 md:w-7 md:h-7 text-white" />
+          ) : (
+            <Plus className="w-6 h-6 md:w-7 md:h-7 text-white" />
+          )}
+        </Button>
       </div>
     </div>
   );
