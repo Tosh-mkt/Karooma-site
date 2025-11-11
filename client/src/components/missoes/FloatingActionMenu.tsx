@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, FileText, Heart, CheckSquare, ShoppingBag, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,33 +19,6 @@ interface FloatingActionMenuProps {
 }
 
 export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProps) {
-  // DEBUG VERSION - Simple red box to test visibility
-  return (
-    <div 
-      style={{
-        position: 'fixed',
-        bottom: '20px',
-        right: '20px',
-        width: '80px',
-        height: '80px',
-        backgroundColor: 'red',
-        borderRadius: '50%',
-        zIndex: 9999,
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        fontSize: '14px',
-        fontWeight: 'bold',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
-      }}
-      onClick={() => alert('Botão clicado!')}
-    >
-      TESTE
-    </div>
-  );
-  
   const [isExpanded, setIsExpanded] = useState(false);
   const { toast } = useToast();
 
@@ -142,7 +116,8 @@ export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProp
     }
   ];
 
-  return (
+  // Use Portal to render directly to body, bypassing any overflow:hidden containers
+  const menuContent = (
     <div 
       className="fixed bottom-6 right-4 md:bottom-10 md:right-8" 
       style={{ zIndex: 9999 }}
@@ -233,4 +208,7 @@ export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProp
       </div>
     </div>
   );
+
+  // Render using Portal to document.body
+  return createPortal(menuContent, document.body);
 }
