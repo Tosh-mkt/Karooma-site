@@ -116,7 +116,7 @@ export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProp
   ];
 
   return (
-    <div className="fixed bottom-20 right-4 md:bottom-24 md:right-8 z-40">
+    <div className="fixed bottom-6 right-4 md:bottom-10 md:right-8 z-[60]">
       <div className="flex flex-col items-end gap-3">
         {/* Expanded Menu Items */}
         <AnimatePresence>
