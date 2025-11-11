@@ -1768,9 +1768,8 @@ export class DatabaseStorage implements IStorage {
         .from(missions)
         .where(and(
           eq(missions.isPublished, true),
-          sql`${missions.diagnosticAreas} && ${sql.placeholder('areas')}`
+          sql`${missions.diagnosticAreas} && ARRAY[${diagnosticAreas.map(() => sql`?`).join(', ')}]::text[]`
         ))
-        .bind({ areas: diagnosticAreas })
         .orderBy(desc(missions.createdAt));
     }
 

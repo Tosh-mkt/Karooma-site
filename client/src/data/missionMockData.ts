@@ -1,0 +1,65 @@
+export interface MissionTask {
+  id: string;
+  title: string;
+  subtitle: string;
+}
+
+export interface MissionTestimonial {
+  name: string;
+  avatar: string;
+  time: string;
+  text: string;
+}
+
+export const MISSION_TASKS: Record<string, MissionTask[]> = {
+  'organize-manha-10-minutos': [
+    { 
+      id: 't1', 
+      title: 'Escolha 3 itens espalhados pela casa e guarde-os', 
+      subtitle: 'Não precisa ser perfeito. Só três coisas que te incomodam agora.' 
+    },
+    { 
+      id: 't2', 
+      title: 'Abra uma janela por 2 minutos', 
+      subtitle: 'O ar fresco renova o espaço e a sua energia.' 
+    },
+    { 
+      id: 't3', 
+      title: 'Coloque uma música que te acalme', 
+      subtitle: 'Deixe tocar enquanto faz as próximas ações.' 
+    },
+    { 
+      id: 't4', 
+      title: 'Organize a mesa da cozinha ou da sala', 
+      subtitle: 'Só a superfície visível. O resto pode esperar.' 
+    },
+    { 
+      id: 't5', 
+      title: 'Respire fundo 3 vezes', 
+      subtitle: 'Sinta a diferença. Você criou esse espaço.' 
+    }
+  ],
+};
+
+export const MISSION_TESTIMONIALS: Record<string, MissionTestimonial[]> = {
+  'organize-manha-10-minutos': [
+    { 
+      name: 'Mariana', 
+      avatar: 'M', 
+      time: 'há 2 horas', 
+      text: 'Fiz hoje e me senti leve! Não sabia que 5 minutos podiam fazer tanta diferença.' 
+    },
+    { 
+      name: 'Camila', 
+      avatar: 'C', 
+      time: 'há 5 horas', 
+      text: 'Organizei com meu filho, foi divertido. Ele escolheu a música! 🎵' 
+    },
+    { 
+      name: 'Juliana', 
+      avatar: 'J', 
+      time: 'ontem', 
+      text: 'Respirei fundo e senti que estava cuidando de mim também, não só da casa.' 
+    }
+  ],
+};
