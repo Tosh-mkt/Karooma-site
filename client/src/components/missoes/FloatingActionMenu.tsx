@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, FileText, Heart, CheckSquare, ShoppingBag, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,29 +19,7 @@ interface FloatingActionMenuProps {
 
 export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
   const { toast } = useToast();
-
-  // Garantir que o portal só seja criado quando o elemento existir
-  useEffect(() => {
-    let targetElement = document.getElementById('floating-menu-root');
-    
-    // Se não existir, criar
-    if (!targetElement) {
-      targetElement = document.createElement('div');
-      targetElement.id = 'floating-menu-root';
-      document.body.appendChild(targetElement);
-    }
-    
-    setPortalRoot(targetElement);
-    
-    return () => {
-      // Cleanup: remover elemento criado dinamicamente ao desmontar
-      if (targetElement && targetElement.parentNode === document.body && !document.getElementById('floating-menu-root')) {
-        document.body.removeChild(targetElement);
-      }
-    };
-  }, []);
 
   const menuActions: MenuAction[] = [
     {
@@ -138,11 +115,12 @@ export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProp
     }
   ];
 
-  // Renderizar conteúdo do menu
-  const menuContent = (
+  // Renderizar menu flutuante diretamente (sem Portal)
+  return (
     <div 
-      className="fixed bottom-6 right-4 md:bottom-10 md:right-8" 
-      style={{ zIndex: 99999, pointerEvents: 'auto' }}
+      className="fixed bottom-6 right-4 md:bottom-10 md:right-8 z-[99999]" 
+      style={{ pointerEvents: 'auto' }}
+      data-testid="floating-action-menu-container"
     >
       <div className="flex flex-col items-end gap-3">
         {/* Expanded Menu Items */}
@@ -230,12 +208,4 @@ export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProp
       </div>
     </div>
   );
-
-  // Só renderizar quando o portal estiver pronto
-  if (!portalRoot) {
-    return null;
-  }
-
-  // Usar Portal para renderizar no elemento dedicado
-  return createPortal(menuContent, portalRoot);
 }
