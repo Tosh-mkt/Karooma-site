@@ -1,0 +1,87 @@
+# 1. Título do Desafio
+
+**Missão Karooma: O Ritual do Café (em 2 minutos)**
+*“Um café no seu tempo, não no do relógio.”*
+
+# 2. Objetivos Práticos
+
+Esta missão foi desenhada para criar um espaço que poupa tempo e, principalmente, *energia mental* logo ao acordar.
+
+* Transformar a primeira tarefa do dia (fazer café) de uma "caça ao tesouro" caótica para um ritual prazeroso e previsível.
+* Reduzir o tempo de preparo eliminando a necessidade de procurar por canecas, pó de café, filtros ou açúcar em diferentes armários.
+* Centralizar a "sujeira" do café em uma única área fácil de limpar.
+* Criar um micro-momento de acolhimento e pausa para a mãe, antes que as demandas do dia comecem.
+
+# 3. Resumo do Dilema e Complexidades
+
+O dilema da mãe ocupada é que ela precisa do café para *começar* a funcionar, mas o ato de *fazer* o café já exige um nível de energia que ela ainda não tem.
+
+A complexidade está na dispersão. A caneca favorita está no escorredor (ou suja na pia), o pó de café está no armário de cima, o filtro na gaveta do outro lado da cozinha, e o açúcar, no balcão. Cada item exige uma decisão e um deslocamento. Isso gasta preciosos minutos e adiciona "ruído" mental a uma manhã que já é uma corrida contra o relógio. Muitas vezes, a bancada está lotada com itens do jantar anterior ou da lancheira do dia seguinte, tornando o simples ato de passar um café um exercício de logística.
+
+# 4. Possíveis Workflows e a Solução Adotada
+
+* **Workflow A: "A Caçadora" (O Status Quo):** Acordar e caçar os itens em 4 ou 5 locais diferentes da cozinha, desviando de outras tarefas.
+    * **Falha:** Ineficiente, estressante e gera mais bagunça para limpar depois.
+
+* **Workflow B: "A Barista Exigente":** Montar um cantinho complexo, com moedor, balança de precisão, 10 tipos de grãos e métodos variados.
+    * **Falha:** Lindo esteticamente, mas frágil. Para a mãe ocupada, vira mais uma *obrigação* de manutenção do que um *facilitador*.
+
+* **Workflow C: "O Ponto de Acolhimento" (O Adotado):** Criar uma estação de café compacta, funcional e autossuficiente, baseada no princípio do "Mise en Place" (tudo no seu lugar).
+    * **Por que é a melhor:** Esta solução foca na *eficiência* e no *ritual*. Ela centraliza 100% dos itens necessários em um único local. A manutenção é mínima e o ganho de tempo é imediato. Ela transforma uma obrigação matinal em um gesto de autocuidado.
+
+# 5. Etapas de Implementação com Produtos e Soluções Associadas
+
+### Etapa 1: A Escolha do Local (O "Spot")
+
+* **Ação:** Defina o seu "território". Escolha um pequeno espaço na bancada da cozinha, idealmente próximo a uma tomada elétrica. Pode ser também um pequeno carrinho ou aparador. O importante é ser um local *fixo*.
+
+### Etapa 2: A Base de Comando (A Bandeja)
+
+* **Ação:** Use uma bandeja. Este é o item mais importante da missão. Ela delimita o espaço visual do "cantinho do café" e, o mais importante, *centraliza a limpeza*.
+* **Porque funciona:** Se o pó de café ou gotas caírem, sujarão apenas a bandeja, que pode ser facilmente lavada, em vez de exigir a limpeza de toda a bancada.
+* **Solução/Produto Associado:** **Bandeja Decorativa**. Pode ser de madeira, bambu, metal ou vime. O material não importa tanto quanto a função de "conter" os itens.
+
+### Etapa 3: O "Hardware" (A Máquina)
+
+* **Ação:** Posicione sua cafeteira (seja ela de cápsula, expresso, ou um simples porta-filtro V60) sobre a bandeja.
+
+### Etapa 4: Os "Insumos" (Potes Herméticos)
+
+* **Ação:** Retire o café (pó ou grãos), açúcar/adoçante e filtros de suas embalagens originais (que são feias, ocupam espaço e fazem sujeira).
+* **Ação:** Transfira-os para potes padronizados.
+* **Solução/Produto Associado:** **Potes Herméticos**. Eles mantêm o café fresco por mais tempo, evitam que o saco de pó aberto se espalhe e são visualmente mais calmos. Tenha um pote para café e outro para açúcar/adoçante.
+
+### Etapa 5: Os "Veículos" (Canecas e Acessórios)
+
+* **Ação:** Mantenha suas canecas de uso diário *neste local*. Não precisa trazer todas as canecas da casa; 2 ou 3 são suficientes.
+* **Ação:** Adicione um pequeno recipiente (um copo baixo ou porta-lápis) para as colheres de café.
+* **Solução/Produto Associado:** **Caneca Térmica**. Para a mãe que é constantemente interrompida, a caneca térmica é uma aliada. Ela garante que o café não estará gelado após você ter resolvido uma emergência infantil.
+
+### Etapa 6: O Ritual (A Manutenção Noturna)
+
+* **Ação:** Crie o micro-hábito de, antes de dormir, verificar seu Cantinho do Café. A caneca do dia está limpa e de volta ao lugar? O pote de pó de café está cheio? A água da cafeteira está abastecida?
+* **Porque funciona:** Isso garante que, na manhã seguinte, seu ritual de 2 minutos estará 100% funcional, sem surpresas.
+
+# 6. Lista de ASIN dos Produtos para Pesquisa
+
+*Nota: Os ASINs da Amazon são voláteis. Estes são exemplos de *tipos* de produtos que cumprem a função. Use os termos de busca para encontrar os mais adequados no momento da implementação.*
+
+1.  **Bandeja Organizadora:**
+    * *Termo de Busca:* "Bandeja bambu retangular" ou "Bandeja decorativa espelhada café"
+    * *Exemplo ASIN:* B07X8MFTF8 (Bandeja de bambu)
+
+2.  **Potes Herméticos:**
+    * *Termo de Busca:* "Pote hermético de vidro com tampa de bambu" ou "Pote hermético acrílico café"
+    * *Exemplo ASIN:* B098RWF23S (Conjunto de potes herméticos de vidro com tampa de bambu)
+
+3.  **Caneca Térmica (para a mãe em movimento):**
+    * *Termo de Busca:* "Copo térmico aço inox com tampa" ou "Caneca térmica Stanley"
+    * *Exemplo ASIN:* B08V1M5TFY (Copo térmico de aço inox com tampa)
+
+4.  **Cafeteira Compacta (se necessário):**
+    * *Termo de Busca:* "Cafeteira expresso compacta" ou "Prensa Francesa pequena"
+    * *Exemplo ASIN:* B07Y9CDP9M (Cafeteira individual compacta)
+
+# 7. Descrição da Imagem de Referência para Cabeçalho
+
+Um close-up de um canto de cozinha bem iluminado pela luz da manhã. Sobre uma bancada clara, uma bandeja de madeira escura organiza elegantemente os elementos: uma cafeteira italiana (Moka) ou uma Prensa Francesa, um pote hermético de vidro com grãos de café visíveis e uma caneca de cerâmica artesanal, da qual sai um leve vapor. A paleta de cores é quente e convidativa (tons de madeira, preto fosco e branco). A imagem deve passar uma sensação imediata de "ordem", "ritual" e "prontidão".
