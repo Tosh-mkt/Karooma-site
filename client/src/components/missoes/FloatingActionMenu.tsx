@@ -120,7 +120,7 @@ export function FloatingActionMenu({ onScrollToSection }: FloatingActionMenuProp
   const menuContent = (
     <div 
       className="fixed bottom-6 right-4 md:bottom-10 md:right-8" 
-      style={{ zIndex: 9999 }}
+      style={{ zIndex: 11000 }}
     >
       <div className="flex flex-col items-end gap-3">
         {/* Expanded Menu Items */}
