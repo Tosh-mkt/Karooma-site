@@ -252,6 +252,11 @@ export const missions = pgTable("missions", {
   understandingText: text("understanding_text").notNull(), // Texto empático sobre o problema
   bonusTip: text("bonus_tip"), // Dica extra prática
   inspirationalQuote: text("inspirational_quote"), // Frase emocional da marca
+  fraseMarca: text("frase_marca"), // Frase de marca específica da missão
+  propositoPratico: text("proposito_pratico"), // Propósito prático da missão
+  descricao: text("descricao"), // Descrição geral da missão
+  exemplosDeProdutos: text("exemplos_de_produtos").array(), // Exemplos de produtos que ajudam
+  tarefasSimplesDeExecucao: text("tarefas_simples_de_execucao").array(), // Checklist de tarefas
   productAsins: text("product_asins").array(), // Lista de ASINs dos produtos da solução
   diagnosticAreas: text("diagnostic_areas").array(), // Áreas do diagnóstico que esta missão resolve: cargaMental, tempoDaCasa, tempoDeQualidade, alimentacao, gestaoDaCasa, logisticaInfantil
   heroImageUrl: text("hero_image_url"), // Imagem principal da missão
