@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Coffee, Home, Brain, Heart, Users, Wrench } from "lucide-react";
+import { Coffee, Home, UtensilsCrossed, Heart, Users, Gift, Car, Hospital, Wrench } from "lucide-react";
 
 interface DilemmaOption {
   id: string;
@@ -9,12 +9,12 @@ interface DilemmaOption {
 }
 
 const DILEMAS: DilemmaOption[] = [
-  { id: "morning", label: "Minhas manhãs", icon: Coffee, category: "Organização" },
-  { id: "mess", label: "A bagunça que nunca some", icon: Home, category: "Organização" },
-  { id: "tired", label: "A cabeça cansada", icon: Brain, category: "Bem-estar" },
-  { id: "self", label: "O tempo pra mim", icon: Heart, category: "Bem-estar" },
-  { id: "kids", label: "As crianças cheias de energia", icon: Users, category: "Educação" },
-  { id: "home", label: "A casa que precisa de um cuidado", icon: Wrench, category: "Organização" },
+  { id: "morning", label: "Minhas manhãs", icon: Coffee, category: "Rotina Matinal" },
+  { id: "mess", label: "A bagunça que nunca some", icon: Home, category: "Casa em Ordem" },
+  { id: "cooking", label: "A cabeça cansada", icon: UtensilsCrossed, category: "Cozinha Inteligente" },
+  { id: "self", label: "O tempo pra mim", icon: Heart, category: "Tempo para Mim" },
+  { id: "kids", label: "As crianças cheias de energia", icon: Users, category: "Educação e Brincadeiras" },
+  { id: "home", label: "A casa que precisa de um cuidado", icon: Wrench, category: "Manutenção e Melhorias do Lar" },
 ];
 
 interface Props {

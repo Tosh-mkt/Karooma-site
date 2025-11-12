@@ -10,12 +10,15 @@ import type { SelectMission } from "@shared/schema";
 
 const CATEGORIES = [
   { value: "all", label: "Todas", icon: "✨" },
-  { value: "Organização", label: "Organização", icon: "📦" },
-  { value: "Alimentação", label: "Alimentação", icon: "🍳" },
-  { value: "Educação", label: "Educação", icon: "📚" },
-  { value: "Bem-estar", label: "Bem-estar", icon: "💆" },
-  { value: "Desenvolvimento", label: "Desenvolvimento", icon: "🌱" },
-  { value: "Segurança", label: "Segurança", icon: "🛡️" },
+  { value: "Rotina Matinal", label: "Rotina Matinal", icon: "☕" },
+  { value: "Casa em Ordem", label: "Casa em Ordem", icon: "🏠" },
+  { value: "Cozinha Inteligente", label: "Cozinha Inteligente", icon: "🍳" },
+  { value: "Educação e Brincadeiras", label: "Educação e Brincadeiras", icon: "📚" },
+  { value: "Tempo para Mim", label: "Tempo para Mim", icon: "💆" },
+  { value: "Presentes e Afetos", label: "Presentes e Afetos", icon: "💝" },
+  { value: "Passeios e Saídas", label: "Passeios e Saídas", icon: "🚗" },
+  { value: "Saúde e Emergências", label: "Saúde e Emergências", icon: "🏥" },
+  { value: "Manutenção e Melhorias do Lar", label: "Manutenção do Lar", icon: "🔧" },
 ];
 
 export default function Missoes() {
