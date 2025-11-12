@@ -18,8 +18,9 @@ export function TestimonialsList({ slug }: TestimonialsListProps) {
     <div className="space-y-8">
       {/* Testimonials section with background image */}
       <div className="relative overflow-hidden rounded-3xl shadow-2xl">
-        {/* Background image with overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-green-600/90 to-emerald-600/90 dark:from-green-700/95 dark:to-emerald-700/95"></div>
+        {/* Background image with overlay - beige/cream gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F5F3EE] to-[#E8DCC4] dark:from-[#7A6856] dark:to-[#5A4B3F]"></div>
+        <div className="absolute inset-0 bg-[#FFF5F0]/20"></div>
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{
@@ -31,11 +32,11 @@ export function TestimonialsList({ slug }: TestimonialsListProps) {
         <div className="relative z-10 px-6 py-12 md:px-12 md:py-16">
           <div className="max-w-6xl mx-auto space-y-8">
             {/* Title */}
-            <div className="text-center text-white space-y-2">
+            <div className="text-center text-gray-800 dark:text-gray-100 space-y-2">
               <h2 className="text-2xl md:text-3xl font-bold">
                 Outras mães disseram
               </h2>
-              <p className="text-white/90">
+              <p className="text-gray-700 dark:text-gray-300">
                 Você faz parte do Círculo da Leveza
               </p>
             </div>
@@ -52,7 +53,7 @@ export function TestimonialsList({ slug }: TestimonialsListProps) {
                   data-testid={`testimonial-${index}`}
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold text-lg">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#FDF3E6] to-[#E6B8A2] dark:from-[#D4A89A] dark:to-[#C39B8E] flex items-center justify-center text-gray-800 dark:text-gray-900 font-bold text-lg">
                       {testimonial.avatar}
                     </div>
                     <div className="flex-1">
@@ -63,7 +64,7 @@ export function TestimonialsList({ slug }: TestimonialsListProps) {
                         {testimonial.time}
                       </p>
                     </div>
-                    <Quote className="w-6 h-6 text-green-500 flex-shrink-0" />
+                    <Quote className="w-6 h-6 text-[#E6B8A2] dark:text-[#D4A89A] flex-shrink-0" />
                   </div>
                   
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-sm">
@@ -75,12 +76,12 @@ export function TestimonialsList({ slug }: TestimonialsListProps) {
 
             {/* CTA */}
             <div className="text-center space-y-4">
-              <p className="text-lg font-medium text-white">
+              <p className="text-lg font-medium text-gray-800 dark:text-gray-100">
                 Você também faz parte disso.
               </p>
               <Button
                 size="lg"
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-2 border-white/40 font-semibold"
+                className="bg-[#E6B8A2] hover:bg-[#D9A493] dark:bg-[#D4A89A] dark:hover:bg-[#C39B8E] text-gray-900 border-2 border-[#E8DCC4] dark:border-[#C3B9A2] font-semibold shadow-lg"
                 data-testid="button-share-leveza"
               >
                 <Plus className="w-5 h-5 mr-2" />

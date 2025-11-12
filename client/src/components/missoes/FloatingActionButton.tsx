@@ -221,7 +221,7 @@ export function FloatingActionButton() {
           <Button
             onClick={() => setIsExpanded(!isExpanded)}
             size="icon"
-            className="h-16 w-16 rounded-full shadow-2xl bg-gradient-to-br from-[#9CA986] to-[#7A9D6F] hover:from-[#8A9976] hover:to-[#6A8D5F] text-white relative z-10"
+            className="h-16 w-16 rounded-full shadow-2xl bg-gradient-to-br from-[#E6B8A2] to-[#D9A493] hover:from-[#D9A493] hover:to-[#D29B8A] dark:from-[#D4A89A] dark:to-[#C39B8E] text-gray-900 dark:text-gray-100 relative z-10"
             data-testid="fab-main-button"
           >
             <motion.div
@@ -238,7 +238,7 @@ export function FloatingActionButton() {
 
           {!isExpanded && (
             <motion.div
-              className="absolute inset-0 rounded-full bg-[#9CA986] -z-10"
+              className="absolute inset-0 rounded-full bg-[#F5F3EE] dark:bg-[#E8DCC4] -z-10"
               initial={{ scale: 1, opacity: 0.5 }}
               animate={{ scale: 1.3, opacity: 0 }}
               transition={{

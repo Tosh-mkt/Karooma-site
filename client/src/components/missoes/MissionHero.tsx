@@ -40,11 +40,9 @@ export function MissionHero({
           animate={{ opacity: 1, x: 0 }}
           className="mb-6"
         >
-          <Link href="/missoes">
-            <a className="inline-flex items-center gap-2 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100 transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-              <span className="font-medium">Voltar para Missões</span>
-            </a>
+          <Link href="/missoes" className="inline-flex items-center gap-2 text-green-700 dark:text-green-300 hover:text-green-900 dark:hover:text-green-100 transition-colors">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="font-medium">Voltar para Missões</span>
           </Link>
         </motion.div>
 
