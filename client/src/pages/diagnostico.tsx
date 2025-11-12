@@ -273,9 +273,7 @@ export default function DiagnosticoPage() {
                 </div>
               </motion.div>
               
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
-                Diagnóstico de Rotina Materna
-              </h1>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">Diagnóstico de Rotina Familiar</h1>
               <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
                 Descubra quais áreas da sua vida precisam de mais leveza e receba missões sob medida para trazer mais tranquilidade ao seu dia a dia ✨
               </p>
