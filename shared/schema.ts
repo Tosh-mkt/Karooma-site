@@ -249,6 +249,8 @@ export const missions = pgTable("missions", {
   title: text("title").notNull(), // Ex: "Organize sua manhã em 10 minutos"
   slug: varchar("slug", { length: 200 }).notNull().unique(), // URL amigável
   category: varchar("category", { length: 100 }).notNull(), // Organização, Alimentação, Educação, etc.
+  energyLevel: varchar("energy_level", { length: 20 }), // baixa, média, alta
+  estimatedMinutes: integer("estimated_minutes"), // Tempo estimado em minutos
   understandingText: text("understanding_text").notNull(), // Texto empático sobre o problema
   bonusTip: text("bonus_tip"), // Dica extra prática
   inspirationalQuote: text("inspirational_quote"), // Frase emocional da marca
@@ -256,7 +258,7 @@ export const missions = pgTable("missions", {
   propositoPratico: text("proposito_pratico"), // Propósito prático da missão
   descricao: text("descricao"), // Descrição geral da missão
   exemplosDeProdutos: text("exemplos_de_produtos").array(), // Exemplos de produtos que ajudam
-  tarefasSimplesDeExecucao: text("tarefas_simples_de_execucao").array(), // Checklist de tarefas
+  tarefasSimplesDeExecucao: json("tarefas_simples_de_execucao").$type<Array<{ task: string; subtext: string }>>(), // Checklist de tarefas com subtextos
   productAsins: text("product_asins").array(), // Lista de ASINs dos produtos da solução
   diagnosticAreas: text("diagnostic_areas").array(), // Áreas do diagnóstico que esta missão resolve: cargaMental, tempoDaCasa, tempoDeQualidade, alimentacao, gestaoDaCasa, logisticaInfantil
   heroImageUrl: text("hero_image_url"), // Imagem principal da missão
@@ -815,6 +817,9 @@ export const insertMissionSchema = createInsertSchema(missions).omit({
   views: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  energyLevel: z.enum(["baixa", "média", "alta"]).optional(),
+  estimatedMinutes: z.number().int().min(0).optional(),
 });
 
 export type InsertMission = z.infer<typeof insertMissionSchema>;

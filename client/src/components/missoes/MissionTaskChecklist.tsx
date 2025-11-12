@@ -1,15 +1,20 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Progress } from "@/components/ui/progress";
 import { CheckCircle2 } from "lucide-react";
+
+interface Task {
+  task: string;
+  subtext: string;
+}
 
 interface MissionTaskChecklistProps {
   missionId: string;
-  tasks: string[];
+  tasks: Task[];
+  onProgressChange?: (completed: number, total: number) => void;
 }
 
-export function MissionTaskChecklist({ missionId, tasks }: MissionTaskChecklistProps) {
+export function MissionTaskChecklist({ missionId, tasks, onProgressChange }: MissionTaskChecklistProps) {
   const STORAGE_KEY = `mission-checklist-${missionId}`;
   
   const [completedTasks, setCompletedTasks] = useState<Set<number>>(() => {
@@ -28,10 +33,13 @@ export function MissionTaskChecklist({ missionId, tasks }: MissionTaskChecklistP
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(completedTasks)));
+      if (onProgressChange) {
+        onProgressChange(completedTasks.size, tasks.length);
+      }
     } catch (error) {
       console.error("Erro ao salvar checklist:", error);
     }
-  }, [completedTasks, STORAGE_KEY]);
+  }, [completedTasks, STORAGE_KEY, tasks.length, onProgressChange]);
 
   const toggleTask = (index: number) => {
     setCompletedTasks(prev => {
@@ -45,79 +53,64 @@ export function MissionTaskChecklist({ missionId, tasks }: MissionTaskChecklistP
     });
   };
 
-  const progress = tasks.length > 0 ? (completedTasks.size / tasks.length) * 100 : 0;
-
   return (
-    <div className="space-y-6" data-section="checklist">
-      <div className="space-y-4">
-        {tasks.map((task, index) => {
-          const isCompleted = completedTasks.has(index);
-          
-          return (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={`flex items-start gap-4 p-4 rounded-xl border-2 transition-all ${
-                isCompleted
-                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-purple-300'
-              }`}
-            >
-              <Checkbox
-                id={`task-${index}`}
-                checked={isCompleted}
-                onCheckedChange={() => toggleTask(index)}
-                className="mt-1 h-5 w-5"
-                data-testid={`checkbox-task-${index}`}
-              />
+    <div className="space-y-4" data-section="checklist">
+      {tasks.map((taskItem, index) => {
+        const isCompleted = completedTasks.has(index);
+        
+        return (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className={`flex items-start gap-4 p-5 rounded-xl border-2 transition-all ${
+              isCompleted
+                ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                : 'border-gray-200 dark:border-gray-700 bg-amber-50/30 dark:bg-amber-900/10 hover:border-purple-300'
+            }`}
+          >
+            <Checkbox
+              id={`task-${index}`}
+              checked={isCompleted}
+              onCheckedChange={() => toggleTask(index)}
+              className="mt-1 h-5 w-5"
+              data-testid={`checkbox-task-${index}`}
+            />
+            <div className="flex-1">
               <label
                 htmlFor={`task-${index}`}
-                className={`flex-1 cursor-pointer text-base ${
+                className={`block cursor-pointer text-base font-medium mb-1 ${
                   isCompleted
                     ? 'line-through text-gray-500 dark:text-gray-400'
-                    : 'text-gray-700 dark:text-gray-300'
+                    : 'text-gray-900 dark:text-white'
                 }`}
                 data-testid={`label-task-${index}`}
               >
-                {task}
+                {taskItem.task}
               </label>
-              {isCompleted && (
-                <motion.div
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  transition={{ type: "spring", stiffness: 200 }}
-                >
-                  <CheckCircle2 className="w-6 h-6 text-green-600" />
-                </motion.div>
+              {taskItem.subtext && (
+                <p className={`text-sm ${
+                  isCompleted
+                    ? 'text-gray-400 dark:text-gray-500'
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}>
+                  {taskItem.subtext}
+                </p>
               )}
-            </motion.div>
-          );
-        })}
-      </div>
-
-      <div className="space-y-2" data-section="progress">
-        <div className="flex items-center justify-between text-sm">
-          <span className="font-medium text-gray-700 dark:text-gray-300">
-            Progresso
-          </span>
-          <span className="font-bold text-purple-600 dark:text-purple-400">
-            {completedTasks.size} de {tasks.length} tarefas concluídas
-          </span>
-        </div>
-        <Progress value={progress} className="h-3" data-testid="progress-bar" />
-        {progress === 100 && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2 text-green-600 dark:text-green-400 font-semibold"
-          >
-            <CheckCircle2 className="w-5 h-5" />
-            <span>Missão completa! 🎉</span>
+            </div>
+            {isCompleted && (
+              <motion.div
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <CheckCircle2 className="w-6 h-6 text-green-600" />
+              </motion.div>
+            )}
           </motion.div>
-        )}
-      </div>
+        );
+      })}
     </div>
   );
 }

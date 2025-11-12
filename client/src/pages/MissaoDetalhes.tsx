@@ -1,18 +1,21 @@
+import { useState, useEffect } from "react";
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, AlertCircle, Share2 } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 import { MissionHero } from "@/components/missoes/MissionHero";
+import { MissionMetadataBadges } from "@/components/missoes/MissionMetadataBadges";
+import { MissionProgressBar } from "@/components/missoes/MissionProgressBar";
 import { WhyMattersCard } from "@/components/missoes/WhyMattersCard";
 import { TestimonialsList } from "@/components/missoes/TestimonialsList";
 import { MissionProducts } from "@/components/missoes/MissionProducts";
+import { CategoryNavigationCards } from "@/components/missoes/CategoryNavigationCards";
+import { CommunityCTA } from "@/components/missoes/CommunityCTA";
 import { FloatingActionButton } from "@/components/missoes/FloatingActionButton";
 import { MissionTaskChecklist } from "@/components/missoes/MissionTaskChecklist";
-import MissionFavoriteButton from "@/components/missoes/MissionFavoriteButton";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAudioNarration } from "@/hooks/useAudioNarration";
-import { useToast } from "@/hooks/use-toast";
 import type { SelectMission } from "@shared/schema";
 
 interface MissionWithProducts extends SelectMission {
@@ -35,14 +38,15 @@ interface MissionWithProducts extends SelectMission {
 export default function MissaoDetalhes() {
   const [match, params] = useRoute("/missoes/:slug");
   const slug = params?.slug;
-  const { toast } = useToast();
+  const [completedTasks, setCompletedTasks] = useState(0);
+  const [totalTasks, setTotalTasks] = useState(0);
 
   const { data, isLoading, error } = useQuery<MissionWithProducts>({
     queryKey: ["/api/missions", slug],
     enabled: !!slug,
   });
 
-  const { toggle, stop, isPlaying, isPaused, isSupported } = useAudioNarration();
+  const { toggle, stop, isPlaying, isSupported } = useAudioNarration();
 
   const handleAudioToggle = () => {
     if (!data) return;
@@ -109,6 +113,18 @@ export default function MissaoDetalhes() {
     );
   }
 
+  // Initialize total tasks when data loads
+  useEffect(() => {
+    if (data?.tarefasSimplesDeExecucao) {
+      setTotalTasks(data.tarefasSimplesDeExecucao.length);
+    }
+  }, [data]);
+
+  const handleProgressChange = (completed: number, total: number) => {
+    setCompletedTasks(completed);
+    setTotalTasks(total);
+  };
+
   const generateSummary = () => {
     const parts = [];
     if (data.propositoPratico) parts.push(data.propositoPratico);
@@ -142,45 +158,65 @@ export default function MissaoDetalhes() {
       </div>
       
       <div className="container mx-auto px-4 py-8 space-y-12 max-w-4xl">
-        {/* 2. Título (já está no hero) */}
-        
-        {/* 3. Frase marca */}
+        {/* 2. Metadados: Tempo, Energia, Categoria */}
+        <div data-section="metadata">
+          <MissionMetadataBadges
+            estimatedMinutes={data.estimatedMinutes ?? undefined}
+            energyLevel={data.energyLevel ?? undefined}
+            category={data.category}
+          />
+        </div>
+
+        {/* 3. Frase contextual/marca */}
         {data.fraseMarca && (
-          <div data-section="frase-marca" className="text-center">
+          <div id="frase-marca" data-section="frase-marca" className="text-center">
             <p className="text-2xl md:text-3xl font-bold text-green-700 dark:text-green-400 italic leading-relaxed">
               "{data.fraseMarca}"
             </p>
           </div>
         )}
-        
-        {/* 4. Resumo de 150 palavras */}
-        <div data-section="summary" className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-lg border border-green-200 dark:border-green-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Sobre esta missão
-          </h2>
-          <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-            {generateSummary()}
-          </p>
-        </div>
 
-        {/* 5 & 6. Checklist de tarefas + Progress bar */}
+        {/* 4. Barra de Progresso */}
         {data.tarefasSimplesDeExecucao && data.tarefasSimplesDeExecucao.length > 0 && (
-          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-lg border border-green-200 dark:border-green-800">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Tarefas para completar
-            </h2>
-            <MissionTaskChecklist 
-              missionId={data.id} 
-              tasks={data.tarefasSimplesDeExecucao} 
+          <div id="progress" data-section="progress">
+            <MissionProgressBar
+              completedTasks={completedTasks}
+              totalTasks={totalTasks}
             />
           </div>
         )}
 
-        {/* 7. Produtos recomendados */}
-        {(data.products && data.products.length > 0) || (data.exemplosDeProdutos && data.exemplosDeProdutos.length > 0) ? (
-          <div data-section="products">
+        {/* 5. Checklist de Tarefas */}
+        {data.tarefasSimplesDeExecucao && data.tarefasSimplesDeExecucao.length > 0 && (
+          <div id="checklist" className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-lg border border-green-200 dark:border-green-800">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Produtos que podem ajudar
+              Tarefas para completar
+            </h2>
+            <MissionTaskChecklist
+              missionId={data.id}
+              tasks={data.tarefasSimplesDeExecucao}
+              onProgressChange={handleProgressChange}
+            />
+          </div>
+        )}
+
+        {/* 6. Por que isso importa */}
+        {(data.propositoPratico || data.bonusTip) && (
+          <div id="purpose" data-section="purpose">
+            <WhyMattersCard text={data.propositoPratico || data.bonusTip || ''} />
+          </div>
+        )}
+
+        {/* 7. Depoimentos (Prova Social) */}
+        <div id="social-proof" data-section="social-proof">
+          <TestimonialsList slug={slug!} />
+        </div>
+
+        {/* 8. Produtos Recomendados */}
+        {(data.products && data.products.length > 0) || (data.exemplosDeProdutos && data.exemplosDeProdutos.length > 0) ? (
+          <div id="products" data-section="products">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+              Ferramentas que tornam isso mais fácil
             </h2>
             {data.exemplosDeProdutos && data.exemplosDeProdutos.length > 0 && (
               <div className="mb-6 bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
@@ -203,63 +239,18 @@ export default function MissaoDetalhes() {
           </div>
         ) : null}
 
-        {/* Por que é importante (usando propositoPratico ou bonusTip) */}
-        {(data.propositoPratico || data.bonusTip) && (
-          <div data-section="purpose">
-            <WhyMattersCard text={data.propositoPratico || data.bonusTip || ''} />
-          </div>
-        )}
-
-        {/* 8. Prova social */}
-        <div data-section="social-proof">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-            Outras mães que já completaram
-          </h2>
-          <TestimonialsList slug={slug!} />
+        {/* 9. Navegação de Categorias */}
+        <div id="categories" data-section="categories">
+          <CategoryNavigationCards />
         </div>
-        
-        {/* 9. Ações sociais - compartilhamento e favoritagem */}
-        <div data-section="social-actions" className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-lg border border-green-200 dark:border-green-800">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-            Gostou desta missão?
-          </h2>
-          <p className="text-center text-gray-600 dark:text-gray-400 mb-6">
-            Salve nos favoritos ou compartilhe com outras mães
-          </p>
-          <div className="flex gap-4 justify-center items-center flex-wrap">
-            <MissionFavoriteButton missionId={data.id} />
-            <Button
-              onClick={async () => {
-                try {
-                  const url = window.location.href;
-                  if (navigator.share) {
-                    await navigator.share({
-                      title: data.title,
-                      text: data.fraseMarca || data.understandingText,
-                      url: url,
-                    });
-                  } else {
-                    await navigator.clipboard.writeText(url);
-                    toast({
-                      title: "Link copiado!",
-                      description: "Compartilhe esta missão com suas amigas"
-                    });
-                  }
-                } catch (error) {
-                  console.error("Erro ao compartilhar:", error);
-                }
-              }}
-              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
-              data-testid="button-share"
-            >
-              <Share2 className="w-5 h-5 mr-2" />
-              Compartilhar
-            </Button>
-          </div>
+
+        {/* 10. CTA Comunidade */}
+        <div id="community" data-section="community">
+          <CommunityCTA />
         </div>
       </div>
 
-      {/* 10. Floating Action Button */}
+      {/* Floating Action Button */}
       <FloatingActionButton />
     </div>
   );
