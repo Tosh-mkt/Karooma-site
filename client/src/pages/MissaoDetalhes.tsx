@@ -83,7 +83,7 @@ export default function MissaoDetalhes() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-green-900/10 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF8F5] dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-green-600 dark:text-green-400 mx-auto mb-4" />
           <p className="text-gray-600 dark:text-gray-400">Carregando missão...</p>
@@ -94,7 +94,7 @@ export default function MissaoDetalhes() {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-green-900/10 flex items-center justify-center">
+      <div className="min-h-screen bg-[#FAF8F5] dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
@@ -138,8 +138,8 @@ export default function MissaoDetalhes() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-green-900/10 pb-24">
-      {/* 1. Hero com categoria */}
+    <div className="min-h-screen bg-[#FAF8F5] dark:bg-gray-900 pb-24">
+      {/* 1. Hero com categoria e botão favoritar */}
       <div id="hero" data-section="hero" className="relative">
         <MissionHero
           title={data.title}
@@ -150,14 +150,9 @@ export default function MissaoDetalhes() {
           onAudioToggle={isSupported ? handleAudioToggle : undefined}
           isAudioPlaying={isPlaying}
         />
-        <div className="absolute top-24 left-4 md:left-8">
-          <Badge className="bg-green-500/90 hover:bg-green-600 text-white px-6 py-2 text-sm font-semibold shadow-lg">
-            {data.category}
-          </Badge>
-        </div>
       </div>
       
-      <div className="container mx-auto px-4 py-8 space-y-12 max-w-4xl">
+      <div className="container mx-auto px-4 py-8 space-y-8 max-w-4xl">
         {/* 2. Metadados: Tempo, Energia, Categoria */}
         <div data-section="metadata">
           <MissionMetadataBadges
@@ -169,9 +164,9 @@ export default function MissaoDetalhes() {
 
         {/* 3. Frase contextual/marca */}
         {data.fraseMarca && (
-          <div id="frase-marca" data-section="frase-marca" className="text-center">
-            <p className="text-2xl md:text-3xl font-bold text-green-700 dark:text-green-400 italic leading-relaxed">
-              "{data.fraseMarca}"
+          <div id="frase-marca" data-section="frase-marca" className="bg-[#F5F3EE] dark:bg-gray-800/50 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-700">
+            <p className="text-lg md:text-xl text-center text-gray-700 dark:text-gray-300 leading-relaxed">
+              {data.fraseMarca}
             </p>
           </div>
         )}
@@ -188,10 +183,7 @@ export default function MissaoDetalhes() {
 
         {/* 5. Checklist de Tarefas */}
         {data.tarefasSimplesDeExecucao && data.tarefasSimplesDeExecucao.length > 0 && (
-          <div id="checklist" className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 shadow-lg border border-green-200 dark:border-green-800">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Tarefas para completar
-            </h2>
+          <div id="checklist" className="bg-[#FFFBF5] dark:bg-gray-800/50 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-700">
             <MissionTaskChecklist
               missionId={data.id}
               tasks={data.tarefasSimplesDeExecucao}
@@ -207,17 +199,24 @@ export default function MissaoDetalhes() {
           </div>
         )}
 
-        {/* 7. Depoimentos (Prova Social) */}
-        <div id="social-proof" data-section="social-proof">
-          <TestimonialsList slug={slug!} />
-        </div>
-
         {/* 8. Produtos Recomendados */}
         {(data.products && data.products.length > 0) || (data.exemplosDeProdutos && data.exemplosDeProdutos.length > 0) ? (
           <div id="products" data-section="products">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Ferramentas que tornam isso mais fácil
-            </h2>
+            <div className="flex items-start gap-2 mb-6">
+              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
+                <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Ferramentas que tornam isso mais fácil
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  Pequenos objetos que facilitam a leveza no dia a dia
+                </p>
+              </div>
+            </div>
             {data.exemplosDeProdutos && data.exemplosDeProdutos.length > 0 && (
               <div className="mb-6 bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
                 <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
@@ -238,14 +237,24 @@ export default function MissaoDetalhes() {
             )}
           </div>
         ) : null}
+      </div>
 
+      {/* 7. Depoimentos (Prova Social) - Full Width */}
+      <div id="social-proof" data-section="social-proof" className="py-12">
+        <TestimonialsList slug={slug!} />
+      </div>
+
+      {/* Container para seções finais */}
+      <div className="container mx-auto px-4 space-y-12 max-w-4xl">
         {/* 9. Navegação de Categorias */}
         <div id="categories" data-section="categories">
           <CategoryNavigationCards />
         </div>
+      </div>
 
-        {/* 10. CTA Comunidade */}
-        <div id="community" data-section="community">
+      {/* 10. CTA Comunidade - Full Width */}
+      <div id="community" data-section="community" className="py-12 px-4">
+        <div className="container mx-auto max-w-6xl">
           <CommunityCTA />
         </div>
       </div>

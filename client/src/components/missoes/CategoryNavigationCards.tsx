@@ -51,22 +51,26 @@ export function CategoryNavigationCards() {
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex overflow-x-auto gap-4 pb-4 snap-x snap-mandatory scrollbar-hide">
         {categories.map((category) => {
           const Icon = category.icon;
           
           return (
             <Link key={category.id} href="/missoes">
-              <div className="group cursor-pointer bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-all hover:scale-105">
-                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${category.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-6 h-6 text-white" />
+              <div className="group cursor-pointer bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all min-w-[200px] snap-start flex-shrink-0">
+                <div className="flex flex-col items-center text-center space-y-3">
+                  <div className="w-14 h-14 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Icon className="w-7 h-7 text-gray-600 dark:text-gray-300" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-sm">
+                      {category.name}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {category.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 dark:text-white mb-2">
-                  {category.name}
-                </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {category.description}
-                </p>
               </div>
             </Link>
           );

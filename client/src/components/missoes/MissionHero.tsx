@@ -26,11 +26,11 @@ export function MissionHero({
   isAudioPlaying = false
 }: MissionHeroProps) {
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-green-100 via-emerald-100 to-green-50 dark:from-green-900/30 dark:via-emerald-900/20 dark:to-green-900/10">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-green-400 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-emerald-400 rounded-full blur-3xl" />
+    <div className="relative overflow-hidden bg-[#F5F3EE] dark:bg-gray-800">
+      {/* Background Pattern - subtle cream tones */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-0 left-0 w-96 h-96 bg-amber-200 dark:bg-gray-700 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-orange-100 dark:bg-gray-700 rounded-full blur-3xl" />
       </div>
 
       <div className="container mx-auto px-4 py-12 relative">
