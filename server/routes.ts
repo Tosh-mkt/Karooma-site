@@ -2504,6 +2504,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Mission Favorites routes
+  app.get("/api/mission-favorites", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.sessionUserId;
+      const favorites = await storage.getUserMissionFavorites(userId);
+      res.json(favorites);
+    } catch (error) {
+      console.error("Error fetching mission favorites:", error);
+      res.status(500).json({ message: "Failed to fetch mission favorites" });
+    }
+  });
+
+  app.post("/api/mission-favorites/:missionId", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.sessionUserId;
+      const { missionId } = req.params;
+      
+      const favorite = await storage.addMissionToFavorites(userId, missionId);
+      res.json(favorite);
+    } catch (error) {
+      console.error("Error adding to mission favorites:", error);
+      res.status(500).json({ message: "Failed to add to mission favorites" });
+    }
+  });
+
+  app.delete("/api/mission-favorites/:missionId", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.sessionUserId;
+      const { missionId } = req.params;
+      
+      await storage.removeMissionFromFavorites(userId, missionId);
+      res.json({ message: "Removed from mission favorites" });
+    } catch (error) {
+      console.error("Error removing from mission favorites:", error);
+      res.status(500).json({ message: "Failed to remove from mission favorites" });
+    }
+  });
+
+  app.get("/api/mission-favorites/check/:missionId", async (req: any, res) => {
+    try {
+      const sessionUser = req.session ? (req.session as any).user : null;
+      const { missionId } = req.params;
+      
+      // If user is not authenticated, return false
+      if (!sessionUser || !sessionUser.id) {
+        return res.json({ isFavorite: false });
+      }
+      
+      const userId = sessionUser.id;
+      const isFavorite = await storage.isMissionFavorite(userId, missionId);
+      res.json({ isFavorite });
+    } catch (error) {
+      console.error("Error checking mission favorite status:", error);
+      res.status(500).json({ message: "Failed to check mission favorite status" });
+    }
+  });
+
   // Pages management routes
   app.get("/api/pages", async (req, res) => {
     try {

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, timestamp, integer, boolean, decimal, index, json } from "drizzle-orm/pg-core";
+import { pgTable, text, varchar, timestamp, integer, boolean, decimal, index, uniqueIndex, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -185,6 +185,18 @@ export const favorites = pgTable("favorites", {
   index("idx_favorites_product_id").on(table.productId),
 ]);
 
+// Mission favorites table for user-mission relationships
+export const missionFavorites = pgTable("mission_favorites", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  missionId: varchar("mission_id").notNull().references(() => missions.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_mission_favorites_user_id").on(table.userId),
+  index("idx_mission_favorites_mission_id").on(table.missionId),
+  uniqueIndex("idx_mission_favorites_unique").on(table.userId, table.missionId),
+]);
+
 // Tabela para controlar acesso aos flipbooks
 export const authorizedFlipbookUsers = pgTable("authorized_flipbook_users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -361,6 +373,10 @@ export type InsertNewsletterAdvanced = z.infer<typeof insertNewsletterAdvancedSc
 // Favorites types
 export type Favorite = typeof favorites.$inferSelect;
 export type InsertFavorite = typeof favorites.$inferInsert;
+
+// Mission Favorites types
+export type MissionFavorite = typeof missionFavorites.$inferSelect;
+export type InsertMissionFavorite = typeof missionFavorites.$inferInsert;
 
 // Authorized Flipbook Users types
 export type AuthorizedFlipbookUser = typeof authorizedFlipbookUsers.$inferSelect;

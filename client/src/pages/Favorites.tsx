@@ -3,13 +3,15 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, ExternalLink, Trash2, ShoppingCart, ImageIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Heart, ExternalLink, Trash2, ShoppingCart, ImageIcon, Clock, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import RecommendationModal from "@/components/RecommendationModal";
+import type { SelectMission } from "@shared/schema";
 
 interface Product {
   id: string;
@@ -34,6 +36,14 @@ interface FavoriteWithProduct {
   product: Product;
 }
 
+interface FavoriteWithMission {
+  id: string;
+  userId: string;
+  missionId: string;
+  createdAt: Date;
+  mission: SelectMission;
+}
+
 export default function Favorites() {
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { toast } = useToast();
@@ -47,10 +57,10 @@ export default function Favorites() {
     enabled: isAuthenticated,
   });
 
-  // Debug SUPER simples - só verificar se executa
-  console.log("COMPONENT EXECUTING!");
-
-  // Log simples removido para evitar conflitos
+  const { data: missionFavorites = [], isLoading: isLoadingMissions } = useQuery<FavoriteWithMission[]>({
+    queryKey: ["/api/mission-favorites"],
+    enabled: isAuthenticated,
+  });
 
   const removeFavoriteMutation = useMutation({
     mutationFn: async (productId: string) => {
@@ -70,6 +80,32 @@ export default function Favorites() {
       toast({
         title: "Erro",
         description: "Não foi possível remover o produto dos favoritos.",
+        variant: "destructive",
+      });
+    },
+    onSettled: () => {
+      setRemovingId(null);
+    },
+  });
+
+  const removeMissionFavoriteMutation = useMutation({
+    mutationFn: async (missionId: string) => {
+      return apiRequest("DELETE", `/api/mission-favorites/${missionId}`);
+    },
+    onMutate: (missionId) => {
+      setRemovingId(missionId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/mission-favorites"] });
+      toast({
+        title: "Removido dos favoritos",
+        description: "A missão foi removida da sua lista de favoritos.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erro",
+        description: "Não foi possível remover a missão dos favoritos.",
         variant: "destructive",
       });
     },

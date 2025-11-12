@@ -114,6 +114,7 @@ export default function MissaoDetalhes() {
           understandingText={data.understandingText}
           heroImageUrl={data.heroImageUrl}
           category={data.category}
+          missionId={data.id}
           onAudioToggle={isSupported ? handleAudioToggle : undefined}
           isAudioPlaying={isPlaying}
         />

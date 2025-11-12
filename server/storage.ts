@@ -10,6 +10,8 @@ import {
   type InsertNewsletterSubscription,
   type Favorite,
   type InsertFavorite,
+  type MissionFavorite,
+  type InsertMissionFavorite,
   type Page,
   type InsertPage,
   type AuthorizedFlipbookUser,
@@ -35,6 +37,7 @@ import {
   products,
   newsletterSubscriptions,
   favorites,
+  missionFavorites,
   pages,
   authorizedFlipbookUsers,
   flipbooks,
@@ -190,6 +193,12 @@ export interface IStorage {
   deleteMission(id: string): Promise<void>;
   incrementMissionViews(id: string): Promise<void>;
   
+  // Mission Favorites methods
+  getUserMissionFavorites(userId: string): Promise<(MissionFavorite & { mission: SelectMission })[]>;
+  addMissionToFavorites(userId: string, missionId: string): Promise<MissionFavorite>;
+  removeMissionFromFavorites(userId: string, missionId: string): Promise<void>;
+  isMissionFavorite(userId: string, missionId: string): Promise<boolean>;
+  
   // Diagnostic methods
   createDiagnostic(data: InsertDiagnostic): Promise<SelectDiagnostic>;
   getDiagnosticById(id: string): Promise<SelectDiagnostic | undefined>;
@@ -206,6 +215,7 @@ export class MemStorage implements IStorage {
   private flipbooks: Map<string, Flipbook>;
   private taxonomies: Map<string, Taxonomy>; // key: slug
   private productTaxonomies: Map<string, ProductTaxonomy[]>; // key: productId
+  private missionFavorites: Map<string, MissionFavorite>; // key: `${userId}:${missionId}`
 
   constructor() {
     this.users = new Map();
@@ -216,6 +226,7 @@ export class MemStorage implements IStorage {
     this.flipbooks = new Map();
     this.taxonomies = new Map();
     this.productTaxonomies = new Map();
+    this.missionFavorites = new Map();
     
     // Initialize with empty state - no mock data
     // Real data will be added through API calls or String.com integration
@@ -556,6 +567,48 @@ export class MemStorage implements IStorage {
 
   async isFavorite(userId: string, productId: string): Promise<boolean> {
     return false; // Simplified implementation for memory storage
+  }
+
+  // Mission Favorites methods (MemStorage)
+  async getUserMissionFavorites(userId: string): Promise<(MissionFavorite & { mission: SelectMission })[]> {
+    const favorites = Array.from(this.missionFavorites.values())
+      .filter(f => f.userId === userId);
+    
+    // Note: This is a simplified implementation that doesn't actually join with missions
+    // In production, use the database implementation
+    return favorites.map(f => ({
+      ...f,
+      mission: {} as SelectMission // Placeholder - requires database for real mission data
+    }));
+  }
+
+  async addMissionToFavorites(userId: string, missionId: string): Promise<MissionFavorite> {
+    const key = `${userId}:${missionId}`;
+    const existing = this.missionFavorites.get(key);
+    
+    if (existing) {
+      return existing;
+    }
+    
+    const favorite: MissionFavorite = {
+      id: randomUUID(),
+      userId,
+      missionId,
+      createdAt: new Date(),
+    };
+    
+    this.missionFavorites.set(key, favorite);
+    return favorite;
+  }
+
+  async removeMissionFromFavorites(userId: string, missionId: string): Promise<void> {
+    const key = `${userId}:${missionId}`;
+    this.missionFavorites.delete(key);
+  }
+
+  async isMissionFavorite(userId: string, missionId: string): Promise<boolean> {
+    const key = `${userId}:${missionId}`;
+    return this.missionFavorites.has(key);
   }
 
   // Pages methods - Add implementation for MemStorage
@@ -1019,6 +1072,83 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(favorites)
       .where(and(eq(favorites.userId, userId), eq(favorites.productId, productId)))
+      .limit(1);
+    
+    return result.length > 0;
+  }
+
+  // Mission Favorites methods
+  async getUserMissionFavorites(userId: string): Promise<(MissionFavorite & { mission: SelectMission })[]> {
+    const result = await db
+      .select({
+        id: missionFavorites.id,
+        userId: missionFavorites.userId,
+        missionId: missionFavorites.missionId,
+        createdAt: missionFavorites.createdAt,
+        mission: {
+          id: missions.id,
+          title: missions.title,
+          slug: missions.slug,
+          category: missions.category,
+          understandingText: missions.understandingText,
+          bonusTip: missions.bonusTip,
+          inspirationalQuote: missions.inspirationalQuote,
+          productAsins: missions.productAsins,
+          diagnosticAreas: missions.diagnosticAreas,
+          heroImageUrl: missions.heroImageUrl,
+          metaDescription: missions.metaDescription,
+          featured: missions.featured,
+          views: missions.views,
+          isPublished: missions.isPublished,
+          createdAt: missions.createdAt,
+          updatedAt: missions.updatedAt,
+        }
+      })
+      .from(missionFavorites)
+      .leftJoin(missions, eq(missionFavorites.missionId, missions.id))
+      .where(eq(missionFavorites.userId, userId))
+      .orderBy(desc(missionFavorites.createdAt));
+
+    return result.map(r => ({
+      id: r.id,
+      userId: r.userId,
+      missionId: r.missionId,
+      createdAt: r.createdAt!,
+      mission: r.mission as SelectMission
+    }));
+  }
+
+  async addMissionToFavorites(userId: string, missionId: string): Promise<MissionFavorite> {
+    const [favorite] = await db
+      .insert(missionFavorites)
+      .values({ userId, missionId })
+      .onConflictDoNothing()
+      .returning();
+    
+    // If favorite is undefined, it means it was already favorited - fetch it
+    if (!favorite) {
+      const [existing] = await db
+        .select()
+        .from(missionFavorites)
+        .where(and(eq(missionFavorites.userId, userId), eq(missionFavorites.missionId, missionId)))
+        .limit(1);
+      return existing;
+    }
+    
+    return favorite;
+  }
+
+  async removeMissionFromFavorites(userId: string, missionId: string): Promise<void> {
+    await db
+      .delete(missionFavorites)
+      .where(and(eq(missionFavorites.userId, userId), eq(missionFavorites.missionId, missionId)));
+  }
+
+  async isMissionFavorite(userId: string, missionId: string): Promise<boolean> {
+    const result = await db
+      .select()
+      .from(missionFavorites)
+      .where(and(eq(missionFavorites.userId, userId), eq(missionFavorites.missionId, missionId)))
       .limit(1);
     
     return result.length > 0;

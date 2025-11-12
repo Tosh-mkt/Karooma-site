@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Volume2, VolumeX } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import MissionFavoriteButton from "./MissionFavoriteButton";
 
 interface MissionHeroProps {
   title: string;
@@ -9,6 +10,7 @@ interface MissionHeroProps {
   understandingText?: string | null;
   heroImageUrl?: string | null;
   category?: string;
+  missionId?: string;
   onAudioToggle?: () => void;
   isAudioPlaying?: boolean;
 }
@@ -19,6 +21,7 @@ export function MissionHero({
   understandingText,
   heroImageUrl, 
   category,
+  missionId,
   onAudioToggle,
   isAudioPlaying = false
 }: MissionHeroProps) {
@@ -70,13 +73,14 @@ export function MissionHero({
               </p>
             )}
 
-            {/* Audio Button */}
-            {onAudioToggle && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.3 }}
-              >
+            {/* Action Buttons */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-wrap gap-3"
+            >
+              {onAudioToggle && (
                 <Button
                   onClick={onAudioToggle}
                   variant="outline"
@@ -96,8 +100,16 @@ export function MissionHero({
                     </>
                   )}
                 </Button>
-              </motion.div>
-            )}
+              )}
+              
+              {missionId && (
+                <MissionFavoriteButton 
+                  missionId={missionId} 
+                  showText 
+                  className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg" 
+                />
+              )}
+            </motion.div>
           </motion.div>
 
           {/* Hero Image */}
