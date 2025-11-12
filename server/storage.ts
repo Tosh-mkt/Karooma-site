@@ -216,6 +216,7 @@ export class MemStorage implements IStorage {
   private taxonomies: Map<string, Taxonomy>; // key: slug
   private productTaxonomies: Map<string, ProductTaxonomy[]>; // key: productId
   private missionFavorites: Map<string, MissionFavorite>; // key: `${userId}:${missionId}`
+  private missions: Map<string, SelectMission>; // key: id
 
   constructor() {
     this.users = new Map();
@@ -227,9 +228,49 @@ export class MemStorage implements IStorage {
     this.taxonomies = new Map();
     this.productTaxonomies = new Map();
     this.missionFavorites = new Map();
+    this.missions = new Map();
     
-    // Initialize with empty state - no mock data
-    // Real data will be added through API calls or String.com integration
+    // Initialize with mock mission data for testing
+    this.initializeMockMissions();
+  }
+  
+  private initializeMockMissions() {
+    const mockMission: SelectMission = {
+      id: randomUUID(),
+      title: `Rotina Matinal Eficiente`,
+      slug: `rotina-matinal-eficiente`,
+      category: "Rotina Matinal",
+      understandingText: "Sabemos que as manhãs podem ser caóticas quando você tem filhos. Esta missão vai te ajudar a criar uma rotina prática e tranquila.",
+      bonusTip: "Dica: Organize um item de cada vez, começando pelo que mais incomoda você visualmente.",
+      inspirationalQuote: "Pequenos passos, grandes transformações.",
+      fraseMarca: "Você não precisa de mais tempo, precisa de um plano que funcione para você.",
+      propositoPratico: "Transformar o caos matinal em uma rotina tranquila e eficiente, economizando tempo e reduzindo o estresse diário.",
+      descricao: "Esta missão foi criada para mães que enfrentam manhãs caóticas e querem começar o dia com mais leveza. Vamos criar juntas uma rotina prática e realista que funciona para sua família, respeitando o seu ritmo e as necessidades únicas dos seus filhos.",
+      exemplosDeProdutos: [
+        "Organizador de roupas por dia da semana",
+        "Quadro de rotina visual para crianças",
+        "Timer de cozinha colorido",
+        "Caixa organizadora de lanches"
+      ],
+      tarefasSimplesDeExecucao: [
+        "Prepare as roupas na noite anterior",
+        "Monte uma estação de café da manhã de fácil acesso",
+        "Crie um checklist visual para as crianças",
+        "Defina horários realistas para cada etapa da manhã",
+        "Organize mochilas e materiais escolares em um local fixo"
+      ],
+      productAsins: [],
+      heroImageUrl: null,
+      metaDescription: null,
+      featured: false,
+      isPublished: true,
+      views: 0,
+      diagnosticAreas: ["cargaMental", "tempoDaCasa"],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    
+    this.missions.set(mockMission.id, mockMission);
   }
 
   // User methods
@@ -646,6 +687,90 @@ export class MemStorage implements IStorage {
   async isMissionFavorite(userId: string, missionId: string): Promise<boolean> {
     const key = `${userId}:${missionId}`;
     return this.missionFavorites.has(key);
+  }
+
+  // Mission methods (MemStorage)
+  async getPublishedMissions(diagnosticAreas?: string[]): Promise<SelectMission[]> {
+    let allMissions = Array.from(this.missions.values())
+      .filter(m => m.isPublished);
+    
+    if (diagnosticAreas && diagnosticAreas.length > 0) {
+      allMissions = allMissions.filter(m => 
+        m.diagnosticAreas?.some(area => diagnosticAreas.includes(area))
+      );
+    }
+    
+    return allMissions.sort((a, b) => 
+      new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+    );
+  }
+
+  async getFeaturedMissions(): Promise<SelectMission[]> {
+    return Array.from(this.missions.values())
+      .filter(m => m.featured && m.isPublished)
+      .sort((a, b) => 
+        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      );
+  }
+
+  async getMissionById(id: string): Promise<SelectMission | undefined> {
+    return this.missions.get(id);
+  }
+
+  async getMissionBySlug(slug: string): Promise<SelectMission | undefined> {
+    for (const mission of Array.from(this.missions.values())) {
+      if (mission.slug === slug) {
+        return mission;
+      }
+    }
+    return undefined;
+  }
+
+  async getMissionsByCategory(category: string): Promise<SelectMission[]> {
+    return Array.from(this.missions.values())
+      .filter(m => m.category === category && m.isPublished)
+      .sort((a, b) => 
+        new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+      );
+  }
+
+  async createMission(data: InsertMission): Promise<SelectMission> {
+    const id = randomUUID();
+    const mission: SelectMission = {
+      id,
+      ...data,
+      views: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.missions.set(id, mission);
+    return mission;
+  }
+
+  async updateMission(id: string, data: Partial<InsertMission>): Promise<SelectMission> {
+    const existing = this.missions.get(id);
+    if (!existing) {
+      throw new Error('Mission not found');
+    }
+    const updated: SelectMission = {
+      ...existing,
+      ...data,
+      updatedAt: new Date(),
+    };
+    this.missions.set(id, updated);
+    return updated;
+  }
+
+  async deleteMission(id: string): Promise<void> {
+    this.missions.delete(id);
+  }
+
+  async incrementMissionViews(id: string): Promise<void> {
+    const mission = this.missions.get(id);
+    if (mission) {
+      mission.views = (mission.views || 0) + 1;
+      this.missions.set(id, mission);
+    }
   }
 
   // Pages methods - Add implementation for MemStorage
