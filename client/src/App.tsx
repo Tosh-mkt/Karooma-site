@@ -98,6 +98,7 @@ function Router() {
               <Route path="/products" component={Products} />
               <Route path="/missoes" component={Missoes} />
               <Route path="/missoes/:slug" component={MissaoDetalhes} />
+              <Route path="/missao/:slug" component={MissaoDetalhes} />
               <Route path="/diagnostico" component={Diagnostico} />
               <Route path="/diagnostico/resultado" component={DiagnosticoResultado} />
               <Route path="/filtros-hierarquia" component={TestFiltersClean} />
