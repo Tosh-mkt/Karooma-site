@@ -9,12 +9,15 @@ interface DilemmaOption {
 }
 
 const DILEMAS: DilemmaOption[] = [
-  { id: "morning", label: "Minhas manhãs", icon: Coffee, category: "Rotina Matinal" },
-  { id: "mess", label: "A bagunça que nunca some", icon: Home, category: "Casa em Ordem" },
-  { id: "cooking", label: "A cabeça cansada", icon: UtensilsCrossed, category: "Cozinha Inteligente" },
-  { id: "self", label: "O tempo pra mim", icon: Heart, category: "Tempo para Mim" },
-  { id: "kids", label: "As crianças cheias de energia", icon: Users, category: "Educação e Brincadeiras" },
-  { id: "home", label: "A casa que precisa de um cuidado", icon: Wrench, category: "Manutenção e Melhorias do Lar" },
+  { id: "morning", label: "Rotina Matinal", icon: Coffee, category: "Rotina Matinal" },
+  { id: "mess", label: "Casa em Ordem", icon: Home, category: "Casa em Ordem" },
+  { id: "cooking", label: "Cozinha Inteligente", icon: UtensilsCrossed, category: "Cozinha Inteligente" },
+  { id: "education", label: "Educação e Brincadeiras", icon: Users, category: "Educação e Brincadeiras" },
+  { id: "self", label: "Tempo para Mim", icon: Heart, category: "Tempo para Mim" },
+  { id: "gifts", label: "Presentes e Afetos", icon: Gift, category: "Presentes e Afetos" },
+  { id: "outings", label: "Passeios e Saídas", icon: Car, category: "Passeios e Saídas" },
+  { id: "health", label: "Saúde e Emergências", icon: Hospital, category: "Saúde e Emergências" },
+  { id: "home", label: "Manutenção do Lar", icon: Wrench, category: "Manutenção e Melhorias do Lar" },
 ];
 
 interface Props {
@@ -37,7 +40,7 @@ export function DilemmaQuiz({ onSelect }: Props) {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 max-w-6xl mx-auto">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
         {DILEMAS.map((dilema, index) => {
           const Icon = dilema.icon;
           return (

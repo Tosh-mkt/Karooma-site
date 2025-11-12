@@ -144,30 +144,6 @@ export default function Missoes() {
         </div>
       )}
 
-      {/* Categories */}
-      <section className="container mx-auto px-4 py-8">
-        <div className="flex flex-wrap gap-3 justify-center">
-          {CATEGORIES.map((category, index) => (
-            <motion.button
-              key={category.value}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 + index * 0.05 }}
-              onClick={() => setSelectedCategory(category.value)}
-              className={`px-5 py-3 rounded-full text-sm font-medium transition-all ${
-                selectedCategory === category.value
-                  ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg scale-105"
-                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:shadow-md hover:scale-105 border border-gray-200 dark:border-gray-700"
-              }`}
-              data-testid={`button-category-${category.value}`}
-            >
-              <span className="mr-2">{category.icon}</span>
-              {category.label}
-            </motion.button>
-          ))}
-        </div>
-      </section>
-
       {/* Missions Grid */}
       <section id="missions-grid" className="container mx-auto px-4 pb-16">
         {isLoading ? (
