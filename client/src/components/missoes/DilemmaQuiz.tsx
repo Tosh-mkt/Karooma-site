@@ -40,7 +40,7 @@ export function DilemmaQuiz({ onSelect }: Props) {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
         {DILEMAS.map((dilema, index) => {
           const Icon = dilema.icon;
           return (
@@ -50,14 +50,14 @@ export function DilemmaQuiz({ onSelect }: Props) {
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: index * 0.05 }}
               onClick={() => onSelect(dilema.category)}
-              className="group relative bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-105 border-2 border-transparent hover:border-orange-300 dark:hover:border-orange-600"
+              className="group relative bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] border-2 border-transparent hover:border-orange-300 dark:hover:border-orange-600 w-full"
               data-testid={`button-dilema-${dilema.id}`}
             >
-              <div className="flex flex-col items-center gap-3">
-                <div className="p-4 bg-gradient-to-br from-orange-100 to-pink-100 dark:from-orange-900/30 dark:to-pink-900/30 rounded-full group-hover:scale-110 transition-transform">
+              <div className="flex items-center gap-4 text-left">
+                <div className="flex-shrink-0 p-4 bg-gradient-to-br from-orange-100 to-pink-100 dark:from-orange-900/30 dark:to-pink-900/30 rounded-full group-hover:scale-110 transition-transform">
                   <Icon className="w-8 h-8 text-orange-600 dark:text-orange-400" />
                 </div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white text-center leading-snug">
+                <p className="text-base font-medium text-gray-900 dark:text-white flex-1">
                   {dilema.label}
                 </p>
               </div>

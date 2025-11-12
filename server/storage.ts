@@ -574,12 +574,36 @@ export class MemStorage implements IStorage {
     const favorites = Array.from(this.missionFavorites.values())
       .filter(f => f.userId === userId);
     
-    // Note: This is a simplified implementation that doesn't actually join with missions
+    // Note: This is a simplified implementation with mock mission data for testing
     // In production, use the database implementation
-    return favorites.map(f => ({
-      ...f,
-      mission: {} as SelectMission // Placeholder - requires database for real mission data
-    }));
+    return favorites.map(f => {
+      const mockMission: SelectMission = {
+        id: f.missionId,
+        title: `Missão ${f.missionId.substring(0, 8)}`,
+        slug: `missao-${f.missionId.substring(0, 8)}`,
+        category: "Casa em Ordem",
+        understandingText: "Esta é uma missão de teste para desenvolvimento local. Use o banco de dados para dados reais.",
+        bonusTip: null,
+        inspirationalQuote: null,
+        productAsins: [],
+        heroImageUrl: null,
+        cardArtwork: null,
+        featured: false,
+        isPublished: true,
+        views: 0,
+        estimatedTimeMinutes: 15,
+        difficultyLevel: "easy",
+        stepsData: [],
+        diagnosticAreas: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      return {
+        ...f,
+        mission: mockMission
+      };
+    });
   }
 
   async addMissionToFavorites(userId: string, missionId: string): Promise<MissionFavorite> {
