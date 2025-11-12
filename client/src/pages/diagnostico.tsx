@@ -249,7 +249,7 @@ export default function DiagnosticoPage() {
 
   if (showNameInput) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-cyan-950/20 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-cyan-950/20 flex items-center justify-center p-4 pt-24">
         <motion.div
           className="max-w-2xl w-full"
           initial={{ opacity: 0, y: 20 }}
@@ -320,7 +320,7 @@ export default function DiagnosticoPage() {
   const question = questions[currentQuestion];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-cyan-950/20 p-4 py-12">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-cyan-950/20 p-4 pt-24 pb-12">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8">
