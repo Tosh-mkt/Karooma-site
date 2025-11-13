@@ -6,6 +6,38 @@ Preferred communication style: Simple, everyday language.
 Target persona: Cláudia - 39-year-old working mom of three (ages 10, 6, 2), seeks practical solutions for daily chaos, values empathetic and solution-focused content that helps simplify family life and allows moments for self-care.
 Image management: Two independent image fields per blog post - Hero (beginning) and Footer (end) images only, no third general image field needed.
 
+# Development Standards
+
+## Template-Based Development
+**REGRA PRINCIPAL**: Sempre desenvolver em templates dedicados, nunca em conteúdo real/produção.
+
+### Nomenclatura Padrão
+Todos os templates de desenvolvimento seguem o padrão: `[tipo]-template-dev`
+
+### URLs de Desenvolvimento (Fixas)
+- **Missões**: `/missoes/missao-template-dev` (slug: `missao-template-dev`)
+- **Blog**: `/blog/blog-template-dev` (slug: `blog-template-dev`)
+- **Produtos**: Via query param ou ID fixo quando necessário
+
+### Workflow de Desenvolvimento
+1. **Desenvolver**: Implementar features no template correspondente
+2. **Testar**: Validar funcionalidades usando as URLs fixas acima
+3. **Aprovar**: Revisar e confirmar que está pronto
+4. **Criar Conteúdo Real**: Usar template como base para criar conteúdo de produção
+
+### Templates Ativos
+- **Missões**: `missao-template-dev` (Title: "Missão Template - Desenvolvimento")
+  - URL: https://[repl-url]/missoes/missao-template-dev
+  - Usar para: Testar checklist, barra de progresso, integração Amazon API, sistema de áudio, etc.
+- **Blog**: `blog-template-dev` (A ser criado quando necessário)
+- **Outros**: Criar conforme necessidade seguindo padrão `-template-dev`
+
+### Vantagens
+✅ Impossível confundir desenvolvimento vs produção
+✅ URLs fixas e previsíveis para testes
+✅ Conteúdo real sempre limpo e profissional
+✅ Fácil identificar e gerenciar templates
+
 # System Architecture
 
 ## Frontend
