@@ -172,7 +172,14 @@ export default function MissaoDetalhes() {
           </div>
         )}
 
-        {/* 4. Barra de Progresso */}
+        {/* 4. Por que isso importa */}
+        {(data.propositoPratico || data.bonusTip) && (
+          <div id="purpose" data-section="purpose">
+            <WhyMattersCard text={data.propositoPratico || data.bonusTip || ''} />
+          </div>
+        )}
+
+        {/* 5. Barra de Progresso */}
         {data.tarefasSimplesDeExecucao && data.tarefasSimplesDeExecucao.length > 0 && (
           <div id="progress" data-section="progress">
             <MissionProgressBar
@@ -182,7 +189,7 @@ export default function MissaoDetalhes() {
           </div>
         )}
 
-        {/* 5. Checklist de Tarefas */}
+        {/* 6. Checklist de Tarefas */}
         {data.tarefasSimplesDeExecucao && data.tarefasSimplesDeExecucao.length > 0 && (
           <div id="checklist" className="bg-[#FFFBF5] dark:bg-gray-800/50 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-700">
             <MissionTaskChecklist
@@ -190,13 +197,6 @@ export default function MissaoDetalhes() {
               tasks={data.tarefasSimplesDeExecucao}
               onProgressChange={handleProgressChange}
             />
-          </div>
-        )}
-
-        {/* 6. Por que isso importa */}
-        {(data.propositoPratico || data.bonusTip) && (
-          <div id="purpose" data-section="purpose">
-            <WhyMattersCard text={data.propositoPratico || data.bonusTip || ''} />
           </div>
         )}
 
