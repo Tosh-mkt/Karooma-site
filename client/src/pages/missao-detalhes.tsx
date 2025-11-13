@@ -12,6 +12,7 @@ import { CategoryNavigationCards } from "@/components/missoes/CategoryNavigation
 import { CommunityCTA } from "@/components/missoes/CommunityCTA";
 import { FloatingActionButton } from "@/components/missoes/FloatingActionButton";
 import { MissionTaskChecklist } from "@/components/missoes/MissionTaskChecklist";
+import { AmazonProductsSection } from "@/components/missoes/AmazonProductsSection";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -201,43 +202,7 @@ export default function MissaoDetalhes() {
         )}
 
         {/* 8. Produtos Recomendados */}
-        {(data.products && data.products.length > 0) || (data.exemplosDeProdutos && data.exemplosDeProdutos.length > 0) ? (
-          <div id="products" data-section="products">
-            <div className="flex items-start gap-2 mb-6">
-              <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700">
-                <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  Ferramentas que tornam isso mais fácil
-                </h2>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Pequenos objetos que facilitam a leveza no dia a dia
-                </p>
-              </div>
-            </div>
-            {data.exemplosDeProdutos && data.exemplosDeProdutos.length > 0 && (
-              <div className="mb-6 bg-green-50 dark:bg-green-900/20 rounded-xl p-4">
-                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-                  Exemplos sugeridos:
-                </h3>
-                <ul className="space-y-2">
-                  {data.exemplosDeProdutos.map((example, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-700 dark:text-gray-300">
-                      <span className="text-green-600 dark:text-green-400 mt-1">✓</span>
-                      <span>{example}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            {data.products && data.products.length > 0 && (
-              <MissionProducts products={data.products} />
-            )}
-          </div>
-        ) : null}
+        <AmazonProductsSection slug={slug!} />
       </div>
 
       {/* 7. Depoimentos (Prova Social) - Full Width */}
