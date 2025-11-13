@@ -44,6 +44,8 @@ interface SearchItemsParams {
   minPrice?: number;
   maxPrice?: number;
   minDiscountPercent?: number;
+  minRating?: number;
+  minReviewCount?: number;
   sortBy?: 'Price:LowToHigh' | 'Price:HighToLow' | 'Featured' | 'Relevance';
   itemCount?: number;
 }
@@ -249,6 +251,20 @@ export class AmazonPAAPIService {
             return false;
           });
         }
+
+        // Filtrar por rating mínimo
+        if (params.minRating) {
+          filteredProducts = filteredProducts.filter((product: AmazonProduct) => {
+            return product.rating && product.rating >= (params.minRating || 0);
+          });
+        }
+
+        // Filtrar por quantidade mínima de reviews
+        if (params.minReviewCount) {
+          filteredProducts = filteredProducts.filter((product: AmazonProduct) => {
+            return product.reviewCount && product.reviewCount >= (params.minReviewCount || 0);
+          });
+        }
         
         return {
           success: true,
@@ -305,17 +321,21 @@ export class AmazonPAAPIService {
     const baseUrl = `https://www.amazon.com/dp/${asin}`;
     const affiliateUrl = `${baseUrl}?tag=${this.config.partnerTag}`;
 
+    const listing = item.Offers?.Listings?.[0];
+    const currentPrice = this.extractPrice(listing?.Price);
+    const savingBasis = this.extractPrice(listing?.SavingBasis);
+
     return {
       asin,
       title: item.ItemInfo?.Title?.DisplayValue || 'Título não disponível',
       brand: item.ItemInfo?.ByLineInfo?.Brand?.DisplayValue,
       imageUrl: item.Images?.Primary?.Medium?.URL,
-      currentPrice: this.extractPrice(item.Offers?.Listings?.[0]?.Price?.Amount),
-      originalPrice: this.extractPrice(item.Offers?.Listings?.[0]?.Price?.Savings?.Amount),
+      currentPrice,
+      originalPrice: savingBasis || currentPrice,
       rating: item.CustomerReviews?.StarRating?.Value,
       reviewCount: item.CustomerReviews?.Count,
-      isPrime: item.Offers?.Listings?.[0]?.DeliveryInfo?.IsPrimeEligible || false,
-      availability: this.mapAvailability(item.Offers?.Listings?.[0]?.Availability),
+      isPrime: listing?.DeliveryInfo?.IsPrimeEligible || false,
+      availability: this.mapAvailability(listing?.Availability),
       bestSellerRank: this.extractBestSellerRank(item.BrowseNodeInfo?.BrowseNodes),
       categoryPath: this.extractCategoryPath(item.BrowseNodeInfo?.BrowseNodes),
       productUrl: affiliateUrl

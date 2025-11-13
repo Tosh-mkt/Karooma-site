@@ -21,6 +21,7 @@ import {
 import bcrypt from "bcryptjs";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 import AmazonPAAPIService from "./services/amazonApi";
+import { amazonProductCache } from "./services/amazonProductCache";
 import Papa from "papaparse";
 import { getBlogTemplate, generateContentSuggestions, type BlogCategory } from "@shared/blog-template";
 import { blogValidator } from "./blog-validator";
@@ -39,6 +40,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerFlipbookAccessRoutes(app);
   registerFlipbookTemporaryAccessRoutes(app);
   registerAnalyticsRoutes(app);
+
+  // Initialize Amazon API Service
+  const amazonApiService = new AmazonPAAPIService();
 
 
   // Object Storage routes
@@ -1746,6 +1750,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ ...mission, products });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch mission" });
+    }
+  });
+
+  app.get("/api/missions/:slug/amazon-products", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const mission = await storage.getMissionBySlug(slug);
+      
+      if (!mission) {
+        return res.status(404).json({ error: "Mission not found" });
+      }
+
+      if (!mission.exemplosDeProdutos || mission.exemplosDeProdutos.length === 0) {
+        return res.json({ success: true, products: [] });
+      }
+
+      const cacheKey = `mission:${mission.id}:amazon-products`;
+      const cachedProducts = amazonProductCache.get(cacheKey);
+
+      if (cachedProducts) {
+        return res.json({ success: true, products: cachedProducts, cached: true });
+      }
+
+      const allProducts: any[] = [];
+      const maxKeywords = 3;
+      const keywords = mission.exemplosDeProdutos.slice(0, maxKeywords);
+
+      for (const keyword of keywords) {
+        try {
+          const searchResult = await amazonApiService.searchItems({
+            keywords: keyword,
+            itemCount: 4,
+            minDiscountPercent: 10,
+            minRating: 4.0,
+            minReviewCount: 50,
+            sortBy: 'Featured'
+          });
+
+          if (searchResult.success && searchResult.products) {
+            allProducts.push(...searchResult.products);
+          }
+
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+          console.error(`Error searching for "${keyword}":`, error);
+        }
+      }
+
+      const uniqueProducts = Array.from(
+        new Map(allProducts.map(p => [p.asin, p])).values()
+      );
+
+      amazonProductCache.set(cacheKey, uniqueProducts);
+
+      res.json({ success: true, products: uniqueProducts, cached: false });
+    } catch (error) {
+      console.error("Error fetching Amazon products:", error);
+      res.status(500).json({ error: "Failed to fetch Amazon products" });
     }
   });
 
