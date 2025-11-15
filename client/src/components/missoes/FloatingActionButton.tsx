@@ -2,11 +2,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 
 export function FloatingActionButton() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { toast } = useToast();
 
   const actions = [
     {
@@ -22,10 +20,6 @@ export function FloatingActionButton() {
           });
         }
         setIsExpanded(false);
-        toast({
-          title: "Início",
-          description: "Voltar ao topo"
-        });
       },
     },
     {
@@ -41,10 +35,6 @@ export function FloatingActionButton() {
           });
         }
         setIsExpanded(false);
-        toast({
-          title: "Frase Inspiradora",
-          description: "Mensagem motivacional"
-        });
       },
     },
     {
@@ -60,10 +50,6 @@ export function FloatingActionButton() {
           });
         }
         setIsExpanded(false);
-        toast({
-          title: "Propósito",
-          description: "Entenda o propósito dessa missão"
-        });
       },
     },
     {
@@ -79,10 +65,6 @@ export function FloatingActionButton() {
           });
         }
         setIsExpanded(false);
-        toast({
-          title: "Tarefas",
-          description: "Confira suas tarefas"
-        });
       },
     },
     {
@@ -98,10 +80,6 @@ export function FloatingActionButton() {
           });
         }
         setIsExpanded(false);
-        toast({
-          title: "Produtos",
-          description: "Veja produtos recomendados"
-        });
       },
     },
     {
@@ -117,10 +95,6 @@ export function FloatingActionButton() {
           });
         }
         setIsExpanded(false);
-        toast({
-          title: "Depoimentos",
-          description: "Veja quem já completou esta missão"
-        });
       },
     },
     {
@@ -136,10 +110,6 @@ export function FloatingActionButton() {
           });
         }
         setIsExpanded(false);
-        toast({
-          title: "Compartilhar",
-          description: "Compartilhe com outras mães"
-        });
       },
     },
   ];
