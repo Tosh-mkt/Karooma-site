@@ -1778,10 +1778,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         for (const asin of mission.productAsins.slice(0, 10)) {
           try {
             // Try to enrich with PA-API data
-            const result = await amazonApiService.getItems({ asins: [asin] });
+            const result = await amazonApiService.getProductByASIN(asin);
             
-            if (result.success && result.products && result.products.length > 0) {
-              productsWithData.push(result.products[0]);
+            if (result.success && result.product) {
+              productsWithData.push(result.product);
             } else {
               // Fallback: basic card with affiliate link (PA-API failed but link works)
               productsWithData.push({
