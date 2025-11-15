@@ -167,8 +167,8 @@ export default function MissaoDetalhes() {
         {/* 3. Frase contextual/marca */}
         {data.fraseMarca && (
           <div id="frase-marca" data-section="frase-marca" className="bg-[#F5F3EE] dark:bg-gray-800/50 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-700">
-            <p className="text-lg md:text-xl text-center text-gray-700 dark:text-gray-300 leading-relaxed">
-              {data.fraseMarca}
+            <p className="text-lg md:text-xl text-center text-gray-700 dark:text-gray-300 leading-relaxed font-bold">
+              "{data.fraseMarca}"
             </p>
           </div>
         )}
