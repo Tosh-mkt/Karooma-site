@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { Package, Loader2 } from "lucide-react";
+import { Package, Loader2, ChevronRight } from "lucide-react";
 import { AmazonProductCard } from "./AmazonProductCard";
+import { Link } from "wouter";
 
 interface AmazonProduct {
   asin: string;
@@ -64,6 +65,20 @@ export function AmazonProductsSection({ slug }: AmazonProductsSectionProps) {
             index={index}
           />
         ))}
+      </div>
+
+      {/* Botão Procurar Mais Produtos */}
+      <div className="flex justify-center mt-8">
+        <Link href="/products">
+          <a 
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            data-testid="button-more-products"
+          >
+            <Package className="w-5 h-5" />
+            Procurar mais produtos
+            <ChevronRight className="w-5 h-5" />
+          </a>
+        </Link>
       </div>
     </div>
   );
