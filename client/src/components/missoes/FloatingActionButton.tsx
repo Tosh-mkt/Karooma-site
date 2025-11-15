@@ -57,9 +57,9 @@ export function FloatingActionButton() {
       label: "Tarefas",
       color: "#D4A89A",
       onClick: () => {
-        const checklistSection = document.querySelector('[data-section="checklist"]');
-        if (checklistSection) {
-          checklistSection.scrollIntoView({
+        const progressSection = document.querySelector('[data-section="progress"]');
+        if (progressSection) {
+          progressSection.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
