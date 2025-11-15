@@ -1762,15 +1762,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "Mission not found" });
       }
 
-      if (!mission.exemplosDeProdutos || mission.exemplosDeProdutos.length === 0) {
-        return res.json({ success: true, products: [] });
+      const PARTNER_TAG = process.env.AMAZON_PARTNER_TAG || 'karoom-20';
+      
+      // Priority 1: Use specific ASINs if available
+      if (mission.productAsins && mission.productAsins.length > 0) {
+        const cacheKey = `mission:${mission.id}:asin-products`;
+        const cachedProducts = amazonProductCache.get(cacheKey);
+
+        if (cachedProducts) {
+          return res.json({ success: true, products: cachedProducts, cached: true, source: 'asins' });
+        }
+
+        const productsWithData: any[] = [];
+
+        for (const asin of mission.productAsins.slice(0, 10)) {
+          try {
+            // Try to enrich with PA-API data
+            const result = await amazonApiService.getItems({ asins: [asin] });
+            
+            if (result.success && result.products && result.products.length > 0) {
+              productsWithData.push(result.products[0]);
+            } else {
+              // Fallback: basic card with affiliate link (PA-API failed but link works)
+              productsWithData.push({
+                asin: asin,
+                title: `Produto recomendado (${asin})`,
+                productUrl: `https://www.amazon.com.br/dp/${asin}?tag=${PARTNER_TAG}`,
+                fallback: true
+              });
+            }
+
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (error) {
+            console.error(`PA-API error for ASIN ${asin}, using fallback:`, error);
+            // Fallback: basic card with affiliate link
+            productsWithData.push({
+              asin: asin,
+              title: `Produto recomendado (${asin})`,
+              productUrl: `https://www.amazon.com.br/dp/${asin}?tag=${PARTNER_TAG}`,
+              fallback: true
+            });
+          }
+        }
+
+        amazonProductCache.set(cacheKey, productsWithData);
+        return res.json({ 
+          success: true, 
+          products: productsWithData, 
+          cached: false,
+          source: 'asins'
+        });
       }
 
-      const cacheKey = `mission:${mission.id}:amazon-products`;
+      // Priority 2: Fallback to keyword search if no ASINs (backward compatibility)
+      if (!mission.exemplosDeProdutos || mission.exemplosDeProdutos.length === 0) {
+        return res.json({ success: true, products: [], source: 'none' });
+      }
+
+      const cacheKey = `mission:${mission.id}:keyword-products`;
       const cachedProducts = amazonProductCache.get(cacheKey);
 
       if (cachedProducts) {
-        return res.json({ success: true, products: cachedProducts, cached: true });
+        return res.json({ success: true, products: cachedProducts, cached: true, source: 'keywords' });
       }
 
       const allProducts: any[] = [];
@@ -1804,7 +1857,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       amazonProductCache.set(cacheKey, uniqueProducts);
 
-      res.json({ success: true, products: uniqueProducts, cached: false });
+      res.json({ success: true, products: uniqueProducts, cached: false, source: 'keywords' });
     } catch (error) {
       console.error("Error fetching Amazon products:", error);
       res.status(500).json({ error: "Failed to fetch Amazon products" });
