@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, FileText, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Quote } from "lucide-react";
+import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Quote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 
@@ -48,28 +48,9 @@ export function FloatingActionButton() {
       },
     },
     {
-      icon: FileText,
-      label: "Resumo da missão",
-      color: "#9CA986",
-      onClick: () => {
-        const summarySection = document.querySelector('[data-section="summary"]');
-        if (summarySection) {
-          summarySection.scrollIntoView({
-            behavior: "smooth",
-            block: "center",
-          });
-        }
-        setIsExpanded(false);
-        toast({
-          title: "Resumo da missão",
-          description: "Veja os objetivos principais"
-        });
-      },
-    },
-    {
       icon: Heart,
       label: "Por que é importante",
-      color: "#D4A89A",
+      color: "#9CA986",
       onClick: () => {
         const purposeSection = document.querySelector('[data-section="purpose"]');
         if (purposeSection) {
@@ -88,7 +69,7 @@ export function FloatingActionButton() {
     {
       icon: CheckSquare,
       label: "Tarefas",
-      color: "#9CA986",
+      color: "#D4A89A",
       onClick: () => {
         const checklistSection = document.querySelector('[data-section="checklist"]');
         if (checklistSection) {
@@ -107,7 +88,7 @@ export function FloatingActionButton() {
     {
       icon: ShoppingBag,
       label: "Produtos que ajudam",
-      color: "#D4A89A",
+      color: "#9CA986",
       onClick: () => {
         const productsSection = document.querySelector('[data-section="products"]');
         if (productsSection) {
@@ -126,7 +107,7 @@ export function FloatingActionButton() {
     {
       icon: Heart,
       label: "Depoimentos",
-      color: "#9CA986",
+      color: "#D4A89A",
       onClick: () => {
         const socialProofSection = document.querySelector('[data-section="social-proof"]');
         if (socialProofSection) {
@@ -144,8 +125,8 @@ export function FloatingActionButton() {
     },
     {
       icon: Share2,
-      label: "Salvar e Compartilhar",
-      color: "#D4A89A",
+      label: "Compartilhar",
+      color: "#9CA986",
       onClick: () => {
         const socialActionsSection = document.querySelector('[data-section="social-actions"]');
         if (socialActionsSection) {
@@ -157,7 +138,7 @@ export function FloatingActionButton() {
         setIsExpanded(false);
         toast({
           title: "Compartilhar",
-          description: "Salve ou compartilhe esta missão"
+          description: "Compartilhe com outras mães"
         });
       },
     },

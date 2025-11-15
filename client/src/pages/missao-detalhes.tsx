@@ -9,7 +9,7 @@ import { WhyMattersCard } from "@/components/missoes/WhyMattersCard";
 import { TestimonialsList } from "@/components/missoes/TestimonialsList";
 import { MissionProducts } from "@/components/missoes/MissionProducts";
 import { CategoryNavigationCards } from "@/components/missoes/CategoryNavigationCards";
-import { CommunityCTA } from "@/components/missoes/CommunityCTA";
+import { SocialShareCTA } from "@/components/missoes/SocialShareCTA";
 import { FloatingActionButton } from "@/components/missoes/FloatingActionButton";
 import { MissionTaskChecklist } from "@/components/missoes/MissionTaskChecklist";
 import { AmazonProductsSection } from "@/components/missoes/AmazonProductsSection";
@@ -192,7 +192,7 @@ export default function MissaoDetalhes() {
 
         {/* 6. Checklist de Tarefas */}
         {data.tarefasSimplesDeExecucao && data.tarefasSimplesDeExecucao.length > 0 && (
-          <div id="checklist" className="bg-[#FFFBF5] dark:bg-gray-800/50 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-700">
+          <div id="checklist" data-section="checklist" className="bg-[#FFFBF5] dark:bg-gray-800/50 rounded-2xl p-6 md:p-8 border border-gray-200 dark:border-gray-700">
             <MissionTaskChecklist
               missionId={data.id}
               tasks={data.tarefasSimplesDeExecucao}
@@ -218,10 +218,10 @@ export default function MissaoDetalhes() {
         </div>
       </div>
 
-      {/* 10. CTA Comunidade - Full Width */}
-      <div id="community" data-section="community" className="py-12 px-4">
+      {/* 10. Compartilhamento Social - Full Width */}
+      <div id="social-actions" data-section="social-actions" className="py-12 px-4">
         <div className="container mx-auto max-w-6xl">
-          <CommunityCTA />
+          <SocialShareCTA missionTitle={data.title} missionSlug={slug!} />
         </div>
       </div>
 
