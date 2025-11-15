@@ -1,0 +1,50 @@
+{
+  "title": "Conexão que Acalma a Birra",
+  "slug": "conexao-que-acalma-birra",
+  "category": "Educação",
+  "understandingText": "A cena se repete: seu filho de 2 anos se joga no chão porque queria o copo azul, mas aparentemente aquele *não* é o azul certo [00:00:00]. Ou o de 6 anos tem um colapso porque o brinquedo quebrou. Você está exausta, atrasada para o jantar, e seu primeiro instinto é dizer 'Para com isso agora! Não foi nada!'. Mas isso só aumenta os gritos. Em segundos, você está gritando também, e o caos venceu.\n\nE o que vem depois é quase pior: a culpa. Aquela voz que diz que você deveria ter mais paciência, que você está falhando em controlar a situação [00:01:05]. A verdade, amiga? Você não está falhando. Você está humana. Seu instinto de 'consertar' a situação rapidamente é o que todas nós sentimos [00:00:13]. Mas e se o nosso instinto estiver colocando mais lenha na fogueira?\n\nNão estamos falando de ignorar a birra ou ter paciência infinita. Estamos falando de uma mudança de postura que dura 60 segundos e muda tudo. Existe uma forma de usar a sua calma para 'emprestar' ao seu filho [00:01:55], desarmando a tempestade em vez de lutar contra ela. É prático, é rápido e, o melhor de tudo, substitui a culpa pela conexão.",
+  "energyLevel": "baixa",
+  "estimatedMinutes": 1,
+  "fraseMarca": "Acalmar-se para poder acalmar.",
+  "propositoPratico": "Reduzir a duração e a intensidade das birras diárias usando uma técnica de 1 minuto.",
+  "descricao": "Aprenda a técnica da 'Pausa de Conexão' para acalmar birras em 60 segundos, sem gritos e com empatia.",
+  "bonusTip": "Se a criança gritar mais alto no início [00:07:27], não é falha. Ela está testando sua calma. Respire fundo e mantenha-se presente.",
+  "inspirationalQuote": "Seu filho não precisa que você *arrume* o sentimento dele. Ele precisa que você *aguente* o sentimento dele junto com ele.",
+  "metaDescription": "Cansada das birras? Descubra o método da Pausa de Conexão para acalmar seu filho em 60 segundos com empatia. Menos estresse, mais conexão.",
+  "exemplosDeProdutos": [
+    "Livros infantis sobre emoções",
+    "Cartões de sentimentos infantis",
+    "Almofadas para cantinho da calma",
+    "Timer de ampulheta colorido",
+    "Bolinha anti-stress (para você!)"
+  ],
+  "diagnosticAreas": [
+    "cargaMental",
+    "tempoDeQualidade",
+    "relacionamentos"
+  ],
+  "tarefasSimplesDeExecucao": [
+    {
+      "task": "PASSO 1: Pause e Abaixe (10s)",
+      "subtext": "No instante da birra, pare. Respire fundo, abaixe seus ombros e agache-se ao nível dos olhos da criança [00:02:58]."
+    },
+    {
+      "task": "PASSO 2: Conecte em Silêncio (10s)",
+      "subtext": "Apenas mantenha contato visual gentil. Não fale nada. Deixe seu rosto mostrar 'Estou aqui, não estou brava' [00:03:28]."
+    },
+    {
+      "task": "PASSO 3: Ofereça o Toque (15s)",
+      "subtext": "Coloque suavemente a mão no ombro, nas costas ou segure a mãozinha. Se ela recusar, tudo bem. Só permaneça perto [00:03:48]."
+    },
+    {
+      "task": "PASSO 4: Nomeie o Sentimento (15s)",
+      "subtext": "Só agora, diga o que vê, sem julgar: 'Você está muito frustrado com esse copo'. [00:04:55] Você não está concordando, está validando."
+    },
+    {
+      "task": "PASSO 5: Respirem Juntos (10s)",
+      "subtext": "Convide-a: 'Vamos respirar fundo juntos'. Você não a manda 'se acalmar', vocês se acalmam juntas [00:05:48]."
+    }
+  ],
+  "featured": "não",
+  "isPublished": "sim"
+}

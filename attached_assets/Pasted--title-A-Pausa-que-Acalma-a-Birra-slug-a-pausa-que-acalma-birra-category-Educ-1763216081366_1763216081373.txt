@@ -1,0 +1,19 @@
+{
+  "title": "A Pausa que Acalma a Birra",
+  "slug": "a-pausa-que-acalma-birra",
+  "category": "Educação",
+  "energyLevel": "baixa",
+  "estimatedMinutes": 5,
+  "understandingText": "A cena repete-se. O seu filho de 2 anos joga-se no chão aos gritos porque queria o copo azul, mas pelos vistos aquele não era o azul *certo*. Ou o de 6 anos tem um colapso porque o brinquedo partiu. Você está exausta, atrasada para o jantar, e o seu primeiro instinto é dizer \"Para com isso agora! Não foi nada!\". Mas isso só aumenta os gritos. Em segundos, você está gritando também, e o caos venceu.\n\nE o que vem depois é quase pior: a culpa. Aquela voz que diz que você deveria ter mais paciência, que está falhando em controlar a situação. A verdade, amiga? Você não está falhando. Você é humana. O seu instinto de 'consertar' a situação rapidamente é o que todas nós sentimos. Mas o problema é que esse instinto está, sem querer, colocando mais lenha na fogueira da birra.\n\nNão estamos falando de ter paciência infinita ou de ignorar o que está acontecendo. Estamos falando de uma mudança de postura que dura menos de 5 minutos e que pode mudar tudo. Existe uma forma prática de usar a *sua* calma para 'emprestar' ao seu filho, ajudando o sistema nervoso dele a se regular. É uma forma de desarmar a tempestade em vez de lutar contra ela, substituindo a culpa pela conexão.",
+  "fraseMarca": "Acalmar-se para poder acalmar",
+  "propositoPratico": "Reduzir a duração e a intensidade das birras usando a técnica da Pausa de Conexão em 5 minutos",
+  "descricao": "Aprenda a técnica da Pausa de Conexão para acalmar birras em 5 minutos, sem gritos e com empatia.",
+  "bonusTip": "Se a criança gritar mais alto no início, não é falha. Ela está confusa com a sua nova calma e está testando. Respire fundo e mantenha-se presente.",
+  "inspirationalQuote": "Seu filho não precisa que você arrume o sentimento dele. Ele precisa que você aguente o sentimento dele junto com ele.",
+  "metaDescription": "Cansada das birras? Descubra o método da Pausa de Conexão para acalmar seu filho em 5 minutos com empatia. Menos estresse, mais conexão.",
+  "exemplosDeProdutos": "Livros infantis sobre emoções|Cartões de sentimentos infantis|Almofadas para cantinho da calma|Bolinha anti-stress|Timer de ampulheta colorido",
+  "diagnosticAreas": "cargaMental|tempoDeQualidade|logisticaInfantil",
+  "tarefasSimplesDeExecucao": "Pause e baixe sua energia::No instante da birra, pare tudo, respire fundo e agache-se ao nível dos olhos dela|Conecte em silêncio por 10 segundos::Mantenha contato visual gentil sem falar nada. Mostre que você está presente e calma, não zangada|Ofereça um toque suave::Coloque a mão no ombro ou nas costas dela. Se ela recusar, tudo bem, apenas fique perto|Nomeie o sentimento sem julgar::Só agora, diga o que vê de forma neutra: 'Você está muito frustrado com esse copo' ou 'Você está triste porque partiu'|Respirem juntos para finalizar::Convide-a a respirar fundo com você. Vocês não estão mais em luta, estão se regulando juntos",
+  "featured": "não",
+  "isPublished": "sim"
+}
