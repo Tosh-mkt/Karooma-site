@@ -37,7 +37,7 @@ export function FloatingActionButton() {
         if (fraseMarcaSection) {
           fraseMarcaSection.scrollIntoView({
             behavior: "smooth",
-            block: "center",
+            block: "start",
           });
         }
         setIsExpanded(false);
@@ -56,7 +56,7 @@ export function FloatingActionButton() {
         if (purposeSection) {
           purposeSection.scrollIntoView({
             behavior: "smooth",
-            block: "center",
+            block: "start",
           });
         }
         setIsExpanded(false);
@@ -75,7 +75,7 @@ export function FloatingActionButton() {
         if (checklistSection) {
           checklistSection.scrollIntoView({
             behavior: "smooth",
-            block: "center",
+            block: "start",
           });
         }
         setIsExpanded(false);
@@ -94,7 +94,7 @@ export function FloatingActionButton() {
         if (productsSection) {
           productsSection.scrollIntoView({
             behavior: "smooth",
-            block: "center",
+            block: "start",
           });
         }
         setIsExpanded(false);
@@ -113,7 +113,7 @@ export function FloatingActionButton() {
         if (socialProofSection) {
           socialProofSection.scrollIntoView({
             behavior: "smooth",
-            block: "center",
+            block: "start",
           });
         }
         setIsExpanded(false);
@@ -132,7 +132,7 @@ export function FloatingActionButton() {
         if (socialActionsSection) {
           socialActionsSection.scrollIntoView({
             behavior: "smooth",
-            block: "center",
+            block: "start",
           });
         }
         setIsExpanded(false);
