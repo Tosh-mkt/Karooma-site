@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
@@ -3772,6 +3772,117 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao buscar diagnóstico:", error);
       res.status(500).json({ error: "Erro ao buscar diagnóstico" });
+    }
+  });
+
+  // Featured Apparel Routes - Montink Integration
+  // Public routes
+  app.get("/api/apparel", async (req, res) => {
+    try {
+      const apparel = await storage.getAllApparel();
+      res.json(apparel);
+    } catch (error) {
+      console.error("Erro ao buscar produtos de roupa:", error);
+      res.status(500).json({ error: "Erro ao buscar produtos" });
+    }
+  });
+
+  app.get("/api/apparel/featured", async (req, res) => {
+    try {
+      const apparel = await storage.getFeaturedApparel();
+      res.json(apparel);
+    } catch (error) {
+      console.error("Erro ao buscar produtos em destaque:", error);
+      res.status(500).json({ error: "Erro ao buscar produtos em destaque" });
+    }
+  });
+
+  app.get("/api/apparel/mission/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const apparel = await storage.getApparelByMissionSlug(slug);
+      res.json(apparel);
+    } catch (error) {
+      console.error("Erro ao buscar produtos da missão:", error);
+      res.status(500).json({ error: "Erro ao buscar produtos da missão" });
+    }
+  });
+
+  app.get("/api/apparel/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const apparel = await storage.getApparelById(id);
+      
+      if (!apparel) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      res.json(apparel);
+    } catch (error) {
+      console.error("Erro ao buscar produto:", error);
+      res.status(500).json({ error: "Erro ao buscar produto" });
+    }
+  });
+
+  // Admin routes
+  app.post("/api/apparel", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const validatedData = insertFeaturedApparelSchema.parse(req.body);
+      const apparel = await storage.createApparel(validatedData);
+      
+      console.log('✅ Produto de roupa criado:', { 
+        id: apparel.id, 
+        title: apparel.title 
+      });
+      
+      res.json(apparel);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos", 
+          details: error.errors 
+        });
+      }
+      console.error("Erro ao criar produto de roupa:", error);
+      res.status(500).json({ error: "Erro ao criar produto" });
+    }
+  });
+
+  app.put("/api/apparel/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertFeaturedApparelSchema.partial().parse(req.body);
+      const apparel = await storage.updateApparel(id, validatedData);
+      
+      console.log('✅ Produto de roupa atualizado:', { 
+        id: apparel.id, 
+        title: apparel.title 
+      });
+      
+      res.json(apparel);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos", 
+          details: error.errors 
+        });
+      }
+      console.error("Erro ao atualizar produto de roupa:", error);
+      res.status(500).json({ error: "Erro ao atualizar produto" });
+    }
+  });
+
+  app.delete("/api/apparel/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteApparel(id);
+      
+      console.log('✅ Produto de roupa excluído:', { id });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro ao excluir produto de roupa:", error);
+      res.status(500).json({ error: "Erro ao excluir produto" });
     }
   });
 
