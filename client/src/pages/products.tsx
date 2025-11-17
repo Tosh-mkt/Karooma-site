@@ -430,22 +430,22 @@ export default function Products() {
                 </div>
 
                 {currentLoading ? (
-                  <div className="flex flex-wrap justify-center gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                     {[...Array(8)].map((_, i) => (
-                      <div key={i} className="animate-pulse" style={{ width: '264px', height: '450px' }}>
-                        <div className="bg-gray-200 rounded-3xl h-full w-full"></div>
+                      <div key={i} className="animate-pulse w-full">
+                        <div className="bg-gray-200 rounded-3xl h-[450px] w-full"></div>
                       </div>
                     ))}
                   </div>
                 ) : filteredProducts.length > 0 ? (
                   <motion.div 
-                    className="flex flex-wrap justify-center gap-6"
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto"
                     variants={staggerContainer}
                     initial="initial"
                     animate="animate"
                   >
                     {filteredProducts.map((product, index) => (
-                      <motion.div key={product.id} variants={staggerItem}>
+                      <motion.div key={product.id} variants={staggerItem} className="w-full flex justify-center">
                         <ProductCard product={product} index={index} />
                       </motion.div>
                     ))}
@@ -479,22 +479,22 @@ export default function Products() {
                 </div>
 
                 {apparelLoading ? (
-                  <div className="flex flex-wrap justify-center gap-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
                     {[...Array(6)].map((_, i) => (
-                      <div key={i} className="animate-pulse" style={{ width: '180px', height: '380px' }}>
-                        <div className="bg-gray-200 rounded-2xl h-full w-full"></div>
+                      <div key={i} className="animate-pulse w-full">
+                        <div className="bg-gray-200 rounded-2xl h-[380px] w-full"></div>
                       </div>
                     ))}
                   </div>
                 ) : filteredApparel.length > 0 ? (
                   <motion.div 
-                    className="flex flex-wrap justify-center gap-6"
+                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-7xl mx-auto"
                     variants={staggerContainer}
                     initial="initial"
                     animate="animate"
                   >
                     {filteredApparel.map((apparel, index) => (
-                      <motion.div key={apparel.id} variants={staggerItem}>
+                      <motion.div key={apparel.id} variants={staggerItem} className="w-full flex justify-center">
                         <ApparelCard apparel={apparel} index={index} />
                       </motion.div>
                     ))}
