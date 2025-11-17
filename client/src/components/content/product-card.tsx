@@ -45,10 +45,9 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="group"
-      style={{ width: '264px', height: '520px' }} // Fixed dimensions like Amazon cards
+      className="group w-full max-w-[264px]"
     >
-      <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-white/20 overflow-hidden h-full max-w-none w-full flex flex-col">
+      <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 backdrop-blur-sm border border-white/20 overflow-hidden w-full flex flex-col" style={{ minHeight: '520px' }}>
         {/* Product Image */}
         <div 
           className="relative h-48 overflow-hidden cursor-pointer" 

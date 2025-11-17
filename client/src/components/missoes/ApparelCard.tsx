@@ -22,10 +22,9 @@ export function ApparelCard({ apparel, index = 0 }: ApparelCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="group"
-      style={{ width: '100%', maxWidth: '180px', height: '380px' }}
+      className="group w-full max-w-[180px]"
     >
-      <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 overflow-hidden h-full w-full flex flex-col">
+      <Card className="hover:shadow-lg transition-all duration-300 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm border border-white/20 dark:border-gray-700/20 overflow-hidden w-full flex flex-col" style={{ minHeight: '380px' }}>
         {/* Product Image */}
         <div 
           className="relative overflow-hidden cursor-pointer" 
