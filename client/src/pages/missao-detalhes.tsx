@@ -12,7 +12,7 @@ import { CategoryNavigationCards } from "@/components/missoes/CategoryNavigation
 import { SocialShareCTA } from "@/components/missoes/SocialShareCTA";
 import { FloatingActionButton } from "@/components/missoes/FloatingActionButton";
 import { MissionTaskChecklist } from "@/components/missoes/MissionTaskChecklist";
-import { AmazonProductsSection } from "@/components/missoes/AmazonProductsSection";
+import { ProductsSection } from "@/components/missoes/ProductsSection";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -202,7 +202,7 @@ export default function MissaoDetalhes() {
         )}
 
         {/* 8. Produtos Recomendados */}
-        <AmazonProductsSection slug={slug!} />
+        <ProductsSection slug={slug!} />
       </div>
 
       {/* 7. Depoimentos (Prova Social) - Full Width */}
