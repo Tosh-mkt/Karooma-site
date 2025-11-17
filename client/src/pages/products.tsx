@@ -14,6 +14,9 @@ import { Product, FeaturedApparel } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
+import resolvemImage from "@assets/stock_images/organized_home_essen_94fa9c13.jpg";
+import expressamImage from "@assets/stock_images/stylish_comfortable__4ebd40a0.jpg";
+import inspiramImage from "@assets/stock_images/digital_books_e-lear_1579fe28.jpg";
 
 const ageFilters = [
   { value: "0-1", label: "0-1 ano" },
@@ -251,7 +254,7 @@ export default function Products() {
             </motion.div>
 
             <motion.div 
-              className="mb-8 space-y-6"
+              className="mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -266,61 +269,6 @@ export default function Products() {
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
               </div>
-
-              {activeTab === "resolvem" && (
-                <>
-                  <div className="flex justify-center mb-6">
-                    {isAuthenticated ? (
-                      <GradientButton
-                        variant="primary"
-                        onClick={() => window.location.href = '/favoritos'}
-                        size="sm"
-                      >
-                        <Heart className="w-4 h-4 mr-2 fill-current" />
-                        Meus Favoritos
-                      </GradientButton>
-                    ) : (
-                      <GradientButton
-                        variant="glass"
-                        onClick={() => window.location.href = '/login'}
-                        size="sm"
-                        className="mx-2 opacity-75"
-                      >
-                        <Heart className="w-4 h-4 mr-2" />
-                        Meus Favoritos (Login Necessário)
-                      </GradientButton>
-                    )}
-                  </div>
-
-                  {!sidebarOpen && (
-                    <motion.div 
-                      className="flex justify-center mb-8"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.3 }}
-                    >
-                      <div className="relative">
-                        <GradientButton
-                          variant="primary"
-                          size="lg"
-                          onClick={() => setSidebarOpen(true)}
-                          className="flex items-center gap-3 px-8 py-4 shadow-xl hover:shadow-2xl transition-all duration-300"
-                        >
-                          <Filter className="w-5 h-5" />
-                          <span className="font-semibold">Filtros de Pesquisa</span>
-                          {activeFiltersCount > 0 && (
-                            <Badge className="bg-white text-purple-600 font-bold text-sm px-2 py-1 ml-2">
-                              {activeFiltersCount}
-                            </Badge>
-                          )}
-                        </GradientButton>
-                        
-                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
-                      </div>
-                    </motion.div>
-                  )}
-                </>
-              )}
             </motion.div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -349,9 +297,72 @@ export default function Products() {
               </TabsList>
 
               <TabsContent value="resolvem" className="mt-6">
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-800 mb-2">Produtos que Resolvem</h2>
                   <p className="text-gray-600">Soluções práticas testadas para o dia a dia da família</p>
+                </div>
+
+                <motion.div 
+                  className="mb-8 max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <img 
+                    src={resolvemImage} 
+                    alt="Produtos que resolvem - Soluções práticas" 
+                    className="w-full h-48 object-cover"
+                  />
+                </motion.div>
+
+                <div className="sticky top-20 z-30 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-6 mb-6">
+                  <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    {isAuthenticated ? (
+                      <GradientButton
+                        variant="primary"
+                        onClick={() => window.location.href = '/favoritos'}
+                        size="sm"
+                        data-testid="button-favorites"
+                      >
+                        <Heart className="w-4 h-4 mr-2 fill-current" />
+                        Meus Favoritos
+                      </GradientButton>
+                    ) : (
+                      <GradientButton
+                        variant="glass"
+                        onClick={() => window.location.href = '/login'}
+                        size="sm"
+                        className="opacity-75"
+                        data-testid="button-favorites-login"
+                      >
+                        <Heart className="w-4 h-4 mr-2" />
+                        Meus Favoritos (Login Necessário)
+                      </GradientButton>
+                    )}
+
+                    {!sidebarOpen && (
+                      <div className="relative">
+                        <GradientButton
+                          variant="primary"
+                          size="sm"
+                          onClick={() => setSidebarOpen(true)}
+                          className="flex items-center gap-2"
+                          data-testid="button-filters"
+                        >
+                          <Filter className="w-4 h-4" />
+                          <span className="font-semibold">Filtros de Pesquisa</span>
+                          {activeFiltersCount > 0 && (
+                            <Badge className="bg-white text-purple-600 font-bold text-xs px-1.5 py-0.5 ml-1">
+                              {activeFiltersCount}
+                            </Badge>
+                          )}
+                        </GradientButton>
+                        {activeFiltersCount === 0 && (
+                          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-yellow-400 rounded-full animate-pulse"></div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {currentLoading ? (
@@ -393,9 +404,32 @@ export default function Products() {
               </TabsContent>
 
               <TabsContent value="expressam" className="mt-6">
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-800 mb-2">Produtos que Expressam</h2>
                   <p className="text-gray-600">Roupas Montink que comunicam seus sentimentos e jornadas</p>
+                </div>
+
+                <motion.div 
+                  className="mb-8 max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <img 
+                    src={expressamImage} 
+                    alt="Produtos que expressam - Moda com significado" 
+                    className="w-full h-48 object-cover"
+                  />
+                </motion.div>
+
+                <div className="sticky top-20 z-30 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-6 mb-6">
+                  <div className="flex justify-center">
+                    <div className="bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-md">
+                      <p className="text-sm text-gray-700 font-medium">
+                        Produtos curados com carinho pela equipe Karooma
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {apparelLoading ? (
@@ -437,9 +471,32 @@ export default function Products() {
               </TabsContent>
 
               <TabsContent value="inspiram" className="mt-6">
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-800 mb-2">Produtos que Inspiram</h2>
                   <p className="text-gray-600">E-books e apps para transformar sua vida</p>
+                </div>
+
+                <motion.div 
+                  className="mb-8 max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-lg"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <img 
+                    src={inspiramImage} 
+                    alt="Produtos que inspiram - Transformação digital" 
+                    className="w-full h-48 object-cover"
+                  />
+                </motion.div>
+
+                <div className="sticky top-20 z-30 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-6 mb-6">
+                  <div className="flex justify-center">
+                    <div className="bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-md">
+                      <p className="text-sm text-gray-700 font-medium">
+                        Conteúdos digitais que transformam
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 <motion.div 
