@@ -121,7 +121,7 @@ export default function FavoriteButton({
         onClick={handleToggleFavorite}
         disabled={isLoading}
         className={cn(
-          "gap-2 transition-all duration-300",
+          "w-full flex items-center justify-center gap-1.5 transition-all duration-300 text-xs py-2",
           isFavorite 
             ? "bg-pink-500 hover:bg-pink-600 text-white" 
             : "hover:bg-pink-50 hover:text-pink-600 hover:border-pink-300",
@@ -130,11 +130,11 @@ export default function FavoriteButton({
         )}
       >
         {isLoading ? (
-          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+          <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current"></div>
         ) : (
           <Heart 
             className={cn(
-              "h-4 w-4 transition-colors duration-300",
+              "h-3 w-3 transition-colors duration-300",
               isFavorite ? "fill-current" : ""
             )} 
           />
