@@ -271,6 +271,88 @@ export default function Products() {
               </div>
             </motion.div>
 
+            <motion.div 
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div 
+                className={`cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+                  activeTab === 'resolvem' ? 'ring-4 ring-purple-500 ring-offset-2' : ''
+                }`}
+                onClick={() => setActiveTab('resolvem')}
+                data-testid="category-card-resolvem"
+              >
+                <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow">
+                  <div className="relative h-40">
+                    <img 
+                      src={resolvemImage} 
+                      alt="Produtos que resolvem" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-3 left-4 right-4">
+                      <h3 className="text-white font-bold text-lg">Resolvem</h3>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-gray-600 text-sm">Soluções práticas testadas para o dia a dia da família</p>
+                  </div>
+                </div>
+              </div>
+
+              <div 
+                className={`cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+                  activeTab === 'expressam' ? 'ring-4 ring-purple-500 ring-offset-2' : ''
+                }`}
+                onClick={() => setActiveTab('expressam')}
+                data-testid="category-card-expressam"
+              >
+                <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow">
+                  <div className="relative h-40">
+                    <img 
+                      src={expressamImage} 
+                      alt="Produtos que expressam" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-3 left-4 right-4">
+                      <h3 className="text-white font-bold text-lg">Expressam</h3>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-gray-600 text-sm">Roupas Montink que comunicam seus sentimentos e jornadas</p>
+                  </div>
+                </div>
+              </div>
+
+              <div 
+                className={`cursor-pointer transition-all duration-300 transform hover:scale-105 ${
+                  activeTab === 'inspiram' ? 'ring-4 ring-purple-500 ring-offset-2' : ''
+                }`}
+                onClick={() => setActiveTab('inspiram')}
+                data-testid="category-card-inspiram"
+              >
+                <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow">
+                  <div className="relative h-40">
+                    <img 
+                      src={inspiramImage} 
+                      alt="Produtos que inspiram" 
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                    <div className="absolute bottom-3 left-4 right-4">
+                      <h3 className="text-white font-bold text-lg">Inspiram</h3>
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-gray-600 text-sm">E-books e apps para transformar sua vida</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8 bg-white/70 backdrop-blur-sm p-1 rounded-full">
                 <TabsTrigger 
@@ -297,24 +379,6 @@ export default function Products() {
               </TabsList>
 
               <TabsContent value="resolvem" className="mt-6">
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Produtos que Resolvem</h2>
-                  <p className="text-gray-600">Soluções práticas testadas para o dia a dia da família</p>
-                </div>
-
-                <motion.div 
-                  className="mb-8 max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <img 
-                    src={resolvemImage} 
-                    alt="Produtos que resolvem - Soluções práticas" 
-                    className="w-full h-48 object-cover"
-                  />
-                </motion.div>
-
                 <div className="sticky top-20 z-30 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-6 mb-6">
                   <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                     {isAuthenticated ? (
@@ -404,24 +468,6 @@ export default function Products() {
               </TabsContent>
 
               <TabsContent value="expressam" className="mt-6">
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Produtos que Expressam</h2>
-                  <p className="text-gray-600">Roupas Montink que comunicam seus sentimentos e jornadas</p>
-                </div>
-
-                <motion.div 
-                  className="mb-8 max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <img 
-                    src={expressamImage} 
-                    alt="Produtos que expressam - Moda com significado" 
-                    className="w-full h-48 object-cover"
-                  />
-                </motion.div>
-
                 <div className="sticky top-20 z-30 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-6 mb-6">
                   <div className="flex justify-center">
                     <div className="bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-md">
@@ -471,24 +517,6 @@ export default function Products() {
               </TabsContent>
 
               <TabsContent value="inspiram" className="mt-6">
-                <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Produtos que Inspiram</h2>
-                  <p className="text-gray-600">E-books e apps para transformar sua vida</p>
-                </div>
-
-                <motion.div 
-                  className="mb-8 max-w-3xl mx-auto rounded-2xl overflow-hidden shadow-lg"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  <img 
-                    src={inspiramImage} 
-                    alt="Produtos que inspiram - Transformação digital" 
-                    className="w-full h-48 object-cover"
-                  />
-                </motion.div>
-
                 <div className="sticky top-20 z-30 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-6 mb-6">
                   <div className="flex justify-center">
                     <div className="bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-md">
