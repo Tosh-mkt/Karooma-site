@@ -297,7 +297,7 @@ export default function Products() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <p className="text-gray-600 text-sm">Soluções práticas testadas para o dia a dia da família</p>
+                    <p className="text-gray-600 text-sm">Produtos selecionados para ajudar no seu dia a dia</p>
                   </div>
                 </div>
               </div>
