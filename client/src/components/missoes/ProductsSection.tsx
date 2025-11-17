@@ -59,15 +59,12 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
           <Package className="w-5 h-5 text-purple-600 dark:text-purple-400" />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Produtos para esta missão
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Produtos que ajudam nesta missão</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400">
             Soluções práticas e expressões emocionais selecionadas
           </p>
         </div>
       </div>
-
       <Tabs defaultValue={hasAmazonProducts ? "resolvem" : "expressam"} className="w-full">
         <TabsList className="grid w-full max-w-md mx-auto grid-cols-2 mb-6 bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-1 rounded-full">
           <TabsTrigger 
@@ -120,7 +117,6 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
           )}
         </TabsContent>
       </Tabs>
-
       <div className="flex justify-center mt-8">
         <Link href="/products">
           <a 
