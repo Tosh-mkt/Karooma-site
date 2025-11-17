@@ -153,6 +153,23 @@ export const products = pgTable("products", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Tabela para produtos de vestuário (roupas Montink)
+export const featuredApparel = pgTable("featured_apparel", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(), // ex: "Café antes de falar"
+  description: text("description"), // ex: "Camiseta oversized"
+  imageUrl: text("image_url").notNull(),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  montinkUrl: text("montink_url").notNull(), // Link para produto na loja Montink
+  category: varchar("category", { length: 50 }), // humor, empowerment, etc
+  isFeatured: boolean("is_featured").default(false), // Aparece na página /produtos
+  relatedMissionSlugs: text("related_mission_slugs").array().default(sql`ARRAY[]::text[]`), // Missões relacionadas
+  sortOrder: integer("sort_order").default(0), // Ordem de exibição
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 export const newsletterSubscriptions = pgTable("newsletter_subscriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").notNull().unique(),
@@ -317,6 +334,12 @@ export const insertProductSchema = createInsertSchema(products).omit({
   createdAt: true,
 });
 
+export const insertFeaturedApparelSchema = createInsertSchema(featuredApparel).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Schema para taxonomias
 export const insertTaxonomySchema = createInsertSchema(taxonomies).omit({
   id: true,
@@ -373,6 +396,8 @@ export type Section = typeof sections.$inferSelect;
 export type InsertSection = z.infer<typeof insertSectionSchema>;
 export type Product = typeof products.$inferSelect;
 export type InsertProduct = z.infer<typeof insertProductSchema>;
+export type FeaturedApparel = typeof featuredApparel.$inferSelect;
+export type InsertFeaturedApparel = z.infer<typeof insertFeaturedApparelSchema>;
 export type NewsletterSubscription = typeof newsletterSubscriptions.$inferSelect;
 export type InsertNewsletterSubscription = z.infer<typeof insertNewsletterSchema>;
 export type InsertNewsletterAdvanced = z.infer<typeof insertNewsletterAdvancedSchema>;
