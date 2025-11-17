@@ -322,7 +322,7 @@ export default function Products() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <p className="text-gray-600 text-sm">Roupas Montink que comunicam seus sentimentos e jornadas</p>
+                    <p className="text-gray-600 text-sm">Roupas que comunicam sentimentos e jornadas</p>
                   </div>
                 </div>
               </div>
