@@ -138,7 +138,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               data-testid={`button-create-alert-${product.id}`}
             >
               <Bell className="h-3 w-3 mr-1.5" />
-              Notificar Desconto
+              Avisar Oferta
             </Button>
           </div>
 
