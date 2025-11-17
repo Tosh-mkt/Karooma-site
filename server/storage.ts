@@ -32,9 +32,12 @@ import {
   type InsertMission,
   type SelectDiagnostic,
   type InsertDiagnostic,
+  type FeaturedApparel,
+  type InsertFeaturedApparel,
   users,
   content,
   products,
+  featuredApparel,
   newsletterSubscriptions,
   favorites,
   missionFavorites,
@@ -204,6 +207,15 @@ export interface IStorage {
   getDiagnosticById(id: string): Promise<SelectDiagnostic | undefined>;
   getDiagnosticsByUser(userId: string): Promise<SelectDiagnostic[]>;
   getLatestDiagnostic(userId: string): Promise<SelectDiagnostic | undefined>;
+  
+  // Featured Apparel methods
+  getAllApparel(): Promise<FeaturedApparel[]>;
+  getApparelById(id: string): Promise<FeaturedApparel | undefined>;
+  getFeaturedApparel(): Promise<FeaturedApparel[]>;
+  getApparelByMissionSlug(missionSlug: string): Promise<FeaturedApparel[]>;
+  createApparel(data: InsertFeaturedApparel): Promise<FeaturedApparel>;
+  updateApparel(id: string, data: Partial<InsertFeaturedApparel>): Promise<FeaturedApparel>;
+  deleteApparel(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -2189,6 +2201,69 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(diagnostics.createdAt))
       .limit(1);
     return diagnostic;
+  }
+
+  // Featured Apparel methods
+  async getAllApparel(): Promise<FeaturedApparel[]> {
+    return await db
+      .select()
+      .from(featuredApparel)
+      .where(eq(featuredApparel.isActive, true))
+      .orderBy(featuredApparel.sortOrder);
+  }
+
+  async getApparelById(id: string): Promise<FeaturedApparel | undefined> {
+    const [apparel] = await db
+      .select()
+      .from(featuredApparel)
+      .where(eq(featuredApparel.id, id))
+      .limit(1);
+    return apparel;
+  }
+
+  async getFeaturedApparel(): Promise<FeaturedApparel[]> {
+    return await db
+      .select()
+      .from(featuredApparel)
+      .where(and(
+        eq(featuredApparel.isActive, true),
+        eq(featuredApparel.isFeatured, true)
+      ))
+      .orderBy(featuredApparel.sortOrder);
+  }
+
+  async getApparelByMissionSlug(missionSlug: string): Promise<FeaturedApparel[]> {
+    return await db
+      .select()
+      .from(featuredApparel)
+      .where(and(
+        eq(featuredApparel.isActive, true),
+        sql`${missionSlug} = ANY(${featuredApparel.relatedMissionSlugs})`
+      ))
+      .orderBy(featuredApparel.sortOrder);
+  }
+
+  async createApparel(data: InsertFeaturedApparel): Promise<FeaturedApparel> {
+    const [apparel] = await db
+      .insert(featuredApparel)
+      .values(data)
+      .returning();
+    return apparel;
+  }
+
+  async updateApparel(id: string, data: Partial<InsertFeaturedApparel>): Promise<FeaturedApparel> {
+    const [apparel] = await db
+      .update(featuredApparel)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(featuredApparel.id, id))
+      .returning();
+    return apparel;
+  }
+
+  async deleteApparel(id: string): Promise<void> {
+    await db
+      .delete(featuredApparel)
+      .where(eq(featuredApparel.id, id));
   }
 }
 
