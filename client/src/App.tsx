@@ -35,6 +35,7 @@ import { AdminAutomation } from "./pages/AdminAutomation";
 import AdminCuradoriaKarooma from "./pages/AdminCuradoriaKarooma";
 import AdminRoadmap from "./pages/AdminRoadmap";
 import AdminMissoes from "./pages/AdminMissoes";
+import AdminApparel from "./pages/AdminApparel";
 import { TempLogin } from "./pages/TempLogin";
 import { Login } from "./pages/Login";
 import { AdminLogin } from "./pages/AdminLogin";
@@ -114,6 +115,7 @@ function Router() {
               <Route path="/admin/curadoria-karooma" component={AdminCuradoriaKarooma} />
               <Route path="/admin/roadmap" component={AdminRoadmap} />
               <Route path="/admin/missoes" component={AdminMissoes} />
+              <Route path="/admin/apparel" component={AdminApparel} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
               <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />
               <Route path="/demo/flipbook-capture" component={DemoFlipbookCapture} />
