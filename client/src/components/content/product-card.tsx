@@ -7,7 +7,6 @@ import { CardDescription } from "@/components/ui/card";
 import { Product } from "@shared/schema";
 import { useState } from "react";
 import FavoriteButton from "@/components/FavoriteButton";
-import RecommendationModal from "@/components/RecommendationModal";
 import AlertModal from "@/components/AlertModal";
 
 interface ProductCardProps {
@@ -16,7 +15,6 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
 
   const formatPrice = (price: string | number) => {
@@ -130,30 +128,17 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           {/* Spacer to push buttons to bottom */}
           <div className="flex-1"></div>
 
-          {/* Why We Recommend Button */}
-          <div className="mb-2 flex-shrink-0">
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full border-blue-500 text-blue-600 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 text-sm py-2"
-              onClick={() => setIsModalOpen(true)}
-              data-testid={`button-why-recommend-${product.id}`}
-            >
-              💡 Porque Indicamos?
-            </Button>
-          </div>
-
           {/* Alert Button */}
           <div className="mb-2 flex-shrink-0">
             <Button
               variant="outline"
               size="sm"
-              className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 text-sm py-2"
+              className="w-full border-purple-500 text-purple-600 hover:bg-purple-50 hover:text-purple-700 transition-all duration-200 text-xs py-2 flex items-center justify-center"
               onClick={() => setIsAlertModalOpen(true)}
               data-testid={`button-create-alert-${product.id}`}
             >
-              <Bell className="h-4 w-4 mr-2" />
-              Avisar quando baixar
+              <Bell className="h-3 w-3 mr-1.5" />
+              Notificar Desconto
             </Button>
           </div>
 
@@ -161,10 +146,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           <div className="flex gap-2 flex-shrink-0">
             <Button 
               size="sm"
-              className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-sm py-2.5"
+              className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-xs py-2.5 flex items-center justify-center"
               onClick={() => window.open(product.affiliateLink, '_blank')}
             >
-              <ExternalLink className="h-4 w-4 mr-2" />
+              <ExternalLink className="h-3 w-3 mr-1.5" />
               Ver Produto
             </Button>
           </div>
@@ -175,16 +160,6 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
         </CardContent>
       </Card>
-
-      {/* Recommendation Modal */}
-      <RecommendationModal 
-        product={{
-          ...product,
-          createdAt: product.createdAt || new Date()
-        }}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
 
       {/* Alert Modal */}
       <AlertModal
