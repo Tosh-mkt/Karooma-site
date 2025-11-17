@@ -81,15 +81,13 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </div>
 
         <CardHeader className="pb-2 px-4 pt-4 flex-shrink-0">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <CardTitle className="text-base font-semibold text-gray-800 line-clamp-2 leading-tight mb-3" style={{ height: '2.8em', overflow: 'hidden' }}>
-                {product.title}
-              </CardTitle>
-              <Badge variant="secondary" className="text-xs">
-                {product.category}
-              </Badge>
-            </div>
+          <CardTitle className="text-base font-semibold text-gray-800 line-clamp-2 leading-tight mb-3 text-center" style={{ height: '2.8em', overflow: 'hidden' }}>
+            {product.title}
+          </CardTitle>
+          <div className="flex justify-center">
+            <Badge variant="secondary" className="text-xs">
+              {product.category}
+            </Badge>
           </div>
         </CardHeader>
 
