@@ -479,7 +479,7 @@ export default function Products() {
                 </div>
 
                 {apparelLoading ? (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-7xl mx-auto">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
                     {[...Array(6)].map((_, i) => (
                       <div key={i} className="animate-pulse w-full">
                         <div className="bg-gray-200 rounded-2xl h-[380px] w-full"></div>
@@ -488,7 +488,7 @@ export default function Products() {
                   </div>
                 ) : filteredApparel.length > 0 ? (
                   <motion.div 
-                    className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 max-w-7xl mx-auto"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-7xl mx-auto"
                     variants={staggerContainer}
                     initial="initial"
                     animate="animate"
