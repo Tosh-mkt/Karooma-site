@@ -99,7 +99,7 @@ export function ApparelCard({ apparel, index = 0 }: ApparelCardProps) {
             data-testid={`button-view-apparel-${apparel.id}`}
           >
             <ExternalLink className="h-4 w-4" />
-            Ver na Montink
+            Veja na Loja Karooma
           </a>
         </CardContent>
       </Card>
