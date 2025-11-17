@@ -347,7 +347,7 @@ export default function Products() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <p className="text-gray-600 text-sm">E-books e apps para transformar sua vida</p>
+                    <p className="text-gray-600 text-sm">Apps e e-books para transformar a vida</p>
                   </div>
                 </div>
               </div>
