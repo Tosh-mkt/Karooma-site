@@ -16,7 +16,6 @@ import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import resolvemImage from "@assets/stock_images/organized_home_essen_94fa9c13.jpg";
 import expressamImage from "@assets/stock_images/stylish_comfortable__4ebd40a0.jpg";
-import inspiramImage from "@assets/stock_images/digital_books_e-lear_1579fe28.jpg";
 
 const ageFilters = [
   { value: "0-1", label: "0-1 ano" },
@@ -329,7 +328,7 @@ export default function Products() {
             </motion.div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full max-w-2xl mx-auto grid-cols-3 mb-8 bg-white/70 backdrop-blur-sm p-1 rounded-full">
+              <TabsList className="grid w-full max-w-xl mx-auto grid-cols-2 mb-8 bg-white/70 backdrop-blur-sm p-1 rounded-full">
                 <TabsTrigger 
                   value="resolvem" 
                   className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
@@ -343,13 +342,6 @@ export default function Products() {
                   data-testid="tab-expressam"
                 >
                   Expressam
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="inspiram" 
-                  className="rounded-full data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-purple-600 data-[state=active]:text-white"
-                  data-testid="tab-inspiram"
-                >
-                  Inspiram
                 </TabsTrigger>
               </TabsList>
 
@@ -489,32 +481,6 @@ export default function Products() {
                     </p>
                   </motion.div>
                 )}
-              </TabsContent>
-
-              <TabsContent value="inspiram" className="mt-6">
-                <div className="sticky top-20 z-30 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-6 mb-6">
-                  <div className="flex justify-center">
-                    <div className="bg-white/60 backdrop-blur-sm px-6 py-3 rounded-full shadow-md">
-                      <p className="text-sm text-gray-700 font-medium">
-                        Conteúdos digitais que transformam
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <motion.div 
-                  className="text-center py-16"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                >
-                  <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="font-poppins text-2xl text-gray-600 mb-2">
-                    Em breve
-                  </h3>
-                  <p className="text-gray-500">
-                    Estamos preparando conteúdos digitais incríveis para você
-                  </p>
-                </motion.div>
               </TabsContent>
             </Tabs>
           </div>
