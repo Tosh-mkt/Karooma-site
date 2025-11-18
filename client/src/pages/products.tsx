@@ -272,7 +272,7 @@ export default function Products() {
             </motion.div>
 
             <motion.div 
-              className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-12 max-w-6xl mx-auto"
+              className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -323,31 +323,6 @@ export default function Products() {
                   </div>
                   <div className="p-4">
                     <p className="text-gray-600 text-sm">Roupas que comunicam sentimentos e jornadas</p>
-                  </div>
-                </div>
-              </div>
-
-              <div 
-                className={`cursor-pointer transition-all duration-300 transform hover:scale-105 ${
-                  activeTab === 'inspiram' ? 'ring-4 ring-purple-500 ring-offset-2' : ''
-                }`}
-                onClick={() => setActiveTab('inspiram')}
-                data-testid="category-card-inspiram"
-              >
-                <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow">
-                  <div className="relative h-40">
-                    <img 
-                      src={inspiramImage} 
-                      alt="Produtos que inspiram" 
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                    <div className="absolute bottom-3 left-4 right-4">
-                      <h3 className="text-white font-bold text-lg">Inspiram</h3>
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-gray-600 text-sm">Apps e e-books para transformar a vida</p>
                   </div>
                 </div>
               </div>
