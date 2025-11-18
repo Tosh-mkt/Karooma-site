@@ -197,7 +197,7 @@ export default function Missoes() {
                   <div className="group cursor-pointer bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] border border-gray-100 dark:border-gray-700">
                     {/* Hero Image */}
                     {mission.heroImageUrl && (
-                      <div className="relative h-56 overflow-hidden">
+                      <div className="relative h-40 overflow-hidden">
                         <img
                           src={mission.heroImageUrl}
                           alt={mission.title}
