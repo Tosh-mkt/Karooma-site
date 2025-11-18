@@ -21,7 +21,7 @@ export default function Navigation() {
     { href: "/blog", label: "Blog", id: "blog" },
     { href: "/missoes", label: "Missões", id: "missions" },
     { href: "/diagnostico", label: "Diagnóstico", id: "diagnostic" },
-    { href: "/products", label: "Facilitam a Vida", id: "life-hacks" },
+    { href: "/products", label: "Nossa Loja", id: "life-hacks" },
   ];
 
   const isActive = (href: string) => location === href;
