@@ -296,7 +296,7 @@ export default function Products() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <p className="text-gray-600 text-sm">Produtos selecionados para ajudar no seu dia a dia</p>
+                    <p className="text-gray-600 text-sm">Produtos e Promoções selecionadas para ajudar no seu dia a dia</p>
                   </div>
                 </div>
               </div>
@@ -321,7 +321,7 @@ export default function Products() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <p className="text-gray-600 text-sm">Roupas que comunicam sentimentos e jornadas</p>
+                    <p className="text-gray-600 text-sm">Roupas e Produtos que comunicam sentimentos e jornadas</p>
                   </div>
                 </div>
               </div>
@@ -503,13 +503,11 @@ export default function Products() {
               transition={{ delay: 0.2 }}
             >
               <p className="font-poppins text-lg text-gray-700 leading-relaxed text-center mb-6">
-                Cada produto que recomendamos e desenvolvemos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? 
-                Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar. 
-                Não funciona ou é mal avaliado? Você não vai encontrar aqui.
+                Cada produto que recomendamos e desenvolvemos passou pelo nosso teste rigoroso: funciona mesmo no dia a dia corrido de uma família? Está conectado aos dilemas das famílias? Selecionamos apenas itens que realmente simplificam, organizam ou facilitam algum aspecto da vida familiar. 
               </p>
               
               <p className="font-inter text-sm text-gray-500 text-center italic">
-                Como associado da Amazon, a Karooma ganha com compras qualificadas que auxiliam na manutenção da estrutura para continuidade e melhoria dos serviços.
+                Como associado da Amazon, a Karooma ganha com compras qualificadas que auxiliam na manutenção da estrutura para continuidade e melhoria dos serviços. Isso não aumenta o preço dos produtos.
               </p>
             </motion.div>
           </div>
