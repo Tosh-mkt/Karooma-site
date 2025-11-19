@@ -206,7 +206,7 @@ function DashboardOverview() {
       </div>
 
       {/* Quick Links */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="glassmorphism border-0 bg-gradient-to-br from-purple-50 to-pink-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
           onClick={() => window.location.href = '/admin/roadmap'}
         >
@@ -229,6 +229,32 @@ function DashboardOverview() {
             }}>
               <Rocket className="w-4 h-4 mr-2" />
               Ver Roadmap Completo
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="glassmorphism border-0 bg-gradient-to-br from-orange-50 to-pink-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          onClick={() => window.location.href = '/admin/missoes'}
+        >
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="flex items-center text-base md:text-lg">
+              <Zap className="w-5 h-5 mr-2 text-orange-600" />
+              Gerenciar Missões
+            </CardTitle>
+            <CardDescription className="text-sm">
+              Crie e edite missões resolvidas
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 pb-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Gerencie missões com importação JSON da IA, checklist de tarefas e integração Amazon.
+            </p>
+            <Button variant="outline" className="w-full bg-white hover:bg-orange-50" onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = '/admin/missoes';
+            }}>
+              <Zap className="w-4 h-4 mr-2" />
+              Abrir Gerenciador
             </Button>
           </CardContent>
         </Card>
