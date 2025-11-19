@@ -511,34 +511,38 @@ export function AdminDashboard() {
                 <BarChart3 className="w-3 h-3" />
                 <span className="hidden sm:inline">Dashboard</span>
               </TabsTrigger>
-              <TabsTrigger value="newsletter" className="flex items-center justify-center space-x-1 text-xs py-2">
-                <Mail className="w-3 h-3" />
-                <span className="hidden sm:inline">Newsletter</span>
+              <TabsTrigger value="content" className="flex items-center justify-center space-x-1 text-xs py-2">
+                <Edit className="w-3 h-3" />
+                <span className="hidden sm:inline">Posts</span>
               </TabsTrigger>
             </TabsList>
             
             {/* Secondary row for mobile */}
             <div className="mt-2">
-              <TabsList className="grid w-full grid-cols-7 glassmorphism h-10">
+              <TabsList className="grid w-full grid-cols-8 glassmorphism h-10">
                 <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Database className="w-3 h-3" />
                   <span className="hidden sm:inline">Cards Amazon</span>
-                </TabsTrigger>
-                <TabsTrigger value="apparel" className="flex items-center justify-center space-x-1 text-xs py-2">
-                  <Shirt className="w-3 h-3" />
-                  <span className="hidden sm:inline">Cards Montink</span>
-                </TabsTrigger>
-                <TabsTrigger value="curadoria" className="flex items-center justify-center space-x-1 text-xs py-2">
-                  <Brain className="w-3 h-3" />
-                  <span className="hidden sm:inline">Curadoria</span>
                 </TabsTrigger>
                 <TabsTrigger value="monitoring" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Activity className="w-3 h-3" />
                   <span className="hidden sm:inline">Monitor</span>
                 </TabsTrigger>
-                <TabsTrigger value="content" className="flex items-center justify-center space-x-1 text-xs py-2">
-                  <Edit className="w-3 h-3" />
-                  <span className="hidden sm:inline">Posts</span>
+                <TabsTrigger value="apparel" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <Shirt className="w-3 h-3" />
+                  <span className="hidden sm:inline">Cards Montink</span>
+                </TabsTrigger>
+                <TabsTrigger value="newsletter" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <Mail className="w-3 h-3" />
+                  <span className="hidden sm:inline">Newsletter</span>
+                </TabsTrigger>
+                <TabsTrigger value="curadoria" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <Brain className="w-3 h-3" />
+                  <span className="hidden sm:inline">Curadoria</span>
+                </TabsTrigger>
+                <TabsTrigger value="analytics" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <TrendingUp className="w-3 h-3" />
+                  <span className="hidden sm:inline">Analytics</span>
                 </TabsTrigger>
                 <TabsTrigger value="automation" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Bot className="w-3 h-3" />
@@ -559,29 +563,29 @@ export function AdminDashboard() {
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
               </TabsTrigger>
-              <TabsTrigger value="newsletter" className="flex items-center space-x-2">
-                <Mail className="w-4 h-4" />
-                <span>Newsletter</span>
+              <TabsTrigger value="content" className="flex items-center space-x-2">
+                <Edit className="w-4 h-4" />
+                <span>Posts</span>
               </TabsTrigger>
               <TabsTrigger value="products" className="flex items-center space-x-2">
                 <Database className="w-4 h-4" />
                 <span>Cards Amazon</span>
               </TabsTrigger>
-              <TabsTrigger value="apparel" className="flex items-center space-x-2">
-                <Shirt className="w-4 h-4" />
-                <span>Cards Montink</span>
-              </TabsTrigger>
-              <TabsTrigger value="curadoria" className="flex items-center space-x-2">
-                <Brain className="w-4 h-4" />
-                <span>Curadoria</span>
-              </TabsTrigger>
               <TabsTrigger value="monitoring" className="flex items-center space-x-2">
                 <Activity className="w-4 h-4" />
                 <span>Monitoramento</span>
               </TabsTrigger>
-              <TabsTrigger value="content" className="flex items-center space-x-2">
-                <Edit className="w-4 h-4" />
-                <span>Posts</span>
+              <TabsTrigger value="apparel" className="flex items-center space-x-2">
+                <Shirt className="w-4 h-4" />
+                <span>Cards Montink</span>
+              </TabsTrigger>
+              <TabsTrigger value="newsletter" className="flex items-center space-x-2">
+                <Mail className="w-4 h-4" />
+                <span>Newsletter</span>
+              </TabsTrigger>
+              <TabsTrigger value="curadoria" className="flex items-center space-x-2">
+                <Brain className="w-4 h-4" />
+                <span>Curadoria</span>
               </TabsTrigger>
               <TabsTrigger value="analytics" className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4" />
