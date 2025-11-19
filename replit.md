@@ -19,11 +19,14 @@ Todos os templates de desenvolvimento seguem o padrão: `[tipo]-template-dev`
 - **Blog**: `/blog/blog-template-dev` (slug: `blog-template-dev`)
 - **Produtos**: Via query param ou ID fixo quando necessário
 
-### Workflow de Desenvolvimento
-1. **Desenvolver**: Implementar features no template correspondente
-2. **Testar**: Validar funcionalidades usando as URLs fixas acima
-3. **Aprovar**: Revisar e confirmar que está pronto
-4. **Criar Conteúdo Real**: Usar template como base para criar conteúdo de produção
+### Workflow de Desenvolvimento (Dev → QA → Prod)
+1. **Desenvolver**: Implementar features no template correspondente (`*-template-dev`)
+2. **Testar Funcionalidade**: Validar no template usando URLs fixas
+3. **Criar Conteúdo**: Usar painel admin para criar novo conteúdo (rascunho)
+4. **Pré-visualizar**: Clicar em "Pré-visualizar" no admin (abre `/preview/missoes/:slug`)
+5. **QA/UX**: Validar com QA-CHECKLIST.md antes de publicar
+6. **Publicar**: Marcar `isPublished: true` no admin
+7. **Verificar Produção**: Testar URL pública final
 
 ### Templates Ativos
 - **Missões**: `missao-template-dev` (Title: "Missão Template - Desenvolvimento")
