@@ -18,7 +18,7 @@ import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
   Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
-  Terminal, FileText, Upload, Brain, Bot
+  Terminal, FileText, Upload, Brain, Bot, Shirt
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -519,10 +519,14 @@ export function AdminDashboard() {
             
             {/* Secondary row for mobile */}
             <div className="mt-2">
-              <TabsList className="grid w-full grid-cols-6 glassmorphism h-10">
+              <TabsList className="grid w-full grid-cols-7 glassmorphism h-10">
                 <TabsTrigger value="products" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Database className="w-3 h-3" />
-                  <span className="hidden sm:inline">Produtos</span>
+                  <span className="hidden sm:inline">Cards Amazon</span>
+                </TabsTrigger>
+                <TabsTrigger value="apparel" className="flex items-center justify-center space-x-1 text-xs py-2">
+                  <Shirt className="w-3 h-3" />
+                  <span className="hidden sm:inline">Cards Montink</span>
                 </TabsTrigger>
                 <TabsTrigger value="curadoria" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Brain className="w-3 h-3" />
@@ -550,7 +554,7 @@ export function AdminDashboard() {
           
           {/* Desktop: Original layout */}
           <div className="hidden md:block">
-            <TabsList className="grid w-full grid-cols-9 glassmorphism">
+            <TabsList className="grid w-full grid-cols-10 glassmorphism">
               <TabsTrigger value="dashboard" className="flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
                 <span>Dashboard</span>
@@ -561,7 +565,11 @@ export function AdminDashboard() {
               </TabsTrigger>
               <TabsTrigger value="products" className="flex items-center space-x-2">
                 <Database className="w-4 h-4" />
-                <span>Produtos</span>
+                <span>Cards Amazon</span>
+              </TabsTrigger>
+              <TabsTrigger value="apparel" className="flex items-center space-x-2">
+                <Shirt className="w-4 h-4" />
+                <span>Cards Montink</span>
               </TabsTrigger>
               <TabsTrigger value="curadoria" className="flex items-center space-x-2">
                 <Brain className="w-4 h-4" />
@@ -600,6 +608,38 @@ export function AdminDashboard() {
 
           <TabsContent value="products">
             <ProductsManagement />
+          </TabsContent>
+
+          <TabsContent value="apparel">
+            <Card className="glassmorphism border-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shirt className="w-5 h-5 text-pink-600" />
+                  Cards Montink
+                </CardTitle>
+                <CardDescription>
+                  Gerencie produtos de vestuário Montink que expressam a jornada emocional das mães
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Shirt className="w-16 h-16 mx-auto mb-4 text-pink-400" />
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                    Produtos Montink (Expressam)
+                  </h3>
+                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                    Acesse o painel completo para criar e gerenciar produtos de vestuário que expressam emoções e experiências maternas
+                  </p>
+                  <Button
+                    onClick={() => window.location.href = '/admin/apparel'}
+                    className="bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700"
+                  >
+                    <Shirt className="w-4 h-4 mr-2" />
+                    Abrir Painel Montink
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="monitoring">
