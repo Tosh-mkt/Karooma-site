@@ -189,7 +189,7 @@ export interface IStorage {
   getPublishedMissions(diagnosticAreas?: string[]): Promise<SelectMission[]>;
   getFeaturedMissions(): Promise<SelectMission[]>;
   getMissionById(id: string): Promise<SelectMission | undefined>;
-  getMissionBySlug(slug: string): Promise<SelectMission | undefined>;
+  getMissionBySlug(slug: string, includeUnpublished?: boolean): Promise<SelectMission | undefined>;
   getMissionsByCategory(category: string): Promise<SelectMission[]>;
   createMission(data: InsertMission): Promise<SelectMission>;
   updateMission(id: string, data: Partial<InsertMission>): Promise<SelectMission>;
@@ -2104,11 +2104,16 @@ export class DatabaseStorage implements IStorage {
     return mission;
   }
 
-  async getMissionBySlug(slug: string): Promise<SelectMission | undefined> {
+  async getMissionBySlug(slug: string, includeUnpublished: boolean = false): Promise<SelectMission | undefined> {
+    const conditions = [eq(missions.slug, slug)];
+    if (!includeUnpublished) {
+      conditions.push(eq(missions.isPublished, true));
+    }
+    
     const [mission] = await db
       .select()
       .from(missions)
-      .where(eq(missions.slug, slug))
+      .where(and(...conditions))
       .limit(1);
     return mission;
   }

@@ -324,6 +324,17 @@ export default function AdminMissoes() {
                   <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending} className="flex-1">
                     {editingMission ? "Atualizar" : "Criar"} Missão
                   </Button>
+                  {editingMission && formData.slug && (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => window.open(`/preview/missoes/${formData.slug}`, '_blank')}
+                      className="flex items-center gap-2"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Pré-visualizar
+                    </Button>
+                  )}
                   <Button
                     type="button"
                     variant="outline"

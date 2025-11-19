@@ -75,6 +75,7 @@ export const content = pgTable("content", {
   youtubeId: text("youtube_id"),
   views: integer("views").default(0),
   featured: boolean("featured").default(false),
+  isPublished: boolean("is_published").default(true), // Controle de publicação
   createdAt: timestamp("created_at").defaultNow(),
 });
 

@@ -1864,6 +1864,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Preview route for unpublished missions (admin only)
+  app.get("/api/preview/missions/:slug", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Access denied. Admin only." });
+      }
+      
+      const { slug } = req.params;
+      const mission = await storage.getMissionBySlug(slug, true); // true = include unpublished
+      
+      if (!mission) {
+        return res.status(404).json({ error: "Mission not found" });
+      }
+      
+      // Fetch products if mission has ASINs (same logic as public route)
+      let products = [];
+      if (mission.productAsins && mission.productAsins.length > 0) {
+        const allProducts = await storage.getAllProducts();
+        products = allProducts.filter(p => 
+          mission.productAsins!.some(asin => 
+            p.asin === asin || p.productLink?.includes(asin)
+          )
+        );
+      }
+      
+      res.json({ ...mission, products });
+    } catch (error) {
+      console.error("Error fetching mission preview:", error);
+      res.status(500).json({ error: "Failed to fetch mission preview" });
+    }
+  });
+
   // Admin Mission Routes
   app.post("/api/admin/missions", extractUserInfo, async (req: any, res) => {
     try {

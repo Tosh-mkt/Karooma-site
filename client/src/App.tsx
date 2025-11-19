@@ -13,6 +13,7 @@ import BlogPost from "./pages/blog-post";
 import Products from "./pages/products";
 import Missoes from "./pages/missoes";
 import MissaoDetalhes from "./pages/missao-detalhes";
+import MissaoPreview from "./pages/missao-preview";
 import Diagnostico from "./pages/diagnostico";
 import DiagnosticoResultado from "./pages/diagnostico-resultado";
 import Landing from "./pages/landing";
@@ -98,6 +99,7 @@ function Router() {
               <Route path="/blog/:id" component={BlogPost} />
               <Route path="/products" component={Products} />
               <Route path="/missoes" component={Missoes} />
+              <Route path="/preview/missoes/:slug" component={MissaoPreview} />
               <Route path="/missoes/:slug" component={MissaoDetalhes} />
               <Route path="/missao/:slug" component={MissaoDetalhes} />
               <Route path="/diagnostico" component={Diagnostico} />
