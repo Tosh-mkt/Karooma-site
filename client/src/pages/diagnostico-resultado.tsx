@@ -126,7 +126,7 @@ export default function DiagnosticoResultadoPage() {
   const criticalAreas = getCriticalAreas();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-cyan-950/20 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-cyan-50 dark:from-gray-950 dark:via-purple-950/20 dark:to-cyan-950/20 pt-28 pb-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div
