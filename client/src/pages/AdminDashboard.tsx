@@ -538,7 +538,7 @@ export function AdminDashboard() {
                 </TabsTrigger>
                 <TabsTrigger value="content" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Edit className="w-3 h-3" />
-                  <span className="hidden sm:inline">Conteúdo</span>
+                  <span className="hidden sm:inline">Posts</span>
                 </TabsTrigger>
                 <TabsTrigger value="automation" className="flex items-center justify-center space-x-1 text-xs py-2">
                   <Bot className="w-3 h-3" />
@@ -581,7 +581,7 @@ export function AdminDashboard() {
               </TabsTrigger>
               <TabsTrigger value="content" className="flex items-center space-x-2">
                 <Edit className="w-4 h-4" />
-                <span>Conteúdo</span>
+                <span>Posts</span>
               </TabsTrigger>
               <TabsTrigger value="analytics" className="flex items-center space-x-2">
                 <TrendingUp className="w-4 h-4" />
