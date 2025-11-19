@@ -88,7 +88,7 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
         <TabsContent value="resolvem">
           {hasAmazonProducts && (
             <>
-              <div className="grid grid-cols-2 gap-4 justify-items-center mb-8">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
                 {amazonData!.products.map((product, index) => (
                   <AmazonProductCard 
                     key={product.asin} 
@@ -104,7 +104,7 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
         <TabsContent value="expressam">
           {hasApparelProducts && (
             <>
-              <div className="grid grid-cols-2 gap-4 justify-items-center mb-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {apparelData!.map((apparel, index) => (
                   <ApparelCard 
                     key={apparel.id} 
