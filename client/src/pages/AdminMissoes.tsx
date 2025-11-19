@@ -63,36 +63,162 @@ export default function AdminMissoes() {
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
-    category: "Organização",
+    category: "Rotina Matinal",
+    energyLevel: "",
+    estimatedMinutes: "",
     understandingText: "",
+    fraseMarca: "",
+    propositoPratico: "",
+    descricao: "",
+    exemplosDeProdutos: "",
     bonusTip: "",
     inspirationalQuote: "",
     productAsins: "",
     diagnosticAreas: [] as string[],
+    tarefasSimplesDeExecucao: "",
     heroImageUrl: "",
+    metaDescription: "",
+    featured: false,
+    isPublished: true,
   });
+
+  const [jsonInput, setJsonInput] = useState("");
 
   const resetForm = () => {
     setFormData({
       title: "",
       slug: "",
-      category: "Organização",
+      category: "Rotina Matinal",
+      energyLevel: "",
+      estimatedMinutes: "",
       understandingText: "",
+      fraseMarca: "",
+      propositoPratico: "",
+      descricao: "",
+      exemplosDeProdutos: "",
       bonusTip: "",
       inspirationalQuote: "",
       productAsins: "",
       diagnosticAreas: [],
+      tarefasSimplesDeExecucao: "",
       heroImageUrl: "",
+      metaDescription: "",
+      featured: false,
+      isPublished: true,
     });
+    setJsonInput("");
+  };
+
+  const parseJsonToForm = () => {
+    try {
+      const parsed = JSON.parse(jsonInput);
+      
+      // Helper: Normalize array fields to pipe-delimited strings
+      const normalizeArray = (value: any): string => {
+        if (!value) return "";
+        if (Array.isArray(value)) return value.join('|');
+        if (typeof value === 'string') return value;
+        return "";
+      };
+      
+      // Helper: Convert tarefasSimplesDeExecucao to string format
+      const normalizeTasks = (value: any): string => {
+        if (!value) return "";
+        if (typeof value === 'string') return value;
+        if (Array.isArray(value)) {
+          return value
+            .map((item: any) => {
+              if (typeof item === 'object' && item.task && item.subtext) {
+                return `${item.task}::${item.subtext}`;
+              }
+              return "";
+            })
+            .filter(Boolean)
+            .join('|');
+        }
+        return "";
+      };
+      
+      // Helper: Normalize diagnosticAreas to array
+      const normalizeDiagnosticAreas = (value: any): string[] => {
+        if (!value) return [];
+        if (Array.isArray(value)) return value.filter(Boolean);
+        if (typeof value === 'string') return value.split('|').filter(Boolean);
+        return [];
+      };
+      
+      setFormData({
+        title: parsed.title || "",
+        slug: parsed.slug || "",
+        category: parsed.category || "Rotina Matinal",
+        energyLevel: parsed.energyLevel || "",
+        estimatedMinutes: parsed.estimatedMinutes?.toString() || "",
+        understandingText: parsed.understandingText || "",
+        fraseMarca: parsed.fraseMarca || "",
+        propositoPratico: parsed.propositoPratico || "",
+        descricao: parsed.descricao || "",
+        exemplosDeProdutos: normalizeArray(parsed.exemplosDeProdutos),
+        bonusTip: parsed.bonusTip || "",
+        inspirationalQuote: parsed.inspirationalQuote || "",
+        productAsins: normalizeArray(parsed.productAsins),
+        diagnosticAreas: normalizeDiagnosticAreas(parsed.diagnosticAreas),
+        tarefasSimplesDeExecucao: normalizeTasks(parsed.tarefasSimplesDeExecucao),
+        heroImageUrl: parsed.heroImageUrl || "",
+        metaDescription: parsed.metaDescription || "",
+        featured: parsed.featured === "sim" || parsed.featured === true,
+        isPublished: parsed.isPublished === "sim" || parsed.isPublished === true || parsed.isPublished !== "não",
+      });
+      
+      toast({ title: "JSON carregado com sucesso!", description: "Revise os campos e salve quando estiver pronto." });
+      setJsonInput("");
+    } catch (error) {
+      toast({ 
+        title: "Erro ao processar JSON", 
+        description: error instanceof Error ? error.message : "Verifique se o JSON está válido",
+        variant: "destructive" 
+      });
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Parse tarefasSimplesDeExecucao (format: "task1::subtext1|task2::subtext2")
+    let parsedTasks: Array<{ task: string; subtext: string }> = [];
+    if (formData.tarefasSimplesDeExecucao) {
+      parsedTasks = formData.tarefasSimplesDeExecucao
+        .split('|')
+        .filter(Boolean)
+        .map(item => {
+          const [task, subtext] = item.split('::');
+          return { task: task?.trim() || "", subtext: subtext?.trim() || "" };
+        });
+    }
+    
     const payload = {
-      ...formData,
-      productAsins: formData.productAsins.split(',').map(s => s.trim()).filter(Boolean),
-      diagnosticAreas: formData.diagnosticAreas,
+      title: formData.title,
+      slug: formData.slug,
+      category: formData.category,
+      energyLevel: formData.energyLevel || null,
+      estimatedMinutes: formData.estimatedMinutes ? parseInt(formData.estimatedMinutes) : null,
+      understandingText: formData.understandingText,
+      fraseMarca: formData.fraseMarca || null,
+      propositoPratico: formData.propositoPratico || null,
+      descricao: formData.descricao || null,
+      exemplosDeProdutos: formData.exemplosDeProdutos 
+        ? formData.exemplosDeProdutos.split('|').map(s => s.trim()).filter(Boolean)
+        : null,
+      bonusTip: formData.bonusTip || null,
+      inspirationalQuote: formData.inspirationalQuote || null,
+      productAsins: formData.productAsins 
+        ? formData.productAsins.split(/[,|]/).map(s => s.trim()).filter(Boolean)
+        : null,
+      diagnosticAreas: formData.diagnosticAreas.length > 0 ? formData.diagnosticAreas : null,
+      tarefasSimplesDeExecucao: parsedTasks.length > 0 ? parsedTasks : null,
+      heroImageUrl: formData.heroImageUrl || null,
+      metaDescription: formData.metaDescription || null,
+      featured: formData.featured,
+      isPublished: formData.isPublished,
     };
 
     if (editingMission) {
@@ -104,16 +230,35 @@ export default function AdminMissoes() {
 
   const handleEdit = (mission: SelectMission) => {
     setEditingMission(mission);
+    
+    // Convert tarefasSimplesDeExecucao back to string format
+    let tasksString = "";
+    if (mission.tarefasSimplesDeExecucao && Array.isArray(mission.tarefasSimplesDeExecucao)) {
+      tasksString = mission.tarefasSimplesDeExecucao
+        .map((t: any) => `${t.task}::${t.subtext}`)
+        .join('|');
+    }
+    
     setFormData({
       title: mission.title,
       slug: mission.slug,
       category: mission.category,
+      energyLevel: mission.energyLevel || "",
+      estimatedMinutes: mission.estimatedMinutes?.toString() || "",
       understandingText: mission.understandingText,
+      fraseMarca: mission.fraseMarca || "",
+      propositoPratico: mission.propositoPratico || "",
+      descricao: mission.descricao || "",
+      exemplosDeProdutos: mission.exemplosDeProdutos?.join('|') || "",
       bonusTip: mission.bonusTip || "",
       inspirationalQuote: mission.inspirationalQuote || "",
-      productAsins: mission.productAsins?.join(', ') || "",
+      productAsins: mission.productAsins?.join('|') || "",
       diagnosticAreas: mission.diagnosticAreas || [],
+      tarefasSimplesDeExecucao: tasksString,
       heroImageUrl: mission.heroImageUrl || "",
+      metaDescription: mission.metaDescription || "",
+      featured: mission.featured || false,
+      isPublished: mission.isPublished !== false,
     });
     setIsCreateOpen(true);
   };
@@ -125,12 +270,15 @@ export default function AdminMissoes() {
   };
 
   const categories = [
-    "Organização",
-    "Alimentação",
-    "Bem-estar",
-    "Educação",
-    "Segurança",
-    "Desenvolvimento"
+    "Rotina Matinal",
+    "Casa em Ordem",
+    "Cozinha Inteligente",
+    "Educação e Brincadeiras",
+    "Tempo para Mim",
+    "Presentes e Afetos",
+    "Passeios e Saídas",
+    "Saúde e Emergências",
+    "Manutenção e Melhorias do Lar"
   ];
 
   const diagnosticAreasOptions = [
@@ -187,6 +335,37 @@ export default function AdminMissoes() {
                   Preencha os dados da missão. Todos os campos são importantes.
                 </DialogDescription>
               </DialogHeader>
+              
+              {/* JSON Import Section */}
+              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="jsonInput" className="text-sm font-semibold text-blue-900 dark:text-blue-100">
+                    🤖 Colar JSON da IA
+                  </Label>
+                  {jsonInput && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={parseJsonToForm}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      Auto-preencher Campos
+                    </Button>
+                  )}
+                </div>
+                <Textarea
+                  id="jsonInput"
+                  value={jsonInput}
+                  onChange={(e) => setJsonInput(e.target.value)}
+                  placeholder='Cole aqui o JSON gerado pela IA: {"title": "...", "slug": "...", ...}'
+                  rows={4}
+                  className="font-mono text-xs bg-white dark:bg-gray-900"
+                />
+                <p className="text-xs text-blue-700 dark:text-blue-300">
+                  💡 Cole o JSON completo gerado pela IA e clique em "Auto-preencher" para distribuir os valores nos campos abaixo
+                </p>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="title">Título da Missão</Label>
@@ -235,6 +414,67 @@ export default function AdminMissoes() {
                   </Select>
                 </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="energyLevel">Nível de Energia</Label>
+                    <Select value={formData.energyLevel} onValueChange={(value) => setFormData(prev => ({ ...prev, energyLevel: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="baixa">Baixa</SelectItem>
+                        <SelectItem value="média">Média</SelectItem>
+                        <SelectItem value="alta">Alta</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="estimatedMinutes">Tempo Estimado (min)</Label>
+                    <Input
+                      id="estimatedMinutes"
+                      type="number"
+                      min="5"
+                      max="60"
+                      value={formData.estimatedMinutes}
+                      onChange={(e) => setFormData(prev => ({ ...prev, estimatedMinutes: e.target.value }))}
+                      placeholder="Ex: 30"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="fraseMarca">Frase de Marca (opcional)</Label>
+                  <Input
+                    id="fraseMarca"
+                    value={formData.fraseMarca}
+                    onChange={(e) => setFormData(prev => ({ ...prev, fraseMarca: e.target.value }))}
+                    placeholder="Ex: Minutos ganhos, estresse perdido"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="propositoPratico">Propósito Prático (opcional)</Label>
+                  <Textarea
+                    id="propositoPratico"
+                    value={formData.propositoPratico}
+                    onChange={(e) => setFormData(prev => ({ ...prev, propositoPratico: e.target.value }))}
+                    placeholder="Ex: Ganhar 30 minutos todas as manhãs sem estresse"
+                    rows={2}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="descricao">Descrição Resumida (opcional)</Label>
+                  <Textarea
+                    id="descricao"
+                    value={formData.descricao}
+                    onChange={(e) => setFormData(prev => ({ ...prev, descricao: e.target.value }))}
+                    placeholder="Resumo breve para cards e listagens (100-150 caracteres)"
+                    rows={2}
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="heroImageUrl">URL da Imagem Hero (opcional)</Label>
                   <Input
@@ -258,15 +498,41 @@ export default function AdminMissoes() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="productAsins">ASINs dos Produtos (separados por vírgula)</Label>
+                  <Label htmlFor="exemplosDeProdutos">Exemplos de Produtos (opcional)</Label>
+                  <Textarea
+                    id="exemplosDeProdutos"
+                    value={formData.exemplosDeProdutos}
+                    onChange={(e) => setFormData(prev => ({ ...prev, exemplosDeProdutos: e.target.value }))}
+                    placeholder="Garrafa térmica|Organizador de gavetas|Timer colorido"
+                    rows={3}
+                  />
+                  <p className="text-sm text-gray-500">Tipos genéricos de produtos separados por | (pipe)</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="productAsins">ASINs dos Produtos (opcional)</Label>
                   <Textarea
                     id="productAsins"
                     value={formData.productAsins}
                     onChange={(e) => setFormData(prev => ({ ...prev, productAsins: e.target.value }))}
-                    placeholder="B08XYZ123, B09ABC456, B0ADEF789"
+                    placeholder="B08XYZ123|B09ABC456|B0ADEF789"
                     rows={3}
                   />
-                  <p className="text-sm text-gray-500">Cole os ASINs dos produtos que resolvem esta missão</p>
+                  <p className="text-sm text-gray-500">ASINs específicos da Amazon separados por | (pipe) ou vírgula</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tarefasSimplesDeExecucao">Checklist de Tarefas (opcional)</Label>
+                  <Textarea
+                    id="tarefasSimplesDeExecucao"
+                    value={formData.tarefasSimplesDeExecucao}
+                    onChange={(e) => setFormData(prev => ({ ...prev, tarefasSimplesDeExecucao: e.target.value }))}
+                    placeholder="Tarefa 1::Explicação da tarefa 1|Tarefa 2::Explicação da tarefa 2"
+                    rows={5}
+                  />
+                  <p className="text-sm text-gray-500">
+                    Use :: entre tarefa e explicação, e | entre tarefas diferentes
+                  </p>
                 </div>
 
                 <div className="space-y-3">
@@ -318,6 +584,41 @@ export default function AdminMissoes() {
                     onChange={(e) => setFormData(prev => ({ ...prev, inspirationalQuote: e.target.value }))}
                     placeholder="Ex: Pequenos passos podem transformar grandes desafios"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="metaDescription">Meta Descrição - SEO (opcional)</Label>
+                  <Textarea
+                    id="metaDescription"
+                    value={formData.metaDescription}
+                    onChange={(e) => setFormData(prev => ({ ...prev, metaDescription: e.target.value }))}
+                    placeholder="Descrição para Google (120-160 caracteres)"
+                    rows={2}
+                  />
+                </div>
+
+                <div className="flex gap-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="featured"
+                      checked={formData.featured}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, featured: !!checked }))}
+                    />
+                    <Label htmlFor="featured" className="cursor-pointer">
+                      ⭐ Destacar na Home
+                    </Label>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="isPublished"
+                      checked={formData.isPublished}
+                      onCheckedChange={(checked) => setFormData(prev => ({ ...prev, isPublished: !!checked }))}
+                    />
+                    <Label htmlFor="isPublished" className="cursor-pointer">
+                      ✅ Publicar (visível no site)
+                    </Label>
+                  </div>
                 </div>
 
                 <div className="flex gap-3 pt-4">
