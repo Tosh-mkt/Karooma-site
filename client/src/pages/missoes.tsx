@@ -147,7 +147,7 @@ export default function Missoes() {
       {/* Missions Grid */}
       <section id="missions-grid" className="container mx-auto px-4 pb-16">
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl p-6 animate-pulse">
                 <div className="h-48 bg-gray-200 dark:bg-gray-700 rounded-lg mb-4" />
@@ -182,7 +182,7 @@ export default function Missoes() {
           </motion.div>
         ) : (
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
