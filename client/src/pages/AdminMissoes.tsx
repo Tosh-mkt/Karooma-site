@@ -24,7 +24,7 @@ export default function AdminMissoes() {
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: any) => apiRequest("/api/admin/missions", "POST", data),
+    mutationFn: async (data: any) => apiRequest("POST", "/api/admin/missions", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
       toast({ title: "Missão criada com sucesso!" });
@@ -37,7 +37,7 @@ export default function AdminMissoes() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: any) => apiRequest(`/api/admin/missions/${data.id}`, "PUT", data),
+    mutationFn: async (data: any) => apiRequest("PUT", `/api/admin/missions/${data.id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
       toast({ title: "Missão atualizada com sucesso!" });
@@ -50,7 +50,7 @@ export default function AdminMissoes() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiRequest(`/api/admin/missions/${id}`, "DELETE"),
+    mutationFn: async (id: string) => apiRequest("DELETE", `/api/admin/missions/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
       toast({ title: "Missão excluída com sucesso!" });
