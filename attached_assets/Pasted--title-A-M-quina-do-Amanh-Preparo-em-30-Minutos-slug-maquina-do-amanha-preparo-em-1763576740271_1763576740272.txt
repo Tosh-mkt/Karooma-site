@@ -1,0 +1,19 @@
+{
+  "title": "A Máquina do Amanhã: Preparo em 30 Minutos",
+  "slug": "maquina-do-amanha-preparo-em-30-minutos",
+  "category": "Organização",
+  "energyLevel": "média",
+  "estimatedMinutes": 30,
+  "understandingText": "Você acorda já cansada, antes mesmo de o dia começar. São 6h e você já sabe que vai ser correria: acordar as crianças de 10, 6 e 2 anos, preparar café, encontrar uniforme, fazer lancheira... A sensação de estar sempre atrasada, sempre faltando algo, é exaustiva, e o pior é que a 'máquina' da casa só funciona se *você* apertar todos os botões, todos os dias.\n\nE sabe o que mais dói? Aquela culpa de gritar com as crianças porque você está estressada, não porque elas fizeram algo errado. Você não é uma mãe ruim — você está em uma rotina que não foi planejada para funcionar com três crianças e um trabalho. A sua carga mental de ter que lembrar de TUDO, desde se o tênis do mais velho está limpo até se o pijama do menor já está no cesto, está te esgotando.\n\nA boa notícia? Pequenos ajustes podem transformar completamente essas manhãs. Não estamos falando de acordar às 5h ou virar uma pessoa diferente. Estamos falando de usar 30 minutos na noite anterior para 'programar' a máquina do amanhã, tirando 80% da sua carga de decisão matinal e devolvendo a você, Cláudia, 15 minutos de autocuidado (ou de sono!) pela manhã.",
+  "fraseMarca": "Minutos ganhos, estresse perdido",
+  "propositoPratico": "Usar 30 minutos na noite anterior para eliminar decisões matinais e ganhar 15-20 minutos de paz pela manhã.",
+  "descricao": "Use 30 minutos de pré-preparo noturno para eliminar a correria da manhã, reduzindo o estresse e a carga mental.",
+  "bonusTip": "O 'Ponto Zero' é o local onde todas as mochilas, chaves e casacos ficam. Determine um e garanta que todos os itens voltem para lá à noite. É sua base de lançamento matinal.",
+  "inspirationalQuote": "Não se trata de ter tempo, mas de criar tempo. A organização é a chave que destranca esses minutos preciosos.",
+  "metaDescription": "Acabe com o caos matinal com 30 minutos de preparo na noite anterior. Simplifique sua rotina e reduza o estresse familiar. Soluções práticas para mães.",
+  "exemplosDeProdutos": "Organizador de gavetas vertical|Quadro de rotinas visual para crianças|Cabideiro infantil de fácil alcance|Potes herméticos para lancheira|Bandeja organizadora de bancada",
+  "diagnosticAreas": "cargaMental|logisticaInfantil|gestaoDaCasa",
+  "tarefasSimplesDeExecucao": "Ativar o Ponto Zero::Garanta que mochilas, chaves e tênis de todos estejam no local designado, prontos para sair|Separar kits de roupas::Monte 'kits' com roupa íntima, uniforme e casaco para os três, deixe-os separados por pessoa|Pré-montar lancheiras secas::Coloque potes, garrafas e itens secos (biscoitos, guardanapos, etc) dentro das lancheiras vazias|Pré-organizar o café da manhã::Deixe o pó do café no filtro, pratos e talheres na bancada e cereais à vista|Recarregar os eletrônicos no Ponto Zero::Celulares, tablets e fones devem ser carregados longe da vista e devolvidos ao 'Ponto Zero' após carregados|Desativar a Cozinha da Noite::Tire a louça da pia e passe um pano rápido nas bancadas. Você acorda merecendo o mínimo de bagunça",
+  "featured": "sim",
+  "isPublished": "sim"
+}
