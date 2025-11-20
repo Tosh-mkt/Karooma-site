@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit, Plus, Eye, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 import type { SelectMission } from "@shared/schema";
 
 export default function AdminMissoes() {
@@ -476,13 +477,32 @@ export default function AdminMissoes() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="heroImageUrl">URL da Imagem Hero (opcional)</Label>
-                  <Input
-                    id="heroImageUrl"
-                    value={formData.heroImageUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, heroImageUrl: e.target.value }))}
-                    placeholder="https://exemplo.com/imagem.jpg"
-                  />
+                  <Label htmlFor="heroImageUrl">Imagem Hero (opcional)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="heroImageUrl"
+                      value={formData.heroImageUrl}
+                      onChange={(e) => setFormData(prev => ({ ...prev, heroImageUrl: e.target.value }))}
+                      placeholder="Cole a URL ou faça upload"
+                      className="flex-1"
+                    />
+                    <ImageUploader
+                      onImageInserted={(url) => setFormData(prev => ({ ...prev, heroImageUrl: url }))}
+                      className="shrink-0"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Recomendado: 1200 x 480px (proporção 5:2), horizontal/panorâmica, 50-150KB
+                  </p>
+                  {formData.heroImageUrl && (
+                    <div className="mt-2 rounded-lg overflow-hidden border border-gray-200">
+                      <img 
+                        src={formData.heroImageUrl} 
+                        alt="Preview" 
+                        className="w-full h-32 object-cover"
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="space-y-2">
