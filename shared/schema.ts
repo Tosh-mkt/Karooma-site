@@ -280,6 +280,7 @@ export const missions = pgTable("missions", {
   productAsins: text("product_asins").array(), // Lista de ASINs dos produtos da solução
   diagnosticAreas: text("diagnostic_areas").array(), // Áreas do diagnóstico que esta missão resolve: cargaMental, tempoDaCasa, tempoDeQualidade, alimentacao, gestaoDaCasa, logisticaInfantil
   heroImageUrl: text("hero_image_url"), // Imagem principal da missão
+  audioUrl: text("audio_url"), // URL do áudio de resumo da missão
   metaDescription: text("meta_description"), // SEO
   featured: boolean("featured").default(false), // Destaque na home
   views: integer("views").default(0), // Contador de visualizações

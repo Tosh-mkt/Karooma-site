@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Trash2, Edit, Plus, Eye, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 import { ImageUploader } from "@/components/admin/ImageUploader";
+import { AudioUploader } from "@/components/admin/AudioUploader";
 import type { SelectMission } from "@shared/schema";
 
 export default function AdminMissoes() {
@@ -78,6 +79,7 @@ export default function AdminMissoes() {
     diagnosticAreas: [] as string[],
     tarefasSimplesDeExecucao: "",
     heroImageUrl: "",
+    audioUrl: "",
     metaDescription: "",
     featured: false,
     isPublished: true,
@@ -103,6 +105,7 @@ export default function AdminMissoes() {
       diagnosticAreas: [],
       tarefasSimplesDeExecucao: "",
       heroImageUrl: "",
+      audioUrl: "",
       metaDescription: "",
       featured: false,
       isPublished: true,
@@ -165,6 +168,7 @@ export default function AdminMissoes() {
         diagnosticAreas: normalizeDiagnosticAreas(parsed.diagnosticAreas),
         tarefasSimplesDeExecucao: normalizeTasks(parsed.tarefasSimplesDeExecucao),
         heroImageUrl: parsed.heroImageUrl || "",
+        audioUrl: parsed.audioUrl || "",
         metaDescription: parsed.metaDescription || "",
         featured: parsed.featured === "sim" || parsed.featured === true,
         isPublished: parsed.isPublished === "sim" || parsed.isPublished === true || parsed.isPublished !== "não",
@@ -217,6 +221,7 @@ export default function AdminMissoes() {
       diagnosticAreas: formData.diagnosticAreas.length > 0 ? formData.diagnosticAreas : null,
       tarefasSimplesDeExecucao: parsedTasks.length > 0 ? parsedTasks : null,
       heroImageUrl: formData.heroImageUrl || null,
+      audioUrl: formData.audioUrl || null,
       metaDescription: formData.metaDescription || null,
       featured: formData.featured,
       isPublished: formData.isPublished,
@@ -257,6 +262,7 @@ export default function AdminMissoes() {
       diagnosticAreas: mission.diagnosticAreas || [],
       tarefasSimplesDeExecucao: tasksString,
       heroImageUrl: mission.heroImageUrl || "",
+      audioUrl: mission.audioUrl || "",
       metaDescription: mission.metaDescription || "",
       featured: mission.featured || false,
       isPublished: mission.isPublished !== false,
@@ -501,6 +507,37 @@ export default function AdminMissoes() {
                         alt="Preview" 
                         className="w-full h-32 object-cover"
                       />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="audioUrl">Áudio de Resumo (opcional)</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="audioUrl"
+                      value={formData.audioUrl}
+                      onChange={(e) => setFormData(prev => ({ ...prev, audioUrl: e.target.value }))}
+                      placeholder="Cole a URL ou faça upload"
+                      className="flex-1"
+                    />
+                    <AudioUploader
+                      onAudioInserted={(url) => setFormData(prev => ({ ...prev, audioUrl: url }))}
+                      className="shrink-0"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Formatos: MP3, WAV, OGG. Máximo 10MB.
+                  </p>
+                  {formData.audioUrl && (
+                    <div className="mt-2 p-3 rounded-lg bg-gray-50 border border-gray-200">
+                      <audio 
+                        controls 
+                        className="w-full"
+                        src={formData.audioUrl.startsWith('/') ? new URL(formData.audioUrl, window.location.origin).toString() : formData.audioUrl}
+                      >
+                        Seu navegador não suporta áudio.
+                      </audio>
                     </div>
                   )}
                 </div>

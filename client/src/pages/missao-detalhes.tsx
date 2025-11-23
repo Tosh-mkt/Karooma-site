@@ -13,6 +13,7 @@ import { SocialShareCTA } from "@/components/missoes/SocialShareCTA";
 import { FloatingActionButton } from "@/components/missoes/FloatingActionButton";
 import { MissionTaskChecklist } from "@/components/missoes/MissionTaskChecklist";
 import { ProductsSection } from "@/components/missoes/ProductsSection";
+import { MissionAudioPlayer } from "@/components/missoes/MissionAudioPlayer";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -163,6 +164,14 @@ export default function MissaoDetalhes() {
             category={data.category}
           />
         </div>
+
+        {/* 2.5. Player de Áudio (entre título e resumo) */}
+        {data.audioUrl && (
+          <MissionAudioPlayer 
+            audioUrl={data.audioUrl} 
+            title={data.title}
+          />
+        )}
 
         {/* 3. Frase contextual/marca */}
         {data.fraseMarca && (

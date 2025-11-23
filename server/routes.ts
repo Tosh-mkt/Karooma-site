@@ -815,6 +815,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/audio/upload", async (req, res) => {
+    if (!req.body.audioURL) {
+      return res.status(400).json({ error: "audioURL is required" });
+    }
+
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectPath = await objectStorageService.trySetObjectEntityAclPolicy(
+        req.body.audioURL,
+        {
+          owner: "admin-karooma",
+          visibility: "public",
+        },
+      );
+
+      res.status(200).json({
+        objectPath: objectPath,
+        audioURL: objectPath
+      });
+    } catch (error) {
+      console.error("Error setting audio:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Auth routes - will be replaced with NextAuth
   app.get('/api/auth/user', async (req: any, res) => {
     try {
