@@ -1,10 +1,10 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Volume2, VolumeX } from "lucide-react";
+import { ArrowLeft, Volume2, VolumeX, ZoomIn } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import MissionFavoriteButton from "./MissionFavoriteButton";
-import Zoom from "react-medium-image-zoom";
-import "react-medium-image-zoom/dist/styles.css";
+import { useState } from "react";
+import { ImageZoomModal } from "./ImageZoomModal";
 
 interface MissionHeroProps {
   title: string;
@@ -27,7 +27,10 @@ export function MissionHero({
   onAudioToggle,
   isAudioPlaying = false
 }: MissionHeroProps) {
+  const [isImageOpen, setIsImageOpen] = useState(false);
+
   return (
+    <>
     <div className="relative overflow-hidden bg-[#F5F3EE] dark:bg-gray-800">
       {/* Background Pattern - subtle cream tones */}
       <div className="absolute inset-0 opacity-5">
@@ -120,20 +123,35 @@ export function MissionHero({
               transition={{ delay: 0.2 }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl cursor-zoom-in">
-                <Zoom>
-                  <img
-                    src={heroImageUrl}
-                    alt={title}
-                    className="w-full h-auto object-cover"
-                  />
-                </Zoom>
+              <div 
+                className="relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer group"
+                onClick={() => setIsImageOpen(true)}
+              >
+                <img
+                  src={heroImageUrl}
+                  alt={title}
+                  className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/20 to-transparent pointer-events-none" />
+                <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                  <ZoomIn className="w-5 h-5 text-green-600 dark:text-green-400" />
+                </div>
               </div>
             </motion.div>
           )}
         </div>
       </div>
     </div>
+
+    {/* Modal de Zoom com suporte a pinch-to-zoom */}
+    {heroImageUrl && (
+      <ImageZoomModal
+        isOpen={isImageOpen}
+        onClose={() => setIsImageOpen(false)}
+        imageUrl={heroImageUrl}
+        alt={title}
+      />
+    )}
+    </>
   );
 }
