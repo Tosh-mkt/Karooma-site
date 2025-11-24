@@ -3,6 +3,8 @@ import { ArrowLeft, Volume2, VolumeX } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import MissionFavoriteButton from "./MissionFavoriteButton";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
 interface MissionHeroProps {
   title: string;
@@ -118,13 +120,15 @@ export function MissionHero({
               transition={{ delay: 0.2 }}
               className="relative"
             >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
-                  src={heroImageUrl}
-                  alt={title}
-                  className="w-full h-auto object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-green-900/20 to-transparent" />
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl cursor-zoom-in">
+                <Zoom>
+                  <img
+                    src={heroImageUrl}
+                    alt={title}
+                    className="w-full h-auto object-cover"
+                  />
+                </Zoom>
+                <div className="absolute inset-0 bg-gradient-to-t from-green-900/20 to-transparent pointer-events-none" />
               </div>
             </motion.div>
           )}

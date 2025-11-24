@@ -201,4 +201,28 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
   }
+
+  /* React Medium Image Zoom Customization */
+  [data-rmiz-wrap="visible"],
+  [data-rmiz-wrap="hidden"] {
+    @apply cursor-zoom-in;
+  }
+
+  [data-rmiz-wrap="visible"]:hover img,
+  [data-rmiz-wrap="hidden"]:hover img {
+    @apply transition-opacity duration-200;
+    opacity: 0.95;
+  }
+
+  [data-rmiz-modal-overlay="visible"] {
+    @apply bg-black/90 dark:bg-black/95;
+  }
+
+  [data-rmiz-modal-img] {
+    @apply cursor-zoom-out;
+  }
+
+  .dark [data-rmiz-modal-overlay] {
+    background-color: rgba(0, 0, 0, 0.95) !important;
+  }
 }
