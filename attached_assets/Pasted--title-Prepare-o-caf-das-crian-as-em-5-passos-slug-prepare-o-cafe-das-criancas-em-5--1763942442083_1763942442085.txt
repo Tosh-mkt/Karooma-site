@@ -1,0 +1,20 @@
+{
+  "title": "Prepare o café das crianças em 5 passos",
+  "slug": "prepare-o-cafe-das-criancas-em-5-passos",
+  "category": "Rotina Matinal",
+  "descricao": "Simplifique o preparo matinal e reduza a bagunça na cozinha com um sistema ágil.",
+  "propositoPratico": "Otimizar o café infantil para começar o dia com tranquilidade e menos louça suja.",
+  "understandingText": "Você acorda e o relógio já parece seu inimigo. Entre acordar o mais velho para a escola, ajudar o do meio e lidar com as demandas do bebê, preparar o café da manhã vira uma batalha contra o tempo, muitas vezes regada a choro e leite derramado.\n\nÉ exaustivo começar o dia sentindo que já está atrasada ou devendo atenção. Não é falta de organização sua; alimentar três crianças em fases diferentes enquanto se arruma para o trabalho é uma logística complexa que sobrecarrega qualquer um.\n\nMas as manhãs não precisam ser esse caos. Ao simplificar o menu e preparar o terreno na noite anterior, transformamos o 'campo de guerra' em uma linha de produção carinhosa e eficiente. Vamos montar um sistema que funcione para a sua realidade.",
+  "tarefasSimplesDeExecucao": "Menu Padronizado::Defina 2 opções de café para a semana (ex: pão com ovo ou iogurte com fruta) para eliminar a fadiga de decisão.|Mise en Place Noturno::Deixe a mesa posta, potes de cereais acessíveis e a lancheira pré-montada antes de dormir.|Estação de Autonomia::Para os filhos de 10 e 6 anos, deixe leite e copos em altura acessível para que se sirvam.|Linha de Produção::Prepare todos os sanduíches de uma vez só na bancada, em vez de um por um.|Limpeza Jato::Use um pano úmido e coloque a louça na pia imediatamente após o uso, evitando a pilha para a volta do trabalho.",
+  "exemplosDeProdutos": "Potes empilháveis|Sanduicheira|Lancheiras térmicas",
+  "productAsins": "B076VSDJ7N|B091D4H69L|B07J5P7J8K",
+  "energyLevel": "média",
+  "estimatedMinutes": 20,
+  "diagnosticAreas": "logisticaInfantil|alimentacao|tempoDaCasa",
+  "fraseMarca": "Pequenas rotinas, grandes manhãs.",
+  "bonusTip": "Organize os ingredientes secos e utensílios na noite anterior para ganhar 15 minutos de sono pela manhã.",
+  "metaDescription": "Cansada do caos matinal? Descubra como preparar o café das crianças em 5 passos simples e ganhe tempo e paz antes de sair de casa.",
+  "inspirationalQuote": "A paz da manhã define o ritmo do dia inteiro. Simplificar é um ato de amor com você mesma.",
+  "featured": "não",
+  "isPublished": "sim"
+}
