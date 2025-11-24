@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema, insertMissionSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
@@ -1505,11 +1505,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!checkIsAdmin(req.user)) {
         return res.status(403).json({ error: "Access denied. Admin only." });
       }
-      const mission = await storage.createMission(req.body);
+      
+      const validatedData = insertMissionSchema.parse(req.body);
+      const mission = await storage.createMission(validatedData);
       res.status(201).json(mission);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating mission:", error);
-      res.status(500).json({ error: "Failed to create mission" });
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "Validation error", 
+          details: error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')
+        });
+      }
+      
+      if (error.code === '23505') {
+        return res.status(409).json({ 
+          error: "Slug já existe. Por favor, use um slug único."
+        });
+      }
+      
+      res.status(500).json({ 
+        error: "Failed to create mission",
+        details: error.message || "Unknown error"
+      });
     }
   });
 
@@ -1519,11 +1538,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied. Admin only." });
       }
       const { id } = req.params;
-      const mission = await storage.updateMission(id, req.body);
+      
+      const validatedData = insertMissionSchema.partial().parse(req.body);
+      const mission = await storage.updateMission(id, validatedData);
       res.json(mission);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating mission:", error);
-      res.status(500).json({ error: "Failed to update mission" });
+      
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          error: "Validation error", 
+          details: error.errors.map((e: any) => `${e.path.join('.')}: ${e.message}`).join(', ')
+        });
+      }
+      
+      if (error.code === '23505') {
+        return res.status(409).json({ 
+          error: "Slug já existe. Por favor, use um slug único."
+        });
+      }
+      
+      res.status(500).json({ 
+        error: "Failed to update mission",
+        details: error.message || "Unknown error"
+      });
     }
   });
 
@@ -1921,49 +1959,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Admin Mission Routes
-  app.post("/api/admin/missions", extractUserInfo, async (req: any, res) => {
-    try {
-      if (!checkIsAdmin(req.user)) {
-        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
-      }
-      const missionData = req.body;
-      const mission = await storage.createMission(missionData);
-      res.json(mission);
-    } catch (error) {
-      console.error("Error creating mission:", error);
-      res.status(500).json({ error: "Failed to create mission" });
-    }
-  });
-
-  app.put("/api/admin/missions/:id", extractUserInfo, async (req: any, res) => {
-    try {
-      if (!checkIsAdmin(req.user)) {
-        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
-      }
-      const { id } = req.params;
-      const missionData = req.body;
-      const mission = await storage.updateMission(id, missionData);
-      res.json(mission);
-    } catch (error) {
-      console.error("Error updating mission:", error);
-      res.status(500).json({ error: "Failed to update mission" });
-    }
-  });
-
-  app.delete("/api/admin/missions/:id", extractUserInfo, async (req: any, res) => {
-    try {
-      if (!checkIsAdmin(req.user)) {
-        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
-      }
-      const { id } = req.params;
-      await storage.deleteMission(id);
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Error deleting mission:", error);
-      res.status(500).json({ error: "Failed to delete mission" });
-    }
-  });
 
   // Endpoint padronizado para importar produto - PROCESSO GARANTIDO SEM AJUSTES
   app.post("/api/products/import", async (req, res) => {

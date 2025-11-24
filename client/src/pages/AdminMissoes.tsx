@@ -33,21 +33,33 @@ export default function AdminMissoes() {
       setIsCreateOpen(false);
       resetForm();
     },
-    onError: (error: Error) => {
-      toast({ title: "Erro ao criar missão", description: error.message, variant: "destructive" });
+    onError: (error: any) => {
+      const errorDetails = error.details || error.message || "Erro desconhecido";
+      toast({ 
+        title: "Erro ao criar missão", 
+        description: errorDetails, 
+        variant: "destructive",
+        duration: 6000
+      });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: any) => apiRequest("PUT", `/api/admin/missions/${data.id}`, data),
+    mutationFn: async (data: any) => apiRequest("PATCH", `/api/admin/missions/${data.id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
       toast({ title: "Missão atualizada com sucesso!" });
       setEditingMission(null);
       resetForm();
     },
-    onError: (error: Error) => {
-      toast({ title: "Erro ao atualizar missão", description: error.message, variant: "destructive" });
+    onError: (error: any) => {
+      const errorDetails = error.details || error.message || "Erro desconhecido";
+      toast({ 
+        title: "Erro ao atualizar missão", 
+        description: errorDetails, 
+        variant: "destructive",
+        duration: 6000
+      });
     },
   });
 

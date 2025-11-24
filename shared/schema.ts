@@ -845,8 +845,22 @@ export const insertMissionSchema = createInsertSchema(missions).omit({
   createdAt: true,
   updatedAt: true,
 }).extend({
-  energyLevel: z.enum(["baixa", "média", "alta"]).optional(),
-  estimatedMinutes: z.number().int().min(0).optional(),
+  energyLevel: z.enum(["baixa", "média", "alta"]).nullable().optional(),
+  estimatedMinutes: z.coerce.number().int().min(0).nullable().optional(),
+  bonusTip: z.string().nullable().optional(),
+  inspirationalQuote: z.string().nullable().optional(),
+  fraseMarca: z.string().nullable().optional(),
+  propositoPratico: z.string().nullable().optional(),
+  descricao: z.string().nullable().optional(),
+  exemplosDeProdutos: z.array(z.string()).nullable().optional(),
+  tarefasSimplesDeExecucao: z.array(z.object({ task: z.string(), subtext: z.string() })).nullable().optional(),
+  productAsins: z.array(z.string()).nullable().optional(),
+  diagnosticAreas: z.array(z.string()).nullable().optional(),
+  heroImageUrl: z.string().nullable().optional(),
+  audioUrl: z.string().nullable().optional(),
+  metaDescription: z.string().nullable().optional(),
+  featured: z.boolean().optional(),
+  isPublished: z.boolean().optional(),
 });
 
 export type InsertMission = z.infer<typeof insertMissionSchema>;
