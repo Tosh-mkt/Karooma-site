@@ -31,7 +31,7 @@ const DIAGNOSTIC_AREA_LABELS: Record<string, { label: string; icon: string; colo
   logisticaInfantil: { label: "Logística Infantil", icon: "👶", color: "from-indigo-500 to-violet-500" },
 };
 
-type ViewMode = "recommendations" | "all-categories" | "category";
+type ViewMode = "recommendations" | "all-categories" | "category" | "diagnostic-area";
 
 export default function Missoes() {
   const searchString = useSearch();
@@ -40,6 +40,7 @@ export default function Missoes() {
 
   const [viewMode, setViewMode] = useState<ViewMode>("recommendations");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedDiagnosticArea, setSelectedDiagnosticArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showDilemmaQuiz, setShowDilemmaQuiz] = useState(false);
 
@@ -72,6 +73,8 @@ export default function Missoes() {
 
   const hasDiagnostic = !!diagnostic;
 
+  const CRITICAL_THRESHOLD = 3.5;
+  
   const criticalAreas = diagnostic ? 
     Object.entries({
       cargaMental: parseFloat(diagnostic.cargaMental || "5"),
@@ -81,6 +84,7 @@ export default function Missoes() {
       gestaoDaCasa: parseFloat(diagnostic.gestaoDaCasa || "5"),
       logisticaInfantil: parseFloat(diagnostic.logisticaInfantil || "5"),
     })
+    .filter(([_, score]) => score < CRITICAL_THRESHOLD)
     .sort((a, b) => a[1] - b[1])
     .slice(0, 3)
     .map(([area, score]) => ({ area, score }))
@@ -119,7 +123,16 @@ export default function Missoes() {
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
+    setSelectedDiagnosticArea(null);
     setViewMode("category");
+    setTimeout(() => {
+      document.getElementById("missions-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
+  const handleDiagnosticAreaSelect = (areaKey: string) => {
+    setSelectedDiagnosticArea(areaKey);
+    setViewMode("diagnostic-area");
     setTimeout(() => {
       document.getElementById("missions-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 100);
@@ -128,12 +141,14 @@ export default function Missoes() {
   const handleBackToRecommendations = () => {
     setViewMode("recommendations");
     setSelectedCategory("all");
+    setSelectedDiagnosticArea(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleViewAllCategories = () => {
     setViewMode("all-categories");
     setSelectedCategory("all");
+    setSelectedDiagnosticArea(null);
   };
 
   const isLoading = missionsLoading || diagnosticLoading;
@@ -241,10 +256,12 @@ export default function Missoes() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    Para Você
+                    {criticalAreas.length > 0 ? 'Para Você' : 'Parabéns! 🎉'}
                   </h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Missões selecionadas com base no seu diagnóstico
+                    {criticalAreas.length > 0 
+                      ? 'Missões selecionadas com base no seu diagnóstico'
+                      : 'Todas as áreas da sua rotina estão equilibradas!'}
                   </p>
                 </div>
               </div>
@@ -259,7 +276,33 @@ export default function Missoes() {
               </Button>
             </div>
 
+            {/* All Good Message */}
+            {criticalAreas.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-8 text-center mb-8 border border-green-200 dark:border-green-800"
+              >
+                <div className="text-5xl mb-4">🌟</div>
+                <h3 className="text-xl font-bold text-green-800 dark:text-green-200 mb-2">
+                  Você está mandando muito bem!
+                </h3>
+                <p className="text-green-700 dark:text-green-300 mb-4">
+                  Seu diagnóstico mostra que todas as áreas da sua vida estão em equilíbrio. 
+                  Continue assim! Explore nossas missões para manter essa leveza.
+                </p>
+                <Button
+                  onClick={handleViewAllCategories}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Explorar Todas as Missões
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              </motion.div>
+            )}
+
             {/* Critical Areas Cards */}
+            {criticalAreas.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {criticalAreas.map(({ area, score }, index) => {
                 const areaInfo = DIAGNOSTIC_AREA_LABELS[area];
@@ -308,7 +351,7 @@ export default function Missoes() {
                         ))}
                         {areaMissions.length > 2 && (
                           <button
-                            onClick={() => handleCategorySelect(areaMissions[0]?.category || "all")}
+                            onClick={() => handleDiagnosticAreaSelect(area)}
                             className="w-full text-sm text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 font-medium py-2"
                           >
                             Ver mais {areaMissions.length - 2} missões →
@@ -316,14 +359,25 @@ export default function Missoes() {
                         )}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500 dark:text-gray-500 italic">
-                        Novas missões em breve!
-                      </p>
+                      <div className="text-center py-4">
+                        <p className="text-sm text-gray-500 dark:text-gray-500 italic mb-2">
+                          Estamos preparando missões para esta área!
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleViewAllCategories}
+                          className="text-xs"
+                        >
+                          Ver outras missões
+                        </Button>
+                      </div>
                     )}
                   </motion.div>
                 );
               })}
             </div>
+            )}
 
             {/* Mobile: View All Categories Button */}
             <div className="sm:hidden text-center">
@@ -461,6 +515,83 @@ export default function Missoes() {
               </div>
             </motion.div>
           )}
+        </section>
+      )}
+
+      {/* View Mode: Diagnostic Area */}
+      {viewMode === "diagnostic-area" && selectedDiagnosticArea && (
+        <section className="container mx-auto px-4 pb-8">
+          {(() => {
+            const areaInfo = DIAGNOSTIC_AREA_LABELS[selectedDiagnosticArea];
+            const areaMissions = getMissionsForArea(selectedDiagnosticArea);
+            const areaScore = diagnostic ? parseFloat((diagnostic as any)[selectedDiagnosticArea] || "5") : null;
+            
+            return (
+              <>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`bg-gradient-to-r ${areaInfo?.color || 'from-gray-500 to-gray-600'} p-3 rounded-xl text-2xl`}>
+                      {areaInfo?.icon || "📋"}
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {areaInfo?.label || selectedDiagnosticArea}
+                      </h2>
+                      {areaScore !== null && (
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          Seu score: {areaScore.toFixed(1)}/5 • {areaMissions.length} missões disponíveis
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+
+                <div id="missions-grid">
+                  <MissionsGrid 
+                    missions={areaMissions} 
+                    isLoading={isLoading}
+                    searchQuery={searchQuery}
+                  />
+                </div>
+
+                {/* Other Diagnostic Areas */}
+                {criticalAreas.length > 1 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.3 }}
+                    className="mt-12"
+                  >
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                      Outras Áreas do Diagnóstico
+                    </h3>
+                    <div className="flex flex-wrap gap-3">
+                      {criticalAreas
+                        .filter(ca => ca.area !== selectedDiagnosticArea)
+                        .map(({ area, score }) => {
+                          const info = DIAGNOSTIC_AREA_LABELS[area];
+                          return (
+                            <button
+                              key={area}
+                              onClick={() => handleDiagnosticAreaSelect(area)}
+                              className={`inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r ${info.color} bg-opacity-10 rounded-full border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:scale-105 transition-all`}
+                            >
+                              <span>{info.icon}</span>
+                              <span>{info.label}</span>
+                              <span className="text-xs text-gray-500">({score.toFixed(1)})</span>
+                            </button>
+                          );
+                        })}
+                    </div>
+                  </motion.div>
+                )}
+              </>
+            );
+          })()}
         </section>
       )}
 
