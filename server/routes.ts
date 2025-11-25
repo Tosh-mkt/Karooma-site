@@ -3744,12 +3744,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Diagnostic Routes - Mom Routine Assessment
   app.post("/api/diagnostics", extractUserInfo, async (req: any, res) => {
     try {
-      const validatedData = insertDiagnosticSchema.parse(req.body);
+      // Extrair userEmail ANTES da validação (campo temporário, não vai para o banco)
+      const userEmail = req.body.userEmail;
       
-      // Se tiver userId no body, use-o; senão, use do usuário autenticado (opcional)
+      // Remover userEmail do body para não interferir na validação do schema
+      const { userEmail: _, ...bodyWithoutEmail } = req.body;
+      
+      const validatedData = insertDiagnosticSchema.parse(bodyWithoutEmail);
+      let userId = validatedData.userId || req.user?.id || null;
+
+      // Se userEmail foi fornecido (usuário não logado), criar/encontrar usuário
+      if (userEmail && !userId) {
+        // Validar formato do email
+        const emailSchema = z.string().email("Email inválido");
+        const validatedEmail = emailSchema.parse(userEmail);
+        const email = validatedEmail.trim().toLowerCase();
+        
+        // Tentar encontrar usuário existente
+        let user = await storage.findUserByEmail(email);
+        
+        // Se não existe, criar novo usuário
+        if (!user) {
+          user = await storage.createUser({
+            email: email,
+            name: validatedData.userName || email.split('@')[0],
+            password: crypto.randomBytes(32).toString('hex'), // senha aleatória (não será usada)
+            emailVerified: new Date() // auto-verificado pois é diagnóstico
+          });
+          
+          console.log('✅ Novo usuário criado via diagnóstico:', { 
+            userId: user.id, 
+            email: email 
+          });
+        }
+        
+        userId = user.id;
+      }
+      
       const diagnosticData = {
         ...validatedData,
-        userId: validatedData.userId || req.user?.id || null
+        userId: userId
       };
 
       const diagnostic = await storage.createDiagnostic(diagnosticData);

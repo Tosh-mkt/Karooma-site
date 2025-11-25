@@ -6,6 +6,8 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Input } from '@/components/ui/input';
 
 interface Question {
   id: number;
@@ -146,14 +148,31 @@ export default function DiagnosticoPage() {
   const { toast } = useToast();
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [userName, setUserName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [showNameInput, setShowNameInput] = useState(true);
   const [answers, setAnswers] = useState<number[]>(Array(12).fill(0));
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: session, isLoading: sessionLoading } = useQuery<{ user?: { email?: string; name?: string } }>({
+    queryKey: ['/api/session'],
+  });
+
+  const isLoggedIn = !!session?.user?.email;
 
   const progress = ((currentQuestion + 1) / questions.length) * 100;
   const isLastQuestion = currentQuestion === questions.length - 1;
 
   const handleStartQuiz = () => {
+    // Aguardar carregamento da sessão antes de validar
+    if (sessionLoading) {
+      toast({
+        title: "Aguarde",
+        description: "Carregando informações...",
+        variant: "default"
+      });
+      return;
+    }
+
     if (!userName.trim()) {
       toast({
         title: "Nome obrigatório",
@@ -162,6 +181,28 @@ export default function DiagnosticoPage() {
       });
       return;
     }
+
+    if (!isLoggedIn && !userEmail.trim()) {
+      toast({
+        title: "Email obrigatório",
+        description: "Por favor, informe seu email para criar seu perfil personalizado!",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!isLoggedIn && userEmail.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userEmail.trim())) {
+        toast({
+          title: "Email inválido",
+          description: "Por favor, informe um email válido.",
+          variant: "destructive"
+        });
+        return;
+      }
+    }
+
     setShowNameInput(false);
   };
 
@@ -220,7 +261,8 @@ export default function DiagnosticoPage() {
       const areaScores = calculateScores(finalAnswers);
       const diagnosticData = {
         userName: userName.trim(),
-        userId: null, // Opcional - pode ser anônimo
+        userEmail: !isLoggedIn && userEmail.trim() ? userEmail.trim() : undefined,
+        userId: null,
         cargaMental: (areaScores.cargaMental.reduce((a, b) => a + b, 0) / areaScores.cargaMental.length).toFixed(2),
         tempoDaCasa: (areaScores.tempoDaCasa.reduce((a, b) => a + b, 0) / areaScores.tempoDaCasa.length).toFixed(2),
         tempoDeQualidade: (areaScores.tempoDeQualidade.reduce((a, b) => a + b, 0) / areaScores.tempoDeQualidade.length).toFixed(2),
@@ -284,7 +326,7 @@ export default function DiagnosticoPage() {
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Como podemos te chamar?
                 </label>
-                <input
+                <Input
                   id="name"
                   type="text"
                   value={userName}
@@ -295,6 +337,30 @@ export default function DiagnosticoPage() {
                   data-testid="input-name"
                 />
               </div>
+
+              {!sessionLoading && !isLoggedIn && (
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Qual seu email?
+                  </label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={userEmail}
+                    onChange={(e) => setUserEmail(e.target.value)}
+                    placeholder="seu@email.com"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 focus:border-purple-500 focus:outline-none transition-colors"
+                    onKeyDown={(e) => e.key === 'Enter' && handleStartQuiz()}
+                    data-testid="input-email"
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-start gap-2">
+                    <span className="text-purple-500 mt-0.5">💌</span>
+                    <span>
+                      Seu email será usado para criar seu perfil personalizado e enviar os resultados do diagnóstico diretamente para você
+                    </span>
+                  </p>
+                </div>
+              )}
 
               <Button
                 onClick={handleStartQuiz}
