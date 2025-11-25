@@ -123,11 +123,10 @@ export default function MissionFavoriteButton({
         disabled={isLoading}
         className={cn(
           "gap-2 transition-all duration-300",
-          isFavorite 
-            ? "bg-green-500 hover:bg-green-600 text-white" 
-            : "hover:bg-green-50 hover:text-green-600 hover:border-green-300",
+          !isFavorite && "hover:bg-green-50 hover:text-green-600 hover:border-green-300",
           isAnimating && "animate-pulse",
-          className
+          className,
+          isFavorite && "!bg-green-500 hover:!bg-green-600 !text-white !border-green-500"
         )}
       >
         {isLoading ? (
