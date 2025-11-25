@@ -240,7 +240,7 @@ export default function DiagnosticoResultadoPage() {
           transition={{ delay: 0.8, duration: 0.6 }}
         >
           <Button
-            onClick={() => navigate('/missoes')}
+            onClick={() => navigate(`/missoes?diagnosticId=${diagnosticId}`)}
             size="lg"
             className="bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 hover:from-pink-600 hover:via-purple-600 hover:to-cyan-600 text-white font-semibold px-12 py-6 rounded-2xl text-xl shadow-2xl"
             data-testid="button-view-solutions"
