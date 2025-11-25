@@ -2,24 +2,26 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
-import { Sparkles, ArrowRight, Leaf, Search, Target, ChevronRight, ArrowLeft, Star } from "lucide-react";
+import { 
+  Sparkles, ArrowRight, Leaf, Search, Target, ChevronRight, ArrowLeft, Star,
+  Coffee, Home, UtensilsCrossed, BookOpen, Heart, Gift, Car, Hospital, Wrench, LayoutGrid
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { DilemmaQuiz } from "@/components/missoes/DilemmaQuiz";
 import type { SelectMission, SelectDiagnostic } from "@shared/schema";
 
 const CATEGORIES = [
-  { value: "all", label: "Todas", icon: "✨" },
-  { value: "Rotina Matinal", label: "Rotina Matinal", icon: "☕" },
-  { value: "Casa em Ordem", label: "Casa em Ordem", icon: "🏠" },
-  { value: "Cozinha Inteligente", label: "Cozinha Inteligente", icon: "🍳" },
-  { value: "Educação e Brincadeiras", label: "Educação e Brincadeiras", icon: "📚" },
-  { value: "Tempo para Mim", label: "Tempo para Mim", icon: "💆" },
-  { value: "Presentes e Afetos", label: "Presentes e Afetos", icon: "💝" },
-  { value: "Passeios e Saídas", label: "Passeios e Saídas", icon: "🚗" },
-  { value: "Saúde e Emergências", label: "Saúde e Emergências", icon: "🏥" },
-  { value: "Manutenção e Melhorias do Lar", label: "Manutenção do Lar", icon: "🔧" },
+  { value: "all", label: "Todas", Icon: LayoutGrid, color: "from-gray-500 to-gray-600", bgColor: "bg-gray-100 dark:bg-gray-800", textColor: "text-gray-600 dark:text-gray-400" },
+  { value: "Rotina Matinal", label: "Rotina Matinal", Icon: Coffee, color: "from-amber-500 to-orange-500", bgColor: "bg-amber-50 dark:bg-amber-900/20", textColor: "text-amber-600 dark:text-amber-400" },
+  { value: "Casa em Ordem", label: "Casa em Ordem", Icon: Home, color: "from-blue-500 to-cyan-500", bgColor: "bg-blue-50 dark:bg-blue-900/20", textColor: "text-blue-600 dark:text-blue-400" },
+  { value: "Cozinha Inteligente", label: "Cozinha Inteligente", Icon: UtensilsCrossed, color: "from-green-500 to-emerald-500", bgColor: "bg-green-50 dark:bg-green-900/20", textColor: "text-green-600 dark:text-green-400" },
+  { value: "Educação e Brincadeiras", label: "Educação e Brincadeiras", Icon: BookOpen, color: "from-purple-500 to-violet-500", bgColor: "bg-purple-50 dark:bg-purple-900/20", textColor: "text-purple-600 dark:text-purple-400" },
+  { value: "Tempo para Mim", label: "Tempo para Mim", Icon: Heart, color: "from-rose-500 to-pink-500", bgColor: "bg-rose-50 dark:bg-rose-900/20", textColor: "text-rose-600 dark:text-rose-400" },
+  { value: "Presentes e Afetos", label: "Presentes e Afetos", Icon: Gift, color: "from-pink-500 to-fuchsia-500", bgColor: "bg-pink-50 dark:bg-pink-900/20", textColor: "text-pink-600 dark:text-pink-400" },
+  { value: "Passeios e Saídas", label: "Passeios e Saídas", Icon: Car, color: "from-indigo-500 to-blue-500", bgColor: "bg-indigo-50 dark:bg-indigo-900/20", textColor: "text-indigo-600 dark:text-indigo-400" },
+  { value: "Saúde e Emergências", label: "Saúde e Emergências", Icon: Hospital, color: "from-red-500 to-rose-500", bgColor: "bg-red-50 dark:bg-red-900/20", textColor: "text-red-600 dark:text-red-400" },
+  { value: "Manutenção e Melhorias do Lar", label: "Manutenção do Lar", Icon: Wrench, color: "from-slate-500 to-zinc-500", bgColor: "bg-slate-50 dark:bg-slate-900/20", textColor: "text-slate-600 dark:text-slate-400" },
 ];
 
 const DIAGNOSTIC_AREA_LABELS: Record<string, { label: string; icon: string; color: string }> = {
@@ -42,7 +44,6 @@ export default function Missoes() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDiagnosticArea, setSelectedDiagnosticArea] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showDilemmaQuiz, setShowDilemmaQuiz] = useState(false);
 
   const { data: session } = useQuery<{ user?: { id?: string; email?: string; name?: string } }>({
     queryKey: ['/api/session'],
@@ -108,18 +109,8 @@ export default function Missoes() {
   useEffect(() => {
     if (!hasDiagnostic && !diagnosticLoading) {
       setViewMode("all-categories");
-      setShowDilemmaQuiz(true);
     }
   }, [hasDiagnostic, diagnosticLoading]);
-
-  const handleDilemmaSelect = (category: string) => {
-    setSelectedCategory(category);
-    setViewMode("category");
-    setShowDilemmaQuiz(false);
-    setTimeout(() => {
-      document.getElementById("missions-grid")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 100);
-  };
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
@@ -413,60 +404,51 @@ export default function Missoes() {
       {/* View Mode: All Categories */}
       {viewMode === "all-categories" && (
         <section className="container mx-auto px-4 pb-8">
-          {/* Dilema Quiz Section */}
-          <AnimatePresence>
-            {showDilemmaQuiz && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <DilemmaQuiz onSelect={handleDilemmaSelect} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Toggle Dilema Quiz Button */}
-          {!showDilemmaQuiz && (
-            <div className="text-center py-4">
-              <button
-                onClick={() => setShowDilemmaQuiz(true)}
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-orange-600 dark:hover:text-orange-400 transition-colors underline"
-              >
-                Mostrar "O que está pedindo leveza hoje?"
-              </button>
-            </div>
-          )}
-
-          {/* Categories Grid */}
+          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8"
+            className="text-center mb-8"
           >
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-              Explorar por Categoria
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+              O que está pedindo leveza hoje?
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-              {CATEGORIES.filter(c => c.value !== "all").map((category, index) => (
-                <motion.button
-                  key={category.value}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.05 }}
-                  onClick={() => handleCategorySelect(category.value)}
-                  className="group bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-md hover:shadow-lg border border-gray-100 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 transition-all text-center"
-                  data-testid={`button-category-${category.value}`}
-                >
-                  <span className="text-3xl mb-2 block group-hover:scale-110 transition-transform">
-                    {category.icon}
-                  </span>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-orange-600 dark:group-hover:text-orange-400">
-                    {category.label}
-                  </span>
-                </motion.button>
-              ))}
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Escolha uma categoria e vamos te ajudar com soluções práticas
+            </p>
+          </motion.div>
+
+          {/* Categories Grid - Clean Icons with Vibrant Colors */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-12"
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
+              {CATEGORIES.filter(c => c.value !== "all").map((category, index) => {
+                const IconComponent = category.Icon;
+                return (
+                  <motion.button
+                    key={category.value}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: index * 0.05 }}
+                    onClick={() => handleCategorySelect(category.value)}
+                    className={`group relative bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md hover:shadow-xl border-2 border-transparent hover:border-current transition-all duration-300 hover:scale-[1.02] text-center ${category.textColor}`}
+                    data-testid={`button-category-${category.value}`}
+                  >
+                    <div className={`mx-auto mb-3 w-14 h-14 rounded-xl ${category.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <IconComponent className={`w-7 h-7 ${category.textColor}`} strokeWidth={1.5} />
+                    </div>
+                    <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                      {category.label}
+                    </span>
+                    
+                    {/* Hover glow effect */}
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${category.color} opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none`} />
+                  </motion.button>
+                );
+              })}
             </div>
           </motion.div>
 
@@ -598,55 +580,66 @@ export default function Missoes() {
       {/* View Mode: Single Category */}
       {viewMode === "category" && (
         <section className="container mx-auto px-4 pb-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">
-                {CATEGORIES.find(c => c.value === selectedCategory)?.icon || "✨"}
-              </span>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                {CATEGORIES.find(c => c.value === selectedCategory)?.label || selectedCategory}
-              </h2>
-            </div>
-            <p className="text-gray-600 dark:text-gray-400">
-              {filteredMissions.length} missões nesta categoria
-            </p>
-          </motion.div>
-
-          <div id="missions-grid">
-            <MissionsGrid 
-              missions={filteredMissions} 
-              isLoading={isLoading}
-              searchQuery={searchQuery}
-            />
-          </div>
-
-          {/* Other Categories */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mt-12"
-          >
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              Outras Categorias
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.filter(c => c.value !== "all" && c.value !== selectedCategory).map(category => (
-                <button
-                  key={category.value}
-                  onClick={() => handleCategorySelect(category.value)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 hover:border-orange-300 dark:hover:border-orange-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-orange-600 dark:hover:text-orange-400 transition-colors"
+          {(() => {
+            const currentCategory = CATEGORIES.find(c => c.value === selectedCategory);
+            const CurrentIcon = currentCategory?.Icon || LayoutGrid;
+            return (
+              <>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6"
                 >
-                  <span>{category.icon}</span>
-                  <span>{category.label}</span>
-                </button>
-              ))}
-            </div>
-          </motion.div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`${currentCategory?.bgColor || 'bg-gray-100'} p-3 rounded-xl`}>
+                      <CurrentIcon className={`w-6 h-6 ${currentCategory?.textColor || 'text-gray-600'}`} strokeWidth={1.5} />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {currentCategory?.label || selectedCategory}
+                    </h2>
+                  </div>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {filteredMissions.length} missões nesta categoria
+                  </p>
+                </motion.div>
+
+                <div id="missions-grid">
+                  <MissionsGrid 
+                    missions={filteredMissions} 
+                    isLoading={isLoading}
+                    searchQuery={searchQuery}
+                  />
+                </div>
+
+                {/* Other Categories */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-12"
+                >
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    Outras Categorias
+                  </h3>
+                  <div className="flex flex-wrap gap-3">
+                    {CATEGORIES.filter(c => c.value !== "all" && c.value !== selectedCategory).map(category => {
+                      const CategoryIcon = category.Icon;
+                      return (
+                        <button
+                          key={category.value}
+                          onClick={() => handleCategorySelect(category.value)}
+                          className={`inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 hover:border-current text-sm font-medium transition-all hover:scale-105 ${category.textColor}`}
+                        >
+                          <CategoryIcon className="w-4 h-4" strokeWidth={1.5} />
+                          <span>{category.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              </>
+            );
+          })()}
         </section>
       )}
 
