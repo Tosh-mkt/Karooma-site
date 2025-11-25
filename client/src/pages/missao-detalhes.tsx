@@ -15,9 +15,6 @@ import { MissionTaskChecklist } from "@/components/missoes/MissionTaskChecklist"
 import { ProductsSection } from "@/components/missoes/ProductsSection";
 import { MissionAudioPlayer } from "@/components/missoes/MissionAudioPlayer";
 import { Link } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { useAudioNarration } from "@/hooks/useAudioNarration";
 import type { SelectMission } from "@shared/schema";
 
 interface MissionWithProducts extends SelectMission {
@@ -48,47 +45,11 @@ export default function MissaoDetalhes() {
     enabled: !!slug,
   });
 
-  const { toggle, stop, isPlaying, isSupported } = useAudioNarration();
-
-  // Initialize total tasks when data loads
   useEffect(() => {
     if (data?.tarefasSimplesDeExecucao) {
       setTotalTasks(data.tarefasSimplesDeExecucao.length);
     }
   }, [data]);
-
-  const handleAudioToggle = () => {
-    if (!data) return;
-    
-    // Se estiver tocando, para completamente para permitir reinício limpo
-    if (isPlaying) {
-      stop();
-      return;
-    }
-    
-    // Inicia nova narração
-    const narrationText = `${data.title}. ${data.understandingText || ''}`;
-    toggle({ 
-      text: narrationText,
-      rate: 0.95,
-      pitch: 1,
-      lang: 'pt-BR'
-    });
-  };
-
-  const handleScrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const offset = 80; // Header offset
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
 
   if (isLoading) {
     return (
@@ -150,8 +111,6 @@ export default function MissaoDetalhes() {
           heroImageUrl={data.heroImageUrl}
           category={data.category}
           missionId={data.id}
-          onAudioToggle={isSupported ? handleAudioToggle : undefined}
-          isAudioPlaying={isPlaying}
         />
       </div>
       
