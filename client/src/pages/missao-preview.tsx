@@ -243,11 +243,7 @@ export default function MissaoPreview() {
       </div>
 
       {/* Floating Action Button */}
-      <FloatingActionButton
-        onScrollToSection={handleScrollToSection}
-        hasProducts={!!data.products && data.products.length > 0}
-        hasAmazonProducts={!!data.productAsins && data.productAsins.length > 0}
-      />
+      <FloatingActionButton slug={slug} />
     </div>
   );
 }

@@ -194,7 +194,7 @@ export default function MissaoDetalhes() {
       </div>
 
       {/* Floating Action Button */}
-      <FloatingActionButton />
+      <FloatingActionButton slug={slug} />
     </div>
   );
 }

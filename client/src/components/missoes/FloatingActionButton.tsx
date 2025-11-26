@@ -1,10 +1,21 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MISSION_TESTIMONIALS } from "@/data/missionMockData";
 
-export function FloatingActionButton() {
+interface FloatingActionButtonProps {
+  slug?: string;
+}
+
+export function FloatingActionButton({ slug }: FloatingActionButtonProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const hasTestimonials = useMemo(() => {
+    if (!slug) return false;
+    const testimonials = MISSION_TESTIMONIALS[slug] || [];
+    return testimonials.length > 0;
+  }, [slug]);
 
   const actions = [
     {
@@ -82,7 +93,7 @@ export function FloatingActionButton() {
         setIsExpanded(false);
       },
     },
-    {
+    ...(hasTestimonials ? [{
       icon: Heart,
       label: "Depoimentos",
       color: "#D4A89A",
@@ -96,7 +107,7 @@ export function FloatingActionButton() {
         }
         setIsExpanded(false);
       },
-    },
+    }] : []),
     {
       icon: Share2,
       label: "Compartilhar",
