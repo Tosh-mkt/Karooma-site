@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Quote, Volume2 } from "lucide-react";
+import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function FloatingActionButton() {
@@ -38,28 +38,13 @@ export function FloatingActionButton() {
       },
     },
     {
-      icon: Quote,
-      label: "Frase Inspiradora",
-      color: "#D4A89A",
-      onClick: () => {
-        const fraseMarcaSection = document.querySelector('[data-section="frase-marca"]');
-        if (fraseMarcaSection) {
-          fraseMarcaSection.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-        setIsExpanded(false);
-      },
-    },
-    {
       icon: Heart,
       label: "Por que é importante",
       color: "#9CA986",
       onClick: () => {
-        const purposeSection = document.querySelector('[data-section="purpose"]');
-        if (purposeSection) {
-          purposeSection.scrollIntoView({
+        const fraseMarcaSection = document.querySelector('[data-section="frase-marca"]');
+        if (fraseMarcaSection) {
+          fraseMarcaSection.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
