@@ -49,8 +49,9 @@ export default function MissionFavoriteButton({
       });
     },
     onError: (error: any) => {
-      const status = error?.response?.status || error?.status;
-      if (status === 401 || !isAuthenticated) {
+      const errorMessage = error?.message || String(error);
+      const is401 = errorMessage.startsWith('401') || !isAuthenticated;
+      if (is401) {
         toast({
           title: "Login necessário",
           description: "Faça login para salvar missões nos favoritos.",
@@ -80,8 +81,9 @@ export default function MissionFavoriteButton({
       });
     },
     onError: (error: any) => {
-      const status = error?.response?.status || error?.status;
-      if (status === 401 || !isAuthenticated) {
+      const errorMessage = error?.message || String(error);
+      const is401 = errorMessage.startsWith('401') || !isAuthenticated;
+      if (is401) {
         toast({
           title: "Login necessário",
           description: "Faça login para gerenciar favoritos.",
