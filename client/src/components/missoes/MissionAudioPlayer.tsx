@@ -73,6 +73,7 @@ export function MissionAudioPlayer({ audioUrl, title }: MissionAudioPlayerProps)
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
       className="mb-6"
+      data-section="audio-player"
     >
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-2xl p-4 border border-green-200 dark:border-green-800">
         <div className="flex items-center gap-4">

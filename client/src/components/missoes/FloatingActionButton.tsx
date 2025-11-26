@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Quote } from "lucide-react";
+import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Quote, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function FloatingActionButton() {
@@ -15,6 +15,21 @@ export function FloatingActionButton() {
         const heroSection = document.querySelector('[data-section="hero"]');
         if (heroSection) {
           heroSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+        setIsExpanded(false);
+      },
+    },
+    {
+      icon: Volume2,
+      label: "Resumo em Áudio",
+      color: "#4CAF50",
+      onClick: () => {
+        const audioSection = document.querySelector('[data-section="audio-player"]');
+        if (audioSection) {
+          audioSection.scrollIntoView({
             behavior: "smooth",
             block: "start",
           });
