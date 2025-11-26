@@ -48,12 +48,21 @@ export default function MissionFavoriteButton({
         description: "A missão foi salva na sua lista de favoritos.",
       });
     },
-    onError: () => {
-      toast({
-        title: "Erro",
-        description: "Não foi possível adicionar aos favoritos.",
-        variant: "destructive",
-      });
+    onError: (error: any) => {
+      const status = error?.response?.status || error?.status;
+      if (status === 401 || !isAuthenticated) {
+        toast({
+          title: "Login necessário",
+          description: "Faça login para salvar missões nos favoritos.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro",
+          description: "Não foi possível adicionar aos favoritos.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
@@ -70,12 +79,21 @@ export default function MissionFavoriteButton({
         description: "A missão foi removida da sua lista de favoritos.",
       });
     },
-    onError: () => {
-      toast({
-        title: "Erro",
-        description: "Não foi possível remover dos favoritos.",
-        variant: "destructive",
-      });
+    onError: (error: any) => {
+      const status = error?.response?.status || error?.status;
+      if (status === 401 || !isAuthenticated) {
+        toast({
+          title: "Login necessário",
+          description: "Faça login para gerenciar favoritos.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro",
+          description: "Não foi possível remover dos favoritos.",
+          variant: "destructive",
+        });
+      }
     },
   });
 
