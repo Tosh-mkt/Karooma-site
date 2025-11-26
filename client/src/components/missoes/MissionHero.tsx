@@ -83,13 +83,14 @@ export function MissionHero({
 
           </motion.div>
 
-          {/* Hero Image */}
+          {/* Hero Image / Infographic */}
           {heroImageUrl && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
               className="relative"
+              data-section="infographic"
             >
               <div 
                 className="relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer group"

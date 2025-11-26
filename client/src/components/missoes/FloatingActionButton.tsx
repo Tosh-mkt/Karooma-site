@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Volume2 } from "lucide-react";
+import { Plus, Heart, CheckSquare, ShoppingBag, Share2, X, Home, Volume2, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MISSION_TESTIMONIALS } from "@/data/missionMockData";
 
@@ -28,6 +28,21 @@ export function FloatingActionButton({ slug }: FloatingActionButtonProps) {
           heroSection.scrollIntoView({
             behavior: "smooth",
             block: "start",
+          });
+        }
+        setIsExpanded(false);
+      },
+    },
+    {
+      icon: Image,
+      label: "Infográfico",
+      color: "#7B9E89",
+      onClick: () => {
+        const infographicSection = document.querySelector('[data-section="infographic"]');
+        if (infographicSection) {
+          infographicSection.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
           });
         }
         setIsExpanded(false);
