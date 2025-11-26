@@ -102,8 +102,9 @@ export function MissionHero({
                   className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-green-900/20 to-transparent pointer-events-none" />
-                <div className="absolute bottom-4 right-4 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                  <ZoomIn className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <div className="absolute bottom-3 right-3 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm rounded-full px-3 py-2 shadow-lg flex items-center gap-2 pointer-events-none">
+                  <ZoomIn className="w-4 h-4 text-green-600 dark:text-green-400" />
+                  <span className="text-xs font-medium text-green-700 dark:text-green-300">Clique para ampliar</span>
                 </div>
               </div>
             </motion.div>
