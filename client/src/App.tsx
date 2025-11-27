@@ -29,6 +29,7 @@ import FlipbookUsersAdmin from "./pages/admin/flipbook-users";
 import FlipbookThemesAdmin from "./pages/admin/flipbook-themes";
 import DemoFlipbookCapture from "./pages/demo-flipbook-capture";
 import FlipbookTest from "./pages/flipbook-test";
+import GuiaPrototipo from "./pages/guia-prototipo";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProductImport } from "./pages/AdminProductImport";
@@ -104,6 +105,7 @@ function Router() {
               <Route path="/missao/:slug" component={MissaoDetalhes} />
               <Route path="/diagnostico" component={Diagnostico} />
               <Route path="/diagnostico/resultado" component={DiagnosticoResultado} />
+              <Route path="/guias/prototipo" component={GuiaPrototipo} />
               <Route path="/filtros-hierarquia" component={TestFiltersClean} />
               <Route path="/filtros-cascata" component={TestFiltersHierarchical} />
               <Route path="/filtros-vertical" component={TestFiltersVertical} />
