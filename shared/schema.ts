@@ -868,6 +868,76 @@ export type SelectMission = typeof missions.$inferSelect;
 export type InsertDiagnostic = z.infer<typeof insertDiagnosticSchema>;
 export type SelectDiagnostic = typeof diagnostics.$inferSelect;
 
+// ========================================
+// Posts de Guia - Bridge entre teoria e prática
+// ========================================
+
+export const guidePosts = pgTable("guide_posts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  slug: varchar("slug", { length: 200 }).notNull().unique(),
+  title: text("title").notNull(),
+  category: varchar("category", { length: 100 }).notNull(), // Rotina Matinal, Casa em Ordem, etc.
+  categoryEmoji: varchar("category_emoji", { length: 10 }), // ☀️, 🏠, 🍳, etc.
+  readingTime: integer("reading_time").default(5), // Tempo de leitura em minutos
+  
+  // Seções de conteúdo
+  sectionEuTeEntendo: text("section_eu_te_entendo").notNull(), // Validação empática
+  sectionCiencia: text("section_ciencia"), // O que a ciência diz
+  sectionProblema: text("section_problema"), // Por que o problema existe
+  sectionBoaNoticia: text("section_boa_noticia"), // A boa notícia / solução
+  
+  // Estatísticas para a seção de ciência
+  stats: json("stats").$type<Array<{ value: string; label: string; color?: string }>>(),
+  
+  // Citação inspiracional
+  quote: text("quote"),
+  quoteAuthor: varchar("quote_author", { length: 100 }),
+  
+  // Áudio
+  audioUrl: text("audio_url"),
+  audioDuration: integer("audio_duration"), // Duração em segundos
+  
+  // Missões relacionadas (slugs das missões)
+  relatedMissionSlugs: text("related_mission_slugs").array(),
+  
+  // SEO e imagem
+  heroImageUrl: text("hero_image_url"),
+  metaDescription: text("meta_description"),
+  
+  // Controle
+  views: integer("views").default(0),
+  featured: boolean("featured").default(false),
+  isPublished: boolean("is_published").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_guide_posts_category").on(table.category),
+  index("idx_guide_posts_featured").on(table.featured),
+  index("idx_guide_posts_published").on(table.isPublished),
+  index("idx_guide_posts_slug").on(table.slug),
+]);
+
+export const insertGuidePostSchema = createInsertSchema(guidePosts).omit({
+  id: true,
+  views: true,
+  createdAt: true,
+  updatedAt: true,
+}).extend({
+  readingTime: z.coerce.number().int().min(1).optional(),
+  stats: z.array(z.object({ 
+    value: z.string(), 
+    label: z.string(), 
+    color: z.string().optional() 
+  })).nullable().optional(),
+  relatedMissionSlugs: z.array(z.string()).nullable().optional(),
+  audioDuration: z.coerce.number().int().min(0).nullable().optional(),
+  featured: z.boolean().optional(),
+  isPublished: z.boolean().optional(),
+});
+
+export type InsertGuidePost = z.infer<typeof insertGuidePostSchema>;
+export type SelectGuidePost = typeof guidePosts.$inferSelect;
+
 export type InsertAutomationJob = z.infer<typeof insertAutomationJobSchema>;
 export type SelectAutomationJob = typeof automationJobs.$inferSelect;
 export type InsertAutomationProgress = z.infer<typeof insertAutomationProgressSchema>;
