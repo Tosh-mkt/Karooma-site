@@ -10,17 +10,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit, Plus, Eye, ExternalLink, BookOpen, Heart, Brain, Lightbulb, ArrowLeft } from "lucide-react";
+import { Trash2, Edit, Plus, Eye, ExternalLink, BookOpen, Heart, Brain, Lightbulb, ArrowLeft, FileJson, Sparkles } from "lucide-react";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { SelectGuidePost, SelectMission } from "@shared/schema";
 
 const CATEGORIES = [
   { value: "Rotina Matinal", emoji: "🌅", color: "bg-amber-100 text-amber-800" },
   { value: "Casa em Ordem", emoji: "🏠", color: "bg-blue-100 text-blue-800" },
+  { value: "Cozinha Inteligente", emoji: "🍳", color: "bg-orange-100 text-orange-800" },
+  { value: "Educação e Brincadeiras", emoji: "📚", color: "bg-green-100 text-green-800" },
   { value: "Tempo para Mim", emoji: "💆", color: "bg-purple-100 text-purple-800" },
-  { value: "Educação", emoji: "📚", color: "bg-green-100 text-green-800" },
-  { value: "Cozinha", emoji: "🍳", color: "bg-orange-100 text-orange-800" },
+  { value: "Presentes e Afetos", emoji: "💝", color: "bg-pink-100 text-pink-800" },
+  { value: "Passeios e Saídas", emoji: "🚗", color: "bg-teal-100 text-teal-800" },
+  { value: "Saúde e Emergências", emoji: "🏥", color: "bg-red-100 text-red-800" },
+  { value: "Manutenção e Melhorias do Lar", emoji: "🔧", color: "bg-gray-100 text-gray-800" },
 ];
 
 export default function AdminGuidePosts() {
@@ -102,6 +107,66 @@ export default function AdminGuidePosts() {
     isPublished: false,
   });
 
+  const [jsonInput, setJsonInput] = useState("");
+  const [isJsonOpen, setIsJsonOpen] = useState(true);
+
+  const parseJsonToForm = () => {
+    try {
+      const parsed = JSON.parse(jsonInput);
+      
+      const normalizeArray = (value: any): string[] => {
+        if (!value) return [];
+        if (Array.isArray(value)) return value.filter(Boolean);
+        if (typeof value === 'string') return value.split('|').filter(Boolean);
+        return [];
+      };
+
+      const normalizeStats = (value: any): string => {
+        if (!value) return "";
+        if (typeof value === 'string') return value;
+        if (Array.isArray(value)) return JSON.stringify(value, null, 2);
+        return "";
+      };
+
+      const category = parsed.category || "Rotina Matinal";
+      const categoryData = CATEGORIES.find(c => c.value === category);
+      
+      setFormData({
+        title: parsed.title || "",
+        slug: parsed.slug || "",
+        category: category,
+        categoryEmoji: categoryData?.emoji || parsed.categoryEmoji || "🌅",
+        readingTime: parsed.readingTime?.toString() || "5",
+        sectionEuTeEntendo: parsed.sectionEuTeEntendo || "",
+        sectionCiencia: parsed.sectionCiencia || "",
+        sectionProblema: parsed.sectionProblema || "",
+        sectionBoaNoticia: parsed.sectionBoaNoticia || "",
+        quote: parsed.quote || "",
+        quoteAuthor: parsed.quoteAuthor || "",
+        stats: normalizeStats(parsed.stats),
+        relatedMissionSlugs: normalizeArray(parsed.relatedMissionSlugs),
+        audioUrl: parsed.audioUrl || "",
+        audioDuration: parsed.audioDuration?.toString() || "",
+        metaDescription: parsed.metaDescription || "",
+        featured: parsed.featured === "sim" || parsed.featured === true,
+        isPublished: parsed.isPublished === "sim" || parsed.isPublished === true,
+      });
+      
+      toast({ 
+        title: "JSON carregado com sucesso!", 
+        description: "Revise os campos e salve quando estiver pronto." 
+      });
+      setJsonInput("");
+      setIsJsonOpen(false);
+    } catch (error) {
+      toast({ 
+        title: "Erro ao processar JSON", 
+        description: error instanceof Error ? error.message : "Verifique se o JSON está válido",
+        variant: "destructive" 
+      });
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: "",
@@ -123,6 +188,8 @@ export default function AdminGuidePosts() {
       featured: false,
       isPublished: false,
     });
+    setJsonInput("");
+    setIsJsonOpen(true);
   };
 
   const loadEditForm = (post: SelectGuidePost) => {
@@ -220,6 +287,46 @@ export default function AdminGuidePosts() {
 
   const FormContent = () => (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+      {/* Importação JSON */}
+      <Collapsible open={isJsonOpen} onOpenChange={setIsJsonOpen}>
+        <CollapsibleTrigger asChild>
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="w-full justify-between bg-gradient-to-r from-violet-50 to-purple-50 hover:from-violet-100 hover:to-purple-100 border-violet-200"
+          >
+            <span className="flex items-center gap-2">
+              <FileJson className="w-5 h-5 text-violet-600" />
+              <span className="font-medium">Importar JSON da IA</span>
+            </span>
+            <Sparkles className="w-4 h-4 text-violet-500" />
+          </Button>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="mt-4 space-y-4">
+          <div className="bg-violet-50 dark:bg-violet-900/20 rounded-lg p-4 border border-violet-200 dark:border-violet-800">
+            <p className="text-sm text-violet-700 dark:text-violet-300 mb-3">
+              Cole o JSON gerado pelo assistente IA (GEP - Gerador de Posts de Guia) para preencher automaticamente os campos.
+            </p>
+            <Textarea
+              value={jsonInput}
+              onChange={(e) => setJsonInput(e.target.value)}
+              placeholder='{"title": "Por que as manhãs são tão difíceis?", "slug": "por-que-manhas-sao-dificeis", ...}'
+              rows={6}
+              className="font-mono text-sm bg-white dark:bg-gray-900"
+            />
+            <Button 
+              type="button" 
+              onClick={parseJsonToForm}
+              disabled={!jsonInput.trim()}
+              className="mt-3 bg-violet-600 hover:bg-violet-700"
+            >
+              <FileJson className="w-4 h-4 mr-2" />
+              Carregar JSON
+            </Button>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
       {/* Informações Básicas */}
       <div className="space-y-4">
         <h3 className="font-semibold text-lg flex items-center gap-2">
