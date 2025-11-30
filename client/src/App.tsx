@@ -32,6 +32,7 @@ import FlipbookTest from "./pages/flipbook-test";
 import GuiaPrototipo from "./pages/guia-prototipo";
 import BlogGuiaPrototipo from "./pages/blog-guia-prototipo";
 import BlogGuia from "./pages/blog-guia";
+import AdminGuidePosts from "./pages/AdminGuidePosts";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { AdminProductImport } from "./pages/AdminProductImport";
@@ -124,6 +125,7 @@ function Router() {
               <Route path="/admin/roadmap" component={AdminRoadmap} />
               <Route path="/admin/missoes" component={AdminMissoes} />
               <Route path="/admin/apparel" component={AdminApparel} />
+              <Route path="/admin/guide-posts" component={AdminGuidePosts} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
               <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />
               <Route path="/demo/flipbook-capture" component={DemoFlipbookCapture} />

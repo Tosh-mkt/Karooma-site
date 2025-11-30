@@ -18,7 +18,7 @@ import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
   Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
-  Terminal, FileText, Upload, Brain, Bot, Shirt
+  Terminal, FileText, Upload, Brain, Bot, Shirt, Book
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -259,6 +259,35 @@ function DashboardOverview() {
           </CardContent>
         </Card>
 
+        <Card className="glassmorphism border-0 bg-gradient-to-br from-green-50 to-teal-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          onClick={() => window.location.href = '/admin/guide-posts'}
+        >
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="flex items-center text-base md:text-lg">
+              <Book className="w-5 h-5 mr-2 text-green-600" />
+              Posts de Guia
+            </CardTitle>
+            <CardDescription className="text-sm">
+              Conecte teoria à prática
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 pb-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Crie posts que explicam o problema e conectam às missões como solução prática.
+            </p>
+            <Button variant="outline" className="w-full bg-white hover:bg-green-50" onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = '/admin/guide-posts';
+            }}>
+              <Book className="w-4 h-4 mr-2" />
+              Gerenciar Posts
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Activity Section */}
+      <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
         <Card className="glassmorphism border-0">
           <CardHeader className="px-3 py-3 md:px-6 md:py-6">
             <CardTitle className="flex items-center text-sm md:text-base">

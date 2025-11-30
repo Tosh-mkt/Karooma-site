@@ -1,0 +1,618 @@
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient, apiRequest } from "@/lib/queryClient";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
+import { Trash2, Edit, Plus, Eye, ExternalLink, BookOpen, Heart, Brain, Lightbulb, ArrowLeft } from "lucide-react";
+import { Link } from "wouter";
+import { Badge } from "@/components/ui/badge";
+import type { SelectGuidePost, SelectMission } from "@shared/schema";
+
+const CATEGORIES = [
+  { value: "Rotina Matinal", emoji: "🌅", color: "bg-amber-100 text-amber-800" },
+  { value: "Casa em Ordem", emoji: "🏠", color: "bg-blue-100 text-blue-800" },
+  { value: "Tempo para Mim", emoji: "💆", color: "bg-purple-100 text-purple-800" },
+  { value: "Educação", emoji: "📚", color: "bg-green-100 text-green-800" },
+  { value: "Cozinha", emoji: "🍳", color: "bg-orange-100 text-orange-800" },
+];
+
+export default function AdminGuidePosts() {
+  const { toast } = useToast();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<SelectGuidePost | null>(null);
+
+  const { data: posts, isLoading } = useQuery<SelectGuidePost[]>({
+    queryKey: ["/api/admin/guide-posts"],
+  });
+
+  const { data: missions } = useQuery<SelectMission[]>({
+    queryKey: ["/api/missions"],
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: any) => apiRequest("POST", "/api/admin/guide-posts", data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/guide-posts"] });
+      toast({ title: "Post de guia criado com sucesso!" });
+      setIsCreateOpen(false);
+      resetForm();
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Erro ao criar post", 
+        description: error.details || error.message || "Erro desconhecido", 
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async (data: any) => apiRequest("PATCH", `/api/admin/guide-posts/${data.id}`, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/guide-posts"] });
+      toast({ title: "Post atualizado com sucesso!" });
+      setEditingPost(null);
+      resetForm();
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Erro ao atualizar post", 
+        description: error.details || error.message || "Erro desconhecido", 
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => apiRequest("DELETE", `/api/admin/guide-posts/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/guide-posts"] });
+      toast({ title: "Post excluído com sucesso!" });
+    },
+    onError: (error: Error) => {
+      toast({ title: "Erro ao excluir", description: error.message, variant: "destructive" });
+    },
+  });
+
+  const [formData, setFormData] = useState({
+    title: "",
+    slug: "",
+    category: "Rotina Matinal",
+    categoryEmoji: "🌅",
+    readingTime: "5",
+    sectionEuTeEntendo: "",
+    sectionCiencia: "",
+    sectionProblema: "",
+    sectionBoaNoticia: "",
+    quote: "",
+    quoteAuthor: "",
+    stats: "",
+    relatedMissionSlugs: [] as string[],
+    audioUrl: "",
+    audioDuration: "",
+    metaDescription: "",
+    featured: false,
+    isPublished: false,
+  });
+
+  const resetForm = () => {
+    setFormData({
+      title: "",
+      slug: "",
+      category: "Rotina Matinal",
+      categoryEmoji: "🌅",
+      readingTime: "5",
+      sectionEuTeEntendo: "",
+      sectionCiencia: "",
+      sectionProblema: "",
+      sectionBoaNoticia: "",
+      quote: "",
+      quoteAuthor: "",
+      stats: "",
+      relatedMissionSlugs: [],
+      audioUrl: "",
+      audioDuration: "",
+      metaDescription: "",
+      featured: false,
+      isPublished: false,
+    });
+  };
+
+  const loadEditForm = (post: SelectGuidePost) => {
+    setFormData({
+      title: post.title,
+      slug: post.slug,
+      category: post.category || "Rotina Matinal",
+      categoryEmoji: post.categoryEmoji || "🌅",
+      readingTime: post.readingTime?.toString() || "5",
+      sectionEuTeEntendo: post.sectionEuTeEntendo || "",
+      sectionCiencia: post.sectionCiencia || "",
+      sectionProblema: post.sectionProblema || "",
+      sectionBoaNoticia: post.sectionBoaNoticia || "",
+      quote: post.quote || "",
+      quoteAuthor: post.quoteAuthor || "",
+      stats: post.stats ? JSON.stringify(post.stats) : "",
+      relatedMissionSlugs: post.relatedMissionSlugs || [],
+      audioUrl: post.audioUrl || "",
+      audioDuration: post.audioDuration?.toString() || "",
+      metaDescription: post.metaDescription || "",
+      featured: post.featured || false,
+      isPublished: post.isPublished || false,
+    });
+    setEditingPost(post);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    const category = CATEGORIES.find(c => c.value === value);
+    setFormData(prev => ({
+      ...prev,
+      category: value,
+      categoryEmoji: category?.emoji || "🌅"
+    }));
+  };
+
+  const handleMissionToggle = (missionSlug: string) => {
+    setFormData(prev => ({
+      ...prev,
+      relatedMissionSlugs: prev.relatedMissionSlugs.includes(missionSlug)
+        ? prev.relatedMissionSlugs.filter(s => s !== missionSlug)
+        : [...prev.relatedMissionSlugs, missionSlug]
+    }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    let parsedStats = null;
+    if (formData.stats) {
+      try {
+        parsedStats = JSON.parse(formData.stats);
+      } catch {
+        toast({ title: "Erro no JSON de estatísticas", variant: "destructive" });
+        return;
+      }
+    }
+
+    const payload = {
+      title: formData.title,
+      slug: formData.slug,
+      category: formData.category,
+      categoryEmoji: formData.categoryEmoji,
+      readingTime: parseInt(formData.readingTime) || 5,
+      sectionEuTeEntendo: formData.sectionEuTeEntendo || null,
+      sectionCiencia: formData.sectionCiencia || null,
+      sectionProblema: formData.sectionProblema || null,
+      sectionBoaNoticia: formData.sectionBoaNoticia || null,
+      quote: formData.quote || null,
+      quoteAuthor: formData.quoteAuthor || null,
+      stats: parsedStats,
+      relatedMissionSlugs: formData.relatedMissionSlugs,
+      audioUrl: formData.audioUrl || null,
+      audioDuration: formData.audioDuration ? parseInt(formData.audioDuration) : null,
+      metaDescription: formData.metaDescription || null,
+      featured: formData.featured,
+      isPublished: formData.isPublished,
+    };
+
+    if (editingPost) {
+      updateMutation.mutate({ ...payload, id: editingPost.id });
+    } else {
+      createMutation.mutate(payload);
+    }
+  };
+
+  const getCategoryBadge = (category: string) => {
+    const cat = CATEGORIES.find(c => c.value === category);
+    return cat ? `${cat.emoji} ${cat.value}` : category;
+  };
+
+  const getCategoryColor = (category: string) => {
+    const cat = CATEGORIES.find(c => c.value === category);
+    return cat?.color || "bg-gray-100 text-gray-800";
+  };
+
+  const FormContent = () => (
+    <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
+      {/* Informações Básicas */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-lg flex items-center gap-2">
+          <BookOpen className="w-5 h-5" />
+          Informações Básicas
+        </h3>
+        
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="title">Título *</Label>
+            <Input
+              id="title"
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              placeholder="Ex: Por que as manhãs são tão difíceis?"
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="slug">Slug *</Label>
+            <Input
+              id="slug"
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+              placeholder="por-que-manhas-sao-dificeis"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="category">Categoria</Label>
+            <Select value={formData.category} onValueChange={handleCategoryChange}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map(cat => (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.emoji} {cat.value}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="readingTime">Tempo de Leitura (min)</Label>
+            <Input
+              id="readingTime"
+              type="number"
+              value={formData.readingTime}
+              onChange={(e) => setFormData({ ...formData, readingTime: e.target.value })}
+              placeholder="5"
+            />
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="metaDescription">Meta Description (SEO)</Label>
+          <Textarea
+            id="metaDescription"
+            value={formData.metaDescription}
+            onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
+            placeholder="Descrição para SEO..."
+            rows={2}
+          />
+        </div>
+      </div>
+
+      {/* Seções de Conteúdo */}
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="font-semibold text-lg flex items-center gap-2">
+          <Heart className="w-5 h-5 text-rose-500" />
+          Seção: Eu Te Entendo
+        </h3>
+        <Textarea
+          value={formData.sectionEuTeEntendo}
+          onChange={(e) => setFormData({ ...formData, sectionEuTeEntendo: e.target.value })}
+          placeholder="Texto empático que mostra compreensão pelo problema..."
+          rows={4}
+        />
+      </div>
+
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="font-semibold text-lg flex items-center gap-2">
+          <Brain className="w-5 h-5 text-blue-500" />
+          Seção: O Que a Ciência Diz
+        </h3>
+        <Textarea
+          value={formData.sectionCiencia}
+          onChange={(e) => setFormData({ ...formData, sectionCiencia: e.target.value })}
+          placeholder="Dados e pesquisas sobre o tema..."
+          rows={4}
+        />
+        
+        <div>
+          <Label htmlFor="stats">Estatísticas (JSON)</Label>
+          <Textarea
+            id="stats"
+            value={formData.stats}
+            onChange={(e) => setFormData({ ...formData, stats: e.target.value })}
+            placeholder='[{"value": "73%", "label": "das mães sentem", "color": "text-amber-600"}]'
+            rows={2}
+            className="font-mono text-sm"
+          />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="quote">Citação</Label>
+            <Textarea
+              id="quote"
+              value={formData.quote}
+              onChange={(e) => setFormData({ ...formData, quote: e.target.value })}
+              placeholder="Uma citação inspiradora..."
+              rows={2}
+            />
+          </div>
+          <div>
+            <Label htmlFor="quoteAuthor">Autor da Citação</Label>
+            <Input
+              id="quoteAuthor"
+              value={formData.quoteAuthor}
+              onChange={(e) => setFormData({ ...formData, quoteAuthor: e.target.value })}
+              placeholder="Nome do autor"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="font-semibold text-lg flex items-center gap-2">
+          <BookOpen className="w-5 h-5 text-purple-500" />
+          Seção: Por Que Isso Acontece
+        </h3>
+        <Textarea
+          value={formData.sectionProblema}
+          onChange={(e) => setFormData({ ...formData, sectionProblema: e.target.value })}
+          placeholder="Explicação do problema..."
+          rows={4}
+        />
+      </div>
+
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="font-semibold text-lg flex items-center gap-2">
+          <Lightbulb className="w-5 h-5 text-green-500" />
+          Seção: A Boa Notícia
+        </h3>
+        <Textarea
+          value={formData.sectionBoaNoticia}
+          onChange={(e) => setFormData({ ...formData, sectionBoaNoticia: e.target.value })}
+          placeholder="Solução e esperança..."
+          rows={4}
+        />
+      </div>
+
+      {/* Missões Relacionadas */}
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="font-semibold text-lg">Missões Relacionadas</h3>
+        <p className="text-sm text-gray-500">Selecione as missões que aparecem como CTA no final do post</p>
+        
+        <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+          {missions?.filter(m => m.isPublished).map(mission => (
+            <div 
+              key={mission.slug} 
+              className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${
+                formData.relatedMissionSlugs.includes(mission.slug)
+                  ? 'bg-green-50 border-green-300'
+                  : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+              }`}
+              onClick={() => handleMissionToggle(mission.slug)}
+            >
+              <Checkbox 
+                checked={formData.relatedMissionSlugs.includes(mission.slug)}
+                className="pointer-events-none"
+              />
+              <span className="text-sm truncate">{mission.title}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Áudio */}
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="font-semibold text-lg">Áudio (Opcional)</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor="audioUrl">URL do Áudio</Label>
+            <Input
+              id="audioUrl"
+              value={formData.audioUrl}
+              onChange={(e) => setFormData({ ...formData, audioUrl: e.target.value })}
+              placeholder="https://..."
+            />
+          </div>
+          <div>
+            <Label htmlFor="audioDuration">Duração (segundos)</Label>
+            <Input
+              id="audioDuration"
+              type="number"
+              value={formData.audioDuration}
+              onChange={(e) => setFormData({ ...formData, audioDuration: e.target.value })}
+              placeholder="180"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Publicação */}
+      <div className="space-y-4 border-t pt-4">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="featured"
+              checked={formData.featured}
+              onCheckedChange={(checked) => setFormData({ ...formData, featured: !!checked })}
+            />
+            <Label htmlFor="featured">Destaque</Label>
+          </div>
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id="isPublished"
+              checked={formData.isPublished}
+              onCheckedChange={(checked) => setFormData({ ...formData, isPublished: !!checked })}
+            />
+            <Label htmlFor="isPublished">Publicado</Label>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-3 pt-4 border-t sticky bottom-0 bg-white dark:bg-gray-900 py-4">
+        <Button 
+          type="button" 
+          variant="outline" 
+          onClick={() => {
+            setEditingPost(null);
+            setIsCreateOpen(false);
+            resetForm();
+          }}
+        >
+          Cancelar
+        </Button>
+        <Button type="submit" disabled={createMutation.isPending || updateMutation.isPending}>
+          {editingPost ? "Atualizar" : "Criar"} Post
+        </Button>
+      </div>
+    </form>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Link href="/admin">
+              <Button variant="ghost" size="icon">
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Posts de Guia</h1>
+              <p className="text-gray-500 dark:text-gray-400">Gerencie os posts que conectam teoria à prática</p>
+            </div>
+          </div>
+          
+          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="w-4 h-4" />
+                Novo Post
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-3xl">
+              <DialogHeader>
+                <DialogTitle>Criar Novo Post de Guia</DialogTitle>
+                <DialogDescription>
+                  Posts de guia conectam conhecimento teórico às missões práticas
+                </DialogDescription>
+              </DialogHeader>
+              <FormContent />
+            </DialogContent>
+          </Dialog>
+        </div>
+
+        {/* Lista de Posts */}
+        {isLoading ? (
+          <div className="text-center py-12">Carregando...</div>
+        ) : !posts?.length ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <BookOpen className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+              <p className="text-gray-500">Nenhum post de guia criado ainda</p>
+              <Button className="mt-4" onClick={() => setIsCreateOpen(true)}>
+                Criar Primeiro Post
+              </Button>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-4">
+            {posts.map((post) => (
+              <Card key={post.id} className="hover:shadow-md transition-shadow">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Badge className={getCategoryColor(post.category || "")}>
+                          {getCategoryBadge(post.category || "")}
+                        </Badge>
+                        {post.featured && (
+                          <Badge variant="secondary">⭐ Destaque</Badge>
+                        )}
+                        {!post.isPublished && (
+                          <Badge variant="outline" className="text-amber-600 border-amber-300">
+                            Rascunho
+                          </Badge>
+                        )}
+                      </div>
+                      
+                      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
+                        {post.title}
+                      </h3>
+                      
+                      <p className="text-sm text-gray-500 mb-3">
+                        /blog-guia/{post.slug} • {post.readingTime} min de leitura • {post.views || 0} visualizações
+                      </p>
+
+                      {post.relatedMissionSlugs && post.relatedMissionSlugs.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">Missões:</span>
+                          {post.relatedMissionSlugs.slice(0, 3).map(slug => (
+                            <Badge key={slug} variant="outline" className="text-xs">
+                              {slug}
+                            </Badge>
+                          ))}
+                          {post.relatedMissionSlugs.length > 3 && (
+                            <span className="text-xs text-gray-400">
+                              +{post.relatedMissionSlugs.length - 3} mais
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Link href={`/blog-guia/${post.slug}`} target="_blank">
+                        <Button variant="ghost" size="icon" title="Visualizar">
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </Link>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => loadEditForm(post)}
+                        title="Editar"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        onClick={() => {
+                          if (confirm("Tem certeza que deseja excluir este post?")) {
+                            deleteMutation.mutate(post.id);
+                          }
+                        }}
+                        title="Excluir"
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editingPost} onOpenChange={(open) => !open && setEditingPost(null)}>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Editar Post de Guia</DialogTitle>
+              <DialogDescription>
+                Atualize as informações do post
+              </DialogDescription>
+            </DialogHeader>
+            <FormContent />
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+}
