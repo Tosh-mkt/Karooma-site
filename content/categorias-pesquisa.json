@@ -1,0 +1,536 @@
+{
+  "categorias_missoes": [
+    {
+      "id": "rotina-matinal",
+      "nome": "Rotina Matinal",
+      "emoji": "☀️",
+      "descricao": "Organizar o início do dia com menos estresse e mais conexão familiar",
+      "persona_dor": "Mãe que acorda já cansada, corre contra o relógio, esquece itens importantes e sente que o dia começa em caos",
+      "topicos_pesquisa": {
+        "gestao_tempo": [
+          "Morning routine for busy moms",
+          "Time blocking for parents",
+          "How to wake up before kids",
+          "Power hour morning routine",
+          "5-minute morning habits"
+        ],
+        "preparo_antecipado": [
+          "Night before routines for families",
+          "Meal prep breakfast ideas",
+          "Laying out clothes the night before",
+          "Backpack station organization",
+          "Launch pad for families"
+        ],
+        "sono_despertar": [
+          "How to wake kids without tantrums",
+          "Gentle wake-up routines for children",
+          "OK to wake clocks for toddlers",
+          "Sleep schedules by age",
+          "Circadian rhythm for kids"
+        ],
+        "autonomia_infantil": [
+          "Age-appropriate morning chores",
+          "Teaching kids to dress themselves",
+          "Visual routine charts for kids",
+          "Montessori morning independence",
+          "Self-care skills by age"
+        ],
+        "mindfulness_matinal": [
+          "5-minute meditation for moms",
+          "Gratitude practice before kids wake",
+          "Calm morning affirmations",
+          "Breathwork for stressed parents",
+          "Mindful coffee ritual"
+        ]
+      },
+      "palavras_chave_seo": [
+        "rotina matinal com filhos",
+        "como organizar manhã família",
+        "dicas manhã menos estressante",
+        "preparar tudo na véspera",
+        "acordar antes dos filhos"
+      ],
+      "fontes_referencia": [
+        "The Miracle Morning (Hal Elrod)",
+        "Hunt, Gather, Parent (Michaeleen Doucleff)",
+        "Simplicity Parenting (Kim John Payne)",
+        "@busytoddler (Instagram)",
+        "@themompsychologist (Instagram)"
+      ]
+    },
+    {
+      "id": "casa-em-ordem",
+      "nome": "Casa em Ordem",
+      "emoji": "🏠",
+      "descricao": "Organização e limpeza do lar de forma sustentável com crianças",
+      "persona_dor": "Mãe que sente que a casa nunca está arrumada, limpa um cômodo e outro já está bagunçado, não sabe por onde começar",
+      "topicos_pesquisa": {
+        "metodos_organizacao": [
+          "KonMari method with kids",
+          "FlyLady cleaning routines",
+          "Minimalism with children",
+          "Clutterbug organizing styles",
+          "Zone cleaning method"
+        ],
+        "organizacao_por_comodo": [
+          "Kids room organization ideas",
+          "Toy rotation system",
+          "Playroom organization",
+          "Closet organization for kids clothes",
+          "Bathroom organization family"
+        ],
+        "rotinas_limpeza": [
+          "Weekly cleaning schedule family",
+          "Daily cleaning checklist busy mom",
+          "Speed cleaning tips",
+          "Cleaning with toddlers at home",
+          "15-minute cleaning routine"
+        ],
+        "envolvimento_criancas": [
+          "Age-appropriate chores chart",
+          "Teaching kids to clean up",
+          "Chore system for kids",
+          "Gamifying household tasks",
+          "Responsibility by age"
+        ],
+        "organizacao_emocional": [
+          "Decluttering sentimental items",
+          "Letting go of baby items",
+          "Organizing kids artwork",
+          "Memory keeping without clutter",
+          "Digital organization for families"
+        ]
+      },
+      "palavras_chave_seo": [
+        "organização casa com filhos",
+        "como manter casa arrumada",
+        "rotina limpeza semanal",
+        "envolver crianças arrumação",
+        "minimalismo familiar"
+      ],
+      "fontes_referencia": [
+        "The Life-Changing Magic of Tidying Up (Marie Kondo)",
+        "Sink Reflections (FlyLady)",
+        "Decluttering at the Speed of Life (Dana K. White)",
+        "@theorganisedhousewife",
+        "@cleanmama"
+      ]
+    },
+    {
+      "id": "cozinha-inteligente",
+      "nome": "Cozinha Inteligente",
+      "emoji": "🍳",
+      "descricao": "Alimentação prática, saudável e sem estresse para toda família",
+      "persona_dor": "Mãe que não sabe o que fazer de jantar, filhos que não comem, desperdício de comida e horas na cozinha",
+      "topicos_pesquisa": {
+        "meal_prep": [
+          "Weekly meal prep for families",
+          "Batch cooking recipes",
+          "Freezer meal ideas",
+          "Once a month cooking",
+          "Prep ahead breakfast ideas"
+        ],
+        "receitas_rapidas": [
+          "30-minute family dinners",
+          "One-pot meals for busy moms",
+          "Sheet pan dinners",
+          "Instant pot family recipes",
+          "No-cook dinner ideas"
+        ],
+        "alimentacao_infantil": [
+          "Baby-led weaning BLW",
+          "Picky eater strategies",
+          "Division of responsibility feeding",
+          "Food chaining therapy",
+          "Sensory issues with food"
+        ],
+        "organizacao_cozinha": [
+          "Pantry organization ideas",
+          "Fridge organization system",
+          "Meal planning templates",
+          "Grocery list organization",
+          "Kitchen zones for efficiency"
+        ],
+        "envolvimento_criancas_cozinha": [
+          "Cooking with toddlers",
+          "Age-appropriate kitchen tasks",
+          "Kids cooking classes",
+          "Kitchen safety for children",
+          "Recipes kids can make alone"
+        ]
+      },
+      "palavras_chave_seo": [
+        "meal prep família",
+        "receitas rápidas para mães",
+        "como lidar filho que não come",
+        "organização cozinha",
+        "introdução alimentar BLW"
+      ],
+      "fontes_referencia": [
+        "Bringing Up Bébé (Pamela Druckerman)",
+        "French Kids Eat Everything (Karen Le Billon)",
+        "Ellyn Satter Division of Responsibility",
+        "@feedinglittles (Instagram)",
+        "@kids.eat.in.color (Instagram)"
+      ]
+    },
+    {
+      "id": "educacao-brincadeiras",
+      "nome": "Educação e Brincadeiras",
+      "emoji": "🎨",
+      "descricao": "Desenvolvimento infantil através do brincar e aprender em casa",
+      "persona_dor": "Mãe que não sabe como entreter os filhos, culpa pelo tempo de tela, dúvidas sobre desenvolvimento e aprendizado",
+      "topicos_pesquisa": {
+        "brincadeiras_idade": [
+          "Activities for 1 year old",
+          "Activities for 2 year old",
+          "Preschool activities at home",
+          "Indoor activities for kids",
+          "Rainy day activities"
+        ],
+        "desenvolvimento": [
+          "Developmental milestones by age",
+          "Fine motor activities",
+          "Gross motor activities",
+          "Language development activities",
+          "Social emotional learning activities"
+        ],
+        "abordagens_pedagogicas": [
+          "Montessori at home",
+          "Reggio Emilia approach",
+          "Waldorf activities",
+          "STEM activities for kids",
+          "Open-ended play benefits"
+        ],
+        "tempo_tela": [
+          "Screen time guidelines by age",
+          "Educational apps for kids",
+          "Screen time alternatives",
+          "Co-viewing strategies",
+          "Digital wellness for families"
+        ],
+        "leitura_alfabetizacao": [
+          "Read aloud benefits",
+          "Best books by age",
+          "Pre-reading activities",
+          "Phonics activities at home",
+          "Building vocabulary through play"
+        ]
+      },
+      "palavras_chave_seo": [
+        "brincadeiras por idade",
+        "atividades desenvolvimento infantil",
+        "tempo de tela recomendado",
+        "montessori em casa",
+        "como brincar com filho"
+      ],
+      "fontes_referencia": [
+        "The Whole-Brain Child (Daniel Siegel)",
+        "How Toddlers Thrive (Tovah Klein)",
+        "No Bad Kids (Janet Lansbury)",
+        "@busytoddler (Instagram)",
+        "@days.with.grey (Instagram)"
+      ]
+    },
+    {
+      "id": "tempo-para-mim",
+      "nome": "Tempo para Mim",
+      "emoji": "💆",
+      "descricao": "Autocuidado e bem-estar físico e mental da mãe",
+      "persona_dor": "Mãe esgotada, que se sente invisível, culpada por querer tempo sozinha, perdeu identidade própria",
+      "topicos_pesquisa": {
+        "burnout_materno": [
+          "Mom burnout symptoms",
+          "Touched out phenomenon",
+          "Rage mom syndrome",
+          "Parental exhaustion recovery",
+          "When motherhood feels too hard"
+        ],
+        "autocuidado_pratico": [
+          "Self-care ideas for busy moms",
+          "5-minute self-care",
+          "Micro self-care moments",
+          "Self-care without leaving home",
+          "Budget self-care ideas"
+        ],
+        "saude_mental": [
+          "Postpartum depression signs",
+          "Mom anxiety symptoms",
+          "Therapy for moms",
+          "Mental load in motherhood",
+          "Invisible labor parenting"
+        ],
+        "rede_apoio": [
+          "Building village as a mom",
+          "Asking for help as a parent",
+          "Mom friends making",
+          "Partner support in parenting",
+          "Delegation strategies for moms"
+        ],
+        "identidade_alem_mae": [
+          "Hobbies for busy moms",
+          "Career after kids",
+          "Rediscovering yourself after baby",
+          "Mom identity crisis",
+          "Personal goals as a mother"
+        ]
+      },
+      "palavras_chave_seo": [
+        "autocuidado para mães",
+        "burnout materno",
+        "tempo para mim culpa",
+        "identidade além de mãe",
+        "saúde mental maternidade"
+      ],
+      "fontes_referencia": [
+        "Momfluenced (Sara Petersen)",
+        "Mom Rage (Minna Dubin)",
+        "How Not to Hate Your Husband (Jancee Dunn)",
+        "@themompsychologist",
+        "@drbeckyathome (Dr. Becky Kennedy)"
+      ]
+    },
+    {
+      "id": "presentes-afetos",
+      "nome": "Presentes e Afetos",
+      "emoji": "🎁",
+      "descricao": "Conexão familiar, celebrações e demonstrações de amor",
+      "persona_dor": "Mãe que não sabe o que dar de presente, festas que viram estresse, pouco tempo de qualidade com filhos",
+      "topicos_pesquisa": {
+        "presentes_desenvolvimento": [
+          "Gifts by age development",
+          "Open-ended toys benefits",
+          "Experience gifts for kids",
+          "Educational gifts by age",
+          "Gifts that encourage play"
+        ],
+        "tradicoes_familiares": [
+          "Family traditions ideas",
+          "Holiday traditions for kids",
+          "Creating meaningful rituals",
+          "Birthday traditions simple",
+          "Seasonal family activities"
+        ],
+        "conexao_familiar": [
+          "Quality time with kids",
+          "Five love languages children",
+          "Connection before correction",
+          "One-on-one time with each child",
+          "Family meeting ideas"
+        ],
+        "festas_simples": [
+          "Simple birthday party ideas",
+          "Low-stress party planning",
+          "Experience-based parties",
+          "Eco-friendly party ideas",
+          "Fiver birthday party trend"
+        ],
+        "demonstracoes_afeto": [
+          "Ways to show love to kids",
+          "Affirmations for children",
+          "Love notes for kids",
+          "Quality time ideas",
+          "Acts of service for family"
+        ]
+      },
+      "palavras_chave_seo": [
+        "presentes por idade",
+        "tradições familiares",
+        "tempo de qualidade filhos",
+        "festa infantil simples",
+        "conexão familiar"
+      ],
+      "fontes_referencia": [
+        "The 5 Love Languages of Children (Gary Chapman)",
+        "The Gifts of Imperfect Parenting (Brené Brown)",
+        "Simplicity Parenting (Kim John Payne)",
+        "@biglittlefeelings",
+        "@simplyonpurpose"
+      ]
+    },
+    {
+      "id": "passeios-saidas",
+      "nome": "Passeios e Saídas",
+      "emoji": "🚗",
+      "descricao": "Mobilidade, viagens e saídas de casa com crianças",
+      "persona_dor": "Mãe que evita sair de casa pelo trabalho que dá, viagens são estressantes, sempre esquece algo importante",
+      "topicos_pesquisa": {
+        "viagens_familia": [
+          "Flying with toddlers tips",
+          "Road trip with kids",
+          "Traveling with baby essentials",
+          "Family travel packing list",
+          "Jet lag with kids"
+        ],
+        "bolsa_passeio": [
+          "Diaper bag essentials",
+          "Toddler outing bag",
+          "Car emergency kit family",
+          "Snack bag organization",
+          "On-the-go changing station"
+        ],
+        "destinos_familias": [
+          "Family-friendly destinations",
+          "Best hotels for families",
+          "Kid-friendly restaurants",
+          "All-inclusive family resorts",
+          "Staycation ideas with kids"
+        ],
+        "seguranca_transporte": [
+          "Car seat safety by age",
+          "When to change car seat",
+          "Airplane car seat rules",
+          "Stroller travel tips",
+          "Child safety in Uber"
+        ],
+        "saidas_cotidianas": [
+          "Grocery shopping with kids",
+          "Doctor appointment with toddler",
+          "Running errands with baby",
+          "Restaurant tips with kids",
+          "Public meltdown strategies"
+        ]
+      },
+      "palavras_chave_seo": [
+        "viajar com crianças",
+        "bolsa de passeio organizada",
+        "destinos família",
+        "segurança cadeirinha",
+        "sair com bebê"
+      ],
+      "fontes_referencia": [
+        "Travels with Baby (Shelly Rivoli)",
+        "@travelingwithababy",
+        "@safekids (Safe Kids Worldwide)",
+        "The Car Seat Lady",
+        "Family Travel Association"
+      ]
+    },
+    {
+      "id": "saude-emergencias",
+      "nome": "Saúde e Emergências",
+      "emoji": "🏥",
+      "descricao": "Cuidados médicos, prevenção e preparo para emergências",
+      "persona_dor": "Mãe que entra em pânico quando filho adoece, não sabe quando ir ao PS, farmacinha desorganizada",
+      "topicos_pesquisa": {
+        "primeiros_socorros": [
+          "Infant CPR steps",
+          "Choking first aid baby",
+          "When to call 911 child",
+          "First aid kit for kids",
+          "Common childhood injuries"
+        ],
+        "farmacinha_infantil": [
+          "Baby medicine cabinet essentials",
+          "OTC medications for kids",
+          "Medicine dosage by weight",
+          "Natural remedies for kids",
+          "When to give fever reducer"
+        ],
+        "doencas_comuns": [
+          "Common childhood illnesses",
+          "When to keep child home sick",
+          "Fever in children when to worry",
+          "Stomach bug treatment kids",
+          "Ear infection symptoms"
+        ],
+        "prevencao_saude": [
+          "Vaccine schedule by age",
+          "Well-child checkups",
+          "Dental care for kids",
+          "Vision screening children",
+          "Healthy habits for kids"
+        ],
+        "quando_buscar_ajuda": [
+          "Emergency room vs urgent care",
+          "Signs of serious illness in child",
+          "When to call pediatrician",
+          "Night time health concerns",
+          "Breathing difficulties children"
+        ]
+      },
+      "palavras_chave_seo": [
+        "primeiros socorros infantil",
+        "farmacinha bebê",
+        "quando ir ao pronto socorro",
+        "doenças comuns infância",
+        "vacinas infantis"
+      ],
+      "fontes_referencia": [
+        "What to Expect (Heidi Murkoff)",
+        "AAP (American Academy of Pediatrics)",
+        "Baby 411 (Dr. Ari Brown)",
+        "@pediatrician.mom",
+        "Red Cross First Aid"
+      ]
+    },
+    {
+      "id": "manutencao-lar",
+      "nome": "Manutenção do Lar",
+      "emoji": "🔧",
+      "descricao": "Reparos, segurança e melhorias para casa com crianças",
+      "persona_dor": "Mãe que não sabe consertar nada, casa com perigos para criança, adia reparos importantes",
+      "topicos_pesquisa": {
+        "childproofing": [
+          "Baby proofing checklist",
+          "Childproofing by age",
+          "Furniture anchoring safety",
+          "Cabinet locks for toddlers",
+          "Outlet covers and safety"
+        ],
+        "reparos_basicos": [
+          "Basic home repairs for moms",
+          "DIY fixes every parent needs",
+          "How to fix common issues",
+          "Tool kit essentials home",
+          "YouTube home repair tutorials"
+        ],
+        "manutencao_preventiva": [
+          "Home maintenance schedule",
+          "Seasonal home checklist",
+          "HVAC maintenance family",
+          "Appliance maintenance tips",
+          "Water heater maintenance"
+        ],
+        "contratacao_servicos": [
+          "How to hire handyman",
+          "Questions to ask contractors",
+          "Home service apps reviews",
+          "When to DIY vs hire pro",
+          "Getting quotes for repairs"
+        ],
+        "melhorias_familia": [
+          "Kid-friendly home improvements",
+          "Creating play spaces",
+          "Mudroom organization",
+          "Family command center",
+          "Safe outdoor play area"
+        ]
+      },
+      "palavras_chave_seo": [
+        "segurança infantil casa",
+        "manutenção casa família",
+        "childproofing",
+        "reparos simples casa",
+        "contratar serviços domésticos"
+      ],
+      "fontes_referencia": [
+        "Safe Kids Worldwide",
+        "Home Improvement 1-2-3 (Home Depot)",
+        "@ourhousenowahome",
+        "This Old House",
+        "Consumer Product Safety Commission"
+      ]
+    }
+  ],
+  "meta": {
+    "total_categorias": 9,
+    "total_topicos_principais": 45,
+    "total_termos_pesquisa": 225,
+    "idioma_pesquisa": "Inglês (para fontes mais amplas)",
+    "persona_alvo": "Cláudia - mãe trabalhadora de 39 anos com 3 filhos",
+    "objetivo": "Criar conteúdo empático que conecta teoria à prática através das missões",
+    "data_criacao": "2025-11-30",
+    "ultima_atualizacao": "2025-11-30"
+  }
+}
