@@ -34,6 +34,8 @@ import {
   type InsertDiagnostic,
   type FeaturedApparel,
   type InsertFeaturedApparel,
+  type SelectGuidePost,
+  type InsertGuidePost,
   users,
   content,
   products,
@@ -53,6 +55,7 @@ import {
   pushSubscriptions,
   missions,
   diagnostics,
+  guidePosts,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -216,6 +219,18 @@ export interface IStorage {
   createApparel(data: InsertFeaturedApparel): Promise<FeaturedApparel>;
   updateApparel(id: string, data: Partial<InsertFeaturedApparel>): Promise<FeaturedApparel>;
   deleteApparel(id: string): Promise<void>;
+  
+  // Guide Posts methods
+  getAllGuidePosts(): Promise<SelectGuidePost[]>;
+  getPublishedGuidePosts(): Promise<SelectGuidePost[]>;
+  getFeaturedGuidePosts(): Promise<SelectGuidePost[]>;
+  getGuidePostById(id: string): Promise<SelectGuidePost | undefined>;
+  getGuidePostBySlug(slug: string, includeUnpublished?: boolean): Promise<SelectGuidePost | undefined>;
+  getGuidePostsByCategory(category: string): Promise<SelectGuidePost[]>;
+  createGuidePost(data: InsertGuidePost): Promise<SelectGuidePost>;
+  updateGuidePost(id: string, data: Partial<InsertGuidePost>): Promise<SelectGuidePost>;
+  deleteGuidePost(id: string): Promise<void>;
+  incrementGuidePostViews(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -938,6 +953,38 @@ export class MemStorage implements IStorage {
     } else {
       return await this.createFlipbook({ ...data, postId });
     }
+  }
+
+  // Guide Posts stubs for MemStorage
+  async getAllGuidePosts(): Promise<SelectGuidePost[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getPublishedGuidePosts(): Promise<SelectGuidePost[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getFeaturedGuidePosts(): Promise<SelectGuidePost[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getGuidePostById(id: string): Promise<SelectGuidePost | undefined> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getGuidePostBySlug(slug: string, includeUnpublished?: boolean): Promise<SelectGuidePost | undefined> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getGuidePostsByCategory(category: string): Promise<SelectGuidePost[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async createGuidePost(data: InsertGuidePost): Promise<SelectGuidePost> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async updateGuidePost(id: string, data: Partial<InsertGuidePost>): Promise<SelectGuidePost> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async deleteGuidePost(id: string): Promise<void> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async incrementGuidePostViews(id: string): Promise<void> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
   }
 }
 
@@ -2269,6 +2316,100 @@ export class DatabaseStorage implements IStorage {
     await db
       .delete(featuredApparel)
       .where(eq(featuredApparel.id, id));
+  }
+
+  // Guide Posts methods
+  async getAllGuidePosts(): Promise<SelectGuidePost[]> {
+    return await db
+      .select()
+      .from(guidePosts)
+      .orderBy(desc(guidePosts.createdAt));
+  }
+
+  async getPublishedGuidePosts(): Promise<SelectGuidePost[]> {
+    return await db
+      .select()
+      .from(guidePosts)
+      .where(eq(guidePosts.isPublished, true))
+      .orderBy(desc(guidePosts.createdAt));
+  }
+
+  async getFeaturedGuidePosts(): Promise<SelectGuidePost[]> {
+    return await db
+      .select()
+      .from(guidePosts)
+      .where(and(
+        eq(guidePosts.isPublished, true),
+        eq(guidePosts.featured, true)
+      ))
+      .orderBy(desc(guidePosts.createdAt));
+  }
+
+  async getGuidePostById(id: string): Promise<SelectGuidePost | undefined> {
+    const [post] = await db
+      .select()
+      .from(guidePosts)
+      .where(eq(guidePosts.id, id))
+      .limit(1);
+    return post;
+  }
+
+  async getGuidePostBySlug(slug: string, includeUnpublished: boolean = false): Promise<SelectGuidePost | undefined> {
+    const conditions = includeUnpublished 
+      ? [eq(guidePosts.slug, slug)]
+      : [eq(guidePosts.slug, slug), eq(guidePosts.isPublished, true)];
+    
+    const [post] = await db
+      .select()
+      .from(guidePosts)
+      .where(and(...conditions))
+      .limit(1);
+    return post;
+  }
+
+  async getGuidePostsByCategory(category: string): Promise<SelectGuidePost[]> {
+    return await db
+      .select()
+      .from(guidePosts)
+      .where(and(
+        eq(guidePosts.category, category),
+        eq(guidePosts.isPublished, true)
+      ))
+      .orderBy(desc(guidePosts.createdAt));
+  }
+
+  async createGuidePost(data: InsertGuidePost): Promise<SelectGuidePost> {
+    const [post] = await db
+      .insert(guidePosts)
+      .values({
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    return post;
+  }
+
+  async updateGuidePost(id: string, data: Partial<InsertGuidePost>): Promise<SelectGuidePost> {
+    const [post] = await db
+      .update(guidePosts)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(guidePosts.id, id))
+      .returning();
+    return post;
+  }
+
+  async deleteGuidePost(id: string): Promise<void> {
+    await db
+      .delete(guidePosts)
+      .where(eq(guidePosts.id, id));
+  }
+
+  async incrementGuidePostViews(id: string): Promise<void> {
+    await db
+      .update(guidePosts)
+      .set({ views: sql`${guidePosts.views} + 1` })
+      .where(eq(guidePosts.id, id));
   }
 }
 

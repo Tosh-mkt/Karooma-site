@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema, insertMissionSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema, insertMissionSchema, insertGuidePostSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
@@ -3969,6 +3969,154 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao excluir produto de roupa:", error);
       res.status(500).json({ error: "Erro ao excluir produto" });
+    }
+  });
+
+  // ========================================
+  // Guide Posts Routes - Posts de Guia
+  // ========================================
+
+  // Public routes
+  app.get("/api/guide-posts", async (req, res) => {
+    try {
+      const posts = await storage.getPublishedGuidePosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch guide posts" });
+    }
+  });
+
+  app.get("/api/guide-posts/featured", async (req, res) => {
+    try {
+      const posts = await storage.getFeaturedGuidePosts();
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch featured guide posts" });
+    }
+  });
+
+  app.get("/api/guide-posts/category/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const posts = await storage.getGuidePostsByCategory(category);
+      res.json(posts);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch guide posts by category" });
+    }
+  });
+
+  app.get("/api/guide-posts/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const post = await storage.getGuidePostBySlug(slug);
+      if (!post) {
+        return res.status(404).json({ error: "Guide post not found" });
+      }
+      
+      // Increment views
+      await storage.incrementGuidePostViews(post.id);
+      
+      // Fetch related missions if any
+      let relatedMissions: any[] = [];
+      if (post.relatedMissionSlugs && post.relatedMissionSlugs.length > 0) {
+        for (const missionSlug of post.relatedMissionSlugs) {
+          const mission = await storage.getMissionBySlug(missionSlug);
+          if (mission) {
+            relatedMissions.push(mission);
+          }
+        }
+      }
+      
+      res.json({ ...post, relatedMissions });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch guide post" });
+    }
+  });
+
+  // Admin routes
+  app.get("/api/admin/guide-posts", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const posts = await storage.getAllGuidePosts();
+      res.json(posts);
+    } catch (error) {
+      console.error("Erro ao buscar posts de guia:", error);
+      res.status(500).json({ error: "Failed to fetch guide posts" });
+    }
+  });
+
+  app.get("/api/admin/guide-posts/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const post = await storage.getGuidePostById(id);
+      if (!post) {
+        return res.status(404).json({ error: "Guide post not found" });
+      }
+      res.json(post);
+    } catch (error) {
+      console.error("Erro ao buscar post de guia:", error);
+      res.status(500).json({ error: "Failed to fetch guide post" });
+    }
+  });
+
+  app.post("/api/admin/guide-posts", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const validatedData = insertGuidePostSchema.parse(req.body);
+      const post = await storage.createGuidePost(validatedData);
+      
+      console.log('✅ Post de guia criado:', { 
+        id: post.id, 
+        title: post.title,
+        slug: post.slug 
+      });
+      
+      res.status(201).json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos", 
+          details: error.errors 
+        });
+      }
+      console.error("Erro ao criar post de guia:", error);
+      res.status(500).json({ error: "Failed to create guide post" });
+    }
+  });
+
+  app.patch("/api/admin/guide-posts/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const validatedData = insertGuidePostSchema.partial().parse(req.body);
+      const post = await storage.updateGuidePost(id, validatedData);
+      
+      console.log('✅ Post de guia atualizado:', { 
+        id: post.id, 
+        title: post.title 
+      });
+      
+      res.json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "Dados inválidos", 
+          details: error.errors 
+        });
+      }
+      console.error("Erro ao atualizar post de guia:", error);
+      res.status(500).json({ error: "Failed to update guide post" });
+    }
+  });
+
+  app.delete("/api/admin/guide-posts/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteGuidePost(id);
+      
+      console.log('✅ Post de guia excluído:', { id });
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro ao excluir post de guia:", error);
+      res.status(500).json({ error: "Failed to delete guide post" });
     }
   });
 
