@@ -94,14 +94,24 @@
         },
         "SECAO_BOA_NOTICIA": {
           "duration": "45 segundos - 1.5 minutos",
-          "purpose": "Oferecer esperança e direcionar para ação",
+          "purpose": "Oferecer esperança e direcionar para ação com missões específicas",
           "adaptation_from_text": [
             "Manter energia positiva mas realista",
-            "Mencionar as Missões como próximo passo natural",
-            "Criar curiosidade para explorar mais",
-            "Encerrar com sensação de possibilidade"
+            "OBRIGATÓRIO: Mencionar pelo nome as Missões recomendadas do campo relatedMissionSlugs",
+            "Criar curiosidade para explorar cada missão mencionada",
+            "Encerrar com sensação de possibilidade e convite claro para as missões"
           ],
-          "example": "[Tom esperançoso, energia levemente mais alta]\n\nMas olha... [pausa] a boa notícia é que você não precisa mudar tudo. [ênfase] Tudo não.\n\nPequenos ajustes estratégicos... [pausa] ...podem transformar suas manhãs de caóticas... em gerenciáveis.\n\n[pausa longa]\n\nAqui no Karooma, a gente criou o que chama de 'Missões'. [tom de convite] São micro-rotinas de cinco a quinze minutos... que automatizam decisões e liberam sua energia mental.\n\nNão são teorias complicadas. [pausa] São passos simples... que você pode aplicar amanhã."
+          "CRITICAL_MISSIONS_MENTION": {
+            "description": "É OBRIGATÓRIO mencionar as missões relacionadas pelo nome nesta seção",
+            "format": "Transforme os slugs em nomes amigáveis e mencione cada missão de forma natural",
+            "example_transformation": {
+              "ritual-hidratacao-primeiro": "Ritual da Hidratação Primeiro",
+              "cafe-da-manha-10-minutos": "Café da Manhã em 10 Minutos",
+              "maquina-do-amanha": "Máquina do Amanhã"
+            },
+            "integration_style": "Mencione as missões como soluções práticas específicas, explicando brevemente o que cada uma faz"
+          },
+          "example": "[Tom esperançoso, energia levemente mais alta]\n\nMas olha... [pausa] a boa notícia é que você não precisa mudar tudo. [ênfase] Tudo não.\n\nPequenos ajustes estratégicos... [pausa] ...podem transformar suas manhãs de caóticas... em gerenciáveis.\n\n[pausa longa]\n\nAqui no Karooma, a gente criou o que chama de 'Missões'. [tom de convite] São micro-rotinas de cinco a quinze minutos... que automatizam decisões e liberam sua energia mental.\n\nNão são teorias complicadas. [pausa] São passos simples... que você pode aplicar amanhã.\n\n[pausa]\n\nPra esse dilema específico, recomendo três missões... [tom animado]\n\nPrimeiro, a Missão 'Ritual da Hidratação Primeiro'. [pausa breve] Um gesto de dois minutinhos que pode mudar como você se sente nas primeiras horas do dia.\n\nDepois, a 'Máquina do Amanhã'... pra preparar tudo na noite anterior e acordar com metade do trabalho feito.\n\nE por fim, 'Café da Manhã em 10 Minutos'... [pausa] pra ganhar tempo sem sacrificar a nutrição da família."
         },
         "FECHAMENTO": {
           "duration": "20-40 segundos",
@@ -214,7 +224,8 @@
       "rule_3": "SEMPRE inclua pausas suficientes - áudio sem pausas é exaustivo",
       "rule_4": "SEMPRE simplifique números grandes para serem compreendidos ao ouvir",
       "rule_5": "NUNCA ultrapasse 8 minutos - atenção de quem ouve é limitada",
-      "rule_6": "SEMPRE termine com sensação de acolhimento e possibilidade"
+      "rule_6": "SEMPRE termine com sensação de acolhimento e possibilidade",
+      "rule_7": "OBRIGATÓRIO mencionar pelo nome as Missões do campo relatedMissionSlugs na seção 'boa_noticia' - transforme slugs em nomes amigáveis e explique brevemente o que cada missão faz"
     }
   }
 }
