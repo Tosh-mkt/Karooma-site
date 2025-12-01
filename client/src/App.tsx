@@ -32,6 +32,7 @@ import FlipbookTest from "./pages/flipbook-test";
 import GuiaPrototipo from "./pages/guia-prototipo";
 import BlogGuiaPrototipo from "./pages/blog-guia-prototipo";
 import BlogGuia from "./pages/blog-guia";
+import Guias from "./pages/guias";
 import AdminGuidePosts from "./pages/AdminGuidePosts";
 
 import { AdminDashboard } from "./pages/AdminDashboard";
@@ -101,6 +102,7 @@ function Router() {
               <Route path="/videos" component={Videos} />
               <Route path="/blog" component={Blog} />
               <Route path="/blog/:id" component={BlogPost} />
+              <Route path="/guias" component={Guias} />
               <Route path="/products" component={Products} />
               <Route path="/missoes" component={Missoes} />
               <Route path="/preview/missoes/:slug" component={MissaoPreview} />
