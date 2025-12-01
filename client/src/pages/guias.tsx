@@ -33,6 +33,17 @@ function GuideCard({ post }: { post: SelectGuidePost }) {
           className="group bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100 cursor-pointer h-full flex flex-col"
           data-testid={`card-guide-${post.slug}`}
         >
+          {/* Imagem de Capa 16:9 */}
+          {post.heroImageUrl && (
+            <div className="aspect-video w-full overflow-hidden">
+              <img 
+                src={post.heroImageUrl} 
+                alt={post.title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+          )}
+          
           <div className="p-6 flex-1 flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <Badge className={`${category?.color || 'bg-gray-100 text-gray-800'} font-medium`}>
@@ -54,7 +65,7 @@ function GuideCard({ post }: { post: SelectGuidePost }) {
               </p>
             )}
             
-            {post.quote && (
+            {!post.heroImageUrl && post.quote && (
               <div className="bg-gradient-to-r from-pink-50 to-purple-50 rounded-lg p-3 mb-4">
                 <p className="text-sm text-gray-700 italic line-clamp-2">
                   "{post.quote}"
