@@ -10,10 +10,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit, Plus, Eye, ExternalLink, BookOpen, Heart, Brain, Lightbulb, ArrowLeft, Bot, Upload } from "lucide-react";
+import { Trash2, Edit, Plus, Eye, ExternalLink, BookOpen, Heart, Brain, Lightbulb, ArrowLeft, Bot, Upload, ImageIcon } from "lucide-react";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
 import { AudioUploader } from "@/components/admin/AudioUploader";
+import { ImageUploader } from "@/components/admin/ImageUploader";
 import type { SelectGuidePost, SelectMission } from "@shared/schema";
 
 const CATEGORIES = [
@@ -102,6 +103,7 @@ export default function AdminGuidePosts() {
     relatedMissionSlugs: [] as string[],
     audioUrl: "",
     audioDuration: "",
+    heroImageUrl: "",
     metaDescription: "",
     featured: false,
     isPublished: false,
@@ -146,6 +148,7 @@ export default function AdminGuidePosts() {
         relatedMissionSlugs: normalizeArray(parsed.relatedMissionSlugs),
         audioUrl: parsed.audioUrl || "",
         audioDuration: parsed.audioDuration?.toString() || "",
+        heroImageUrl: parsed.heroImageUrl || "",
         metaDescription: parsed.metaDescription || "",
         featured: parsed.featured === "sim" || parsed.featured === true,
         isPublished: parsed.isPublished === "sim" || parsed.isPublished === true,
@@ -182,6 +185,7 @@ export default function AdminGuidePosts() {
       relatedMissionSlugs: [],
       audioUrl: "",
       audioDuration: "",
+      heroImageUrl: "",
       metaDescription: "",
       featured: false,
       isPublished: false,
@@ -206,6 +210,7 @@ export default function AdminGuidePosts() {
       relatedMissionSlugs: post.relatedMissionSlugs || [],
       audioUrl: post.audioUrl || "",
       audioDuration: post.audioDuration?.toString() || "",
+      heroImageUrl: post.heroImageUrl || "",
       metaDescription: post.metaDescription || "",
       featured: post.featured || false,
       isPublished: post.isPublished || false,
@@ -273,6 +278,7 @@ export default function AdminGuidePosts() {
       relatedMissionSlugs: formData.relatedMissionSlugs,
       audioUrl: formData.audioUrl.trim() || null,
       audioDuration: formData.audioDuration ? parseInt(formData.audioDuration) : null,
+      heroImageUrl: formData.heroImageUrl.trim() || null,
       metaDescription: formData.metaDescription.trim() || null,
       featured: formData.featured,
       isPublished: formData.isPublished,
@@ -394,6 +400,39 @@ export default function AdminGuidePosts() {
             placeholder="Descrição para SEO..."
             rows={2}
           />
+        </div>
+
+        {/* Imagem de Capa */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="heroImageUrl" className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              Imagem de Capa (16:9)
+            </Label>
+            <ImageUploader 
+              onImageInserted={(url) => setFormData({ ...formData, heroImageUrl: url })}
+              className="bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-200"
+            />
+          </div>
+          <Input
+            id="heroImageUrl"
+            value={formData.heroImageUrl}
+            onChange={(e) => setFormData({ ...formData, heroImageUrl: e.target.value })}
+            placeholder="https://..."
+          />
+          {formData.heroImageUrl && (
+            <div className="mt-2 relative aspect-video max-w-md rounded-lg overflow-hidden border border-gray-200">
+              <img 
+                src={formData.heroImageUrl} 
+                alt="Preview da capa" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='225' viewBox='0 0 400 225'%3E%3Crect fill='%23f3f4f6' width='400' height='225'/%3E%3Ctext fill='%239ca3af' font-family='sans-serif' font-size='14' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3EImagem não encontrada%3C/text%3E%3C/svg%3E";
+                }}
+              />
+              <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">16:9</span>
+            </div>
+          )}
         </div>
       </div>
 
