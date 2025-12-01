@@ -498,11 +498,16 @@ export default function AdminGuidePosts() {
                   ? 'bg-green-50 border-green-300'
                   : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
               }`}
-              onClick={() => handleMissionToggle(mission.slug)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleMissionToggle(mission.slug);
+              }}
             >
               <Checkbox 
                 checked={formData.relatedMissionSlugs.includes(mission.slug)}
-                className="pointer-events-none"
+                onCheckedChange={() => handleMissionToggle(mission.slug)}
+                onClick={(e) => e.stopPropagation()}
               />
               <span className="text-sm truncate">{mission.title}</span>
             </div>

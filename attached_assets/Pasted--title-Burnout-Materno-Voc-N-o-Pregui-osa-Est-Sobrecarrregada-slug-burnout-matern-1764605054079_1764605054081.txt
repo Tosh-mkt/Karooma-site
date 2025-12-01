@@ -1,0 +1,20 @@
+{
+"title": "Burnout Materno: Você Não é Preguiçosa, Está Sobrecarrregada",
+"slug": "burnout-materno-nao-e-preguica-e-sobrecarga",
+"category": "Tempo para Mim",
+"readingTime": 5,
+"sectionEuTeEntendo": "Você se levanta e sente que já falhou. A lista de tarefas na sua cabeça é infinita, mas a energia que você tem é zero. Você ama seus filhos, mas secretamente, o desejo de fugir para uma ilha deserta por apenas 24 horas é real. Isso tem um nome, e não é 'ser mãe ruim'. É **burnout materno**. Você se sente exausta, irritada por coisas pequenas e se pergunta constantemente se está fazendo tudo errado. Essa culpa é o que nos isola, nos fazendo acreditar que todas as outras mães dão conta, menos nós. Eu te entendo. É uma sobrecarga física, emocional e mental causada por expectativas irreais e falta de suporte, e o primeiro passo para sair disso é **validar** o que você está sentindo. Você não é egoísta por precisar de um tempo sozinha; você é humana e está sobrecarregada.",
+"sectionCiencia": "O burnout materno é um esgotamento real, não uma invenção. A pesquisa aponta que entre **65% a 75%** das mães experimentam algum nível de esgotamento. Esse estado de fadiga extrema e sentimento de inadequação é frequentemente correlacionado com a ansiedade, sendo que 77% das mães com ansiedade relatam burnout. Um dos fatores biológicos é o fenômeno 'Touched Out' – a sobrecarga sensorial do toque constante das crianças, que leva o cérebro materno a atingir o limite de processamento e manifestar repulsa ao toque. A boa notícia é que o autocuidado não precisa ser um luxo; o **micro self-care** – intervenções de 5 a 15 minutos – pode reduzir o estresse em 25% a 30%. Além disso, apenas 1 hora extra por semana de tempo para si pode reduzir o risco de burnout em 20%.",
+"sectionProblema": "O problema não é sua força de vontade, mas a estrutura da maternidade moderna:\n\n* **Expectativa de Perfeição:** A pressão social e as redes sociais exigem uma mãe que cuida da casa, dos filhos, do trabalho e do corpo, tudo impecavelmente. Essa expectativa de ser a 'mãe moral' ainda persiste.\n* **Ausência de Rede de Apoio:** A jornada da maternidade é social, mas muitas vezes se torna solitária. A falta de um 'time' ativo (seja parceiro, família ou amigos) para dividir a carga torna a responsabilidade 100% sua.\n* **O Paradoxo do 'Ajudante':** Quando o parceiro 'ajuda' em vez de compartilhar 50/50, o peso mental da gestão da casa e dos filhos continua a ser seu. Você continua sendo a figura mais requisitada, mesmo com a presença de terceiros.\n* **O Cansaço Sem Fim:** O sono inadequado e a falta de tempo ininterrupto para recarregar as energias esgotam o sistema nervoso central, levando ao ciclo de fadiga extrema.",
+"sectionBoaNoticia": "Você não precisa de uma semana no spa para começar a se recuperar – você precisa de pequenos **ajustes estratégicos** na sua rotina. Reconhecer o burnout é o primeiro passo para o autocuidado ser visto como **manutenção** (essencial) e não luxo (opcional). O caminho para o bem-estar e redução do estresse começa com a decisão de agendar esse tempo para si, mesmo que sejam apenas 5 minutos. Pare de julgar a si mesma e comece a agir de forma prática. Nossas Missões de Tempo Para Mim foram criadas com o objetivo de oferecer estratégias de micro self-care que cabem na sua vida real.\n\n**O próximo passo é simples: dê a si mesma permissão.**",
+"quote": "Burnout não significa falha — significa sobrecarga.",
+"quoteAuthor": "Dr. Anjali Ferguson",
+"stats": [
+{"value": "65-75%", "label": "de mães experimentam burnout", "color": "text-amber-600"},
+{"value": "+1h/semana", "label": "próprio tempo reduz 20% de burnout", "color": "text-amber-600"}
+],
+"relatedMissionSlugs": ["tempo-para-mim-micro-self-care", "tempo-para-mim-rede-apoio"],
+"metaDescription": "Entenda o que é burnout materno, por que você não é preguiçosa e como o micro self-care pode reduzir o estresse em até 30% hoje.",
+"featured": true,
+"isPublished": true
+}
