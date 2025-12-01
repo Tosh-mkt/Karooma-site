@@ -239,6 +239,34 @@ export default function BlogGuia() {
                   </div>
                 </motion.div>
               )}
+              
+              {/* Botão Favoritar e Imagem - Mobile */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="lg:hidden flex flex-col gap-4 mt-6"
+              >
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full border-2 border-rose-200 text-rose-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-300 rounded-xl px-6 py-3 font-medium shadow-sm"
+                  data-testid="button-favorite-guide-mobile"
+                >
+                  <Heart className="w-6 h-6 mr-2" />
+                  Favoritar
+                </Button>
+                
+                {post.heroImageUrl && (
+                  <div className="aspect-video rounded-2xl overflow-hidden shadow-lg border-4 border-white/50">
+                    <img 
+                      src={post.heroImageUrl} 
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+              </motion.div>
             </div>
             
             {/* Imagem de Capa e Botão Favoritar à direita (apenas desktop) */}
