@@ -149,90 +149,120 @@ export default function BlogGuia() {
             <span className="font-medium">Voltar para Blog</span>
           </Link>
           
-          <div className="max-w-4xl">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Badge className={`mb-4 ${categoryColor.bg} ${categoryColor.text} border-0 px-4 py-2`}>
-                <CategoryIcon className="w-4 h-4 mr-2" />
-                {post.categoryEmoji} {post.category}
-              </Badge>
-            </motion.div>
-            
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight"
-            >
-              {post.title}
-            </motion.h1>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6"
-            >
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>{post.readingTime} min de leitura</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString('pt-BR') : ''}</span>
-              </div>
-              {post.views && post.views > 0 && (
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4" />
-                  <span>{post.views.toLocaleString('pt-BR')} leituras</span>
-                </div>
-              )}
-            </motion.div>
-            
-            {/* Audio Player - Below Title */}
-            {(post.audioUrl || post.audioDuration) && (
+          <div className="flex gap-8 items-start">
+            {/* Conteúdo à esquerda */}
+            <div className="flex-1 max-w-3xl">
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-700 rounded-2xl p-4 md:p-6"
-                data-section="audio-player"
+                className="flex items-center gap-3 mb-4"
               >
-                <div className="flex items-center gap-4">
-                  <Button
-                    onClick={togglePlay}
-                    size="icon"
-                    className="h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg flex-shrink-0"
-                    data-testid="audio-play-button"
-                  >
-                    {isPlaying ? (
-                      <Pause className="w-6 h-6" />
-                    ) : (
-                      <Play className="w-6 h-6 ml-1" />
-                    )}
-                  </Button>
-                  
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Volume2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <span className="font-medium text-gray-900 dark:text-white">Ouça o Áudio</span>
-                    </div>
+                <Badge className={`${categoryColor.bg} ${categoryColor.text} border-0 px-4 py-2`}>
+                  <CategoryIcon className="w-4 h-4 mr-2" />
+                  {post.categoryEmoji} {post.category}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-500 hover:text-rose-500 hover:bg-rose-50"
+                  data-testid="button-favorite-guide"
+                >
+                  <Heart className="w-5 h-5" />
+                </Button>
+              </motion.div>
+              
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight"
+              >
+                {post.title}
+              </motion.h1>
+              
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6"
+              >
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  <span>{post.readingTime} min de leitura</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString('pt-BR') : ''}</span>
+                </div>
+                {post.views && post.views > 0 && (
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4" />
+                    <span>{post.views.toLocaleString('pt-BR')} leituras</span>
+                  </div>
+                )}
+              </motion.div>
+              
+              {/* Audio Player - Below Title */}
+              {(post.audioUrl || post.audioDuration) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-700 rounded-2xl p-4 md:p-6"
+                  data-section="audio-player"
+                >
+                  <div className="flex items-center gap-4">
+                    <Button
+                      onClick={togglePlay}
+                      size="icon"
+                      className="h-14 w-14 rounded-full bg-green-600 hover:bg-green-700 text-white shadow-lg flex-shrink-0"
+                      data-testid="audio-play-button"
+                    >
+                      {isPlaying ? (
+                        <Pause className="w-6 h-6" />
+                      ) : (
+                        <Play className="w-6 h-6 ml-1" />
+                      )}
+                    </Button>
                     
-                    <div className="flex items-center gap-3">
-                      <Slider
-                        value={[currentTime]}
-                        max={duration}
-                        step={1}
-                        onValueChange={handleSeek}
-                        className="flex-1"
-                      />
-                      <span className="text-sm text-gray-500 dark:text-gray-400 font-mono whitespace-nowrap">
-                        {formatTime(currentTime)} / {formatTime(duration)}
-                      </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Volume2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        <span className="font-medium text-gray-900 dark:text-white">Ouça o Áudio</span>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        <Slider
+                          value={[currentTime]}
+                          max={duration}
+                          step={1}
+                          onValueChange={handleSeek}
+                          className="flex-1"
+                        />
+                        <span className="text-sm text-gray-500 dark:text-gray-400 font-mono whitespace-nowrap">
+                          {formatTime(currentTime)} / {formatTime(duration)}
+                        </span>
+                      </div>
                     </div>
                   </div>
+                </motion.div>
+              )}
+            </div>
+            
+            {/* Imagem de Capa à direita (apenas desktop) */}
+            {post.heroImageUrl && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className="hidden lg:block flex-shrink-0 w-64 xl:w-80"
+              >
+                <div className="aspect-video rounded-2xl overflow-hidden shadow-lg border-4 border-white/50">
+                  <img 
+                    src={post.heroImageUrl} 
+                    alt={post.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               </motion.div>
             )}
