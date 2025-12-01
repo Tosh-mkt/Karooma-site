@@ -4058,16 +4058,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/guide-posts", extractUserInfo, checkIsAdmin, async (req, res) => {
+  app.post("/api/admin/guide-posts", extractUserInfo, async (req, res) => {
     console.log('📝 Iniciando criação de guide post...');
-    console.log('📝 Body recebido:', JSON.stringify(req.body, null, 2));
+    
+    if (!checkIsAdmin(req.user)) {
+      console.log('❌ Acesso negado - usuário não é admin');
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
     
     try {
-      console.log('📝 Validando dados com schema...');
       const validatedData = insertGuidePostSchema.parse(req.body);
-      console.log('📝 Dados validados:', JSON.stringify(validatedData, null, 2));
-      
-      console.log('📝 Chamando storage.createGuidePost...');
       const post = await storage.createGuidePost(validatedData);
       
       console.log('✅ Post de guia criado:', { 
@@ -4080,18 +4080,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('❌ Erro ao criar guide post:', error);
       if (error instanceof z.ZodError) {
-        console.error('❌ Erros de validação Zod:', JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ 
           error: "Dados inválidos", 
           details: error.errors 
         });
       }
-      console.error("Erro ao criar post de guia:", error);
       res.status(500).json({ error: "Failed to create guide post" });
     }
   });
 
-  app.patch("/api/admin/guide-posts/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+  app.patch("/api/admin/guide-posts/:id", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
     try {
       const { id } = req.params;
       const validatedData = insertGuidePostSchema.partial().parse(req.body);
@@ -4115,7 +4117,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/guide-posts/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+  app.delete("/api/admin/guide-posts/:id", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
     try {
       const { id } = req.params;
       await storage.deleteGuidePost(id);
