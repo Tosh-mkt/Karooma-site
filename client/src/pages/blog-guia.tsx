@@ -173,7 +173,7 @@ export default function BlogGuia() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-8"
+              className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6"
             >
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4" />
@@ -190,18 +190,13 @@ export default function BlogGuia() {
                 </div>
               )}
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Audio Player */}
-      {(post.audioUrl || post.audioDuration) && (
-        <section className="py-6 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 sticky top-0 z-40">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
+            
+            {/* Audio Player - Below Title */}
+            {(post.audioUrl || post.audioDuration) && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
                 className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-gray-700 dark:to-gray-700 rounded-2xl p-4 md:p-6"
                 data-section="audio-player"
               >
@@ -222,7 +217,7 @@ export default function BlogGuia() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <Volume2 className="w-4 h-4 text-green-600 dark:text-green-400" />
-                      <span className="font-medium text-gray-900 dark:text-white">Resumo em Áudio</span>
+                      <span className="font-medium text-gray-900 dark:text-white">Ouça o Áudio</span>
                     </div>
                     
                     <div className="flex items-center gap-3">
@@ -240,10 +235,10 @@ export default function BlogGuia() {
                   </div>
                 </div>
               </motion.div>
-            </div>
+            )}
           </div>
-        </section>
-      )}
+        </div>
+      </section>
 
       {/* Conteúdo Principal */}
       <article className="py-12">
