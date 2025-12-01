@@ -4034,7 +4034,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes
-  app.get("/api/admin/guide-posts", extractUserInfo, checkIsAdmin, async (req, res) => {
+  app.get("/api/admin/guide-posts", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
     try {
       const posts = await storage.getAllGuidePosts();
       res.json(posts);
@@ -4044,7 +4048,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/admin/guide-posts/:id", extractUserInfo, checkIsAdmin, async (req, res) => {
+  app.get("/api/admin/guide-posts/:id", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
     try {
       const { id } = req.params;
       const post = await storage.getGuidePostById(id);
