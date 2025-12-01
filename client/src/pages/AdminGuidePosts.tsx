@@ -234,6 +234,19 @@ export default function AdminGuidePosts() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.title.trim()) {
+      toast({ title: "Título é obrigatório", variant: "destructive" });
+      return;
+    }
+    if (!formData.slug.trim()) {
+      toast({ title: "Slug é obrigatório", variant: "destructive" });
+      return;
+    }
+    if (!formData.sectionEuTeEntendo.trim()) {
+      toast({ title: "Seção 'Eu Te Entendo' é obrigatória", variant: "destructive" });
+      return;
+    }
+    
     let parsedStats = null;
     if (formData.stats) {
       try {
@@ -245,25 +258,27 @@ export default function AdminGuidePosts() {
     }
 
     const payload = {
-      title: formData.title,
-      slug: formData.slug,
+      title: formData.title.trim(),
+      slug: formData.slug.trim(),
       category: formData.category,
       categoryEmoji: formData.categoryEmoji,
       readingTime: parseInt(formData.readingTime) || 5,
-      sectionEuTeEntendo: formData.sectionEuTeEntendo || null,
-      sectionCiencia: formData.sectionCiencia || null,
-      sectionProblema: formData.sectionProblema || null,
-      sectionBoaNoticia: formData.sectionBoaNoticia || null,
-      quote: formData.quote || null,
-      quoteAuthor: formData.quoteAuthor || null,
+      sectionEuTeEntendo: formData.sectionEuTeEntendo.trim(),
+      sectionCiencia: formData.sectionCiencia.trim() || null,
+      sectionProblema: formData.sectionProblema.trim() || null,
+      sectionBoaNoticia: formData.sectionBoaNoticia.trim() || null,
+      quote: formData.quote.trim() || null,
+      quoteAuthor: formData.quoteAuthor.trim() || null,
       stats: parsedStats,
       relatedMissionSlugs: formData.relatedMissionSlugs,
-      audioUrl: formData.audioUrl || null,
+      audioUrl: formData.audioUrl.trim() || null,
       audioDuration: formData.audioDuration ? parseInt(formData.audioDuration) : null,
-      metaDescription: formData.metaDescription || null,
+      metaDescription: formData.metaDescription.trim() || null,
       featured: formData.featured,
       isPublished: formData.isPublished,
     };
+
+    console.log("Enviando payload:", payload);
 
     if (editingPost) {
       updateMutation.mutate({ ...payload, id: editingPost.id });
