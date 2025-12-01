@@ -4059,8 +4059,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.post("/api/admin/guide-posts", extractUserInfo, checkIsAdmin, async (req, res) => {
+    console.log('📝 Iniciando criação de guide post...');
+    console.log('📝 Body recebido:', JSON.stringify(req.body, null, 2));
+    
     try {
+      console.log('📝 Validando dados com schema...');
       const validatedData = insertGuidePostSchema.parse(req.body);
+      console.log('📝 Dados validados:', JSON.stringify(validatedData, null, 2));
+      
+      console.log('📝 Chamando storage.createGuidePost...');
       const post = await storage.createGuidePost(validatedData);
       
       console.log('✅ Post de guia criado:', { 
@@ -4071,7 +4078,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.status(201).json(post);
     } catch (error) {
+      console.error('❌ Erro ao criar guide post:', error);
       if (error instanceof z.ZodError) {
+        console.error('❌ Erros de validação Zod:', JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ 
           error: "Dados inválidos", 
           details: error.errors 
