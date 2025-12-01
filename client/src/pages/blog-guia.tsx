@@ -155,20 +155,12 @@ export default function BlogGuia() {
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-3 mb-4"
+                className="mb-4"
               >
                 <Badge className={`${categoryColor.bg} ${categoryColor.text} border-0 px-4 py-2`}>
                   <CategoryIcon className="w-4 h-4 mr-2" />
                   {post.categoryEmoji} {post.category}
                 </Badge>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-500 hover:text-rose-500 hover:bg-rose-50"
-                  data-testid="button-favorite-guide"
-                >
-                  <Heart className="w-5 h-5" />
-                </Button>
               </motion.div>
               
               <motion.h1
@@ -249,23 +241,37 @@ export default function BlogGuia() {
               )}
             </div>
             
-            {/* Imagem de Capa à direita (apenas desktop) */}
-            {post.heroImageUrl && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2 }}
-                className="hidden lg:block flex-shrink-0 w-64 xl:w-80"
+            {/* Imagem de Capa e Botão Favoritar à direita (apenas desktop) */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="hidden lg:flex flex-col items-center gap-4 flex-shrink-0"
+            >
+              {/* Botão Favoritar Grande */}
+              <Button
+                variant="outline"
+                size="lg"
+                className="w-full border-2 border-rose-200 text-rose-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-300 rounded-xl px-6 py-3 font-medium shadow-sm"
+                data-testid="button-favorite-guide"
               >
-                <div className="aspect-video rounded-2xl overflow-hidden shadow-lg border-4 border-white/50">
-                  <img 
-                    src={post.heroImageUrl} 
-                    alt={post.title}
-                    className="w-full h-full object-cover"
-                  />
+                <Heart className="w-6 h-6 mr-2" />
+                Favoritar
+              </Button>
+              
+              {/* Imagem de Capa */}
+              {post.heroImageUrl && (
+                <div className="w-64 xl:w-80">
+                  <div className="aspect-video rounded-2xl overflow-hidden shadow-lg border-4 border-white/50">
+                    <img 
+                      src={post.heroImageUrl} 
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </motion.div>
-            )}
+              )}
+            </motion.div>
           </div>
         </div>
       </section>
