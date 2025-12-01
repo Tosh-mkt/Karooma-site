@@ -10,9 +10,10 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit, Plus, Eye, ExternalLink, BookOpen, Heart, Brain, Lightbulb, ArrowLeft, Bot } from "lucide-react";
+import { Trash2, Edit, Plus, Eye, ExternalLink, BookOpen, Heart, Brain, Lightbulb, ArrowLeft, Bot, Upload } from "lucide-react";
 import { Link } from "wouter";
 import { Badge } from "@/components/ui/badge";
+import { AudioUploader } from "@/components/admin/AudioUploader";
 import type { SelectGuidePost, SelectMission } from "@shared/schema";
 
 const CATEGORIES = [
@@ -496,7 +497,13 @@ export default function AdminGuidePosts() {
 
       {/* Áudio */}
       <div className="space-y-4 border-t pt-4">
-        <h3 className="font-semibold text-lg">Áudio (Opcional)</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="font-semibold text-lg">Áudio (Opcional)</h3>
+          <AudioUploader 
+            onAudioInserted={(url) => setFormData({ ...formData, audioUrl: url })}
+            className="bg-purple-50 hover:bg-purple-100 text-purple-700 border-purple-200"
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="audioUrl">URL do Áudio</Label>
