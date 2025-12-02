@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import imageCompression from "browser-image-compression";
 
 interface ImageUploaderProps {
   onImageInserted: (markdown: string) => void;
@@ -12,9 +13,11 @@ interface ImageUploaderProps {
 /**
  * Componente para upload de imagens que serão inseridas no editor de markdown.
  * Permite fazer upload de imagens do computador e insere automaticamente o markdown da imagem.
+ * Comprime automaticamente imagens grandes antes do upload.
  */
 export function ImageUploader({ onImageInserted, className }: ImageUploaderProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -23,10 +26,10 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
     if (!file) return;
 
     // Validações
-    if (file.size > 5 * 1024 * 1024) { // 5MB
+    if (file.size > 7.5 * 1024 * 1024) { // 7.5MB
       toast({
         title: "Arquivo muito grande",
-        description: "A imagem deve ter no máximo 5MB.",
+        description: "A imagem deve ter no máximo 7,5MB.",
         variant: "destructive",
       });
       return;
@@ -42,6 +45,34 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
     }
 
     setIsUploading(true);
+    
+    let fileToUpload: File = file;
+    const originalSize = file.size;
+    
+    // Comprimir imagem se for maior que 1MB
+    if (file.size > 1 * 1024 * 1024) {
+      try {
+        setUploadStatus("Comprimindo...");
+        
+        const compressionOptions = {
+          maxSizeMB: 1, // Máximo 1MB após compressão
+          maxWidthOrHeight: 1920, // Máximo 1920px de largura ou altura
+          useWebWorker: true,
+          fileType: file.type as string,
+        };
+        
+        fileToUpload = await imageCompression(file, compressionOptions);
+        
+        const savedPercent = Math.round((1 - fileToUpload.size / originalSize) * 100);
+        console.log(`Imagem comprimida: ${(originalSize / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB (${savedPercent}% reduzido)`);
+        
+      } catch (compressionError) {
+        console.error("Erro na compressão, usando arquivo original:", compressionError);
+        fileToUpload = file;
+      }
+    }
+    
+    setUploadStatus("Enviando...");
 
     try {
       // Obter URL de upload
@@ -59,12 +90,12 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
       const uploadData = await uploadResponse.json();
       const uploadURL = uploadData.uploadURL;
 
-      // Fazer upload direto para o storage
+      // Fazer upload direto para o storage (usando arquivo comprimido)
       const uploadResult = await fetch(uploadURL, {
         method: "PUT",
-        body: file,
+        body: fileToUpload,
         headers: {
-          'Content-Type': file.type,
+          'Content-Type': fileToUpload.type,
         },
       });
 
@@ -113,6 +144,7 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
       });
     } finally {
       setIsUploading(false);
+      setUploadStatus("");
     }
   };
 
@@ -137,7 +169,7 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
         data-testid="button-upload-image"
       >
         <ImageIcon className="w-4 h-4 mr-2" />
-        {isUploading ? "Enviando..." : "Inserir Imagem"}
+        {isUploading ? (uploadStatus || "Processando...") : "Inserir Imagem"}
       </Button>
     </>
   );
