@@ -303,7 +303,7 @@ export default function AdminGuidePosts() {
     return cat?.color || "bg-gray-100 text-gray-800";
   };
 
-  const FormContent = () => (
+  const formContent = (
     <form onSubmit={handleSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
       {/* Importação JSON */}
       <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 space-y-3">
@@ -658,7 +658,7 @@ export default function AdminGuidePosts() {
                   Posts de guia conectam conhecimento teórico às missões práticas
                 </DialogDescription>
               </DialogHeader>
-              <FormContent />
+              {formContent}
             </DialogContent>
           </Dialog>
         </div>
@@ -766,7 +766,7 @@ export default function AdminGuidePosts() {
                 Atualize as informações do post
               </DialogDescription>
             </DialogHeader>
-            <FormContent />
+            {formContent}
           </DialogContent>
         </Dialog>
       </div>
