@@ -103,13 +103,15 @@
           ],
           "CRITICAL_MISSIONS_MENTION": {
             "description": "É OBRIGATÓRIO mencionar as missões relacionadas pelo nome nesta seção",
-            "format": "Transforme os slugs em nomes amigáveis e mencione cada missão de forma natural",
+            "format": "Transforme os slugs em nomes amigáveis e mencione cada missão de forma natural - NUNCA inclua o slug no texto",
             "example_transformation": {
               "ritual-hidratacao-primeiro": "Ritual da Hidratação Primeiro",
               "cafe-da-manha-10-minutos": "Café da Manhã em 10 Minutos",
-              "maquina-do-amanha": "Máquina do Amanhã"
+              "maquina-do-amanha": "Máquina do Amanhã",
+              "destralhe-zonas-quentes": "Destralhe das Zonas Quentes"
             },
-            "integration_style": "Mencione as missões como soluções práticas específicas, explicando brevemente o que cada uma faz"
+            "integration_style": "Mencione as missões como soluções práticas específicas, explicando brevemente o que cada uma faz",
+            "FORBIDDEN": "NUNCA escreva '(slug: xxx)' ou 'slug: xxx' no texto - apenas o nome amigável da missão"
           },
           "example": "[Tom esperançoso, energia levemente mais alta]\n\nMas olha... [pausa] a boa notícia é que você não precisa mudar tudo. [ênfase] Tudo não.\n\nPequenos ajustes estratégicos... [pausa] ...podem transformar suas manhãs de caóticas... em gerenciáveis.\n\n[pausa longa]\n\nAqui no Karooma, a gente criou o que chama de 'Missões'. [tom de convite] São micro-rotinas de cinco a quinze minutos... que automatizam decisões e liberam sua energia mental.\n\nNão são teorias complicadas. [pausa] São passos simples... que você pode aplicar amanhã.\n\n[pausa]\n\nPra esse dilema específico, recomendo três missões... [tom animado]\n\nPrimeiro, a Missão 'Ritual da Hidratação Primeiro'. [pausa breve] Um gesto de dois minutinhos que pode mudar como você se sente nas primeiras horas do dia.\n\nDepois, a 'Máquina do Amanhã'... pra preparar tudo na noite anterior e acordar com metade do trabalho feito.\n\nE por fim, 'Café da Manhã em 10 Minutos'... [pausa] pra ganhar tempo sem sacrificar a nutrição da família."
         },
@@ -225,7 +227,21 @@
       "rule_4": "SEMPRE simplifique números grandes para serem compreendidos ao ouvir",
       "rule_5": "NUNCA ultrapasse 8 minutos - atenção de quem ouve é limitada",
       "rule_6": "SEMPRE termine com sensação de acolhimento e possibilidade",
-      "rule_7": "OBRIGATÓRIO mencionar pelo nome as Missões do campo relatedMissionSlugs na seção 'boa_noticia' - transforme slugs em nomes amigáveis e explique brevemente o que cada missão faz"
+      "rule_7": "OBRIGATÓRIO mencionar pelo nome as Missões do campo relatedMissionSlugs na seção 'boa_noticia' - transforme slugs em nomes amigáveis e explique brevemente o que cada missão faz",
+      "rule_8": "PROIBIDO usar markdown no texto (nada de **negrito**, *itálico*, # títulos, - listas, etc.) - o texto deve ser puro, pronto para narração",
+      "rule_9": "PROIBIDO incluir slugs técnicos no texto (ex: 'slug: destralhe-zonas-quentes') - mencione apenas o NOME da missão de forma natural, sem referência ao slug"
+    },
+    "FORMAT_WARNINGS": {
+      "forbidden_patterns": [
+        "**texto** (markdown negrito)",
+        "*texto* (markdown itálico)",
+        "slug: nome-da-missao",
+        "(slug: qualquer-coisa)",
+        "# títulos markdown",
+        "- listas markdown",
+        "[links](url)"
+      ],
+      "correct_format": "Texto puro, conversacional, sem formatação. Exemplo correto: 'Recomendo a missão Destralhe das Zonas Quentes. É uma missão curtinha que...' - SEM asteriscos, SEM slugs, SEM markdown."
     }
   }
 }
