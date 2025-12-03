@@ -148,27 +148,29 @@ export default function Guias() {
             <div className="grid grid-cols-2 gap-2 max-w-md mx-auto">
               <button
                 onClick={() => setSelectedCategory(null)}
-                className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   !selectedCategory 
                     ? 'bg-pink-500 text-white' 
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-100'
                 }`}
                 data-testid="button-filter-all"
               >
-                Todos
+                <span className="w-5 text-center">✨</span>
+                <span>Todos</span>
               </button>
               {CATEGORIES.map(cat => (
                 <button
                   key={cat.value}
                   onClick={() => setSelectedCategory(cat.value)}
-                  className={`px-3 py-2 rounded-full text-sm font-medium transition-all text-left ${
+                  className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     selectedCategory === cat.value 
                       ? 'bg-pink-500 text-white' 
-                      : 'bg-white text-gray-600 hover:bg-gray-100'
+                      : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-100'
                   }`}
                   data-testid={`button-filter-${cat.value.toLowerCase()}`}
                 >
-                  {cat.emoji} {cat.value}
+                  <span className="w-5 text-center flex-shrink-0">{cat.emoji}</span>
+                  <span className="text-left">{cat.value}</span>
                 </button>
               ))}
             </div>
