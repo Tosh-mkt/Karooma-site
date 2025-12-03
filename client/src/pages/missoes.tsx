@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useSearch } from "wouter";
 import { 
-  Sparkles, ArrowRight, Leaf, Search, Target, ChevronRight, ArrowLeft, Star,
+  Sparkles, ArrowRight, Leaf, Search, Target, ChevronRight, ArrowLeft, Star, Check,
   Coffee, Home, UtensilsCrossed, BookOpen, Heart, Gift, Car, Hospital, Wrench, LayoutGrid
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -585,8 +585,105 @@ export default function Missoes() {
             const CurrentIcon = currentCategory?.Icon || LayoutGrid;
             return (
               <>
+                {/* Header */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center mb-8"
+                >
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    O que está pedindo leveza hoje?
+                  </h2>
+                  <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    Escolha uma categoria e vamos te ajudar com soluções práticas
+                  </p>
+                </motion.div>
+
+                {/* Categories Grid - Always visible at top */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mb-6"
+                >
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4 max-w-5xl mx-auto">
+                    {CATEGORIES.filter(c => c.value !== "all").map((category, index) => {
+                      const IconComponent = category.Icon;
+                      const isSelected = category.value === selectedCategory;
+                      return (
+                        <motion.button
+                          key={category.value}
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: index * 0.03 }}
+                          onClick={() => handleCategorySelect(category.value)}
+                          className={`group relative bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-md hover:shadow-xl border-2 transition-all duration-300 hover:scale-[1.02] text-center ${category.textColor} ${
+                            isSelected 
+                              ? 'border-current ring-2 ring-current ring-opacity-30 scale-[1.02]' 
+                              : 'border-transparent hover:border-current'
+                          }`}
+                          data-testid={`button-category-${category.value}`}
+                        >
+                          <div className={`mx-auto mb-3 w-14 h-14 rounded-xl ${category.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform ${isSelected ? 'scale-110' : ''}`}>
+                            <IconComponent className={`w-7 h-7 ${category.textColor}`} strokeWidth={1.5} />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-800 dark:text-gray-200">
+                            {category.label}
+                          </span>
+                          
+                          {/* Selection indicator */}
+                          {isSelected && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 bg-current rounded-full flex items-center justify-center">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                          
+                          {/* Hover glow effect */}
+                          <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r ${category.color} opacity-0 group-hover:opacity-5 transition-opacity pointer-events-none`} />
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+
+                {/* Navigation buttons */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col sm:flex-row justify-between gap-3 mb-8 max-w-5xl mx-auto"
+                >
+                  {hasDiagnostic ? (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setViewMode("recommendations");
+                        setSelectedCategory("all");
+                      }}
+                      className="flex items-center gap-2"
+                      data-testid="button-back-to-diagnostic"
+                    >
+                      <ArrowLeft className="w-4 h-4" />
+                      Recomendações do diagnóstico
+                    </Button>
+                  ) : (
+                    <div />
+                  )}
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setViewMode("all-categories");
+                      setSelectedCategory("all");
+                    }}
+                    className="flex items-center gap-2"
+                    data-testid="button-see-all-categories"
+                  >
+                    Ver todas as categorias
+                    <LayoutGrid className="w-4 h-4" />
+                  </Button>
+                </motion.div>
+
+                {/* Selected category info */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mb-6"
                 >
@@ -594,13 +691,15 @@ export default function Missoes() {
                     <div className={`${currentCategory?.bgColor || 'bg-gray-100'} p-3 rounded-xl`}>
                       <CurrentIcon className={`w-6 h-6 ${currentCategory?.textColor || 'text-gray-600'}`} strokeWidth={1.5} />
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {currentCategory?.label || selectedCategory}
-                    </h2>
+                    <div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                        {currentCategory?.label || selectedCategory}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {filteredMissions.length} missões nesta categoria
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-gray-600 dark:text-gray-400">
-                    {filteredMissions.length} missões nesta categoria
-                  </p>
                 </motion.div>
 
                 <div id="missions-grid">
@@ -610,33 +709,6 @@ export default function Missoes() {
                     searchQuery={searchQuery}
                   />
                 </div>
-
-                {/* Other Categories */}
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="mt-12"
-                >
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                    Outras Categorias
-                  </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {CATEGORIES.filter(c => c.value !== "all" && c.value !== selectedCategory).map(category => {
-                      const CategoryIcon = category.Icon;
-                      return (
-                        <button
-                          key={category.value}
-                          onClick={() => handleCategorySelect(category.value)}
-                          className={`inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 hover:border-current text-sm font-medium transition-all hover:scale-105 ${category.textColor}`}
-                        >
-                          <CategoryIcon className="w-4 h-4" strokeWidth={1.5} />
-                          <span>{category.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </motion.div>
               </>
             );
           })()}
