@@ -18,15 +18,15 @@ import { ImageUploader } from "@/components/admin/ImageUploader";
 import type { SelectGuidePost, SelectMission } from "@shared/schema";
 
 const CATEGORIES = [
-  { value: "Rotina Matinal", emoji: "🌅", color: "bg-amber-100 text-amber-800" },
-  { value: "Casa em Ordem", emoji: "🏠", color: "bg-blue-100 text-blue-800" },
-  { value: "Cozinha Inteligente", emoji: "🍳", color: "bg-orange-100 text-orange-800" },
-  { value: "Educação e Brincadeiras", emoji: "📚", color: "bg-green-100 text-green-800" },
-  { value: "Tempo para Mim", emoji: "💆", color: "bg-purple-100 text-purple-800" },
-  { value: "Presentes e Afetos", emoji: "💝", color: "bg-pink-100 text-pink-800" },
-  { value: "Passeios e Saídas", emoji: "🚗", color: "bg-teal-100 text-teal-800" },
-  { value: "Saúde e Emergências", emoji: "🏥", color: "bg-red-100 text-red-800" },
-  { value: "Manutenção e Melhorias do Lar", emoji: "🔧", color: "bg-gray-100 text-gray-800" },
+  { value: "Rotina Matinal", emoji: "🌅", color: "bg-orange-100 text-orange-800 border-orange-200" },
+  { value: "Casa em Ordem", emoji: "🏠", color: "bg-blue-100 text-blue-800 border-blue-200" },
+  { value: "Cozinha Inteligente", emoji: "🍳", color: "bg-amber-100 text-amber-800 border-amber-200" },
+  { value: "Educação e Brincadeiras", emoji: "🎨", color: "bg-purple-100 text-purple-800 border-purple-200" },
+  { value: "Tempo para Mim", emoji: "✨", color: "bg-pink-100 text-pink-800 border-pink-200" },
+  { value: "Presentes e Afetos", emoji: "🎁", color: "bg-rose-100 text-rose-800 border-rose-200" },
+  { value: "Passeios e Saídas", emoji: "🚗", color: "bg-teal-100 text-teal-800 border-teal-200" },
+  { value: "Saúde e Emergências", emoji: "💊", color: "bg-red-100 text-red-800 border-red-200" },
+  { value: "Manutenção e Melhorias do Lar", emoji: "🔧", color: "bg-slate-100 text-slate-800 border-slate-200" },
 ];
 
 export default function AdminGuidePosts() {
