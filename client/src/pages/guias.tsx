@@ -145,10 +145,10 @@ export default function Guias() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-5 h-5" />
             </div>
 
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="grid grid-cols-2 gap-2 max-w-md mx-auto">
               <button
                 onClick={() => setSelectedCategory(null)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-3 py-2 rounded-full text-sm font-medium transition-all ${
                   !selectedCategory 
                     ? 'bg-pink-500 text-white' 
                     : 'bg-white text-gray-600 hover:bg-gray-100'
@@ -161,7 +161,7 @@ export default function Guias() {
                 <button
                   key={cat.value}
                   onClick={() => setSelectedCategory(cat.value)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-3 py-2 rounded-full text-sm font-medium transition-all text-left ${
                     selectedCategory === cat.value 
                       ? 'bg-pink-500 text-white' 
                       : 'bg-white text-gray-600 hover:bg-gray-100'
