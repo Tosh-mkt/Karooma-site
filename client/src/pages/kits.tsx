@@ -594,7 +594,7 @@ export default function Kits() {
       {/* Category Filters */}
       <div className="sticky top-0 z-20 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="container mx-auto px-4 py-4 max-w-6xl">
-          <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             {CATEGORIES.map((category) => (
               <CategoryButton
                 key={category.value}
