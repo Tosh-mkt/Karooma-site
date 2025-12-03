@@ -669,6 +669,21 @@ export default function Missoes() {
   );
 }
 
+const getCategoryBadgeColor = (category: string): string => {
+  const colors: Record<string, string> = {
+    "Rotina Matinal": "bg-amber-500 text-white",
+    "Casa em Ordem": "bg-blue-500 text-white",
+    "Cozinha Inteligente": "bg-green-500 text-white",
+    "Educação e Brincadeiras": "bg-purple-500 text-white",
+    "Tempo para Mim": "bg-rose-500 text-white",
+    "Presentes e Afetos": "bg-pink-500 text-white",
+    "Passeios e Saídas": "bg-indigo-500 text-white",
+    "Saúde e Emergências": "bg-red-500 text-white",
+    "Manutenção e Melhorias do Lar": "bg-slate-500 text-white",
+  };
+  return colors[category] || "bg-gray-500 text-white";
+};
+
 function MissionsGrid({ 
   missions, 
   isLoading, 
@@ -749,7 +764,7 @@ function MissionsGrid({
                     </div>
                   )}
                   <div className="absolute bottom-3 left-3">
-                    <Badge className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm text-gray-900 dark:text-white border-0">
+                    <Badge className={`${getCategoryBadgeColor(mission.category)} border-0 shadow-md`}>
                       {mission.category}
                     </Badge>
                   </div>
@@ -759,7 +774,7 @@ function MissionsGrid({
               {/* Content */}
               <div className="p-6">
                 {!mission.heroImageUrl && (
-                  <Badge className="mb-3" variant="secondary">
+                  <Badge className={`mb-3 ${getCategoryBadgeColor(mission.category)} border-0`}>
                     {mission.category}
                   </Badge>
                 )}
