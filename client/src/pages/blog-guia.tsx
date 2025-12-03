@@ -47,13 +47,13 @@ const categoryIcons: Record<string, typeof Sun> = {
 };
 
 const categoryColors: Record<string, { bg: string; text: string; border: string }> = {
-  "Rotina Matinal": { bg: "bg-orange-100 dark:bg-orange-900/30", text: "text-orange-800 dark:text-orange-200", border: "border-orange-200 dark:border-orange-800" },
+  "Rotina Matinal": { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-800 dark:text-amber-200", border: "border-amber-200 dark:border-amber-800" },
   "Casa em Ordem": { bg: "bg-blue-100 dark:bg-blue-900/30", text: "text-blue-800 dark:text-blue-200", border: "border-blue-200 dark:border-blue-800" },
-  "Cozinha Inteligente": { bg: "bg-amber-100 dark:bg-amber-900/30", text: "text-amber-800 dark:text-amber-200", border: "border-amber-200 dark:border-amber-800" },
+  "Cozinha Inteligente": { bg: "bg-green-100 dark:bg-green-900/30", text: "text-green-800 dark:text-green-200", border: "border-green-200 dark:border-green-800" },
   "Educação e Brincadeiras": { bg: "bg-purple-100 dark:bg-purple-900/30", text: "text-purple-800 dark:text-purple-200", border: "border-purple-200 dark:border-purple-800" },
-  "Tempo para Mim": { bg: "bg-pink-100 dark:bg-pink-900/30", text: "text-pink-800 dark:text-pink-200", border: "border-pink-200 dark:border-pink-800" },
-  "Presentes e Afetos": { bg: "bg-rose-100 dark:bg-rose-900/30", text: "text-rose-800 dark:text-rose-200", border: "border-rose-200 dark:border-rose-800" },
-  "Passeios e Saídas": { bg: "bg-teal-100 dark:bg-teal-900/30", text: "text-teal-800 dark:text-teal-200", border: "border-teal-200 dark:border-teal-800" },
+  "Tempo para Mim": { bg: "bg-rose-100 dark:bg-rose-900/30", text: "text-rose-800 dark:text-rose-200", border: "border-rose-200 dark:border-rose-800" },
+  "Presentes e Afetos": { bg: "bg-pink-100 dark:bg-pink-900/30", text: "text-pink-800 dark:text-pink-200", border: "border-pink-200 dark:border-pink-800" },
+  "Passeios e Saídas": { bg: "bg-indigo-100 dark:bg-indigo-900/30", text: "text-indigo-800 dark:text-indigo-200", border: "border-indigo-200 dark:border-indigo-800" },
   "Saúde e Emergências": { bg: "bg-red-100 dark:bg-red-900/30", text: "text-red-800 dark:text-red-200", border: "border-red-200 dark:border-red-800" },
   "Manutenção e Melhorias do Lar": { bg: "bg-slate-100 dark:bg-slate-900/30", text: "text-slate-800 dark:text-slate-200", border: "border-slate-200 dark:border-slate-800" },
 };
