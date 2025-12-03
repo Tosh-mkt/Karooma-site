@@ -42,6 +42,9 @@ import AdminCuradoriaKarooma from "./pages/AdminCuradoriaKarooma";
 import AdminRoadmap from "./pages/AdminRoadmap";
 import AdminMissoes from "./pages/AdminMissoes";
 import AdminApparel from "./pages/AdminApparel";
+import AdminKits from "./pages/AdminKits";
+import Kits from "./pages/kits";
+import KitDetalhes from "./pages/kit-detalhes";
 import { TempLogin } from "./pages/TempLogin";
 import { Login } from "./pages/Login";
 import { AdminLogin } from "./pages/AdminLogin";
@@ -107,6 +110,8 @@ function Router() {
               <Route path="/missoes" component={Missoes} />
               <Route path="/preview/missoes/:slug" component={MissaoPreview} />
               <Route path="/missoes/:slug" component={MissaoDetalhes} />
+              <Route path="/kits" component={Kits} />
+              <Route path="/kits/:slug" component={KitDetalhes} />
               <Route path="/missao/:slug" component={MissaoDetalhes} />
               <Route path="/diagnostico" component={Diagnostico} />
               <Route path="/diagnostico/resultado" component={DiagnosticoResultado} />
@@ -127,6 +132,7 @@ function Router() {
               <Route path="/admin/roadmap" component={AdminRoadmap} />
               <Route path="/admin/missoes" component={AdminMissoes} />
               <Route path="/admin/apparel" component={AdminApparel} />
+              <Route path="/admin/kits" component={AdminKits} />
               <Route path="/admin/guide-posts" component={AdminGuidePosts} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
               <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />

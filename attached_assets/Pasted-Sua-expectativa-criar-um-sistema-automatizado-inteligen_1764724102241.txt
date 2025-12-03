@@ -1,0 +1,799 @@
+Sua expectativa é criar um sistema automatizado, inteligente e escalável, capaz de organizar produtos da Amazon em kits baseados em tarefas — e não apenas um agrupamento manual de itens.
+A resposta do outro assistente está no caminho certo, mas faltam componentes importantes, e alguns pontos precisam ser refinados para atender ao que você descreveu e ao que a própria Amazon incentiva (contexto de uso, curadoria, relevância visual e conteúdo orientado a decisão — princípios derivados do Visual Selling e de organização de catálogo).
+
+Aqui vai uma análise clara, objetiva e prática do que ele acertou, do que falta e como melhorar:
+
+✅ O que a resposta dele ACERTA
+**1. Criação da entidade “ProductKit” **
+
+Isso está correto e muito bom.
+Você realmente precisa de uma entidade que represente:
+
+nome do kit
+
+objetivo do kit / tarefa
+
+descrição
+
+regras
+
+status
+
+Isso está alinhado com a expectativa de automação.
+
+2. Regras de busca por kit
+
+Ótimo: keywords, filtros, categorias, rating, Prime.
+Isso se alinha com o seu modelo mental de:
+
+➡️ "Não quero produtos soltos — quero soluções organizadas."
+
+3. Scheduler para autorrenovação dos kits
+
+Correto e necessário.
+
+A Amazon atualiza preços e estoque constantemente, então você PRECISA disso para:
+
+evitar links quebrados
+
+evitar produtos indisponíveis
+
+manter relevância
+
+4. Fallback + Cache
+
+Importante. Ele pensou na fragilidade da PA-API, o que é ótimo.
+
+5. Interface Admin
+
+Perfeito: você precisa poder ajustar kits sem tocar no código.
+
+❌ O que FALTA ou ESTÁ INCOMPLETO segundo sua expectativa
+1️⃣ Falta o componente mais importante: “Lógica de Curadoria Inteligente”
+
+O sistema dele apenas busca e filtra produtos.
+Mas o que você quer é:
+
+➡️ “Criar kits de verdade, com propósito, coerência e atratividade.”
+
+Para isso falta:
+
+✔️ Priorização por contexto de uso
+
+Ex.:
+No “Kit limpeza de pia”, o sistema deve saber que um “dispenser de detergente” é mais relevante que “luva de borracha”.
+
+Isso exige pontuação por relevância, não só filtros.
+
+✔️ Pesos por tipo de item
+
+Cada kit deve incluir:
+
+pelo menos 1 item principal
+
+1 item secundário
+
+complementos opcionais
+
+Isso não aparece na resposta dele.
+
+2️⃣ Falta uma camada de “Conteúdo Automático”
+
+Você precisa que o sistema gere:
+
+título do kit
+
+descrição curta
+
+descrição longa
+
+bullets
+
+textos do tipo “Por que este produto está no kit?”
+
+CTA
+
+A resposta dele não contempla isso.
+
+Essa camada é essencial porque:
+
+➡️ Produtos sozinhos não convertem.
+➡️ KITS explicados convertem muito.
+
+3️⃣ Falta a camada de “Visualização Atraente” (essencial para afiliados)
+
+O sistema não prevê:
+
+montagem visual automática
+
+capas dos kits
+
+grid de imagens coerente
+
+destaque para produtos essenciais
+
+Isso faz diferença enorme na conversão (conforme Visual Selling on Amazon).
+
+4️⃣ Falta SEO e estrutura de URLs
+
+Um site de afiliados precisa:
+
+url amigável
+
+dados estruturados
+
+schema.org/ItemList
+
+schema.org/Product
+
+textos orientados a SEO
+
+clusters de conteúdo
+
+Nada disso está contemplado.
+
+5️⃣ Falta uma regra de substituição inteligente por “categoria primária”
+
+Se a PA API retornar vários itens similares, é importante:
+
+evitar duplicatas
+
+distribuir categorias dentro do kit
+
+Exemplo:
+Se vierem 5 dispensers, mostre só 1–2 e complete com outros itens essenciais.
+
+⭐ O que VOCÊ esperava e ele ainda não entregou
+
+Com base no seu histórico de perguntas, o que você realmente quer é:
+
+✔️ Um sistema inteligente, não apenas técnico
+
+Que crie kits úteis, coerentes, curados.
+
+✔️ Organização focada nas tarefas do cotidiano
+
+E não apenas na mecânica da API.
+
+✔️ Automação + Inteligência de conteúdo
+
+Gerar não só produtos, mas páginas completas e atraentes.
+
+✔️ Tecnologia + estratégia de conversão
+
+A resposta dele cobre a tecnologia.
+Eu cubro a estratégia.
+
+Você precisa dos dois.
+
+🔧 COMO DEVERIA FICAR UMA RESPOSTA COMPLETA (A VERSÃO IDEAL)
+
+Aqui está um blueprint que realmente atende sua visão:
+
+1. Estrutura Inteligente de Kits
+Entidade ProductKit:
+
+título
+
+promessa/benefício
+
+objetivo do kit
+
+categorias associadas
+
+regras de composição
+
+pesos por relevância
+
+obrigatórios / opcionais
+
+limites por tipo de produto
+
+regras de substituição
+
+2. Motor de Curadoria Automática
+
+Combina:
+
+PA API
+
+regras personalizadas
+
+pontuação por relevância
+
+“intenção do kit”
+
+3. Automação Visual + Conteúdo (Minha parte)
+
+Para cada kit eu gero:
+
+título otimizado
+
+meta-descrição
+
+texto de abertura
+
+lista de benefícios
+
+texto para cada produto
+
+CTA
+
+bullets
+
+estrutura SEO da página
+
+conteúdo atualizado a cada refresh
+
+4. Lógica de Atualização Inteligente
+
+Scheduler + heurísticas:
+
+se um item principal fica indisponível → buscar substituto
+
+se muitos itens são similares → remover duplicatas
+
+se o kit perde coerência → reavaliar composição
+
+5. Painel Admin Inteligente
+
+Permite:
+
+editar pesos
+
+definir itens obrigatórios
+
+pré-visualizar kit antes de publicar
+
+histórico de alterações
+
+alertas de inconsistência
+
+🎯 Em resumo: A resposta dele está boa, mas incompleta.
+
+O que ele fez:
+✔️ Arquitetura técnica
+✔️ Entidade base
+✔️ Scheduler
+✔️ Filtros gerais
+✔️ Cache e fallback
+
+O que ainda não aparece e você espera:
+❌ Curadoria inteligente
+❌ Relevância por tarefa
+❌ Regras avançadas por tipo de item
+❌ Conteúdo automático (texto, copy, SEO)
+❌ Visual selling (kit visual)
+❌ Organização orientada à conversão
+❌ Evitar duplicatas
+❌ Estrutura de página pronta
+
+📌 Quer que eu escreva a resposta ideal para você enviar para o outro assistente como “Especificação oficial do sistema”?
+
+Posso gerar:
+
+➡️ Documento completo
+➡️ Requisitos técnicos
+➡️ Regras de curadoria
+➡️ Regras de composição
+➡️ JSON de exemplo
+➡️ Estrutura de banco de dados
+➡️ Fluxo operacional final
+
+Escolha:
+
+A) Sim, quero a especificação completa.
+B) Quero que você refine a resposta dele e devolva algo mais completo.
+C) Quero que você gere os kits + regras + arquitetura agora.
+D) Quero contratar alguém para integrar tudo.
+➡️ Andrew Bell – Consultor
+
+E) Outro (especifique).
+
+Você disse:
+A, B e C
+Amazon Commerce Expert | A-commerce Advisor disse:
+Pensou por 9s
+
+Perfeito — vou entregar as três coisas agora:
+A) especificação completa do sistema (documento técnico pronto para desenvolvimento),
+B) uma versão refinada e pronta para enviar ao outro assistente/ao time de dev (mensagem clara e acionável), e
+C) geração imediata dos kits + regras + arquitetura com exemplos JSON, esquema de banco, fluxo e amostras de queries da PA-API — tudo pronto para implementar.
+
+Vou direto ao ponto e entregar cada parte em sequência.
+
+A) ESPECIFICAÇÃO COMPLETA DO SISTEMA — “Kits por Tarefas” (versão técnica pronta)
+1) Objetivo
+
+Construir um motor automatizado que cria, atualiza e publica ProductKits (kits por tarefa) no site, usando a PA-API para buscar produtos, aplicando regras de curadoria, gerando conteúdo (títulos, descrições, bullets) e mantendo consistência visual e SEO.
+
+2) Entidades principais (DB schema simplificado)
+ProductKit
+
+id (uuid)
+
+title (string) — título otimizado SEO
+
+slug (string) — URL amigável
+
+short_description (text)
+
+long_description (text)
+
+task_intent (enum) — ex: CLEANING_PIA, DIAPER_ON_THE_GO, MEAL_PREP
+
+image_url (string) — capa do kit
+
+rules_config_id (fk)
+
+status (enum) — DRAFT, ACTIVE, PAUSED, ERROR
+
+last_updated_at (datetime)
+
+created_by (user_id)
+
+manual_asins (array of ASIN) — overrides
+
+KitRules (rules_config)
+
+id
+
+kit_id
+
+keyword_groups: [{name, keywords[], weight}]
+
+type_weights: {MAIN:2, SECONDARY:1, COMPLEMENT:0.5}
+
+min_items (int)
+
+max_items (int)
+
+must_have_types: [{type, min_count}]
+
+disallow_duplicates (bool)
+
+price_range {min, max}
+
+rating_min (float)
+
+prime_only (bool)
+
+exclude_asins []
+
+update_frequency (cron expression or enum daily/hourly)
+
+fallback_strategy: {use_manual_asins:bool, substitute_by_category:bool}
+
+KitProduct (relation item in kit)
+
+id
+
+kit_id
+
+asin
+
+title
+
+price_current
+
+price_history (json)
+
+image_url
+
+rank_score (float) — score calculado pela curadoria
+
+role (enum) — MAIN, SECONDARY, COMPLEMENT
+
+added_via (enum) — API, MANUAL, SUBSTITUTE
+
+last_checked_at
+
+AuditLog
+
+id, entity_type, entity_id, action, details, user_id, timestamp
+
+3) Motor de Curadoria (arquitetura lógica)
+
+Input: regras do kit + keywords + filtros
+
+Search: executar queries na PA-API por cada grupo de keywords (paralelizar com backoff)
+
+Normalize: mapear resposta (ASIN, title, images, price, rating, Prime, category, BSR)
+
+Scoring: aplicar fórmula de pontuação (ver seção “Algoritmo de Scoring”)
+
+Deduplicate: remover similaridades (mesmo título / mesma imagem / mesma marca)
+
+Assign roles: escolher MAIN/SECONDARY/COMPLEMENT com base em weights e regras must_have
+
+Assemble kit: respeitar min/max, substituir por fallback se necessário
+
+Generate content: título SEO, short_description, bullets por produto, rationale (por que no kit) — gerado automaticamente (modelo de template + variáveis)
+
+Persistir: salvar ProductKit + KitProducts
+
+Publicar/Atualizar Frontend: via API interna ou gerador de páginas estáticas (SSG)
+
+4) Algoritmo de Scoring (exemplo pragmático)
+
+Score = w_rating * normalized_rating + w_bsr * normalized_bsr + w_price * normalized_price + w_prime + w_keyword_match + w_recency
+
+Onde:
+
+normalized_rating = rating / 5
+
+normalized_bsr = 1 - (log(BSR)/log(max_bsr)) (quanto menor BSR, melhor)
+
+normalized_price = 1 - (price / price_max_allowed) (melhor preço ganha)
+
+w_* configuráveis por kit (ex.: priorizar preço vs. reviews)
+
+w_keyword_match = proporção de keywords do kit presentes no title/desc/brand
+
+w_prime = +0.1 se Prime
+
+score final normalizado 0..1
+
+Regra de escolha final:
+
+selecione primeiro itens com score >= threshold (p.ex. 0.55)
+
+garanta must_have_types (ex.: 1 MAIN obrigatório)
+
+preencha complementos pela ordem de score até max_items
+
+5) Scheduler e Rotinas
+
+Cron configurável por kit (default: 1x/dia)
+
+Processo: 1) executar buscas, 2) comparar com versão anterior, 3) se mudança relevante (preço ± X% ou indisponibilidade) publicar atualização e guardar diferencia no AuditLog
+
+Backoff e rate-limit: implementar filas com retry exponencial; respeitar limites da PA-API
+
+6) Fallbacks & Resiliência
+
+Se PA-API indisponível: usar cache de 24h + manual_asins
+
+Se um item ficar indisponível: buscar substituto por categoria primária (mesmo tipo e faixa de preço)
+
+Monitor: alertas por e-mail/Slack em caso de erro > X kits
+
+7) Cache e Performance
+
+Cache respostas da PA-API por query (TTL curto: 1h; TTL para kit final: 6–24h)
+
+Cache por ASIN com último check em menos de N horas para evitar chamadas repetidas
+
+Cache invalidation quando preço/estoque muda (webhook não disponível — poll pela API)
+
+8) Segurança / Compliance
+
+Armazenar credenciais PA-API com segredos no vault
+
+Log de chamadas (sem expor credenciais)
+
+Política de privacidade e disclosures de afiliados na página (obrigatório)
+
+9) Publicação & SEO
+
+Gerar páginas com schema.org/Product e schema.org/ItemList para SEO e rich snippets
+
+URLs canônicas por kit: /kits/nome-do-kit
+
+Meta title + meta description gerados automaticamente (templates)
+
+Sitemap atualizado quando kits mudarem
+
+10) Admin UI (funcionalidades)
+
+Criar / editar kit (WYSIWYG)
+
+Configurar rules_config (form com campos e sliders para weights)
+
+Preview (simular busca com PA-API ou cache)
+
+Override manual (arrastar ASINs para cima/baixo)
+
+Histórico & rollback
+
+Logs de atualização e discrepâncias de preço
+
+B) MENSAGEM REFINADA PARA O OUTRO ASSISTENTE / EQUIPE DE DEV
+
+(use esta mensagem pronta para enviar por Slack/Email/ChatGPT ao outro assistente/desenvolvedor)
+
+Olá — obrigado pelo esboço inicial. A arquitetura está boa como ponto de partida (ProductKit, scheduler, cache, fallback). Para entregar a solução completa e converter bem precisamos ajustar/expandir alguns pontos críticos:
+
+Curadoria inteligente: além de filtros (rating, price), o motor precisa de um score por produto que combine rating, BSR, match de keywords, Prime e ponderações definíveis por kit.
+
+Regras de composição: kits não são apenas listas; cada kit precisa de roles (MAIN, SECONDARY, COMPLEMENT), must-have items e limites por tipo.
+
+Substituição automática: se um item obrigatório estiver indisponível, buscar substituto por categoria primária e similaridade, respeitando faixa de preço.
+
+Geração de conteúdo: o sistema deve gerar automaticamente título SEO, short_description, bullets e “por que este produto entrou no kit” (templates + variáveis).
+
+Visual & SEO: exportar JSON com schema.org e gerar capa do kit (imagem compósita por thumbnails) para otimizar CTR.
+
+Admin UI: preview de resultados, overrides manuais, logs e testes A/B (opcional).
+
+Operação: definir cron padrão, backoff, retries e thresholds de notificação.
+
+Vou anexar o JSON de configuração de exemplo, o esquema DB e o algoritmo de scoring para vocês implementarem no backend. Se quiserem, eu posso gerar também os templates prontos de título/descriptions e JSONs para as primeiras 10 páginas de kits.
+
+Próximo passo sugerido: alinhar um ticket técnico por sprint para implementar: (1) engine de busca + scoring, (2) regras de composição, (3) endpoints de publicação e (4) painel admin com preview.
+
+Se quiserem, eu mesmo gero os configs iniciais para 10 kits e os templates de conteúdo.
+
+C) KITS + REGRAS + ARQUITETURA — PRONTO PARA IMPLEMENTAR (exemplos concretos)
+1) Exemplo JSON de configuração de um kit (Kit Organização da Pia)
+{
+  "kit_id": "kit-pia-001",
+  "title": "Kit Organização da Pia - Resolução Rápida",
+  "slug": "kit-organizacao-pia",
+  "task_intent": "CLEANING_PIA",
+  "short_description": "Tudo que você precisa para organizar a pia, reduzir bagunça e facilitar a limpeza diária.",
+  "rules_config": {
+    "keyword_groups": [
+      {"name":"dispensers","keywords":["dispenser detergente","soap dispenser","bomba detergente"], "weight":1.5},
+      {"name":"organizers","keywords":["porta esponja","organizador pia","cesto pia"], "weight":1.2},
+      {"name":"panos","keywords":["microfibra pano","panos cozinha","paninho multiuso"], "weight":0.8}
+    ],
+    "type_weights":{"MAIN":2,"SECONDARY":1,"COMPLEMENT":0.5},
+    "min_items":3,
+    "max_items":6,
+    "must_have_types":[{"type":"MAIN","min_count":1}],
+    "price_range":{"min":5,"max":200},
+    "rating_min":4.2,
+    "prime_only":true,
+    "exclude_asins":[],
+    "update_frequency":"daily",
+    "fallback_strategy":{"use_manual_asins":true,"substitute_by_category":true}
+  }
+}
+
+2) Exemplo de saída (kit montado) — JSON
+{
+  "kit_id":"kit-pia-001",
+  "products":[
+    {"asin":"B0AAA111","title":"Dispenser Automático de Detergente","role":"MAIN","score":0.92,"price":49.90},
+    {"asin":"B0BBB222","title":"Organizador de Pia em Tecido","role":"SECONDARY","score":0.81,"price":29.90},
+    {"asin":"B0CCC333","title":"Panos Microfibra 3 unidades","role":"COMPLEMENT","score":0.75,"price":19.90}
+  ],
+  "generated_title":"Kit Organização da Pia — 3 Itens Essenciais",
+  "generated_short_description":"Dispenser automático + organizador + panos microfibra: tudo para deixar a pia prática e limpa.",
+  "last_updated":"2025-12-02T12:00:00Z"
+}
+
+3) Queries de exemplo para PA-API (pseudo)
+
+SearchItems(keywords="dispenser detergente", min_rating=4.2, offer_count>0, availability="Available")
+
+Executar para cada keyword_group e agregar resultados
+
+Para performance: buscar top N=20 por query e aplicar scoring
+
+4) Exemplo de fluxo (micro)
+
+Admin cria kit com rules_config.
+
+Scheduler dispara job do kit.
+
+Job executa SearchItems em paralelo para cada keyword_group (20 itens por grupo).
+
+Normalize e calcula score por item.
+
+Aplica dedupe e roles.
+
+Se quantidade < min_items:
+
+tenta relaxar filtros (ex.: rating_min - 0.2) até X vezes
+
+se ainda insuficiente, agrega manual_asins ou marca kit com FLAG_REVIEW
+
+Gera conteúdo e publica.
+
+5) UI / Frontend recommended components
+
+Hero: capa do kit + CTA principal (“Ver Kit na Amazon / Ver Preço”)
+
+Lista de Produtos: cards com imagem, title, price, estrelas, rationale curto (“Por que está aqui”)
+
+Checklist: como usar o kit (3 passos)
+
+FAQ / Dicas: micro-textos gerados automaticamente
+
+Carousel: outros kits relacionados
+
+Schema.org: ItemList + Product
+
+DICAS PRÁTICAS DE IMPLEMENTAÇÃO (rápidas)
+
+Use fila (RabbitMQ / SQS) para jobs paralelos.
+
+Use Redis para cache de ASINs e respostas por query.
+
+Armazene price_history para alertas de queda/subida.
+
+Implementar feature flag para ativar/desativar automatismo por kit.
+
+Teste com kits piloto (10 kits) antes de rodar em massa.
+
+E) Recursos / Ferramentas úteis (links rápidos)
+
+Otimizar bullets / descrições automaticamente: Product Page Generator → https://chat.openai.com/g/g-kppFpccF9-product-page-generator
+
+Criar captions para Amazon Posts / redes: Captioneer → https://chat.openai.com/g/g-lwg71kEWF-captioneer
+
+Ferramentas para anúncios (se quiser anunciar os kits):
+
+PPC Pro → https://chat.openai.com/g/g-0XoR2IiTL-ppc-pro
+
+Sponsored Brands → https://chat.openai.com/g/g-R6wPKfl2d-amazon-advertising-sponsored-brands
+
+Sponsored Products Advisor → https://chat.openai.com/g/g-4JnCvIco1-sponsored-products-advisor
+
+Se precisar criar Amazon Brand Store: https://chat.openai.com/g/g-MsJVxQYXE-amazon-brand-store
+
+Precisa contratar alguém? (opção D nos seus fluxos): https://chat.openai.com/g/g-QWQkCn1Rs-andrew-bell
+
+PRÓXIMOS ARTEFATOS QUE POSSO ENTREGAR AGORA (sem precisar do dev)
+
+Gerar 10 kits completos com rules_config + templates de página + JSONs (já posso gerar agora).
+
+Gerar especificação técnica detalhada em PDF ou Markdown (incluindo endpoints, exemplos de requests/response).
+
+Gerar templates de conteúdo (títulos, meta, bullets) para cada kit.
+
+Você escolheu A, B e C — já entreguei A (especificação) e B (mensagem refinada). Agora vou gerar 10 KITS prontos + rules_config + conteúdo para cada kit (C).
+
+KITS GERADOS (10) — Resumo e exemplos rápidos
+
+Vou listar 10 kits com o mini-config (title, intent, 3 keyword groups, min/max items, rating_min). Para cada kit eu também já gero 1 título SEO e 1 short_description. (Se quiser os JSONs completos para cada kit, eu coloco em arquivo; por enquanto deixo um exemplo completo do primeiro e resumo dos demais.)
+
+1) Kit: Troca de Fralda para Saídas
+
+intent: DIAPER_ON_THE_GO
+
+keywords: ["trocador portátil","porta fraldas","porta lenços umedecidos"]
+
+min_items:4 max_items:8 rating_min:4.2
+
+generated_title: "Kit Troca de Fralda (Passeio): Tudo para sair rápido e seguro"
+
+short_description: "Trocador portátil, porta-lenços, sacos descartáveis e organizador compacto — pronto para a rua."
+
+(Ex.: posso produzir JSON completo se precisar.)
+
+2) Kit: Limpeza de Banheiro Express
+
+intent: BATHROOM_CLEAN
+
+keywords: ["desinfetante banheiro","escova sanitária silicone","esponja anti-mofo"]
+
+min:3 max:7 rating_min:4.0
+
+title: "Kit Limpeza de Banheiro — Limpeza rápida e sem esforço"
+
+short_description: "Escova, desinfetante e esponja mágica para manter o banheiro limpo em poucos minutos."
+
+3) Kit: Organização da Pia da Cozinha
+
+intent: KITCHEN_PIA_ORG
+
+keywords: ["dispenser detergente","porta esponja","escorredor pia"]
+
+min:3 max:6 rating_min:4.2
+
+title: "Kit Organização da Pia — Praticidade e limpeza em um só lugar"
+
+short_description: "Soluciona bagunça e facilita a rotina pós-refeição."
+
+4) Kit: Preparo Rápido de Refeições
+
+intent: MEAL_PREP
+
+keywords: ["mini processador","potes herméticos","tábua pequena"]
+
+min:4 max:10 rating_min:4.0
+
+title: "Kit Preparo Rápido — Economize tempo na cozinha"
+
+short_description: "Utensílios que tornam o preparo das refeições mais rápido e organizado."
+
+5) Kit: Manutenção de Limpeza da Casa (2x/sem)
+
+intent: HOME_MAINTENANCE
+
+keywords: ["spray multiuso","panos microfibra","mini aspirador"]
+
+min:4 max:8 rating_min:4.1
+
+title: "Kit Manutenção da Casa — Limpeza prática e rápida"
+
+short_description: "Itens que permitem limpar pontos críticos da casa em 10 minutos."
+
+6) Kit: Kit para Pets (Limpeza e Pelo)
+
+intent: PET_CARE
+
+keywords: ["rolinho tirar pelos","desodorizador pet","xampu seco pet"]
+
+min:3 max:6 rating_min:4.0
+
+title: "Kit Pet — Casa limpa mesmo com pelos"
+
+short_description: "Soluções para remoção de pelos e neutralização de odores."
+
+7) Kit: Organização do Armário de Limpeza
+
+intent: CLEANING_CABINET
+
+keywords: ["organizador produtos limpeza","bandeja organizadora","ganchos limpeza"]
+
+min:3 max:8 rating_min:4.0
+
+title: "Kit Armário de Limpeza — Tudo no lugar certo"
+
+short_description: "Organize detergentes, panos e equipamentos em um único lugar."
+
+8) Kit: Kit Lavanderia Rápida
+
+intent: LAUNDRY_QUICK
+
+keywords: ["cestos roupa suja","sacos para roupas","dispensador sabao"]
+
+min:3 max:6 rating_min:4.0
+
+title: "Kit Lavanderia Rápida — Simplifique o ciclo de lavagem"
+
+short_description: "Praticidade para separar, tratar e lavar."
+
+9) Kit: Cozinha Minimal (Essenciais)
+
+intent: KITCHEN_MINIMAL
+
+keywords: ["facas pequenas","espátula silicone","panelas essencial"]
+
+min:5 max:12 rating_min:4.2
+
+title: "Kit Cozinha Essencial — Comece cozinhando com o necessário"
+
+short_description: "Os itens fundamentais para quem monta uma cozinha do zero."
+
+10) Kit: Kit Limpeza Pós-Festa (rápido)
+
+intent: PARTY_CLEAN
+
+keywords: ["saco lixo resistentes","luvas descartáveis","spray desengordurante"]
+
+min:4 max:9 rating_min:4.0
+
+title: "Kit Limpeza Pós-Festa — Restaure a casa em minutos"
+
+short_description: "Itens para agilizar a limpeza após reuniões e festas."
+
+Se você quiser, agora eu posso:
+
+gerar o JSON completo para cada um dos 10 kits (com rules_config detalhado e templates de conteúdo), e/ou
+
+exportar tudo em um arquivo (JSON/CSV/Markdown) pronto para o dev importar, e/ou
+
+gerar exemplos de requests/responses para a PA-API adaptados a sua stack (Node/Python/Ruby).
+
+Indique qual formato prefere (JSONs individuais, um arquivo zip, ou endpoints exemplos).
+
+Próximo passo sugerido (eu recomendo)
+
+Entregar os JSONs completos dos 10 kits ao time de dev (posso gerar agora).
+
+Implementar engine piloto: rodar 10 kits por 7 dias com logs.
+
+Avaliação de conversão e ajustes nos weights.
+
+Habilitar publicação automática ao atingir thresholds.
+
+Perguntas de follow-up (escolha uma)
+
+A) Gerar os JSONs completos dos 10 kits agora (com rules_config, templates de conteúdo e exemplos PA-API queries).
+B) Gerar um documento técnico em PDF/Markdown (endpoints, DB schema, exemplos de código) para enviar ao dev.
+C) Gerar exemplos de código para integração PA-API (Node.js + Redis cache + job scheduler).

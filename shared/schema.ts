@@ -983,3 +983,212 @@ export const resetPasswordSchema = z.object({
 
 export type RequestPasswordReset = z.infer<typeof requestPasswordResetSchema>;
 export type ResetPassword = z.infer<typeof resetPasswordSchema>;
+
+// ========================================
+// PRODUCT KITS SYSTEM - Automated Affiliate Kits
+// ========================================
+
+// Enum types for ProductKit system
+export const KitProductRole = {
+  MAIN: 'MAIN',
+  SECONDARY: 'SECONDARY',
+  COMPLEMENT: 'COMPLEMENT'
+} as const;
+
+export const KitStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  NEEDS_REVIEW: 'NEEDS_REVIEW',
+  ERROR: 'ERROR'
+} as const;
+
+export const KitProductSource = {
+  API: 'API',
+  MANUAL: 'MANUAL',
+  SUBSTITUTE: 'SUBSTITUTE'
+} as const;
+
+// TypeScript types for ProductKit system (MVP - frontend types only)
+export interface KitKeywordGroup {
+  name: string;
+  keywords: string[];
+  weight: number;
+}
+
+export interface KitMustHaveType {
+  type: typeof KitProductRole[keyof typeof KitProductRole];
+  minCount: number;
+}
+
+export interface KitFallbackStrategy {
+  useManualAsins: boolean;
+  substituteByCategory: boolean;
+}
+
+export interface KitPriceRange {
+  min: number;
+  max: number;
+}
+
+export interface KitTypeWeights {
+  MAIN: number;
+  SECONDARY: number;
+  COMPLEMENT: number;
+}
+
+export interface KitAttributeWeights {
+  easyCleaning?: number;
+  compact?: number;
+  lowMaintenance?: number;
+  durable?: number;
+  portable?: number;
+}
+
+export interface KitRulesConfig {
+  keywordGroups: KitKeywordGroup[];
+  typeWeights: KitTypeWeights;
+  minItems: number;
+  maxItems: number;
+  mustHaveTypes: KitMustHaveType[];
+  priceRange: KitPriceRange;
+  ratingMin: number;
+  primeOnly: boolean;
+  excludeAsins: string[];
+  allowedCategories: string[];
+  attributeWeights?: KitAttributeWeights;
+  updateFrequency: 'hourly' | 'daily' | 'weekly';
+  fallbackStrategy: KitFallbackStrategy;
+}
+
+export interface KitProductAttributes {
+  easyCleaning?: number;
+  compact?: number;
+  lowMaintenance?: number;
+  durable?: number;
+  portable?: number;
+}
+
+export interface KitProduct {
+  id: string;
+  kitId: string;
+  asin: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  price: number;
+  originalPrice?: number;
+  rating?: number;
+  reviewCount?: number;
+  isPrime?: boolean;
+  role: typeof KitProductRole[keyof typeof KitProductRole];
+  rankScore: number;
+  taskMatchScore?: number;
+  rationale?: string;
+  attributes?: KitProductAttributes;
+  addedVia: typeof KitProductSource[keyof typeof KitProductSource];
+  affiliateLink: string;
+  lastCheckedAt?: Date;
+}
+
+export interface ProductKit {
+  id: string;
+  title: string;
+  slug: string;
+  theme?: string;
+  taskIntent: string;
+  shortDescription: string;
+  longDescription?: string;
+  coverImageUrl?: string;
+  generatedTitle?: string;
+  generatedDescription?: string;
+  generatedBullets?: string[];
+  schemaJsonLd?: string;
+  status: typeof KitStatus[keyof typeof KitStatus];
+  rulesConfig: KitRulesConfig;
+  products: KitProduct[];
+  manualAsins?: string[];
+  missionId?: string;
+  views?: number;
+  lastUpdatedAt?: Date;
+  createdAt?: Date;
+}
+
+// Insert schemas for future database integration
+export const insertKitProductSchema = z.object({
+  kitId: z.string(),
+  asin: z.string(),
+  title: z.string(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+  price: z.number(),
+  originalPrice: z.number().optional(),
+  rating: z.number().optional(),
+  reviewCount: z.number().optional(),
+  isPrime: z.boolean().optional(),
+  role: z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT']),
+  rankScore: z.number(),
+  taskMatchScore: z.number().optional(),
+  rationale: z.string().optional(),
+  attributes: z.record(z.number()).optional(),
+  addedVia: z.enum(['API', 'MANUAL', 'SUBSTITUTE']),
+  affiliateLink: z.string(),
+});
+
+export const kitRulesConfigSchema = z.object({
+  keywordGroups: z.array(z.object({
+    name: z.string(),
+    keywords: z.array(z.string()),
+    weight: z.number()
+  })),
+  typeWeights: z.object({
+    MAIN: z.number(),
+    SECONDARY: z.number(),
+    COMPLEMENT: z.number()
+  }),
+  minItems: z.number().min(1).max(20),
+  maxItems: z.number().min(1).max(20),
+  mustHaveTypes: z.array(z.object({
+    type: z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT']),
+    minCount: z.number()
+  })),
+  priceRange: z.object({
+    min: z.number(),
+    max: z.number()
+  }),
+  ratingMin: z.number().min(0).max(5),
+  primeOnly: z.boolean(),
+  excludeAsins: z.array(z.string()),
+  allowedCategories: z.array(z.string()),
+  attributeWeights: z.object({
+    easyCleaning: z.number().optional(),
+    compact: z.number().optional(),
+    lowMaintenance: z.number().optional(),
+    durable: z.number().optional(),
+    portable: z.number().optional()
+  }).optional(),
+  updateFrequency: z.enum(['hourly', 'daily', 'weekly']),
+  fallbackStrategy: z.object({
+    useManualAsins: z.boolean(),
+    substituteByCategory: z.boolean()
+  })
+});
+
+export const insertProductKitSchema = z.object({
+  title: z.string().min(1),
+  slug: z.string().min(1),
+  theme: z.string().optional(),
+  taskIntent: z.string(),
+  shortDescription: z.string(),
+  longDescription: z.string().optional(),
+  coverImageUrl: z.string().optional(),
+  generatedTitle: z.string().optional(),
+  generatedDescription: z.string().optional(),
+  generatedBullets: z.array(z.string()).optional(),
+  status: z.enum(['DRAFT', 'ACTIVE', 'NEEDS_REVIEW', 'ERROR']).default('DRAFT'),
+  rulesConfig: kitRulesConfigSchema,
+  manualAsins: z.array(z.string()).optional(),
+  missionId: z.string().optional(),
+});
+
+export type InsertKitProduct = z.infer<typeof insertKitProductSchema>;
+export type InsertProductKit = z.infer<typeof insertProductKitSchema>;
