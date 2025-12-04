@@ -1,0 +1,95 @@
+{
+  "kit": {
+    "title": "Kit Troca Rápida, Zero Estresse: Fraldas, Pomada e Lenços",
+    "slug": "kit-troca-rapida-bebe-organizacao",
+    "theme": "organização-e-praticidade",
+    "taskIntent": "Simplificar e agilizar o processo de troca de fraldas do bebê",
+    "problemToSolve": [
+      "Falta de organização: lenços, pomadas e fraldas nunca estão no mesmo lugar.",
+      "Trocas de fralda demoradas e com vazamentos ou bagunça.",
+      "Necessidade de procurar itens enquanto o bebê se debate."
+    ],
+    "shortDescription": "Tudo que você precisa para trocas eficientes e sem estresse, organizando a vida de mãe trabalhadora.",
+    "longDescription": "Cláudia, como mãe multitarefas, sabemos que cada segundo conta. O ritual da troca de fraldas, repetido incansavelmente, não pode ser um ponto de atrito. Este kit foi montado pensando em você: ele não é só uma lista de produtos, mas uma estratégia de organização.\n\nCom itens chave para manter a área de troca sempre abastecida e funcional, você elimina o 'Onde está a pomada?' e o 'Acabou o lenço!'. O trocador portátil e os organizadores garantem que, onde quer que você esteja na casa, a troca será um pit stop rápido e higiênico, te devolvendo tempo e paz de espírito para o resto do seu dia. Invista na sua sanidade!",
+    "category": "bebê-e-maternidade",
+    "missionSlug": "simplificando-a-rotina-do-bebe"
+  },
+  "conceptItems": [
+    {
+      "name": "Cesto Organizador para Fraldas e Utensílios de Bebê",
+      "role": "MAIN",
+      "weight": 1.0,
+      "criteria": {
+        "mustKeywords": ["cesto organizador bebê", "troca fralda portátil", "feltro"],
+        "optionalKeywords": ["divisórias ajustáveis", "alça", "compacto"],
+        "category": "Bebês",
+        "priceMin": 80,
+        "priceMax": 180,
+        "ratingMin": 4.5,
+        "primeOnly": true,
+        "featureFlags": ["portátil", "durável", "espaçoso"]
+      }
+    },
+    {
+      "name": "Trocador Portátil Dobrável com Compartimentos",
+      "role": "SECONDARY",
+      "weight": 0.8,
+      "criteria": {
+        "mustKeywords": ["trocador portátil bebê", "impermeável", "dobrável"],
+        "optionalKeywords": ["acolchoado", "bolsos", "limpeza fácil"],
+        "category": "Bebês",
+        "priceMin": 50,
+        "priceMax": 150,
+        "ratingMin": 4.2,
+        "primeOnly": true,
+        "featureFlags": ["fácil-limpeza", "compacto", "impermeável"]
+      }
+    },
+    {
+      "name": "Kit Pomada para Prevenção de Assaduras com Alto Rendimento",
+      "role": "SECONDARY",
+      "weight": 0.7,
+      "criteria": {
+        "mustKeywords": ["pomada assadura bebê", "óxido de zinco", "grande"],
+        "optionalKeywords": ["hipoalergênico", "bisnaga", "kit com 2"],
+        "category": "Saúde",
+        "priceMin": 40,
+        "priceMax": 120,
+        "ratingMin": 4.3,
+        "primeOnly": true,
+        "featureFlags": ["fácil-aplicação", "eficaz", "rendimento"]
+      }
+    },
+    {
+      "name": "Aquecedor de Lenços Umedecidos (Opcional Conforto)",
+      "role": "COMPLEMENT",
+      "weight": 0.4,
+      "criteria": {
+        "mustKeywords": ["aquecedor de lenço umedecido", "dispenser lenço bebê"],
+        "optionalKeywords": ["luz noturna", "bivolt"],
+        "category": "Bebês",
+        "priceMin": 100,
+        "priceMax": 250,
+        "ratingMin": 4.0,
+        "primeOnly": false,
+        "featureFlags": ["conforto-bebê", "prático"]
+      }
+    }
+  ],
+  "rulesConfig": {
+    "minItems": 3,
+    "maxItems": 6,
+    "priceRange": {
+      "min": 200,
+      "max": 600
+    },
+    "ratingMin": 4.0,
+    "primeOnly": true,
+    "allowedCategories": [
+      "Bebês",
+      "Saúde",
+      "Casa e Cozinha"
+    ],
+    "updateFrequency": "monthly"
+  }
+}

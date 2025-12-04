@@ -1,0 +1,98 @@
+{
+  "kit": {
+    "title": "Kit Troca Rápida: Livre-se do Caos da Fralda em 1 Minuto",
+    "slug": "kit-troca-rapida-organizacao-fraldas",
+    "theme": "organização-bebê",
+    "taskIntent": "Simplificar e agilizar a troca de fraldas em qualquer ambiente",
+    "problemToSolve": [
+      "Perder tempo procurando lenços, pomada ou fraldas na hora 'H'.",
+      "Carregar o bebê de um cômodo para outro para fazer a troca no trocador.",
+      "Bagunça visual e itens espalhados pelo quarto ou sala."
+    ],
+    "shortDescription": "Tudo que você precisa para a troca de fraldas sempre à mão, organizado e portátil, para mais tempo e menos estresse.",
+    "longDescription": "Sabemos que o momento da troca de fraldas, que se repete dezenas de vezes ao dia, pode ser um ponto de exaustão na sua rotina já apertada. É no meio da noite, ou com o bebê agitado no colo, que você percebe que a pomada sumiu ou as fraldas acabaram no trocador. Você não está sozinha nessa luta contra a desorganização e a pressa.\n\nEste kit foi pensado para trazer a solução completa e portátil. Ele resolve o problema central de ter todos os itens essenciais reunidos em um só lugar. Você pode fazer a troca no quarto, na sala ou até levar para a casa da vovó, mantendo a rotina do bebê sempre sob controle, de forma rápida e higiênica.\n\nImagine-se fazendo a troca sem estresse: basta pegar o organizador, ter todos os itens à vista e prontos para uso. O tempo que você economiza é o tempo que você ganha para um café quente ou um momento de carinho com seus filhos mais velhos. Você merece essa praticidade!",
+    "category": "Bebês",
+    "missionSlug": "missao-troca-sem-estresse"
+  },
+  "conceptItems": [
+    {
+      "name": "Organizador Portátil para Trocador (Cesto)",
+      "role": "MAIN",
+      "weight": 1.0,
+      "criteria": {
+        "mustKeywords": ["organizador", "trocador", "portátil"],
+        "optionalKeywords": ["cesto", "feltro", "divisórias", "bebê"],
+        "category": "Bebês",
+        "priceMin": 80,
+        "priceMax": 200,
+        "ratingMin": 4.3,
+        "primeOnly": true,
+        "featureFlags": ["portátil", "multiuso", "compacto"]
+      }
+    },
+    {
+      "name": "Capa Protetora Impermeável para Trocador",
+      "role": "SECONDARY",
+      "weight": 0.8,
+      "criteria": {
+        "mustKeywords": ["capa", "trocador", "impermeável"],
+        "optionalKeywords": ["lavável", "protetor", "bebê", "algodão"],
+        "category": "Bebês",
+        "priceMin": 40,
+        "priceMax": 120,
+        "ratingMin": 4.1,
+        "primeOnly": true,
+        "featureFlags": ["fácil-limpeza", "baixa-manutenção"]
+      }
+    },
+    {
+      "name": "Lixeira de Mesa com Tampa para Descarte de Fraldas",
+      "role": "SECONDARY",
+      "weight": 0.7,
+      "criteria": {
+        "mustKeywords": ["lixeira", "mesa", "bebê", "tampa"],
+        "optionalKeywords": ["compacta", "tira odor", "trocador"],
+        "category": "Casa e Cozinha",
+        "priceMin": 50,
+        "priceMax": 100,
+        "ratingMin": 4.0,
+        "primeOnly": false,
+        "featureFlags": ["compacto", "silencioso", "fácil-limpeza"]
+      }
+    },
+    {
+      "name": "Porta-Lenços Umedecidos com Vedação",
+      "role": "COMPLEMENT",
+      "weight": 0.5,
+      "criteria": {
+        "mustKeywords": ["porta-lenço", "vedação", "bebê"],
+        "optionalKeywords": ["dispenser", "caixa", "recipiente"],
+        "category": "Bebês",
+        "priceMin": 20,
+        "priceMax": 50,
+        "ratingMin": 4.4,
+        "primeOnly": true,
+        "featureFlags": ["compacto", "durável"]
+      }
+    }
+  ],
+  "rulesConfig": {
+    "minItems": 3,
+    "maxItems": 6,
+    "priceRange": {
+      "min": 150,
+      "max": 500
+    },
+    "ratingMin": 4.0,
+    "primeOnly": true,
+    "allowedCategories": [
+      "Bebês",
+      "Casa e Cozinha"
+    ],
+    "updateFrequency": "weekly",
+    "fallbackStrategy": {
+      "useManualAsins": false,
+      "substituteByCategory": true
+    }
+  }
+}
