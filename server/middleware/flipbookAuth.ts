@@ -91,7 +91,10 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
 
   // 2. Try NextAuth session (Google OAuth)
   try {
+    console.log('🔐 Tentando buscar sessão NextAuth...');
     const nextAuthSession = await getSession(req, authConfig);
+    console.log('🔐 NextAuth session result:', nextAuthSession ? JSON.stringify(nextAuthSession, null, 2) : 'null');
+    
     if (nextAuthSession?.user) {
       const email = nextAuthSession.user.email;
       const isAdminEmail = email?.includes('@karooma.life') || email?.includes('admin');
@@ -100,6 +103,7 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
       let isAdmin = isAdminEmail;
       if (email) {
         const dbUser = await storage.getUserByEmail(email);
+        console.log('🔐 DB User found:', dbUser ? JSON.stringify({ email: dbUser.email, isAdmin: dbUser.isAdmin }, null, 2) : 'null');
         if (dbUser?.isAdmin) {
           isAdmin = true;
         }
@@ -113,6 +117,8 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
       console.log('✅ Usuário extraído do NextAuth:', JSON.stringify(req.user, null, 2));
       console.log('=========================================================\n');
       return next();
+    } else {
+      console.log('🔐 NextAuth session não contém user');
     }
   } catch (error) {
     console.log('⚠️ Erro ao verificar NextAuth session:', error);
