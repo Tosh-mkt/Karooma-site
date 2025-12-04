@@ -21,7 +21,12 @@ import {
   ArrowLeft,
   Settings,
   ExternalLink,
-  Loader2
+  Loader2,
+  FileJson,
+  Upload,
+  Copy,
+  Check,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -195,6 +200,365 @@ function CreateKitDialog() {
               <>
                 <Sparkles className="w-4 h-4 mr-2" />
                 Gerar Kit
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+interface ValidationPreview {
+  title: string;
+  slug: string;
+  taskIntent: string;
+  problemToSolve?: string[];
+  shortDescription: string;
+  category?: string;
+  conceptItemsCount: number;
+  roles: {
+    MAIN: number;
+    SECONDARY: number;
+    COMPLEMENT: number;
+  };
+  priceRange?: { min?: number; max?: number };
+  ratingMin?: number;
+}
+
+interface ValidationResponse {
+  valid: boolean;
+  message: string;
+  preview?: ValidationPreview;
+  warnings?: string[];
+  errors?: Array<{ path: string; message: string }>;
+}
+
+function ImportJsonDialog({ onSuccess }: { onSuccess: () => void }) {
+  const [jsonInput, setJsonInput] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [validationResult, setValidationResult] = useState<ValidationResponse | null>(null);
+  const { toast } = useToast();
+
+  const handleValidate = async () => {
+    if (!jsonInput.trim()) {
+      toast({ title: "Cole o JSON primeiro", variant: "destructive" });
+      return;
+    }
+
+    setIsValidating(true);
+    setValidationResult(null);
+
+    try {
+      // First try to parse JSON locally
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonInput);
+      } catch (parseError: any) {
+        setValidationResult({
+          valid: false,
+          message: "JSON mal formatado. Verifique a sintaxe.",
+          errors: [{ path: "root", message: parseError.message }]
+        });
+        setIsValidating(false);
+        return;
+      }
+
+      // Send to server for validation
+      const response = await fetch("/api/admin/kits/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(parsed)
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        setValidationResult({
+          valid: false,
+          message: result.message || "Erro ao validar JSON",
+          errors: result.errors || result.details
+        });
+      } else {
+        setValidationResult(result);
+      }
+    } catch (error: any) {
+      setValidationResult({
+        valid: false,
+        message: "Erro de conexão. Tente novamente.",
+        errors: [{ path: "network", message: error.message }]
+      });
+    } finally {
+      setIsValidating(false);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!validationResult?.valid) {
+      toast({ title: "Valide o JSON primeiro", variant: "destructive" });
+      return;
+    }
+
+    setIsImporting(true);
+
+    try {
+      const parsed = JSON.parse(jsonInput);
+      
+      const response = await fetch("/api/admin/kits/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(parsed)
+      });
+      
+      const result = await response.json();
+      
+      if (!response.ok) {
+        toast({ 
+          title: result.error || "Erro ao importar",
+          description: result.message || "Tente novamente",
+          variant: "destructive" 
+        });
+        return;
+      }
+      
+      toast({ 
+        title: "Kit importado com sucesso!",
+        description: `"${result.kit.title}" criado com ${result.stats.conceptItemsCount} itens`
+      });
+      
+      setJsonInput("");
+      setValidationResult(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/kits"] });
+      onSuccess();
+    } catch (error: any) {
+      toast({ 
+        title: "Erro ao importar",
+        description: error.message || "Tente novamente",
+        variant: "destructive" 
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  const handleClear = () => {
+    setJsonInput("");
+    setValidationResult(null);
+  };
+
+  const handlePasteExample = () => {
+    const example = `{
+  "kit": {
+    "title": "Kit Exemplo - Troca de Fraldas",
+    "slug": "kit-exemplo-troca-fraldas",
+    "theme": "bebê-e-maternidade",
+    "taskIntent": "Simplificar a troca de fraldas",
+    "problemToSolve": [
+      "Falta de organização",
+      "Itens espalhados"
+    ],
+    "shortDescription": "Tudo para trocas rápidas e sem estresse",
+    "category": "Bebês"
+  },
+  "conceptItems": [
+    {
+      "name": "Organizador de Fraldas",
+      "role": "MAIN",
+      "weight": 1.0,
+      "criteria": {
+        "mustKeywords": ["organizador", "bebê", "fralda"],
+        "category": "Bebês",
+        "priceMin": 50,
+        "priceMax": 150,
+        "ratingMin": 4.0,
+        "primeOnly": true
+      }
+    }
+  ],
+  "rulesConfig": {
+    "minItems": 3,
+    "maxItems": 6,
+    "ratingMin": 4.0,
+    "updateFrequency": "weekly"
+  }
+}`;
+    setJsonInput(example);
+    setValidationResult(null);
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="border-blue-300 text-blue-700 hover:bg-blue-50">
+          <FileJson className="w-4 h-4 mr-2" />
+          Importar JSON
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Upload className="w-5 h-5 text-blue-500" />
+            Importar Kit via JSON
+          </DialogTitle>
+          <DialogDescription>
+            Cole o JSON gerado pelo assistente de pesquisa para criar um novo kit automaticamente.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="json-input">JSON do Kit</Label>
+              <div className="flex gap-2">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handlePasteExample}
+                  data-testid="btn-paste-example"
+                >
+                  <Copy className="w-3 h-3 mr-1" />
+                  Exemplo
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={handleClear}
+                  disabled={!jsonInput}
+                >
+                  <X className="w-3 h-3 mr-1" />
+                  Limpar
+                </Button>
+              </div>
+            </div>
+            <Textarea
+              id="json-input"
+              placeholder='{"kit": {"title": "...", "slug": "..."}, "conceptItems": [...], "rulesConfig": {...}}'
+              value={jsonInput}
+              onChange={(e) => {
+                setJsonInput(e.target.value);
+                setValidationResult(null);
+              }}
+              className="font-mono text-sm h-64 resize-none"
+              data-testid="textarea-json-input"
+            />
+          </div>
+
+          {validationResult && (
+            <Card className={validationResult.valid 
+              ? "bg-green-50 dark:bg-green-900/20 border-green-200" 
+              : "bg-red-50 dark:bg-red-900/20 border-red-200"
+            }>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  {validationResult.valid ? (
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  )}
+                  <div className="flex-1">
+                    <p className={`font-medium ${validationResult.valid ? "text-green-800" : "text-red-800"}`}>
+                      {validationResult.message}
+                    </p>
+                    
+                    {validationResult.valid && validationResult.preview && (
+                      <div className="mt-3 space-y-2 text-sm">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <span className="text-gray-500">Título:</span>{" "}
+                            <span className="font-medium">{validationResult.preview.title}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Slug:</span>{" "}
+                            <span className="font-mono text-xs">{validationResult.preview.slug}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Categoria:</span>{" "}
+                            <span>{validationResult.preview.category || "Não definida"}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-500">Rating mínimo:</span>{" "}
+                            <span>{validationResult.preview.ratingMin || 4.0} estrelas</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-4 pt-2">
+                          <Badge className="bg-amber-100 text-amber-700">
+                            <Crown className="w-3 h-3 mr-1" />
+                            {validationResult.preview.roles.MAIN} MAIN
+                          </Badge>
+                          <Badge className="bg-blue-100 text-blue-700">
+                            <Zap className="w-3 h-3 mr-1" />
+                            {validationResult.preview.roles.SECONDARY} SECONDARY
+                          </Badge>
+                          <Badge className="bg-green-100 text-green-700">
+                            <Heart className="w-3 h-3 mr-1" />
+                            {validationResult.preview.roles.COMPLEMENT} COMPLEMENT
+                          </Badge>
+                        </div>
+
+                        {validationResult.warnings && validationResult.warnings.length > 0 && (
+                          <div className="mt-2 p-2 bg-amber-50 rounded text-amber-700 text-xs">
+                            {validationResult.warnings.map((w, i) => (
+                              <div key={i}>{w}</div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {!validationResult.valid && validationResult.errors && (
+                      <div className="mt-2 space-y-1 text-sm text-red-700">
+                        {validationResult.errors.map((err, i) => (
+                          <div key={i} className="font-mono text-xs">
+                            <span className="text-red-500">{err.path}:</span> {err.message}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button 
+            variant="outline" 
+            onClick={handleValidate}
+            disabled={!jsonInput.trim() || isValidating || isImporting}
+            data-testid="btn-validate-json"
+          >
+            {isValidating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Validando...
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Validar
+              </>
+            )}
+          </Button>
+          <Button 
+            onClick={handleImport}
+            disabled={!validationResult?.valid || isImporting}
+            className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
+            data-testid="btn-import-kit"
+          >
+            {isImporting ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Importando...
+              </>
+            ) : (
+              <>
+                <Upload className="w-4 h-4 mr-2" />
+                Criar Kit
               </>
             )}
           </Button>
@@ -388,7 +752,10 @@ export default function AdminKits() {
               </p>
             </div>
             
-            <CreateKitDialog />
+            <div className="flex gap-2">
+              <ImportJsonDialog onSuccess={() => refetch()} />
+              <CreateKitDialog />
+            </div>
           </div>
         </div>
 

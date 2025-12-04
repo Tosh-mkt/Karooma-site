@@ -4427,6 +4427,215 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin route - Import kit from JSON (from external AI assistant)
+  const kitImportSchema = z.object({
+    kit: z.object({
+      title: z.string().min(1).max(100),
+      slug: z.string().min(1).max(100),
+      theme: z.string().optional(),
+      taskIntent: z.string().min(1).max(200),
+      problemToSolve: z.array(z.string()).optional(),
+      shortDescription: z.string().min(1).max(500),
+      longDescription: z.string().optional(),
+      category: z.string().optional(),
+      missionSlug: z.string().optional()
+    }),
+    conceptItems: z.array(z.object({
+      name: z.string().min(1),
+      role: z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT']),
+      weight: z.number().min(0).max(1).optional().default(0.5),
+      criteria: z.object({
+        mustKeywords: z.array(z.string()),
+        optionalKeywords: z.array(z.string()).optional(),
+        category: z.string().optional(),
+        priceMin: z.number().optional(),
+        priceMax: z.number().optional(),
+        ratingMin: z.number().optional(),
+        primeOnly: z.boolean().optional(),
+        featureFlags: z.array(z.string()).optional()
+      })
+    })).min(1).max(10),
+    rulesConfig: z.object({
+      minItems: z.number().min(1).max(20).optional().default(3),
+      maxItems: z.number().min(1).max(20).optional().default(6),
+      priceRange: z.object({
+        min: z.number().optional(),
+        max: z.number().optional()
+      }).optional(),
+      ratingMin: z.number().min(0).max(5).optional().default(4.0),
+      primeOnly: z.boolean().optional().default(false),
+      allowedCategories: z.array(z.string()).optional(),
+      updateFrequency: z.enum(['hourly', 'daily', 'weekly']).optional().default('weekly'),
+      fallbackStrategy: z.object({
+        useManualAsins: z.boolean().optional(),
+        substituteByCategory: z.boolean().optional()
+      }).optional()
+    }).optional()
+  });
+
+  app.post("/api/admin/kits/import", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      // Validate the incoming JSON
+      const validatedData = kitImportSchema.parse(req.body);
+      const { kit: kitData, conceptItems, rulesConfig } = validatedData;
+
+      // Check if slug already exists
+      const existingKit = await storage.getProductKitBySlug(kitData.slug);
+      if (existingKit) {
+        return res.status(409).json({ 
+          error: "Slug já existe",
+          message: `Já existe um kit com o slug "${kitData.slug}". Escolha outro slug.`,
+          existingKit: { id: existingKit.id, title: existingKit.title }
+        });
+      }
+
+      // Clean concept items - remove undefined optional fields
+      const cleanedConceptItems = conceptItems.map(item => ({
+        name: item.name,
+        role: item.role,
+        weight: item.weight ?? 0.5,
+        criteria: {
+          mustKeywords: item.criteria.mustKeywords,
+          ...(item.criteria.optionalKeywords && { optionalKeywords: item.criteria.optionalKeywords }),
+          ...(item.criteria.category && { category: item.criteria.category }),
+          ...(item.criteria.priceMin !== undefined && { priceMin: item.criteria.priceMin }),
+          ...(item.criteria.priceMax !== undefined && { priceMax: item.criteria.priceMax }),
+          ...(item.criteria.ratingMin !== undefined && { ratingMin: item.criteria.ratingMin }),
+          ...(item.criteria.primeOnly !== undefined && { primeOnly: item.criteria.primeOnly }),
+          ...(item.criteria.featureFlags && { featureFlags: item.criteria.featureFlags })
+        }
+      }));
+
+      // Build the kit data for insertion
+      const insertData = {
+        title: kitData.title,
+        slug: kitData.slug,
+        theme: kitData.theme || null,
+        taskIntent: kitData.taskIntent,
+        problemToSolve: kitData.problemToSolve || [],
+        shortDescription: kitData.shortDescription,
+        longDescription: kitData.longDescription || null,
+        category: kitData.category || null,
+        missionId: kitData.missionSlug || null,
+        status: 'CONCEPT_ONLY' as const,
+        conceptItems: cleanedConceptItems,
+        rulesConfig: rulesConfig ? {
+          keywordGroups: [],
+          typeWeights: { MAIN: 1.0, SECONDARY: 0.8, COMPLEMENT: 0.5 },
+          minItems: rulesConfig.minItems ?? 3,
+          maxItems: rulesConfig.maxItems ?? 6,
+          mustHaveTypes: [{ type: 'MAIN' as const, minCount: 1 }],
+          priceRange: {
+            min: rulesConfig.priceRange?.min ?? 0,
+            max: rulesConfig.priceRange?.max ?? 1000
+          },
+          ratingMin: rulesConfig.ratingMin ?? 4.0,
+          primeOnly: rulesConfig.primeOnly ?? false,
+          excludeAsins: [],
+          allowedCategories: rulesConfig.allowedCategories || [],
+          updateFrequency: rulesConfig.updateFrequency || 'weekly',
+          fallbackStrategy: {
+            useManualAsins: rulesConfig.fallbackStrategy?.useManualAsins ?? false,
+            substituteByCategory: rulesConfig.fallbackStrategy?.substituteByCategory ?? true
+          }
+        } : null,
+        paapiEnabled: false,
+        views: 0
+      };
+
+      // Create the kit
+      const createdKit = await storage.createProductKit(insertData as any);
+
+      console.log('✅ Kit importado via JSON:', { 
+        id: createdKit.id, 
+        title: createdKit.title,
+        conceptItems: conceptItems.length 
+      });
+
+      res.status(201).json({
+        success: true,
+        message: `Kit "${createdKit.title}" criado com sucesso!`,
+        kit: createdKit,
+        stats: {
+          conceptItemsCount: conceptItems.length,
+          mainCount: conceptItems.filter(i => i.role === 'MAIN').length,
+          secondaryCount: conceptItems.filter(i => i.role === 'SECONDARY').length,
+          complementCount: conceptItems.filter(i => i.role === 'COMPLEMENT').length
+        }
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          error: "JSON inválido",
+          message: "O formato do JSON não está correto",
+          details: error.errors.map(e => ({
+            path: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
+      console.error("Erro ao importar kit:", error);
+      res.status(500).json({ error: "Erro ao importar kit" });
+    }
+  });
+
+  // Admin route - Validate kit JSON without creating
+  app.post("/api/admin/kits/validate", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const validatedData = kitImportSchema.parse(req.body);
+      const { kit: kitData, conceptItems, rulesConfig } = validatedData;
+
+      // Check if slug exists
+      const existingKit = await storage.getProductKitBySlug(kitData.slug);
+      
+      res.json({
+        valid: true,
+        message: "JSON válido e pronto para importação",
+        preview: {
+          title: kitData.title,
+          slug: kitData.slug,
+          taskIntent: kitData.taskIntent,
+          problemToSolve: kitData.problemToSolve,
+          shortDescription: kitData.shortDescription,
+          category: kitData.category,
+          conceptItemsCount: conceptItems.length,
+          roles: {
+            MAIN: conceptItems.filter(i => i.role === 'MAIN').length,
+            SECONDARY: conceptItems.filter(i => i.role === 'SECONDARY').length,
+            COMPLEMENT: conceptItems.filter(i => i.role === 'COMPLEMENT').length
+          },
+          priceRange: rulesConfig?.priceRange,
+          ratingMin: rulesConfig?.ratingMin
+        },
+        warnings: [
+          existingKit ? `⚠️ Slug "${kitData.slug}" já existe (kit: ${existingKit.title})` : null,
+          conceptItems.filter(i => i.role === 'MAIN').length === 0 ? "⚠️ Nenhum item MAIN definido" : null,
+          conceptItems.length < 3 ? "⚠️ Menos de 3 itens no kit" : null
+        ].filter(Boolean)
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          valid: false,
+          message: "JSON inválido",
+          errors: error.errors.map(e => ({
+            path: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
+      res.status(500).json({ valid: false, message: "Erro ao validar JSON" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
