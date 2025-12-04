@@ -1,5 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
+import { getSession } from '@auth/express';
+import { authConfig } from '../auth';
 
 // Extend Request type to include user
 declare global {
@@ -68,14 +70,13 @@ export function requireFlipbookAccess(flipbookId: string) {
 /**
  * Middleware to extract user info from session/auth
  * This should be called before requireFlipbookAccess
+ * Supports both Express session and NextAuth session
  */
-export function extractUserInfo(req: Request, res: Response, next: NextFunction) {
+export async function extractUserInfo(req: Request, res: Response, next: NextFunction) {
   console.log('🔍 ===== EXTRAINDO INFO DO USUÁRIO (extractUserInfo) =====');
   console.log('📍 URL:', req.method, req.path);
-  console.log('🔑 Session existe?', !!req.session);
-  console.log('👤 Session user:', req.session ? JSON.stringify((req.session as any).user, null, 2) : 'não disponível');
   
-  // Extract user from session (set by login)
+  // 1. First try Express session (traditional login)
   if (req.session && (req.session as any).user) {
     const sessionUser = (req.session as any).user;
     req.user = {
@@ -83,12 +84,41 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
       isAdmin: sessionUser.isAdmin || false,
       id: sessionUser.id
     };
-    console.log('✅ Usuário extraído da sessão:', JSON.stringify(req.user, null, 2));
+    console.log('✅ Usuário extraído da sessão Express:', JSON.stringify(req.user, null, 2));
     console.log('=========================================================\n');
     return next();
   }
 
-  // Check if admin override (only in development)
+  // 2. Try NextAuth session (Google OAuth)
+  try {
+    const nextAuthSession = await getSession(req, authConfig);
+    if (nextAuthSession?.user) {
+      const email = nextAuthSession.user.email;
+      const isAdminEmail = email?.includes('@karooma.life') || email?.includes('admin');
+      
+      // Check if user is admin in database
+      let isAdmin = isAdminEmail;
+      if (email) {
+        const dbUser = await storage.getUserByEmail(email);
+        if (dbUser?.isAdmin) {
+          isAdmin = true;
+        }
+      }
+      
+      req.user = {
+        email: email || undefined,
+        isAdmin: isAdmin || (nextAuthSession.user as any).isAdmin || false,
+        id: (nextAuthSession.user as any).id
+      };
+      console.log('✅ Usuário extraído do NextAuth:', JSON.stringify(req.user, null, 2));
+      console.log('=========================================================\n');
+      return next();
+    }
+  } catch (error) {
+    console.log('⚠️ Erro ao verificar NextAuth session:', error);
+  }
+
+  // 3. Check if admin override (only in development)
   if (process.env.NODE_ENV === 'development' && req.query.admin === 'true') {
     req.user = {
       email: 'admin@karooma.life',
@@ -100,7 +130,7 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
     return next();
   }
 
-  // Extract from query params (fallback - replace with real auth)
+  // 4. Extract from query params (fallback)
   const email = req.query.email as string;
   if (email) {
     req.user = {
@@ -110,7 +140,7 @@ export function extractUserInfo(req: Request, res: Response, next: NextFunction)
     };
     console.log('📧 Usuário extraído de query params:', email);
   } else {
-    console.log('⚠️ Nenhum usuário encontrado na sessão');
+    console.log('⚠️ Nenhum usuário encontrado');
   }
 
   console.log('=========================================================\n');
