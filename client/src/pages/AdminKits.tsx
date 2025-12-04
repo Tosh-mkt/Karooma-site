@@ -278,8 +278,8 @@ function ImportJsonDialog({ onSuccess }: { onSuccess: () => void }) {
       if (!response.ok) {
         setValidationResult({
           valid: false,
-          message: result.message || "Erro ao validar JSON",
-          errors: result.errors || result.details
+          message: result.error || result.message || "Erro ao validar JSON",
+          errors: result.errors || result.details || (result.error ? [{ path: "auth", message: result.error }] : undefined)
         });
       } else {
         setValidationResult(result);
