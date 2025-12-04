@@ -36,6 +36,10 @@ import {
   type InsertFeaturedApparel,
   type SelectGuidePost,
   type InsertGuidePost,
+  type SelectProductKit,
+  type InsertProductKit,
+  type SelectKitProduct,
+  type InsertKitProduct,
   users,
   content,
   products,
@@ -56,6 +60,8 @@ import {
   missions,
   diagnostics,
   guidePosts,
+  productKits,
+  kitProducts,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -231,6 +237,25 @@ export interface IStorage {
   updateGuidePost(id: string, data: Partial<InsertGuidePost>): Promise<SelectGuidePost>;
   deleteGuidePost(id: string): Promise<void>;
   incrementGuidePostViews(id: string): Promise<void>;
+
+  // Product Kits methods
+  getAllProductKits(): Promise<SelectProductKit[]>;
+  getActiveProductKits(): Promise<SelectProductKit[]>;
+  getProductKitById(id: string): Promise<SelectProductKit | undefined>;
+  getProductKitBySlug(slug: string): Promise<SelectProductKit | undefined>;
+  getProductKitsByCategory(category: string): Promise<SelectProductKit[]>;
+  getProductKitsByStatus(status: string): Promise<SelectProductKit[]>;
+  createProductKit(data: InsertProductKit): Promise<SelectProductKit>;
+  updateProductKit(id: string, data: Partial<InsertProductKit>): Promise<SelectProductKit>;
+  deleteProductKit(id: string): Promise<void>;
+  incrementProductKitViews(id: string): Promise<void>;
+  
+  // Kit Products methods (products within kits)
+  getKitProducts(kitId: string): Promise<SelectKitProduct[]>;
+  addKitProduct(data: InsertKitProduct): Promise<SelectKitProduct>;
+  updateKitProduct(id: string, data: Partial<InsertKitProduct>): Promise<SelectKitProduct>;
+  removeKitProduct(id: string): Promise<void>;
+  clearKitProducts(kitId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -984,6 +1009,53 @@ export class MemStorage implements IStorage {
     throw new Error("Method not implemented - Use DatabaseStorage");
   }
   async incrementGuidePostViews(id: string): Promise<void> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+
+  // Product Kits stubs for MemStorage
+  async getAllProductKits(): Promise<SelectProductKit[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getActiveProductKits(): Promise<SelectProductKit[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getProductKitById(id: string): Promise<SelectProductKit | undefined> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getProductKitBySlug(slug: string): Promise<SelectProductKit | undefined> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getProductKitsByCategory(category: string): Promise<SelectProductKit[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getProductKitsByStatus(status: string): Promise<SelectProductKit[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async createProductKit(data: InsertProductKit): Promise<SelectProductKit> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async updateProductKit(id: string, data: Partial<InsertProductKit>): Promise<SelectProductKit> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async deleteProductKit(id: string): Promise<void> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async incrementProductKitViews(id: string): Promise<void> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getKitProducts(kitId: string): Promise<SelectKitProduct[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async addKitProduct(data: InsertKitProduct): Promise<SelectKitProduct> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async updateKitProduct(id: string, data: Partial<InsertKitProduct>): Promise<SelectKitProduct> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async removeKitProduct(id: string): Promise<void> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async clearKitProducts(kitId: string): Promise<void> {
     throw new Error("Method not implemented - Use DatabaseStorage");
   }
 }
@@ -2410,6 +2482,126 @@ export class DatabaseStorage implements IStorage {
       .update(guidePosts)
       .set({ views: sql`${guidePosts.views} + 1` })
       .where(eq(guidePosts.id, id));
+  }
+
+  // Product Kits methods
+  async getAllProductKits(): Promise<SelectProductKit[]> {
+    return await db
+      .select()
+      .from(productKits)
+      .orderBy(desc(productKits.createdAt));
+  }
+
+  async getActiveProductKits(): Promise<SelectProductKit[]> {
+    return await db
+      .select()
+      .from(productKits)
+      .where(eq(productKits.status, 'ACTIVE'))
+      .orderBy(desc(productKits.createdAt));
+  }
+
+  async getProductKitById(id: string): Promise<SelectProductKit | undefined> {
+    const [kit] = await db
+      .select()
+      .from(productKits)
+      .where(eq(productKits.id, id))
+      .limit(1);
+    return kit;
+  }
+
+  async getProductKitBySlug(slug: string): Promise<SelectProductKit | undefined> {
+    const [kit] = await db
+      .select()
+      .from(productKits)
+      .where(eq(productKits.slug, slug))
+      .limit(1);
+    return kit;
+  }
+
+  async getProductKitsByCategory(category: string): Promise<SelectProductKit[]> {
+    return await db
+      .select()
+      .from(productKits)
+      .where(eq(productKits.category, category))
+      .orderBy(desc(productKits.createdAt));
+  }
+
+  async getProductKitsByStatus(status: string): Promise<SelectProductKit[]> {
+    return await db
+      .select()
+      .from(productKits)
+      .where(eq(productKits.status, status))
+      .orderBy(desc(productKits.createdAt));
+  }
+
+  async createProductKit(data: InsertProductKit): Promise<SelectProductKit> {
+    const [kit] = await db
+      .insert(productKits)
+      .values({
+        ...data,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning();
+    return kit;
+  }
+
+  async updateProductKit(id: string, data: Partial<InsertProductKit>): Promise<SelectProductKit> {
+    const [kit] = await db
+      .update(productKits)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(productKits.id, id))
+      .returning();
+    return kit;
+  }
+
+  async deleteProductKit(id: string): Promise<void> {
+    await db.delete(kitProducts).where(eq(kitProducts.kitId, id));
+    await db.delete(productKits).where(eq(productKits.id, id));
+  }
+
+  async incrementProductKitViews(id: string): Promise<void> {
+    await db
+      .update(productKits)
+      .set({ views: sql`${productKits.views} + 1` })
+      .where(eq(productKits.id, id));
+  }
+
+  // Kit Products methods
+  async getKitProducts(kitId: string): Promise<SelectKitProduct[]> {
+    return await db
+      .select()
+      .from(kitProducts)
+      .where(eq(kitProducts.kitId, kitId))
+      .orderBy(kitProducts.sortOrder);
+  }
+
+  async addKitProduct(data: InsertKitProduct): Promise<SelectKitProduct> {
+    const [product] = await db
+      .insert(kitProducts)
+      .values({
+        ...data,
+        createdAt: new Date()
+      })
+      .returning();
+    return product;
+  }
+
+  async updateKitProduct(id: string, data: Partial<InsertKitProduct>): Promise<SelectKitProduct> {
+    const [product] = await db
+      .update(kitProducts)
+      .set(data)
+      .where(eq(kitProducts.id, id))
+      .returning();
+    return product;
+  }
+
+  async removeKitProduct(id: string): Promise<void> {
+    await db.delete(kitProducts).where(eq(kitProducts.id, id));
+  }
+
+  async clearKitProducts(kitId: string): Promise<void> {
+    await db.delete(kitProducts).where(eq(kitProducts.kitId, kitId));
   }
 }
 

@@ -996,6 +996,7 @@ export const KitProductRole = {
 } as const;
 
 export const KitStatus = {
+  CONCEPT_ONLY: 'CONCEPT_ONLY',
   DRAFT: 'DRAFT',
   ACTIVE: 'ACTIVE',
   NEEDS_REVIEW: 'NEEDS_REVIEW',
@@ -1007,6 +1008,81 @@ export const KitProductSource = {
   MANUAL: 'MANUAL',
   SUBSTITUTE: 'SUBSTITUTE'
 } as const;
+
+// Database Tables for Product Kits System
+export const productKits = pgTable("product_kits", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  title: text("title").notNull(),
+  slug: varchar("slug").notNull().unique(),
+  theme: text("theme"),
+  taskIntent: varchar("task_intent", { length: 100 }).notNull(),
+  problemToSolve: json("problem_to_solve").$type<string[]>(),
+  shortDescription: text("short_description").notNull(),
+  longDescription: text("long_description"),
+  coverImageUrl: text("cover_image_url"),
+  category: varchar("category", { length: 100 }),
+  generatedTitle: text("generated_title"),
+  generatedDescription: text("generated_description"),
+  generatedBullets: json("generated_bullets").$type<string[]>(),
+  schemaJsonLd: text("schema_json_ld"),
+  status: varchar("status", { length: 20 }).notNull().default('CONCEPT_ONLY'),
+  rulesConfig: json("rules_config").$type<KitRulesConfig>(),
+  conceptItems: json("concept_items").$type<KitConceptItem[]>(),
+  missionId: varchar("mission_id"),
+  views: integer("views").default(0),
+  paapiEnabled: boolean("paapi_enabled").default(false),
+  lastResolvedAt: timestamp("last_resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const kitProducts = pgTable("kit_products", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  kitId: varchar("kit_id").notNull().references(() => productKits.id, { onDelete: "cascade" }),
+  asin: varchar("asin", { length: 20 }).notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  imageUrl: text("image_url"),
+  price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  originalPrice: decimal("original_price", { precision: 10, scale: 2 }),
+  rating: decimal("rating", { precision: 2, scale: 1 }),
+  reviewCount: integer("review_count"),
+  isPrime: boolean("is_prime").default(false),
+  role: varchar("role", { length: 20 }).notNull(),
+  rankScore: decimal("rank_score", { precision: 5, scale: 4 }).notNull(),
+  taskMatchScore: decimal("task_match_score", { precision: 5, scale: 4 }),
+  rationale: text("rationale"),
+  attributes: json("attributes").$type<KitProductAttributes>(),
+  addedVia: varchar("added_via", { length: 20 }).notNull(),
+  affiliateLink: text("affiliate_link").notNull(),
+  matchedCriteria: json("matched_criteria"),
+  sortOrder: integer("sort_order").default(0),
+  lastCheckedAt: timestamp("last_checked_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_kit_products_kit_id").on(table.kitId),
+  index("idx_kit_products_asin").on(table.asin),
+]);
+
+// Conceptual Item structure (from PreASIN documentation)
+export interface KitConceptItemCriteria {
+  mustKeywords: string[];
+  optionalKeywords?: string[];
+  category?: string;
+  priceMin?: number;
+  priceMax?: number;
+  ratingMin?: number;
+  primeOnly?: boolean;
+  featureFlags?: string[];
+}
+
+export interface KitConceptItem {
+  name: string;
+  role: typeof KitProductRole[keyof typeof KitProductRole];
+  weight?: number;
+  criteria: KitConceptItemCriteria;
+  resolvedAsin?: string;
+}
 
 // TypeScript types for ProductKit system (MVP - frontend types only)
 export interface KitKeywordGroup {
@@ -1096,20 +1172,24 @@ export interface ProductKit {
   slug: string;
   theme?: string;
   taskIntent: string;
+  problemToSolve?: string[];
   shortDescription: string;
   longDescription?: string;
   coverImageUrl?: string;
+  category?: string;
   generatedTitle?: string;
   generatedDescription?: string;
   generatedBullets?: string[];
   schemaJsonLd?: string;
   status: typeof KitStatus[keyof typeof KitStatus];
-  rulesConfig: KitRulesConfig;
+  rulesConfig?: KitRulesConfig;
+  conceptItems?: KitConceptItem[];
   products: KitProduct[];
-  manualAsins?: string[];
   missionId?: string;
   views?: number;
-  lastUpdatedAt?: Date;
+  paapiEnabled?: boolean;
+  lastResolvedAt?: Date;
+  updatedAt?: Date;
   createdAt?: Date;
 }
 
@@ -1173,22 +1253,48 @@ export const kitRulesConfigSchema = z.object({
   })
 });
 
+// Concept item criteria schema (for PA-API search)
+export const kitConceptItemCriteriaSchema = z.object({
+  mustKeywords: z.array(z.string()),
+  optionalKeywords: z.array(z.string()).optional(),
+  category: z.string().optional(),
+  priceMin: z.number().optional(),
+  priceMax: z.number().optional(),
+  ratingMin: z.number().optional(),
+  primeOnly: z.boolean().optional(),
+  featureFlags: z.array(z.string()).optional(),
+});
+
+export const kitConceptItemSchema = z.object({
+  name: z.string(),
+  role: z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT']),
+  weight: z.number().optional(),
+  criteria: kitConceptItemCriteriaSchema,
+  resolvedAsin: z.string().optional(),
+});
+
 export const insertProductKitSchema = z.object({
   title: z.string().min(1),
   slug: z.string().min(1),
   theme: z.string().optional(),
   taskIntent: z.string(),
+  problemToSolve: z.array(z.string()).optional(),
   shortDescription: z.string(),
   longDescription: z.string().optional(),
   coverImageUrl: z.string().optional(),
+  category: z.string().optional(),
   generatedTitle: z.string().optional(),
   generatedDescription: z.string().optional(),
   generatedBullets: z.array(z.string()).optional(),
-  status: z.enum(['DRAFT', 'ACTIVE', 'NEEDS_REVIEW', 'ERROR']).default('DRAFT'),
-  rulesConfig: kitRulesConfigSchema,
-  manualAsins: z.array(z.string()).optional(),
+  schemaJsonLd: z.string().optional(),
+  status: z.enum(['CONCEPT_ONLY', 'DRAFT', 'ACTIVE', 'NEEDS_REVIEW', 'ERROR']).default('CONCEPT_ONLY'),
+  rulesConfig: kitRulesConfigSchema.optional(),
+  conceptItems: z.array(kitConceptItemSchema).optional(),
   missionId: z.string().optional(),
+  paapiEnabled: z.boolean().optional(),
 });
 
 export type InsertKitProduct = z.infer<typeof insertKitProductSchema>;
 export type InsertProductKit = z.infer<typeof insertProductKitSchema>;
+export type SelectProductKit = typeof productKits.$inferSelect;
+export type SelectKitProduct = typeof kitProducts.$inferSelect;

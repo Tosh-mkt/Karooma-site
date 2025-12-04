@@ -8,7 +8,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
-import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema, insertMissionSchema, insertGuidePostSchema } from "@shared/schema";
+import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema, insertMissionSchema, insertGuidePostSchema, insertProductKitSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
 import { setupNextAuth } from "./nextAuthExpress";
@@ -4140,6 +4140,168 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Erro ao excluir post de guia:", error);
       res.status(500).json({ error: "Failed to delete guide post" });
+    }
+  });
+
+  // ========================================
+  // Product Kits Routes - Kits de Produtos Automatizados
+  // ========================================
+
+  // Public routes - List all active kits
+  app.get("/api/kits", async (req, res) => {
+    try {
+      const kits = await storage.getActiveProductKits();
+      res.json(kits);
+    } catch (error) {
+      console.error("Erro ao buscar kits:", error);
+      res.status(500).json({ error: "Failed to fetch product kits" });
+    }
+  });
+
+  // Public route - Get kit by slug
+  app.get("/api/kits/:slug", async (req, res) => {
+    try {
+      const { slug } = req.params;
+      const kit = await storage.getProductKitBySlug(slug);
+      if (!kit) {
+        return res.status(404).json({ error: "Kit not found" });
+      }
+      
+      // Increment views
+      await storage.incrementProductKitViews(kit.id);
+      
+      // Get kit products
+      const products = await storage.getKitProducts(kit.id);
+      
+      res.json({ ...kit, products });
+    } catch (error) {
+      console.error("Erro ao buscar kit:", error);
+      res.status(500).json({ error: "Failed to fetch product kit" });
+    }
+  });
+
+  // Public route - Get kits by category
+  app.get("/api/kits/category/:category", async (req, res) => {
+    try {
+      const { category } = req.params;
+      const kits = await storage.getProductKitsByCategory(category);
+      res.json(kits);
+    } catch (error) {
+      console.error("Erro ao buscar kits por categoria:", error);
+      res.status(500).json({ error: "Failed to fetch product kits by category" });
+    }
+  });
+
+  // Admin routes - Get all kits (including drafts)
+  app.get("/api/admin/kits", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const kits = await storage.getAllProductKits();
+      res.json(kits);
+    } catch (error) {
+      console.error("Erro ao buscar kits (admin):", error);
+      res.status(500).json({ error: "Failed to fetch product kits" });
+    }
+  });
+
+  // Admin route - Get kit by ID with products
+  app.get("/api/admin/kits/:id", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const { id } = req.params;
+      const kit = await storage.getProductKitById(id);
+      if (!kit) {
+        return res.status(404).json({ error: "Kit not found" });
+      }
+      
+      const products = await storage.getKitProducts(id);
+      res.json({ ...kit, products });
+    } catch (error) {
+      console.error("Erro ao buscar kit (admin):", error);
+      res.status(500).json({ error: "Failed to fetch product kit" });
+    }
+  });
+
+  // Admin route - Create kit
+  app.post("/api/admin/kits", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const validatedData = insertProductKitSchema.parse(req.body);
+      const kit = await storage.createProductKit(validatedData);
+      
+      console.log('✅ Kit criado:', { id: kit.id, title: kit.title });
+      res.status(201).json(kit);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      console.error("Erro ao criar kit:", error);
+      res.status(500).json({ error: "Failed to create product kit" });
+    }
+  });
+
+  // Admin route - Update kit
+  app.patch("/api/admin/kits/:id", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const { id } = req.params;
+      const validatedData = insertProductKitSchema.partial().parse(req.body);
+      const kit = await storage.updateProductKit(id, validatedData);
+      
+      console.log('✅ Kit atualizado:', { id: kit.id, title: kit.title });
+      res.json(kit);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Dados inválidos", details: error.errors });
+      }
+      console.error("Erro ao atualizar kit:", error);
+      res.status(500).json({ error: "Failed to update product kit" });
+    }
+  });
+
+  // Admin route - Delete kit
+  app.delete("/api/admin/kits/:id", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const { id } = req.params;
+      await storage.deleteProductKit(id);
+      
+      console.log('✅ Kit excluído:', { id });
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro ao excluir kit:", error);
+      res.status(500).json({ error: "Failed to delete product kit" });
+    }
+  });
+
+  // Admin route - Get kits by status
+  app.get("/api/admin/kits/status/:status", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const { status } = req.params;
+      const kits = await storage.getProductKitsByStatus(status);
+      res.json(kits);
+    } catch (error) {
+      console.error("Erro ao buscar kits por status:", error);
+      res.status(500).json({ error: "Failed to fetch product kits by status" });
     }
   });
 

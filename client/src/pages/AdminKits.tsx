@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { 
   Plus, 
   Package, 
@@ -19,7 +20,8 @@ import {
   Clock,
   ArrowLeft,
   Settings,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,108 +47,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import type { ProductKit } from "@shared/schema";
-
-const MOCK_KITS: ProductKit[] = [
-  {
-    id: "kit-001",
-    title: "Kit Limpeza de Banheiro",
-    slug: "kit-limpeza-banheiro",
-    taskIntent: "BATHROOM_CLEAN",
-    shortDescription: "Tudo para manter o banheiro limpo em poucos minutos.",
-    coverImageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400",
-    status: "ACTIVE",
-    rulesConfig: {
-      keywordGroups: [
-        { name: "escovas", keywords: ["escova sanitária silicone"], weight: 1.5 },
-        { name: "desinfetantes", keywords: ["desinfetante banheiro"], weight: 1.2 }
-      ],
-      typeWeights: { MAIN: 2, SECONDARY: 1, COMPLEMENT: 0.5 },
-      minItems: 3,
-      maxItems: 7,
-      mustHaveTypes: [{ type: "MAIN", minCount: 1 }],
-      priceRange: { min: 10, max: 200 },
-      ratingMin: 4.0,
-      primeOnly: true,
-      excludeAsins: [],
-      allowedCategories: ["Home & Kitchen"],
-      updateFrequency: "daily",
-      fallbackStrategy: { useManualAsins: true, substituteByCategory: true }
-    },
-    products: [
-      { id: "1", kitId: "kit-001", asin: "A1", title: "Escova Sanitária", price: 49.9, role: "MAIN", rankScore: 0.92, addedVia: "MANUAL", affiliateLink: "#" },
-      { id: "2", kitId: "kit-001", asin: "A2", title: "Desinfetante", price: 24.9, role: "SECONDARY", rankScore: 0.81, addedVia: "MANUAL", affiliateLink: "#" },
-      { id: "3", kitId: "kit-001", asin: "A3", title: "Panos Microfibra", price: 29.9, role: "COMPLEMENT", rankScore: 0.75, addedVia: "MANUAL", affiliateLink: "#" },
-      { id: "4", kitId: "kit-001", asin: "A4", title: "Esponja Mágica", price: 19.9, role: "COMPLEMENT", rankScore: 0.68, addedVia: "MANUAL", affiliateLink: "#" },
-    ],
-    views: 1247,
-    lastUpdatedAt: new Date(),
-    createdAt: new Date()
-  },
-  {
-    id: "kit-002",
-    title: "Kit Troca de Fralda para Passeio",
-    slug: "kit-troca-fralda-passeio",
-    taskIntent: "DIAPER_ON_THE_GO",
-    shortDescription: "Tudo para trocar fralda fora de casa com praticidade.",
-    coverImageUrl: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=400",
-    status: "ACTIVE",
-    rulesConfig: {
-      keywordGroups: [],
-      typeWeights: { MAIN: 2, SECONDARY: 1, COMPLEMENT: 0.5 },
-      minItems: 4,
-      maxItems: 8,
-      mustHaveTypes: [],
-      priceRange: { min: 20, max: 150 },
-      ratingMin: 4.2,
-      primeOnly: true,
-      excludeAsins: [],
-      allowedCategories: [],
-      updateFrequency: "daily",
-      fallbackStrategy: { useManualAsins: true, substituteByCategory: true }
-    },
-    products: [
-      { id: "5", kitId: "kit-002", asin: "B1", title: "Trocador Portátil", price: 89.9, role: "MAIN", rankScore: 0.94, addedVia: "MANUAL", affiliateLink: "#" },
-      { id: "6", kitId: "kit-002", asin: "B2", title: "Porta Fraldas", price: 45.9, role: "SECONDARY", rankScore: 0.82, addedVia: "MANUAL", affiliateLink: "#" },
-      { id: "7", kitId: "kit-002", asin: "B3", title: "Porta Lenços", price: 34.9, role: "COMPLEMENT", rankScore: 0.76, addedVia: "MANUAL", affiliateLink: "#" },
-    ],
-    views: 892,
-    lastUpdatedAt: new Date(),
-    createdAt: new Date()
-  },
-  {
-    id: "kit-003",
-    title: "Kit Organização da Pia",
-    slug: "kit-organizacao-pia",
-    taskIntent: "KITCHEN_PIA_ORG",
-    shortDescription: "Praticidade e limpeza em um só lugar.",
-    coverImageUrl: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400",
-    status: "DRAFT",
-    rulesConfig: {
-      keywordGroups: [],
-      typeWeights: { MAIN: 2, SECONDARY: 1, COMPLEMENT: 0.5 },
-      minItems: 3,
-      maxItems: 6,
-      mustHaveTypes: [],
-      priceRange: { min: 15, max: 180 },
-      ratingMin: 4.0,
-      primeOnly: true,
-      excludeAsins: [],
-      allowedCategories: [],
-      updateFrequency: "daily",
-      fallbackStrategy: { useManualAsins: true, substituteByCategory: true }
-    },
-    products: [
-      { id: "8", kitId: "kit-003", asin: "C1", title: "Dispenser", price: 59.9, role: "MAIN", rankScore: 0.88, addedVia: "MANUAL", affiliateLink: "#" },
-      { id: "9", kitId: "kit-003", asin: "C2", title: "Porta Esponja", price: 35.9, role: "SECONDARY", rankScore: 0.79, addedVia: "MANUAL", affiliateLink: "#" },
-    ],
-    views: 0,
-    lastUpdatedAt: new Date(),
-    createdAt: new Date()
-  }
-];
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import type { SelectProductKit, InsertProductKit } from "@shared/schema";
 
 const statusConfig = {
+  CONCEPT_ONLY: { label: "Conceitual", color: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300", icon: Sparkles },
   ACTIVE: { label: "Ativo", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300", icon: CheckCircle },
   DRAFT: { label: "Rascunho", color: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", icon: Clock },
   NEEDS_REVIEW: { label: "Precisa Revisão", color: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300", icon: AlertCircle },
@@ -298,14 +204,24 @@ function CreateKitDialog() {
   );
 }
 
-function KitRow({ kit }: { kit: ProductKit }) {
-  const status = statusConfig[kit.status];
+interface KitWithProducts extends SelectProductKit {
+  products?: Array<{
+    id: string;
+    role: string;
+    price: string;
+  }>;
+}
+
+function KitRow({ kit, onDelete }: { kit: KitWithProducts; onDelete: (id: string) => void }) {
+  const status = statusConfig[kit.status as keyof typeof statusConfig] || statusConfig.DRAFT;
   const StatusIcon = status.icon;
-  const totalPrice = kit.products.reduce((sum, p) => sum + p.price, 0);
+  const products = kit.products || [];
+  const totalPrice = products.reduce((sum, p) => sum + parseFloat(p.price || '0'), 0);
   
-  const mainCount = kit.products.filter(p => p.role === 'MAIN').length;
-  const secondaryCount = kit.products.filter(p => p.role === 'SECONDARY').length;
-  const complementCount = kit.products.filter(p => p.role === 'COMPLEMENT').length;
+  const mainCount = products.filter(p => p.role === 'MAIN').length;
+  const secondaryCount = products.filter(p => p.role === 'SECONDARY').length;
+  const complementCount = products.filter(p => p.role === 'COMPLEMENT').length;
+  const conceptItemCount = kit.conceptItems?.length || 0;
 
   return (
     <motion.div
@@ -346,24 +262,35 @@ function KitRow({ kit }: { kit: ProductKit }) {
               </p>
 
               <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
-                <span className="flex items-center gap-1">
-                  <Crown className="w-3 h-3 text-amber-500" />
-                  {mainCount} principal
-                </span>
-                <span className="flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-blue-500" />
-                  {secondaryCount} secundário
-                </span>
-                <span className="flex items-center gap-1">
-                  <Heart className="w-3 h-3 text-green-500" />
-                  {complementCount} complemento
-                </span>
+                {products.length > 0 ? (
+                  <>
+                    <span className="flex items-center gap-1">
+                      <Crown className="w-3 h-3 text-amber-500" />
+                      {mainCount} principal
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Zap className="w-3 h-3 text-blue-500" />
+                      {secondaryCount} secundário
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Heart className="w-3 h-3 text-green-500" />
+                      {complementCount} complemento
+                    </span>
+                    <span className="text-gray-400">•</span>
+                    <span className="font-medium text-green-600">
+                      R$ {totalPrice.toFixed(2)}
+                    </span>
+                  </>
+                ) : conceptItemCount > 0 ? (
+                  <span className="flex items-center gap-1 text-purple-600">
+                    <Sparkles className="w-3 h-3" />
+                    {conceptItemCount} itens conceituais (aguardando PA-API)
+                  </span>
+                ) : (
+                  <span className="text-gray-400 italic">Sem produtos ainda</span>
+                )}
                 <span className="text-gray-400">•</span>
-                <span className="font-medium text-green-600">
-                  R$ {totalPrice.toFixed(2)}
-                </span>
-                <span className="text-gray-400">•</span>
-                <span>{kit.views} views</span>
+                <span>{kit.views || 0} views</span>
               </div>
             </div>
 
@@ -379,7 +306,13 @@ function KitRow({ kit }: { kit: ProductKit }) {
               <Button variant="ghost" size="sm" data-testid={`btn-settings-${kit.id}`}>
                 <Settings className="w-4 h-4" />
               </Button>
-              <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-700" data-testid={`btn-delete-${kit.id}`}>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-red-500 hover:text-red-700" 
+                data-testid={`btn-delete-${kit.id}`}
+                onClick={() => onDelete(kit.id)}
+              >
                 <Trash2 className="w-4 h-4" />
               </Button>
             </div>
@@ -393,8 +326,32 @@ function KitRow({ kit }: { kit: ProductKit }) {
 export default function AdminKits() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { toast } = useToast();
 
-  const filteredKits = MOCK_KITS.filter(kit => {
+  const { data: kits = [], isLoading, refetch } = useQuery<KitWithProducts[]>({
+    queryKey: ["/api/admin/kits"],
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await apiRequest("DELETE", `/api/admin/kits/${id}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/kits"] });
+      toast({ title: "Kit excluído com sucesso!" });
+    },
+    onError: () => {
+      toast({ title: "Erro ao excluir kit", variant: "destructive" });
+    }
+  });
+
+  const handleDelete = (id: string) => {
+    if (confirm("Tem certeza que deseja excluir este kit?")) {
+      deleteMutation.mutate(id);
+    }
+  };
+
+  const filteredKits = kits.filter(kit => {
     const matchesSearch = kit.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          kit.shortDescription.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === "all" || kit.status === statusFilter;
@@ -402,12 +359,12 @@ export default function AdminKits() {
   });
 
   const stats = {
-    total: MOCK_KITS.length,
-    active: MOCK_KITS.filter(k => k.status === 'ACTIVE').length,
-    draft: MOCK_KITS.filter(k => k.status === 'DRAFT').length,
-    needsReview: MOCK_KITS.filter(k => k.status === 'NEEDS_REVIEW').length,
-    totalProducts: MOCK_KITS.reduce((sum, k) => sum + k.products.length, 0),
-    totalViews: MOCK_KITS.reduce((sum, k) => sum + (k.views || 0), 0)
+    total: kits.length,
+    active: kits.filter(k => k.status === 'ACTIVE').length,
+    draft: kits.filter(k => k.status === 'DRAFT' || k.status === 'CONCEPT_ONLY').length,
+    needsReview: kits.filter(k => k.status === 'NEEDS_REVIEW').length,
+    totalProducts: kits.reduce((sum, k) => sum + (k.products?.length || 0), 0),
+    totalViews: kits.reduce((sum, k) => sum + (k.views || 0), 0)
   };
 
   return (
@@ -530,20 +487,30 @@ export default function AdminKits() {
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="ACTIVE">Ativos</SelectItem>
+              <SelectItem value="CONCEPT_ONLY">Conceituais</SelectItem>
               <SelectItem value="DRAFT">Rascunhos</SelectItem>
               <SelectItem value="NEEDS_REVIEW">Precisa Revisão</SelectItem>
               <SelectItem value="ERROR">Com Erro</SelectItem>
             </SelectContent>
           </Select>
           
-          <Button variant="outline" size="icon">
-            <RefreshCw className="w-4 h-4" />
+          <Button variant="outline" size="icon" onClick={() => refetch()}>
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
 
         {/* Kits List */}
         <div className="space-y-4">
-          {filteredKits.length === 0 ? (
+          {isLoading ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Loader2 className="w-12 h-12 text-green-500 mx-auto mb-4 animate-spin" />
+                <h3 className="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                  Carregando kits...
+                </h3>
+              </CardContent>
+            </Card>
+          ) : filteredKits.length === 0 ? (
             <Card>
               <CardContent className="p-12 text-center">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
@@ -562,7 +529,7 @@ export default function AdminKits() {
             </Card>
           ) : (
             filteredKits.map((kit) => (
-              <KitRow key={kit.id} kit={kit} />
+              <KitRow key={kit.id} kit={kit} onDelete={handleDelete} />
             ))
           )}
         </div>
