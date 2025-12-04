@@ -4305,6 +4305,128 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin route - Resolve kit products via PA-API
+  app.post("/api/admin/kits/:id/resolve", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const { id } = req.params;
+      const kit = await storage.getProductKitById(id);
+      
+      if (!kit) {
+        return res.status(404).json({ error: "Kit não encontrado" });
+      }
+
+      // Import kit resolver
+      const { kitResolver } = await import('./services/kitResolver');
+      
+      if (!kitResolver.isApiAvailable()) {
+        return res.status(503).json({ 
+          error: "PA-API não disponível",
+          message: "A API de produtos da Amazon ainda não está habilitada. São necessárias 3 vendas qualificadas para ativação."
+        });
+      }
+
+      // Resolve all concept items in the kit
+      const resolvedProducts = await kitResolver.resolveKit(kit as any);
+      
+      if (resolvedProducts.length === 0) {
+        return res.status(404).json({ 
+          error: "Nenhum produto encontrado",
+          message: "Não foi possível encontrar produtos que atendam aos critérios definidos."
+        });
+      }
+
+      // Save resolved products to database
+      for (const product of resolvedProducts) {
+        await storage.addKitProduct(product as any);
+      }
+
+      // Update kit status to RESOLVED or ACTIVE
+      await storage.updateProductKit(id, { 
+        status: 'ACTIVE',
+        lastResolvedAt: new Date()
+      });
+
+      console.log(`✅ Kit ${id} resolvido com ${resolvedProducts.length} produtos`);
+      
+      // Return updated kit with products
+      const updatedKit = await storage.getProductKitById(id);
+      res.json(updatedKit);
+    } catch (error) {
+      console.error("Erro ao resolver kit:", error);
+      res.status(500).json({ error: "Failed to resolve kit products" });
+    }
+  });
+
+  // Admin route - Re-rank existing kit products
+  app.post("/api/admin/kits/:id/rerank", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const { id } = req.params;
+      const kit = await storage.getProductKitById(id);
+      
+      if (!kit) {
+        return res.status(404).json({ error: "Kit não encontrado" });
+      }
+
+      if (!kit.products || kit.products.length === 0) {
+        return res.status(400).json({ error: "Kit não possui produtos para re-ranquear" });
+      }
+
+      // Import kit resolver
+      const { kitResolver } = await import('./services/kitResolver');
+      
+      // Re-rank existing products
+      const reRankedProducts = kitResolver.reRankProducts(kit.products as any);
+      
+      // Update products in database with new scores
+      for (const product of reRankedProducts) {
+        await storage.updateKitProduct(product.id, {
+          rankScore: product.rankScore,
+          scoreBreakdown: product.scoreBreakdown,
+          sortOrder: (product as any).sortOrder
+        });
+      }
+
+      console.log(`✅ Kit ${id} re-ranqueado com ${reRankedProducts.length} produtos`);
+      
+      // Return updated kit
+      const updatedKit = await storage.getProductKitById(id);
+      res.json(updatedKit);
+    } catch (error) {
+      console.error("Erro ao re-ranquear kit:", error);
+      res.status(500).json({ error: "Failed to re-rank kit products" });
+    }
+  });
+
+  // Admin route - Check PA-API status
+  app.get("/api/admin/kits/paapi-status", extractUserInfo, async (req, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+    
+    try {
+      const { kitResolver } = await import('./services/kitResolver');
+      
+      res.json({
+        available: kitResolver.isApiAvailable(),
+        affiliateTag: process.env.AMAZON_PARTNER_TAG || 'karoom-20',
+        message: kitResolver.isApiAvailable() 
+          ? "PA-API está configurada e disponível para uso"
+          : "PA-API bloqueada - são necessárias 3 vendas qualificadas para ativação"
+      });
+    } catch (error) {
+      console.error("Erro ao verificar status PA-API:", error);
+      res.status(500).json({ error: "Failed to check PA-API status" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

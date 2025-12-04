@@ -1056,6 +1056,7 @@ export const kitProducts = pgTable("kit_products", {
   addedVia: varchar("added_via", { length: 20 }).notNull(),
   affiliateLink: text("affiliate_link").notNull(),
   matchedCriteria: json("matched_criteria"),
+  scoreBreakdown: json("score_breakdown").$type<KitProductScoreBreakdown>(),
   sortOrder: integer("sort_order").default(0),
   lastCheckedAt: timestamp("last_checked_at"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -1144,6 +1145,18 @@ export interface KitProductAttributes {
   portable?: number;
 }
 
+// Score breakdown for transparency and debugging
+export interface KitProductScoreBreakdown {
+  valueScore: number;           // Base value score (rating × weight + discount × weight - price × weight)
+  reviewMultiplier: number;     // 1 + log10(reviewCount + 1) × weight
+  finalScore: number;           // valueScore × reviewMultiplier
+  priceNormalized: number;      // Normalized price (0-1)
+  ratingNormalized: number;     // Normalized rating (0-1)
+  discountNormalized: number;   // Normalized discount (0-1)
+  reviewCount: number;          // Raw review count for tie-breaking
+  calculatedAt: string;         // ISO timestamp
+}
+
 export interface KitProduct {
   id: string;
   kitId: string;
@@ -1163,6 +1176,7 @@ export interface KitProduct {
   attributes?: KitProductAttributes;
   addedVia: typeof KitProductSource[keyof typeof KitProductSource];
   affiliateLink: string;
+  scoreBreakdown?: KitProductScoreBreakdown;
   lastCheckedAt?: Date;
 }
 

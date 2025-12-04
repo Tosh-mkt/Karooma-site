@@ -2581,16 +2581,27 @@ export class DatabaseStorage implements IStorage {
       .insert(kitProducts)
       .values({
         ...data,
-        createdAt: new Date()
+        price: String(data.price),
+        originalPrice: data.originalPrice ? String(data.originalPrice) : undefined,
+        rating: data.rating ? String(data.rating) : undefined,
+        rankScore: String(data.rankScore),
+        taskMatchScore: data.taskMatchScore ? String(data.taskMatchScore) : undefined
       })
       .returning();
     return product;
   }
 
   async updateKitProduct(id: string, data: Partial<InsertKitProduct>): Promise<SelectKitProduct> {
+    const updateData: any = { ...data };
+    if (data.price !== undefined) updateData.price = String(data.price);
+    if (data.originalPrice !== undefined) updateData.originalPrice = String(data.originalPrice);
+    if (data.rating !== undefined) updateData.rating = String(data.rating);
+    if (data.rankScore !== undefined) updateData.rankScore = String(data.rankScore);
+    if (data.taskMatchScore !== undefined) updateData.taskMatchScore = String(data.taskMatchScore);
+    
     const [product] = await db
       .update(kitProducts)
-      .set(data)
+      .set(updateData)
       .where(eq(kitProducts.id, id))
       .returning();
     return product;
