@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { useRoute, Link } from "wouter";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { 
   Star, 
   StarHalf, 
-  ExternalLink, 
   Package, 
   CheckCircle2, 
   Clock, 
@@ -22,226 +21,19 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import type { ProductKit, KitProduct } from "@shared/schema";
+import type { SelectProductKit, SelectKitProduct } from "@shared/schema";
 
-const MOCK_KITS: Record<string, ProductKit> = {
-  "kit-limpeza-banheiro": {
-    id: "kit-001",
-    title: "Kit Limpeza de Banheiro",
-    slug: "kit-limpeza-banheiro",
-    theme: "Limpeza de banheiro",
-    taskIntent: "BATHROOM_CLEAN",
-    shortDescription: "Tudo para manter o banheiro limpo em poucos minutos, sem esforço e com praticidade.",
-    longDescription: "Este kit foi cuidadosamente montado para resolver o problema de manutenção do banheiro no dia a dia. Inclui itens que facilitam a limpeza rápida, eliminam odores e mantêm o ambiente sempre fresco. Ideal para quem tem pouco tempo mas não abre mão da higiene.",
-    coverImageUrl: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=800&h=400&fit=crop",
-    generatedTitle: "Kit Limpeza de Banheiro — Limpeza rápida sem esforço",
-    generatedDescription: "Escova sanitária + desinfetante + panos microfibra: tudo para deixar o banheiro impecável em minutos.",
-    generatedBullets: [
-      "Elimina 99,9% das bactérias",
-      "Produtos com fragrância duradoura",
-      "Fácil de usar e armazenar",
-      "Ideal para limpeza diária rápida"
-    ],
-    status: "ACTIVE",
-    rulesConfig: {
-      keywordGroups: [
-        { name: "escovas", keywords: ["escova sanitária silicone"], weight: 1.5 },
-        { name: "desinfetantes", keywords: ["desinfetante banheiro"], weight: 1.2 },
-        { name: "panos", keywords: ["pano microfibra"], weight: 0.8 }
-      ],
-      typeWeights: { MAIN: 2, SECONDARY: 1, COMPLEMENT: 0.5 },
-      minItems: 3,
-      maxItems: 7,
-      mustHaveTypes: [{ type: "MAIN", minCount: 1 }],
-      priceRange: { min: 10, max: 200 },
-      ratingMin: 4.0,
-      primeOnly: true,
-      excludeAsins: [],
-      allowedCategories: ["Home & Kitchen"],
-      updateFrequency: "daily",
-      fallbackStrategy: { useManualAsins: true, substituteByCategory: true }
-    },
-    products: [
-      {
-        id: "prod-1",
-        kitId: "kit-001",
-        asin: "B0ABC12345",
-        title: "Escova Sanitária de Silicone Premium com Suporte",
-        description: "Escova sanitária com cerdas de silicone flexíveis que não acumulam resíduos",
-        imageUrl: "https://images.unsplash.com/photo-1585421514738-01798e348b17?w=300&h=300&fit=crop",
-        price: 49.90,
-        originalPrice: 69.90,
-        rating: 4.7,
-        reviewCount: 2847,
-        isPrime: true,
-        role: "MAIN",
-        rankScore: 0.92,
-        taskMatchScore: 0.95,
-        rationale: "Item principal do kit. Escova de silicone é mais higiênica, seca rápido e não acumula bactérias como escovas tradicionais.",
-        attributes: { easyCleaning: 0.9, durable: 0.85, lowMaintenance: 0.9 },
-        addedVia: "MANUAL",
-        affiliateLink: "https://www.amazon.com.br/dp/B0ABC12345?tag=karoom-20"
-      },
-      {
-        id: "prod-2",
-        kitId: "kit-001",
-        asin: "B0DEF67890",
-        title: "Desinfetante Multiuso Banheiro 500ml - Fragrância Lavanda",
-        description: "Desinfetante bactericida com ação prolongada e aroma suave",
-        imageUrl: "https://images.unsplash.com/photo-1563453392212-326f5e854473?w=300&h=300&fit=crop",
-        price: 24.90,
-        originalPrice: 32.90,
-        rating: 4.5,
-        reviewCount: 1523,
-        isPrime: true,
-        role: "SECONDARY",
-        rankScore: 0.81,
-        taskMatchScore: 0.88,
-        rationale: "Desinfetante específico para banheiro com ação prolongada. Elimina odores e deixa fragrância agradável por horas.",
-        attributes: { easyCleaning: 0.85, lowMaintenance: 0.7 },
-        addedVia: "MANUAL",
-        affiliateLink: "https://www.amazon.com.br/dp/B0DEF67890?tag=karoom-20"
-      },
-      {
-        id: "prod-3",
-        kitId: "kit-001",
-        asin: "B0GHI11223",
-        title: "Kit 5 Panos Microfibra Ultra Absorventes",
-        description: "Panos de microfibra premium para limpeza sem deixar fiapos",
-        imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=300&fit=crop",
-        price: 29.90,
-        originalPrice: 39.90,
-        rating: 4.6,
-        reviewCount: 3421,
-        isPrime: true,
-        role: "COMPLEMENT",
-        rankScore: 0.75,
-        taskMatchScore: 0.72,
-        rationale: "Complemento perfeito para secagem e polimento. Microfibra absorve 7x mais água e não risca superfícies.",
-        attributes: { easyCleaning: 0.7, durable: 0.9, compact: 0.8 },
-        addedVia: "MANUAL",
-        affiliateLink: "https://www.amazon.com.br/dp/B0GHI11223?tag=karoom-20"
-      },
-      {
-        id: "prod-4",
-        kitId: "kit-001",
-        asin: "B0JKL44556",
-        title: "Esponja Mágica Anti-Mofo para Rejunte",
-        description: "Esponja especial para limpeza de rejuntes e cantos difíceis",
-        imageUrl: "https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=300&h=300&fit=crop",
-        price: 19.90,
-        originalPrice: 24.90,
-        rating: 4.4,
-        reviewCount: 892,
-        isPrime: true,
-        role: "COMPLEMENT",
-        rankScore: 0.68,
-        taskMatchScore: 0.75,
-        rationale: "Resolve o problema dos rejuntes escuros sem esforço. Remove manchas de mofo com água.",
-        attributes: { easyCleaning: 0.95, compact: 0.9 },
-        addedVia: "MANUAL",
-        affiliateLink: "https://www.amazon.com.br/dp/B0JKL44556?tag=karoom-20"
-      }
-    ],
-    views: 1247,
-    lastUpdatedAt: new Date(),
-    createdAt: new Date()
-  },
-  "kit-troca-fralda-passeio": {
-    id: "kit-002",
-    title: "Kit Troca de Fralda para Passeio",
-    slug: "kit-troca-fralda-passeio",
-    theme: "Troca de fralda para passeio",
-    taskIntent: "DIAPER_ON_THE_GO",
-    shortDescription: "Tudo para trocar fralda fora de casa com praticidade e segurança.",
-    longDescription: "Kit completo pensado para mamães e papais que precisam trocar fralda durante passeios. Inclui trocador portátil, organizadores e acessórios que cabem na bolsa e facilitam a vida.",
-    coverImageUrl: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=800&h=400&fit=crop",
-    generatedTitle: "Kit Troca de Fralda (Passeio) — Praticidade para sair com o bebê",
-    generatedDescription: "Trocador portátil + porta-lenços + organizador: pronto para qualquer situação fora de casa.",
-    generatedBullets: [
-      "Compacto e leve para levar na bolsa",
-      "Materiais impermeáveis e fáceis de limpar",
-      "Organização perfeita para fraldas e lenços",
-      "Design discreto e elegante"
-    ],
-    status: "ACTIVE",
-    rulesConfig: {
-      keywordGroups: [
-        { name: "trocador", keywords: ["trocador portátil bebê"], weight: 1.5 },
-        { name: "organizador", keywords: ["porta fraldas portátil"], weight: 1.2 },
-        { name: "acessórios", keywords: ["porta lenços umedecidos"], weight: 0.8 }
-      ],
-      typeWeights: { MAIN: 2, SECONDARY: 1, COMPLEMENT: 0.5 },
-      minItems: 4,
-      maxItems: 8,
-      mustHaveTypes: [{ type: "MAIN", minCount: 1 }],
-      priceRange: { min: 20, max: 150 },
-      ratingMin: 4.2,
-      primeOnly: true,
-      excludeAsins: [],
-      allowedCategories: ["Baby Products"],
-      updateFrequency: "daily",
-      fallbackStrategy: { useManualAsins: true, substituteByCategory: true }
-    },
-    products: [
-      {
-        id: "prod-5",
-        kitId: "kit-002",
-        asin: "B0MNO77889",
-        title: "Trocador Portátil Dobrável Impermeável com Bolsos",
-        imageUrl: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=300&h=300&fit=crop",
-        price: 89.90,
-        originalPrice: 119.90,
-        rating: 4.8,
-        reviewCount: 1856,
-        isPrime: true,
-        role: "MAIN",
-        rankScore: 0.94,
-        rationale: "Trocador principal do kit. Impermeável, acolchoado e com bolsos para guardar fraldas e lenços.",
-        addedVia: "MANUAL",
-        affiliateLink: "https://www.amazon.com.br/dp/B0MNO77889?tag=karoom-20"
-      },
-      {
-        id: "prod-6",
-        kitId: "kit-002",
-        asin: "B0PQR99001",
-        title: "Porta Fraldas Organizador Compacto",
-        imageUrl: "https://images.unsplash.com/photo-1522771930-78848d9293e8?w=300&h=300&fit=crop",
-        price: 45.90,
-        originalPrice: 59.90,
-        rating: 4.5,
-        reviewCount: 723,
-        isPrime: true,
-        role: "SECONDARY",
-        rankScore: 0.82,
-        rationale: "Mantém fraldas organizadas e acessíveis. Cabe na bolsa e comporta até 6 fraldas.",
-        addedVia: "MANUAL",
-        affiliateLink: "https://www.amazon.com.br/dp/B0PQR99001?tag=karoom-20"
-      },
-      {
-        id: "prod-7",
-        kitId: "kit-002",
-        asin: "B0STU22334",
-        title: "Dispenser Porta Lenços Umedecidos Portátil",
-        imageUrl: "https://images.unsplash.com/photo-1585435557343-3b092031a831?w=300&h=300&fit=crop",
-        price: 34.90,
-        rating: 4.6,
-        reviewCount: 1245,
-        isPrime: true,
-        role: "COMPLEMENT",
-        rankScore: 0.76,
-        rationale: "Mantém os lenços sempre úmidos e de fácil acesso. Vedação hermética.",
-        addedVia: "MANUAL",
-        affiliateLink: "https://www.amazon.com.br/dp/B0STU22334?tag=karoom-20"
-      }
-    ],
-    views: 892,
-    lastUpdatedAt: new Date(),
-    createdAt: new Date()
-  }
-};
+type KitWithProducts = SelectProductKit & { products: SelectKitProduct[] };
 
-const roleConfig = {
+const roleConfig: Record<string, {
+  label: string;
+  icon: typeof Crown;
+  bgColor: string;
+  textColor: string;
+  borderColor: string;
+  ringColor: string;
+  gradient: string;
+}> = {
   MAIN: {
     label: "Principal",
     icon: Crown,
@@ -288,10 +80,12 @@ function RatingStars({ rating }: { rating: number }) {
   );
 }
 
-function KitProductCard({ product, index }: { product: KitProduct; index: number }) {
-  const config = roleConfig[product.role];
-  const discount = product.originalPrice 
-    ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
+function KitProductCard({ product, index }: { product: SelectKitProduct; index: number }) {
+  const config = roleConfig[product.role || 'COMPLEMENT'];
+  const price = Number(product.price) || 0;
+  const originalPrice = Number(product.originalPrice) || 0;
+  const discount = originalPrice > price
+    ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
 
   return (
@@ -312,7 +106,7 @@ function KitProductCard({ product, index }: { product: KitProduct; index: number
               {product.imageUrl ? (
                 <img
                   src={product.imageUrl}
-                  alt={product.title}
+                  alt={product.title || 'Produto'}
                   className="w-full h-full object-cover rounded-lg"
                 />
               ) : (
@@ -341,13 +135,15 @@ function KitProductCard({ product, index }: { product: KitProduct; index: number
                   {config.label}
                 </Badge>
                 
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  Score: {(product.rankScore * 100).toFixed(0)}%
-                </span>
+                {product.rankScore && (
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    Score: {(product.rankScore * 100).toFixed(0)}%
+                  </span>
+                )}
               </div>
               
               <h3 className="font-semibold text-gray-900 dark:text-white text-sm line-clamp-2 mb-2">
-                {product.title}
+                {product.title || 'Produto sem título'}
               </h3>
               
               <div className="flex items-center gap-2 mb-2">
@@ -364,24 +160,26 @@ function KitProductCard({ product, index }: { product: KitProduct; index: number
               <div className="flex items-center justify-between">
                 <div>
                   <span className="text-lg font-bold text-green-600 dark:text-green-400">
-                    R$ {product.price.toFixed(2)}
+                    R$ {price.toFixed(2)}
                   </span>
-                  {product.originalPrice && product.originalPrice > product.price && (
+                  {originalPrice > price && (
                     <span className="text-sm text-gray-400 line-through ml-2">
-                      R$ {product.originalPrice.toFixed(2)}
+                      R$ {originalPrice.toFixed(2)}
                     </span>
                   )}
                 </div>
                 
-                <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
-                  onClick={() => window.open(product.affiliateLink, '_blank')}
-                  data-testid={`btn-buy-${product.asin}`}
-                >
-                  <ShoppingCart className="w-4 h-4 mr-1" />
-                  Ver na Amazon
-                </Button>
+                {product.affiliateLink && (
+                  <Button
+                    size="sm"
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                    onClick={() => window.open(product.affiliateLink!, '_blank')}
+                    data-testid={`btn-buy-${product.asin}`}
+                  >
+                    <ShoppingCart className="w-4 h-4 mr-1" />
+                    Ver na Amazon
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -402,7 +200,7 @@ function KitProductCard({ product, index }: { product: KitProduct; index: number
   );
 }
 
-function KitChecklist({ bullets }: { bullets?: string[] }) {
+function KitChecklist({ bullets }: { bullets?: string[] | null }) {
   if (!bullets || bullets.length === 0) return null;
 
   return (
@@ -432,7 +230,11 @@ function KitChecklist({ bullets }: { bullets?: string[] }) {
 }
 
 function RelatedKits({ currentSlug }: { currentSlug: string }) {
-  const otherKits = Object.values(MOCK_KITS).filter(kit => kit.slug !== currentSlug);
+  const { data: allKits } = useQuery<SelectProductKit[]>({
+    queryKey: ["/api/kits"],
+  });
+
+  const otherKits = allKits?.filter(kit => kit.slug !== currentSlug) || [];
 
   if (otherKits.length === 0) return null;
 
@@ -479,8 +281,10 @@ export default function KitDetalhes() {
   const [, params] = useRoute("/kits/:slug");
   const slug = params?.slug;
   
-  const kit = slug ? MOCK_KITS[slug] : null;
-  const isLoading = false;
+  const { data: kit, isLoading, error } = useQuery<KitWithProducts>({
+    queryKey: ["/api/kits", slug],
+    enabled: !!slug,
+  });
 
   if (isLoading) {
     return (
@@ -493,7 +297,7 @@ export default function KitDetalhes() {
     );
   }
 
-  if (!kit) {
+  if (error || !kit) {
     return (
       <div className="min-h-screen bg-[#FAF8F5] dark:bg-gray-900 flex items-center justify-center">
         <div className="text-center max-w-md mx-auto px-4">
@@ -514,12 +318,13 @@ export default function KitDetalhes() {
     );
   }
 
-  const mainProducts = kit.products.filter(p => p.role === 'MAIN');
-  const secondaryProducts = kit.products.filter(p => p.role === 'SECONDARY');
-  const complementProducts = kit.products.filter(p => p.role === 'COMPLEMENT');
+  const products = kit.products || [];
+  const mainProducts = products.filter(p => p.role === 'MAIN');
+  const secondaryProducts = products.filter(p => p.role === 'SECONDARY');
+  const complementProducts = products.filter(p => p.role === 'COMPLEMENT');
 
-  const totalPrice = kit.products.reduce((sum, p) => sum + p.price, 0);
-  const totalOriginalPrice = kit.products.reduce((sum, p) => sum + (p.originalPrice || p.price), 0);
+  const totalPrice = products.reduce((sum, p) => sum + (p.price || 0), 0);
+  const totalOriginalPrice = products.reduce((sum, p) => sum + (p.originalPrice || p.price || 0), 0);
   const totalSavings = totalOriginalPrice - totalPrice;
 
   return (
@@ -550,7 +355,7 @@ export default function KitDetalhes() {
                 Kit Curado
               </Badge>
               <Badge className="bg-white/20 text-white border-white/30">
-                {kit.products.length} itens
+                {products.length} itens
               </Badge>
             </div>
             
@@ -586,7 +391,7 @@ export default function KitDetalhes() {
               <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                 <div className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  <span>Atualizado {kit.lastUpdatedAt ? 'hoje' : 'recentemente'}</span>
+                  <span>Atualizado recentemente</span>
                 </div>
               </div>
             </div>
