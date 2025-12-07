@@ -200,6 +200,10 @@ export default function AdminMissoes() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log("[DEBUG] handleSubmit chamado");
+    console.log("[DEBUG] editingMission:", editingMission?.id, editingMission?.title);
+    console.log("[DEBUG] formData.audioUrl:", formData.audioUrl);
+    
     // Parse tarefasSimplesDeExecucao (format: "task1::subtext1|task2::subtext2")
     let parsedTasks: Array<{ task: string; subtext: string }> = [];
     if (formData.tarefasSimplesDeExecucao) {
@@ -239,9 +243,14 @@ export default function AdminMissoes() {
       isPublished: formData.isPublished,
     };
 
+    console.log("[DEBUG] Payload audioUrl:", payload.audioUrl);
+    console.log("[DEBUG] Payload completo:", JSON.stringify(payload, null, 2));
+
     if (editingMission) {
+      console.log("[DEBUG] Chamando updateMutation com id:", editingMission.id);
       updateMutation.mutate({ ...payload, id: editingMission.id });
     } else {
+      console.log("[DEBUG] Chamando createMutation");
       createMutation.mutate(payload);
     }
   };
