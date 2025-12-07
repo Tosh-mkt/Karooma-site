@@ -70,11 +70,37 @@ export function requireFlipbookAccess(flipbookId: string) {
 /**
  * Middleware to extract user info from session/auth
  * This should be called before requireFlipbookAccess
- * Supports both Express session and NextAuth session
+ * Supports Express session, NextAuth session, and X-User-Auth header
  */
 export async function extractUserInfo(req: Request, res: Response, next: NextFunction) {
   console.log('🔍 ===== EXTRAINDO INFO DO USUÁRIO (extractUserInfo) =====');
   console.log('📍 URL:', req.method, req.path);
+  
+  // 0. Try X-User-Auth header (for mobile browsers where cookies don't work)
+  const userAuthHeader = req.headers['x-user-auth'] as string;
+  if (userAuthHeader) {
+    try {
+      const headerUser = JSON.parse(userAuthHeader);
+      if (headerUser.id && headerUser.email) {
+        // Validate user exists in database
+        const dbUser = await storage.getUserByEmail(headerUser.email);
+        if (dbUser && dbUser.id === headerUser.id) {
+          req.user = {
+            email: dbUser.email || undefined,
+            isAdmin: dbUser.isAdmin || false,
+            id: dbUser.id
+          };
+          console.log('✅ Usuário extraído do header X-User-Auth:', JSON.stringify(req.user, null, 2));
+          console.log('=========================================================\n');
+          return next();
+        } else {
+          console.log('⚠️ Header X-User-Auth inválido - usuário não encontrado ou ID não corresponde');
+        }
+      }
+    } catch (e) {
+      console.log('⚠️ Erro ao parsear header X-User-Auth:', e);
+    }
+  }
   
   // 1. First try Express session (traditional login)
   if (req.session && (req.session as any).user) {

@@ -7,14 +7,34 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
+function getUserAuthHeader(): Record<string, string> {
+  try {
+    const savedUser = localStorage.getItem('karooma_user');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      if (user.id && user.email) {
+        return { 'X-User-Auth': JSON.stringify({ id: user.id, email: user.email }) };
+      }
+    }
+  } catch (e) {
+    console.error('Error getting user auth header:', e);
+  }
+  return {};
+}
+
 export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
+  const headers: Record<string, string> = {
+    ...getUserAuthHeader(),
+    ...(data ? { "Content-Type": "application/json" } : {}),
+  };
+  
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
@@ -31,6 +51,7 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
+      headers: getUserAuthHeader(),
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
