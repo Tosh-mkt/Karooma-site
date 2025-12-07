@@ -200,6 +200,12 @@ export default function AdminMissoes() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // DEBUG: Alerta visível para confirmar que o submit está sendo chamado
+    toast({ 
+      title: "[DEBUG] Salvando...", 
+      description: `audioUrl: ${formData.audioUrl?.substring(0, 50) || 'vazio'}`,
+    });
+    
     console.log("[DEBUG] handleSubmit chamado");
     console.log("[DEBUG] editingMission:", editingMission?.id, editingMission?.title);
     console.log("[DEBUG] formData.audioUrl:", formData.audioUrl);
