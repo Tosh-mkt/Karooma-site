@@ -45,10 +45,26 @@ export default function AdminMissoes() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: any) => apiRequest("PATCH", `/api/admin/missions/${data.id}`, data),
-    onSuccess: () => {
+    mutationFn: async (data: any) => {
+      // DEBUG: Log exato do que está sendo enviado
+      console.log("[DEBUG mutationFn] audioUrl enviado:", data.audioUrl);
+      toast({ 
+        title: "[DEBUG] Enviando para servidor...", 
+        description: `audioUrl: ${data.audioUrl?.substring(0, 40) || 'VAZIO'}`,
+        duration: 5000
+      });
+      const result = await apiRequest("PATCH", `/api/admin/missions/${data.id}`, data);
+      console.log("[DEBUG mutationFn] Resposta:", result);
+      return result;
+    },
+    onSuccess: (result: any) => {
       queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
-      toast({ title: "Missão atualizada com sucesso!" });
+      // DEBUG: Mostrar o que o servidor retornou
+      toast({ 
+        title: "Missão atualizada com sucesso!", 
+        description: `[DEBUG] Servidor retornou audioUrl: ${result?.audioUrl?.substring(0, 40) || 'VAZIO'}`,
+        duration: 8000
+      });
       setEditingMission(null);
       resetForm();
     },
