@@ -46,25 +46,11 @@ export default function AdminMissoes() {
 
   const updateMutation = useMutation({
     mutationFn: async (data: any) => {
-      // DEBUG: Log exato do que está sendo enviado
-      console.log("[DEBUG mutationFn] audioUrl enviado:", data.audioUrl);
-      toast({ 
-        title: "[DEBUG] Enviando para servidor...", 
-        description: `audioUrl: ${data.audioUrl?.substring(0, 40) || 'VAZIO'}`,
-        duration: 5000
-      });
-      const result = await apiRequest("PATCH", `/api/admin/missions/${data.id}`, data);
-      console.log("[DEBUG mutationFn] Resposta:", result);
-      return result;
+      return await apiRequest("PATCH", `/api/admin/missions/${data.id}`, data);
     },
-    onSuccess: (result: any) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/missions"] });
-      // DEBUG: Mostrar o que o servidor retornou
-      toast({ 
-        title: "Missão atualizada com sucesso!", 
-        description: `[DEBUG] Servidor retornou audioUrl: ${result?.audioUrl?.substring(0, 40) || 'VAZIO'}`,
-        duration: 8000
-      });
+      toast({ title: "Missão atualizada com sucesso!" });
       setEditingMission(null);
       resetForm();
     },
@@ -216,16 +202,6 @@ export default function AdminMissoes() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // DEBUG: Alerta visível para confirmar que o submit está sendo chamado
-    toast({ 
-      title: "[DEBUG] Salvando...", 
-      description: `audioUrl: ${formData.audioUrl?.substring(0, 50) || 'vazio'}`,
-    });
-    
-    console.log("[DEBUG] handleSubmit chamado");
-    console.log("[DEBUG] editingMission:", editingMission?.id, editingMission?.title);
-    console.log("[DEBUG] formData.audioUrl:", formData.audioUrl);
-    
     // Parse tarefasSimplesDeExecucao (format: "task1::subtext1|task2::subtext2")
     let parsedTasks: Array<{ task: string; subtext: string }> = [];
     if (formData.tarefasSimplesDeExecucao) {
@@ -265,14 +241,9 @@ export default function AdminMissoes() {
       isPublished: formData.isPublished,
     };
 
-    console.log("[DEBUG] Payload audioUrl:", payload.audioUrl);
-    console.log("[DEBUG] Payload completo:", JSON.stringify(payload, null, 2));
-
     if (editingMission) {
-      console.log("[DEBUG] Chamando updateMutation com id:", editingMission.id);
       updateMutation.mutate({ ...payload, id: editingMission.id });
     } else {
-      console.log("[DEBUG] Chamando createMutation");
       createMutation.mutate(payload);
     }
   };

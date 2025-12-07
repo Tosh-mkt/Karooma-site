@@ -73,16 +73,12 @@ export function requireFlipbookAccess(flipbookId: string) {
  * Supports Express session, NextAuth session, and X-User-Auth header
  */
 export async function extractUserInfo(req: Request, res: Response, next: NextFunction) {
-  console.log('🔍 ===== EXTRAINDO INFO DO USUÁRIO (extractUserInfo) =====');
-  console.log('📍 URL:', req.method, req.path);
-  
   // 0. Try X-User-Auth header (for mobile browsers where cookies don't work)
   const userAuthHeader = req.headers['x-user-auth'] as string;
   if (userAuthHeader) {
     try {
       const headerUser = JSON.parse(userAuthHeader);
       if (headerUser.id && headerUser.email) {
-        // Validate user exists in database
         const dbUser = await storage.getUserByEmail(headerUser.email);
         if (dbUser && dbUser.id === headerUser.id) {
           req.user = {
@@ -90,15 +86,11 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
             isAdmin: dbUser.isAdmin || false,
             id: dbUser.id
           };
-          console.log('✅ Usuário extraído do header X-User-Auth:', JSON.stringify(req.user, null, 2));
-          console.log('=========================================================\n');
           return next();
-        } else {
-          console.log('⚠️ Header X-User-Auth inválido - usuário não encontrado ou ID não corresponde');
         }
       }
     } catch (e) {
-      console.log('⚠️ Erro ao parsear header X-User-Auth:', e);
+      // Invalid header, continue to other auth methods
     }
   }
   
@@ -110,26 +102,20 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
       isAdmin: sessionUser.isAdmin || false,
       id: sessionUser.id
     };
-    console.log('✅ Usuário extraído da sessão Express:', JSON.stringify(req.user, null, 2));
-    console.log('=========================================================\n');
     return next();
   }
 
   // 2. Try NextAuth session (Google OAuth)
   try {
-    console.log('🔐 Tentando buscar sessão NextAuth...');
     const nextAuthSession = await getSession(req, authConfig);
-    console.log('🔐 NextAuth session result:', nextAuthSession ? JSON.stringify(nextAuthSession, null, 2) : 'null');
     
     if (nextAuthSession?.user) {
       const email = nextAuthSession.user.email;
       const isAdminEmail = email?.includes('@karooma.life') || email?.includes('admin');
       
-      // Check if user is admin in database
       let isAdmin = isAdminEmail;
       if (email) {
         const dbUser = await storage.getUserByEmail(email);
-        console.log('🔐 DB User found:', dbUser ? JSON.stringify({ email: dbUser.email, isAdmin: dbUser.isAdmin }, null, 2) : 'null');
         if (dbUser?.isAdmin) {
           isAdmin = true;
         }
@@ -140,14 +126,10 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
         isAdmin: isAdmin || (nextAuthSession.user as any).isAdmin || false,
         id: (nextAuthSession.user as any).id
       };
-      console.log('✅ Usuário extraído do NextAuth:', JSON.stringify(req.user, null, 2));
-      console.log('=========================================================\n');
       return next();
-    } else {
-      console.log('🔐 NextAuth session não contém user');
     }
   } catch (error) {
-    console.log('⚠️ Erro ao verificar NextAuth session:', error);
+    // NextAuth session check failed, continue
   }
 
   // 3. Check if admin override (only in development)
@@ -157,8 +139,6 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
       isAdmin: true,
       id: 'admin'
     };
-    console.log('🔓 Admin override ativado (dev mode)');
-    console.log('=========================================================\n');
     return next();
   }
 
@@ -170,11 +150,7 @@ export async function extractUserInfo(req: Request, res: Response, next: NextFun
       isAdmin: false,
       id: 'user_' + email.replace('@', '_').replace('.', '_')
     };
-    console.log('📧 Usuário extraído de query params:', email);
-  } else {
-    console.log('⚠️ Nenhum usuário encontrado');
   }
 
-  console.log('=========================================================\n');
   next();
 }

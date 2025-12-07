@@ -1538,18 +1538,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ error: "Access denied. Admin only." });
       }
       const { id } = req.params;
-      
-      console.log("[DEBUG PATCH] Recebido request para mission:", id);
-      console.log("[DEBUG PATCH] Body audioUrl:", req.body.audioUrl);
-      
       const validatedData = insertMissionSchema.partial().parse(req.body);
-      
-      console.log("[DEBUG PATCH] Dados validados audioUrl:", validatedData.audioUrl);
-      
       const mission = await storage.updateMission(id, validatedData);
-      
-      console.log("[DEBUG PATCH] Mission atualizada audioUrl:", mission.audioUrl);
-      
       res.json(mission);
     } catch (error: any) {
       console.error("Error updating mission:", error);
