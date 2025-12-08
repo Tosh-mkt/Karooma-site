@@ -49,13 +49,13 @@ export function ImageUploader({ onImageInserted, className }: ImageUploaderProps
     let fileToUpload: File = file;
     const originalSize = file.size;
     
-    // Comprimir imagem se for maior que 1MB
-    if (file.size > 1 * 1024 * 1024) {
+    // Comprimir imagem se for maior que 2.1MB
+    if (file.size > 2.1 * 1024 * 1024) {
       try {
         setUploadStatus("Comprimindo...");
         
         const compressionOptions = {
-          maxSizeMB: 1, // Máximo 1MB após compressão
+          maxSizeMB: 2.1, // Máximo 2.1MB após compressão
           maxWidthOrHeight: 1920, // Máximo 1920px de largura ou altura
           useWebWorker: true,
           fileType: file.type as string,
