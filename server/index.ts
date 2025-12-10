@@ -5,6 +5,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
 import { startAlertScheduler } from "./jobs/scheduler";
+import { seedChatbot } from "./seed/chatbotSeed";
 import { pool } from "./db";
 import path from "path";
 
@@ -140,8 +141,15 @@ app.get('/sw.js', (req, res) => {
     port,
     host: "0.0.0.0",
     reusePort: true,
-  }, () => {
+  }, async () => {
     log(`serving on port ${port}`);
+    
+    // Seed do chatbot (configura automaticamente em produção)
+    try {
+      await seedChatbot();
+    } catch (error) {
+      log('Failed to seed chatbot:', String(error));
+    }
     
     // Inicializar jobs de atualização de produtos
     try {
