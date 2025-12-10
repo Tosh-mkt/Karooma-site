@@ -146,7 +146,7 @@ export default function AdminChatbot() {
   const mergedConfig = { ...config, ...localConfig };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-6xl">
+    <div className="container mx-auto pt-20 md:pt-24 pb-8 px-4 max-w-6xl">
       <div className="flex items-center gap-3 mb-8">
         <Bot className="w-8 h-8 text-primary" />
         <div>
@@ -156,22 +156,26 @@ export default function AdminChatbot() {
       </div>
 
       <Tabs defaultValue="config" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="config" className="flex items-center gap-2">
-            <Settings className="w-4 h-4" />
-            Configuração
+        <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsTrigger value="config" className="flex items-center gap-1 text-xs md:text-sm px-2 py-2">
+            <Settings className="w-4 h-4 shrink-0" />
+            <span className="hidden md:inline">Configuração</span>
+            <span className="md:hidden">Config</span>
           </TabsTrigger>
-          <TabsTrigger value="prompt" className="flex items-center gap-2">
-            <Brain className="w-4 h-4" />
-            Prompt & RAG
+          <TabsTrigger value="prompt" className="flex items-center gap-1 text-xs md:text-sm px-2 py-2">
+            <Brain className="w-4 h-4 shrink-0" />
+            <span className="hidden md:inline">Prompt & RAG</span>
+            <span className="md:hidden">Prompt</span>
           </TabsTrigger>
-          <TabsTrigger value="knowledge" className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" />
-            Base de Conhecimento
+          <TabsTrigger value="knowledge" className="flex items-center gap-1 text-xs md:text-sm px-2 py-2">
+            <MessageSquare className="w-4 h-4 shrink-0" />
+            <span className="hidden md:inline">Base de Conhecimento</span>
+            <span className="md:hidden">Base</span>
           </TabsTrigger>
-          <TabsTrigger value="conversations" className="flex items-center gap-2">
-            <MessageSquare className="w-4 h-4" />
-            Conversas
+          <TabsTrigger value="conversations" className="flex items-center gap-1 text-xs md:text-sm px-2 py-2">
+            <MessageSquare className="w-4 h-4 shrink-0" />
+            <span className="hidden md:inline">Conversas</span>
+            <span className="md:hidden">Chat</span>
           </TabsTrigger>
         </TabsList>
 
