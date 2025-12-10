@@ -44,6 +44,7 @@ import AdminMissoes from "./pages/AdminMissoes";
 import AdminApparel from "./pages/AdminApparel";
 import AdminKits from "./pages/AdminKits";
 import AdminChatbot from "./pages/AdminChatbot";
+import AdminChatbotFiles from "./pages/AdminChatbotFiles";
 import Kits from "./pages/kits";
 import KitDetalhes from "./pages/kit-detalhes";
 import { TempLogin } from "./pages/TempLogin";
@@ -136,6 +137,7 @@ function Router() {
               <Route path="/admin/apparel" component={AdminApparel} />
               <Route path="/admin/kits" component={AdminKits} />
               <Route path="/admin/chatbot" component={AdminChatbot} />
+              <Route path="/admin/chatbot-knowledge" component={AdminChatbotFiles} />
               <Route path="/admin/guide-posts" component={AdminGuidePosts} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
               <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />
