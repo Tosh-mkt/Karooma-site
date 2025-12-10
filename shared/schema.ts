@@ -1312,3 +1312,132 @@ export type InsertKitProduct = z.infer<typeof insertKitProductSchema>;
 export type InsertProductKit = z.infer<typeof insertProductKitSchema>;
 export type SelectProductKit = typeof productKits.$inferSelect;
 export type SelectKitProduct = typeof kitProducts.$inferSelect;
+
+// ========================================
+// AI CHATBOT SYSTEM - DeepSeek + RAG
+// ========================================
+
+// Supported LLM providers
+export const LLMProviders = {
+  DEEPSEEK: 'deepseek',
+  OPENAI: 'openai',
+  ANTHROPIC: 'anthropic',
+  GEMINI: 'gemini',
+} as const;
+
+// RAG content sources
+export const RAGSources = {
+  MISSIONS: 'missions',
+  BLOG: 'blog',
+  PRODUCTS: 'products',
+  KITS: 'kits',
+  CUSTOM: 'custom',
+} as const;
+
+// Chatbot configuration table - admin configurable
+export const chatbotConfig = pgTable("chatbot_config", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull().default("Karooma Assistant"),
+  isActive: boolean("is_active").default(true),
+  llmProvider: varchar("llm_provider", { length: 50 }).notNull().default("deepseek"),
+  llmModel: varchar("llm_model", { length: 100 }).notNull().default("deepseek-chat"),
+  systemPrompt: text("system_prompt").notNull(),
+  temperature: decimal("temperature", { precision: 2, scale: 1 }).default("0.7"),
+  maxTokens: integer("max_tokens").default(1024),
+  ragEnabled: boolean("rag_enabled").default(true),
+  ragSources: text("rag_sources").array().default(sql`ARRAY['missions', 'blog', 'products']::text[]`),
+  ragMaxResults: integer("rag_max_results").default(5),
+  welcomeMessage: text("welcome_message").default("Olá! Sou a assistente virtual da Karooma. Como posso ajudar você hoje?"),
+  suggestedQuestions: text("suggested_questions").array().default(sql`ARRAY[]::text[]`),
+  widgetPosition: varchar("widget_position", { length: 20 }).default("bottom-right"),
+  widgetPrimaryColor: varchar("widget_primary_color", { length: 20 }).default("#6366f1"),
+  widgetTitle: varchar("widget_title", { length: 100 }).default("Precisa de ajuda?"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Chat conversations
+export const chatConversations = pgTable("chat_conversations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  sessionId: varchar("session_id", { length: 100 }).notNull(),
+  userId: varchar("user_id").references(() => users.id, { onDelete: "set null" }),
+  userEmail: varchar("user_email", { length: 255 }),
+  userName: varchar("user_name", { length: 255 }),
+  status: varchar("status", { length: 20 }).default("active"),
+  metadata: json("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_chat_conversations_session").on(table.sessionId),
+  index("idx_chat_conversations_user").on(table.userId),
+]);
+
+// Chat messages
+export const chatMessages = pgTable("chat_messages", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  conversationId: varchar("conversation_id").notNull().references(() => chatConversations.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 20 }).notNull(),
+  content: text("content").notNull(),
+  ragContext: json("rag_context"),
+  tokensUsed: integer("tokens_used"),
+  llmProvider: varchar("llm_provider", { length: 50 }),
+  llmModel: varchar("llm_model", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_chat_messages_conversation").on(table.conversationId),
+  index("idx_chat_messages_created").on(table.createdAt),
+]);
+
+// Custom RAG knowledge base entries (for adding custom Q&A)
+export const chatKnowledgeBase = pgTable("chat_knowledge_base", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  question: text("question").notNull(),
+  answer: text("answer").notNull(),
+  category: varchar("category", { length: 100 }),
+  keywords: text("keywords").array().default(sql`ARRAY[]::text[]`),
+  priority: integer("priority").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_chat_kb_category").on(table.category),
+  index("idx_chat_kb_active").on(table.isActive),
+]);
+
+// Schemas
+export const insertChatbotConfigSchema = createInsertSchema(chatbotConfig).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertChatConversationSchema = createInsertSchema(chatConversations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertChatMessageSchema = createInsertSchema(chatMessages).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertChatKnowledgeBaseSchema = createInsertSchema(chatKnowledgeBase).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// Types
+export type ChatbotConfig = typeof chatbotConfig.$inferSelect;
+export type InsertChatbotConfig = z.infer<typeof insertChatbotConfigSchema>;
+export type ChatConversation = typeof chatConversations.$inferSelect;
+export type InsertChatConversation = z.infer<typeof insertChatConversationSchema>;
+export type ChatMessage = typeof chatMessages.$inferSelect;
+export type InsertChatMessage = z.infer<typeof insertChatMessageSchema>;
+export type ChatKnowledgeBase = typeof chatKnowledgeBase.$inferSelect;
+export type InsertChatKnowledgeBase = z.infer<typeof insertChatKnowledgeBaseSchema>;
+
+// LLM Provider type
+export type LLMProvider = typeof LLMProviders[keyof typeof LLMProviders];
+export type RAGSource = typeof RAGSources[keyof typeof RAGSources];

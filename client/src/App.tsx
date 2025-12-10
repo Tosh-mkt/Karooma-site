@@ -43,6 +43,7 @@ import AdminRoadmap from "./pages/AdminRoadmap";
 import AdminMissoes from "./pages/AdminMissoes";
 import AdminApparel from "./pages/AdminApparel";
 import AdminKits from "./pages/AdminKits";
+import AdminChatbot from "./pages/AdminChatbot";
 import Kits from "./pages/kits";
 import KitDetalhes from "./pages/kit-detalhes";
 import { TempLogin } from "./pages/TempLogin";
@@ -63,6 +64,7 @@ import { LandingLayout } from "./components/layout/landing-layout";
 import { AutoNotification } from "./components/content/auto-notification";
 import { CookieConsent } from "./components/CookieConsent";
 import { ConsentProvider } from "./contexts/ConsentContext";
+import { ChatWidget } from "./components/ChatWidget";
 import { motion } from "framer-motion";
 
 function Router() {
@@ -133,6 +135,7 @@ function Router() {
               <Route path="/admin/missoes" component={AdminMissoes} />
               <Route path="/admin/apparel" component={AdminApparel} />
               <Route path="/admin/kits" component={AdminKits} />
+              <Route path="/admin/chatbot" component={AdminChatbot} />
               <Route path="/admin/guide-posts" component={AdminGuidePosts} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
               <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />
@@ -176,6 +179,7 @@ function App() {
           <div className="custom-scrollbar">
             <Router />
             <CookieConsent />
+            <ChatWidget />
             <Toaster />
           </div>
         </ConsentProvider>

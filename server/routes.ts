@@ -8,6 +8,7 @@ import crypto from "crypto";
 import { registerFlipbookAccessRoutes } from "./routes/flipbookAccess";
 import { registerFlipbookTemporaryAccessRoutes } from "./routes/flipbookTemporaryAccess";
 import { registerAnalyticsRoutes } from "./routes/analytics";
+import { registerChatbotRoutes } from "./routes/chatbot";
 import { insertContentSchema, insertProductSchema, insertNewsletterSchema, insertNewsletterAdvancedSchema, insertPageSchema, startStageSchema, completeStageSchema, requestPasswordResetSchema, resetPasswordSchema, passwordResetTokens, registerUserSchema, insertDiagnosticSchema, insertFeaturedApparelSchema, insertMissionSchema, insertGuidePostSchema, insertProductKitSchema } from "@shared/schema";
 import { z } from "zod";
 import { sseManager } from "./sse";
@@ -40,6 +41,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerFlipbookAccessRoutes(app);
   registerFlipbookTemporaryAccessRoutes(app);
   registerAnalyticsRoutes(app);
+  registerChatbotRoutes(app);
 
   // Initialize Amazon API Service
   const amazonApiService = new AmazonPAAPIService();
