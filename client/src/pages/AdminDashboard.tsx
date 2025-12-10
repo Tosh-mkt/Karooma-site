@@ -18,7 +18,7 @@ import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
   Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
-  Terminal, FileText, Upload, Brain, Bot, Shirt, Book, Package
+  Terminal, FileText, Upload, Brain, Bot, Shirt, Book, Package, MessageCircle
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -307,6 +307,32 @@ function DashboardOverview() {
             }}>
               <Package className="w-4 h-4 mr-2" />
               Gerenciar Kits
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="glassmorphism border-0 bg-gradient-to-br from-indigo-50 to-purple-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          onClick={() => window.location.href = '/admin/chatbot'}
+        >
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="flex items-center text-base md:text-lg">
+              <MessageCircle className="w-5 h-5 mr-2 text-indigo-600" />
+              Chatbot Karoo
+            </CardTitle>
+            <CardDescription className="text-sm">
+              Configure a assistente virtual
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 pb-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Configure o tom, perguntas sugeridas, base de FAQ e integração com IA.
+            </p>
+            <Button variant="outline" className="w-full bg-white hover:bg-indigo-50" onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = '/admin/chatbot';
+            }}>
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Configurar Chatbot
             </Button>
           </CardContent>
         </Card>
