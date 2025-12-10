@@ -1,6 +1,7 @@
 import { Router, type Request, type Response } from "express";
 import { createChatbotService } from "../services/chatbotService";
 import { LLMService } from "../services/llmService";
+import { chatbotConfigLoader } from "../services/chatbotConfigLoader";
 import { extractUserInfo } from "../middleware/flipbookAuth";
 import { z } from "zod";
 
@@ -263,6 +264,150 @@ router.get("/admin/conversations/:id/messages", extractUserInfo, async (req: any
   } catch (error) {
     console.error("Error fetching messages:", error);
     res.status(500).json({ error: "Failed to fetch messages" });
+  }
+});
+
+router.get("/admin/files", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const loaded = await chatbotConfigLoader.loadAll();
+    const categories = await chatbotConfigLoader.getCategories();
+
+    res.json({
+      config: loaded.config,
+      systemPrompt: loaded.systemPrompt,
+      categories,
+      stats: loaded.stats,
+      entries: {
+        faq: loaded.faqEntries,
+        policies: loaded.policyEntries,
+      },
+    });
+  } catch (error) {
+    console.error("Error loading chatbot files:", error);
+    res.status(500).json({ error: "Failed to load chatbot files" });
+  }
+});
+
+router.get("/admin/files/category/:category", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { category } = req.params;
+    const content = await chatbotConfigLoader.getFileContent(category);
+
+    if (content === null) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.json({ category, content });
+  } catch (error) {
+    console.error("Error loading category:", error);
+    res.status(500).json({ error: "Failed to load category" });
+  }
+});
+
+router.put("/admin/files/category/:category", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { category } = req.params;
+    const { content } = req.body;
+
+    if (!content || typeof content !== "string") {
+      return res.status(400).json({ error: "Content is required" });
+    }
+
+    const success = await chatbotConfigLoader.saveFileContent(category, content);
+
+    if (!success) {
+      return res.status(500).json({ error: "Failed to save category" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error saving category:", error);
+    res.status(500).json({ error: "Failed to save category" });
+  }
+});
+
+router.post("/admin/files/category", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { name, type } = req.body;
+
+    if (!name || typeof name !== "string") {
+      return res.status(400).json({ error: "Category name is required" });
+    }
+
+    const success = await chatbotConfigLoader.createCategory(name, type || "faq");
+
+    if (!success) {
+      return res.status(400).json({ error: "Category already exists" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error creating category:", error);
+    res.status(500).json({ error: "Failed to create category" });
+  }
+});
+
+router.delete("/admin/files/category/:category", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { category } = req.params;
+    const success = await chatbotConfigLoader.deleteCategory(category);
+
+    if (!success) {
+      return res.status(404).json({ error: "Category not found" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    res.status(500).json({ error: "Failed to delete category" });
+  }
+});
+
+router.post("/admin/files/sync", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const result = await chatbotConfigLoader.syncToDatabase();
+    res.json(result);
+  } catch (error) {
+    console.error("Error syncing to database:", error);
+    res.status(500).json({ error: "Failed to sync to database" });
+  }
+});
+
+router.get("/admin/files/config", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const config = await chatbotConfigLoader.loadConfig();
+    res.json(config || {});
+  } catch (error) {
+    console.error("Error loading config:", error);
+    res.status(500).json({ error: "Failed to load config" });
   }
 });
 
