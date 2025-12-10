@@ -9,7 +9,7 @@ const chatbotService = createChatbotService();
 
 const chatRequestSchema = z.object({
   message: z.string().min(1),
-  sessionId: z.string().optional(),
+  sessionId: z.string().nullable().optional(),
 });
 
 const knowledgeEntrySchema = z.object({
