@@ -32,7 +32,8 @@ const LLM_CONFIGS: Record<string, { baseURL?: string; envKey: string }> = {
     envKey: "ANTHROPIC_API_KEY",
   },
   gemini: {
-    envKey: "GEMINI_API_KEY",
+    baseURL: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai",
+    envKey: "AI_INTEGRATIONS_GEMINI_API_KEY",
   },
 };
 
@@ -69,11 +70,10 @@ export class LLMService {
     switch (this.provider) {
       case "deepseek":
       case "openai":
+      case "gemini":
         return this.chatOpenAICompatible(messages);
       case "anthropic":
         return this.chatAnthropic(messages);
-      case "gemini":
-        return this.chatGemini(messages);
       default:
         return this.chatOpenAICompatible(messages);
     }
@@ -131,7 +131,11 @@ export class LLMService {
   }
 
   private async chatGemini(messages: LLMMessage[]): Promise<LLMResponse> {
-    const genAI = new GoogleGenAI({ apiKey: this.getApiKey() });
+    const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+    const genAI = new GoogleGenAI({ 
+      apiKey: this.getApiKey(),
+      httpOptions: baseUrl ? { baseUrl } : undefined,
+    });
 
     const systemMessage = messages.find((m) => m.role === "system");
     const chatMessages = messages.filter((m) => m.role !== "system");
@@ -163,13 +167,11 @@ export class LLMService {
     switch (this.provider) {
       case "deepseek":
       case "openai":
+      case "gemini":
         yield* this.streamOpenAICompatible(messages);
         break;
       case "anthropic":
         yield* this.streamAnthropic(messages);
-        break;
-      case "gemini":
-        yield* this.streamGemini(messages);
         break;
       default:
         yield* this.streamOpenAICompatible(messages);
@@ -228,7 +230,11 @@ export class LLMService {
   }
 
   private async *streamGemini(messages: LLMMessage[]): AsyncGenerator<LLMStreamChunk> {
-    const genAI = new GoogleGenAI({ apiKey: this.getApiKey() });
+    const baseUrl = process.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+    const genAI = new GoogleGenAI({ 
+      apiKey: this.getApiKey(),
+      httpOptions: baseUrl ? { baseUrl } : undefined,
+    });
 
     const systemMessage = messages.find((m) => m.role === "system");
     const chatMessages = messages.filter((m) => m.role !== "system");

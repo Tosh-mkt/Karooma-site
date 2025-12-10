@@ -17,7 +17,7 @@
     "@aws-crypto/sha256-js": "^5.2.0",
     "@aws-sdk/signature-v4": "^3.370.0",
     "@google-cloud/storage": "^7.17.0",
-    "@google/genai": "^1.19.0",
+    "@google/genai": "^1.32.0",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
     "@neondatabase/serverless": "^0.10.4",
