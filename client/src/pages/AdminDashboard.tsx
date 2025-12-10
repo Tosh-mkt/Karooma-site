@@ -336,6 +336,32 @@ function DashboardOverview() {
             </Button>
           </CardContent>
         </Card>
+
+        <Card className="glassmorphism border-0 bg-gradient-to-br from-cyan-50 to-blue-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          onClick={() => window.location.href = '/admin/chatbot-knowledge'}
+        >
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="flex items-center text-base md:text-lg">
+              <Book className="w-5 h-5 mr-2 text-cyan-600" />
+              Base de Conhecimento
+            </CardTitle>
+            <CardDescription className="text-sm">
+              FAQs e conteúdo da Karoo
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 pb-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Gerencie arquivos de FAQ, políticas e conteúdo dinâmico do chatbot.
+            </p>
+            <Button variant="outline" className="w-full bg-white hover:bg-cyan-50" onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = '/admin/chatbot-knowledge';
+            }}>
+              <Book className="w-4 h-4 mr-2" />
+              Gerenciar Conhecimento
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Activity Section */}
