@@ -311,54 +311,27 @@ function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card className="glassmorphism border-0 bg-gradient-to-br from-indigo-50 to-purple-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
-          onClick={() => window.location.href = '/admin/chatbot'}
-        >
+        <Card className="glassmorphism border-0 bg-gradient-to-br from-indigo-50 to-purple-50 hover:shadow-lg transition-all duration-300">
           <CardHeader className="px-4 py-4">
             <CardTitle className="flex items-center text-base md:text-lg">
               <MessageCircle className="w-5 h-5 mr-2 text-indigo-600" />
               Chatbot Karoo
             </CardTitle>
             <CardDescription className="text-sm">
-              Configure a assistente virtual
+              Configure a assistente virtual e base de conhecimento
             </CardDescription>
           </CardHeader>
-          <CardContent className="px-4 pb-4">
+          <CardContent className="px-4 pb-4 space-y-2">
             <p className="text-sm text-gray-600 mb-3">
-              Configure o tom, perguntas sugeridas, base de FAQ e integração com IA.
+              Configure tom, personalidade, FAQs, políticas e prompts da Karoo.
             </p>
-            <Button variant="outline" className="w-full bg-white hover:bg-indigo-50" onClick={(e) => {
-              e.stopPropagation();
-              window.location.href = '/admin/chatbot';
-            }}>
+            <Button variant="outline" className="w-full bg-white hover:bg-indigo-50" onClick={() => window.location.href = '/admin/chatbot'}>
               <MessageCircle className="w-4 h-4 mr-2" />
-              Configurar Chatbot
+              Configurações Gerais
             </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="glassmorphism border-0 bg-gradient-to-br from-cyan-50 to-blue-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
-          onClick={() => window.location.href = '/admin/chatbot-knowledge'}
-        >
-          <CardHeader className="px-4 py-4">
-            <CardTitle className="flex items-center text-base md:text-lg">
-              <Book className="w-5 h-5 mr-2 text-cyan-600" />
-              Base de Conhecimento
-            </CardTitle>
-            <CardDescription className="text-sm">
-              FAQs e conteúdo da Karoo
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="px-4 pb-4">
-            <p className="text-sm text-gray-600 mb-3">
-              Gerencie arquivos de FAQ, políticas e conteúdo dinâmico do chatbot.
-            </p>
-            <Button variant="outline" className="w-full bg-white hover:bg-cyan-50" onClick={(e) => {
-              e.stopPropagation();
-              window.location.href = '/admin/chatbot-knowledge';
-            }}>
+            <Button variant="outline" className="w-full bg-white hover:bg-cyan-50" onClick={() => window.location.href = '/admin/chatbot-knowledge'}>
               <Book className="w-4 h-4 mr-2" />
-              Gerenciar Conhecimento
+              Base de Conhecimento
             </Button>
           </CardContent>
         </Card>
