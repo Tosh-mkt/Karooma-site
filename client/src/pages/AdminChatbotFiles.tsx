@@ -164,91 +164,81 @@ export default function AdminChatbotFiles() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 pt-20 md:pt-24 px-4 pb-8 md:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/admin/dashboard">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Voltar
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-800 flex items-center gap-2">
-                <BookOpen className="w-7 h-7 text-purple-600" />
-                Base de Conhecimento Karoo
-              </h1>
-              <p className="text-gray-600 text-sm mt-1">
-                Gerencie arquivos de FAQ, políticas e configurações do chatbot
-              </p>
-            </div>
+        <div className="space-y-4">
+          <Link href="/admin/dashboard">
+            <Button variant="ghost" size="sm">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+          </Link>
+          
+          <div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800 flex items-center gap-2">
+              <BookOpen className="w-6 h-6 text-purple-600" />
+              Karoo
+            </h1>
+            <p className="text-gray-600 text-sm">
+              Gerencie arquivos de FAQ, políticas e configurações do chatbot
+            </p>
           </div>
+          
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => refetch()}>
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Atualizar
+            <Button variant="outline" size="sm" onClick={() => refetch()}>
+              <RefreshCw className="w-4 h-4" />
+              <span className="hidden md:inline ml-2">Atualizar</span>
             </Button>
             <Button 
+              size="sm"
               onClick={() => syncMutation.mutate()} 
               disabled={syncMutation.isPending}
               className="bg-purple-600 hover:bg-purple-700"
             >
               {syncMutation.isPending ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <Database className="w-4 h-4 mr-2" />
+                <Database className="w-4 h-4" />
               )}
-              Sincronizar com RAG
+              <span className="hidden md:inline ml-2">Sincronizar</span>
             </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Card className="bg-white/80 backdrop-blur">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-500" />
-                Arquivos FAQ
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-blue-600">{filesData?.stats.faqFiles || 0}</p>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <FileText className="w-4 h-4 text-blue-500" />
+                <span className="text-xs text-gray-600">Arquivos FAQ</span>
+              </div>
+              <p className="text-2xl font-bold text-blue-600">{filesData?.stats.faqFiles || 0}</p>
             </CardContent>
           </Card>
           <Card className="bg-white/80 backdrop-blur">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Shield className="w-5 h-5 text-green-500" />
-                Arquivos Políticas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-green-600">{filesData?.stats.policyFiles || 0}</p>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield className="w-4 h-4 text-green-500" />
+                <span className="text-xs text-gray-600">Políticas</span>
+              </div>
+              <p className="text-2xl font-bold text-green-600">{filesData?.stats.policyFiles || 0}</p>
             </CardContent>
           </Card>
           <Card className="bg-white/80 backdrop-blur">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-purple-500" />
-                Total de Perguntas
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-purple-600">{filesData?.stats.totalEntries || 0}</p>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <MessageCircle className="w-4 h-4 text-purple-500" />
+                <span className="text-xs text-gray-600">Perguntas</span>
+              </div>
+              <p className="text-2xl font-bold text-purple-600">{filesData?.stats.totalEntries || 0}</p>
             </CardContent>
           </Card>
           <Card className="bg-white/80 backdrop-blur">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Settings className="w-5 h-5 text-orange-500" />
-                Configuração
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600">
-                {filesData?.config ? "Ativo" : "Não configurado"}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Tom: {filesData?.config?.tone?.style || "N/A"}
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Settings className="w-4 h-4 text-orange-500" />
+                <span className="text-xs text-gray-600">Config</span>
+              </div>
+              <p className="text-sm font-medium text-orange-600">
+                {filesData?.config ? "Ativo" : "N/A"}
               </p>
             </CardContent>
           </Card>
