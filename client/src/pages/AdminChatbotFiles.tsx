@@ -137,7 +137,7 @@ export default function AdminChatbotFiles() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chatbot/admin/files"] });
       setShowImportDialog(false);
-      setImportJsonText("");
+      // Mantém o JSON no campo para referência/edição futura
       toast({ title: "Configuração importada com sucesso!" });
     },
     onError: (error: any) => {
