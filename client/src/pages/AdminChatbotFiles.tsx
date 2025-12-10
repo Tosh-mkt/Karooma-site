@@ -162,7 +162,7 @@ export default function AdminChatbotFiles() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 pt-20 md:pt-24 px-4 pb-8 md:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">

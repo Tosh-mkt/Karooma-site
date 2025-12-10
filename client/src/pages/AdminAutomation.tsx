@@ -209,7 +209,7 @@ export function AdminAutomation() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 pt-20 md:pt-24 px-6 pb-6">
       <div className="max-w-7xl mx-auto space-y-6">
         
         {/* Header */}

@@ -732,7 +732,7 @@ export default function AdminKits() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] dark:bg-gray-900 p-6">
+    <div className="min-h-screen bg-[#FAF8F5] dark:bg-gray-900 pt-20 md:pt-24 px-6 pb-6">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
