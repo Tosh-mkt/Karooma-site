@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { 
   ArrowLeft, FileText, FolderOpen, Plus, Save, Trash2, RefreshCw, 
   Database, BookOpen, Shield, Settings, MessageCircle, Loader2,
-  ChevronRight, Edit, AlertCircle
+  ChevronRight, Edit, AlertCircle, Upload
 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -58,6 +58,8 @@ export default function AdminChatbotFiles() {
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryType, setNewCategoryType] = useState<"faq" | "policy">("faq");
   const [showNewDialog, setShowNewDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+  const [importJsonText, setImportJsonText] = useState("");
 
   const { data: filesData, isLoading, refetch } = useQuery<ChatbotFilesData>({
     queryKey: ["/api/chatbot/admin/files"],
@@ -127,6 +129,38 @@ export default function AdminChatbotFiles() {
       toast({ title: "Erro na sincronização", variant: "destructive" });
     },
   });
+
+  const importConfigMutation = useMutation({
+    mutationFn: async (jsonContent: string) => {
+      return apiRequest("PUT", "/api/chatbot/admin/files/config", { content: jsonContent });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chatbot/admin/files"] });
+      setShowImportDialog(false);
+      setImportJsonText("");
+      toast({ title: "Configuração importada com sucesso!" });
+    },
+    onError: (error: any) => {
+      toast({ 
+        title: "Erro ao importar", 
+        description: error?.message || "Verifique se o JSON está válido",
+        variant: "destructive" 
+      });
+    },
+  });
+
+  const handleImportConfig = () => {
+    try {
+      JSON.parse(importJsonText);
+      importConfigMutation.mutate(importJsonText);
+    } catch {
+      toast({ 
+        title: "JSON inválido", 
+        description: "Verifique a formatação do JSON antes de importar",
+        variant: "destructive" 
+      });
+    }
+  };
 
   const handleEditCategory = () => {
     if (categoryContent) {
@@ -484,17 +518,62 @@ export default function AdminChatbotFiles() {
           </Card>
         </div>
 
-        {filesData?.config && (
-          <Card className="bg-white/80 backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Settings className="w-5 h-5 text-orange-600" />
-                Configuração Atual (config.json)
-              </CardTitle>
-              <CardDescription>
-                Configurações de tom, restrições e comportamento da Karoo
-              </CardDescription>
-            </CardHeader>
+        <Card className="bg-white/80 backdrop-blur">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-orange-600" />
+                  Configuração (config.json)
+                </CardTitle>
+                <CardDescription>
+                  Configurações de tom, restrições e comportamento da Karoo
+                </CardDescription>
+              </div>
+              <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm">
+                    <Upload className="w-4 h-4 mr-2" />
+                    Importar JSON
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-3xl max-h-[90vh]">
+                  <DialogHeader>
+                    <DialogTitle>Importar Configuração Completa</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <p className="text-sm text-gray-600">
+                      Cole o JSON completo abaixo. Isso substituirá toda a configuração atual.
+                    </p>
+                    <Textarea 
+                      placeholder='{"chatbot": {...}, "tone": {...}, "restrictions": {...}}'
+                      value={importJsonText}
+                      onChange={(e) => setImportJsonText(e.target.value)}
+                      className="min-h-[400px] font-mono text-sm"
+                    />
+                  </div>
+                  <DialogFooter>
+                    <DialogClose asChild>
+                      <Button variant="outline">Cancelar</Button>
+                    </DialogClose>
+                    <Button 
+                      onClick={handleImportConfig}
+                      disabled={!importJsonText.trim() || importConfigMutation.isPending}
+                      className="bg-orange-600 hover:bg-orange-700"
+                    >
+                      {importConfigMutation.isPending ? (
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                      ) : (
+                        <Save className="w-4 h-4 mr-2" />
+                      )}
+                      Salvar Configuração
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </CardHeader>
+          {filesData?.config && (
             <CardContent>
               <Tabs defaultValue="tone">
                 <TabsList>
@@ -542,8 +621,8 @@ export default function AdminChatbotFiles() {
                 </TabsContent>
               </Tabs>
             </CardContent>
-          </Card>
-        )}
+          )}
+        </Card>
       </div>
     </div>
   );

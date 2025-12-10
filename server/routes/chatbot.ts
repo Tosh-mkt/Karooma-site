@@ -411,6 +411,36 @@ router.get("/admin/files/config", extractUserInfo, async (req: any, res: Respons
   }
 });
 
+router.put("/admin/files/config", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { content } = req.body;
+    if (!content) {
+      return res.status(400).json({ error: "Content is required" });
+    }
+
+    // Validate JSON
+    try {
+      JSON.parse(content);
+    } catch {
+      return res.status(400).json({ error: "Invalid JSON format" });
+    }
+
+    const success = await chatbotConfigLoader.saveConfig(content);
+    if (!success) {
+      return res.status(500).json({ error: "Failed to save config" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error saving config:", error);
+    res.status(500).json({ error: "Failed to save config" });
+  }
+});
+
 function generateSessionId(): string {
   return `chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }

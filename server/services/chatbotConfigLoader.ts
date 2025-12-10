@@ -74,6 +74,28 @@ export class ChatbotConfigLoader {
     }
   }
 
+  async saveConfig(jsonContent: string): Promise<boolean> {
+    const configPath = path.join(CONFIG_DIR, "config.json");
+    try {
+      // Validate JSON
+      JSON.parse(jsonContent);
+      
+      // Format nicely
+      const formatted = JSON.stringify(JSON.parse(jsonContent), null, 2);
+      fs.writeFileSync(configPath, formatted, "utf-8");
+      
+      // Invalidate cache
+      this.configCache = null;
+      this.lastLoadTime = 0;
+      
+      console.log("[ChatbotConfigLoader] Config saved successfully");
+      return true;
+    } catch (error) {
+      console.error("[ChatbotConfigLoader] Error saving config:", error);
+      return false;
+    }
+  }
+
   async loadSystemPrompt(): Promise<string | null> {
     const promptPath = path.join(CONFIG_DIR, "prompts/system-base.md");
     if (!fs.existsSync(promptPath)) {
