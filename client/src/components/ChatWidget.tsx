@@ -38,12 +38,17 @@ export function ChatWidget() {
 
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
+      console.log("[ChatWidget] Sending message:", message, "sessionId:", sessionId);
       const response = await fetch("/api/chatbot/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, sessionId }),
       });
-      if (!response.ok) throw new Error("Failed to send message");
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error("[ChatWidget] Error response:", errorData);
+        throw new Error("Failed to send message");
+      }
       return response.json();
     },
     onSuccess: (data) => {
