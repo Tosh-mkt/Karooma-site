@@ -32,6 +32,7 @@ import { flipbookGenerator } from "./services/flipbookGenerator";
 import { insertFlipbookSchema, insertCookieConsentSchema } from "@shared/schema";
 import { extractUserInfo } from "./middleware/flipbookAuth";
 import { pushNotificationService } from "./services/pushNotificationService";
+import { thumbnailService } from "./services/thumbnailService";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup NextAuth
@@ -807,12 +808,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
       );
 
+      // Gerar thumbnail automaticamente (400x300, 80% quality)
+      let thumbnailPath: string | null = null;
+      try {
+        thumbnailPath = await thumbnailService.generateThumbnail(objectPath, {
+          width: 400,
+          height: 300,
+          quality: 80,
+        });
+      } catch (thumbError) {
+        console.error("Erro ao gerar thumbnail (não crítico):", thumbError);
+      }
+
       res.status(200).json({
         objectPath: objectPath,
-        imageURL: objectPath
+        imageURL: objectPath,
+        thumbnailURL: thumbnailPath
       });
     } catch (error) {
       console.error("Error setting image:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Rota para gerar thumbnail de uma imagem existente
+  app.post("/api/images/thumbnail", async (req, res) => {
+    const { imageURL, width, height, quality } = req.body;
+
+    if (!imageURL) {
+      return res.status(400).json({ error: "imageURL is required" });
+    }
+
+    try {
+      const thumbnailUrl = await thumbnailService.generateThumbnail(imageURL, {
+        width: width || 400,
+        height: height || 300,
+        quality: quality || 80,
+      });
+
+      res.status(200).json({
+        original: imageURL,
+        thumbnail: thumbnailUrl,
+      });
+    } catch (error) {
+      console.error("Error generating thumbnail:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
