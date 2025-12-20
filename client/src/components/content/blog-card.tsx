@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { Badge } from "@/components/ui/badge";
 import { GradientButton } from "@/components/ui/gradient-button";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { Content } from "@shared/schema";
 
 interface BlogCardProps {
@@ -27,14 +28,11 @@ export function BlogCard({ article, featured = false, index = 0 }: BlogCardProps
   if (featured) {
     return (
       <AnimatedCard delay={index * 0.1} className="overflow-hidden">
-        <img
+        <LazyImage
           src={article.heroImageUrl || article.imageUrl || "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600"}
           alt={article.title}
-          className="w-full h-64 lg:h-80 object-cover"
-          onError={(e) => {
-            console.error("Erro ao carregar imagem do blog card featured:", article.id);
-            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600";
-          }}
+          className="w-full h-64 lg:h-80"
+          fallbackSrc="https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600"
         />
         <div className="p-8">
           <div className="flex items-center gap-4 mb-4">
@@ -79,14 +77,12 @@ export function BlogCard({ article, featured = false, index = 0 }: BlogCardProps
   return (
     <Link href={`/blog/${article.id}`}>
       <AnimatedCard delay={index * 0.1} className="p-6 cursor-pointer hover:scale-105 transition-transform duration-300">
-        <img
+        <LazyImage
           src={article.heroImageUrl || article.imageUrl || "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300"}
           alt={article.title}
-          className="w-full h-32 object-cover rounded-xl mb-4"
-          onError={(e) => {
-            console.error("Erro ao carregar imagem do blog card regular:", article.id);
-            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300";
-          }}
+          placeholderClassName="w-full h-32 rounded-xl mb-4"
+          className="rounded-xl"
+          fallbackSrc="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300"
         />
         
         <Badge className="bg-gradient-to-r from-green-400 to-blue-500 text-white mb-3">

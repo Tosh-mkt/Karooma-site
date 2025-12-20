@@ -9,6 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { LazyImage } from "@/components/ui/lazy-image";
 import type { SelectMission, SelectDiagnostic } from "@shared/schema";
 
 const CATEGORIES = [
@@ -821,10 +822,11 @@ function MissionsGrid({
               {/* Hero Image */}
               {mission.heroImageUrl && (
                 <div className="relative h-40 overflow-hidden">
-                  <img
+                  <LazyImage
                     src={mission.heroImageUrl}
                     alt={mission.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    placeholderClassName="w-full h-40"
+                    className="group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   {mission.featured && (

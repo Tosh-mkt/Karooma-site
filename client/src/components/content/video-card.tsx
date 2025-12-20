@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Play, Eye, Calendar } from "lucide-react";
 import { AnimatedCard } from "@/components/ui/animated-card";
 import { Badge } from "@/components/ui/badge";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { Content } from "@shared/schema";
 
 interface VideoCardProps {
@@ -30,14 +31,12 @@ export function VideoCard({ video, index = 0 }: VideoCardProps) {
   return (
     <AnimatedCard delay={index * 0.1} className="group overflow-hidden">
       <div className="relative">
-        <img
+        <LazyImage
           src={video.heroImageUrl || video.imageUrl || "https://images.unsplash.com/photo-1542744094-3a31f272c490?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=450"}
           alt={video.title}
-          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-          onError={(e) => {
-            console.error("Erro ao carregar imagem do video card:", video.id);
-            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1542744094-3a31f272c490?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=450";
-          }}
+          placeholderClassName="w-full h-48"
+          className="transition-transform duration-300 group-hover:scale-105"
+          fallbackSrc="https://images.unsplash.com/photo-1542744094-3a31f272c490?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=450"
         />
         <motion.div 
           className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center"

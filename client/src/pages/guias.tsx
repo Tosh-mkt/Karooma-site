@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { Search, BookHeart, Clock, ArrowRight, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { useQuery } from "@tanstack/react-query";
 import { SelectGuidePost } from "@shared/schema";
 import { staggerContainer, staggerItem } from "@/lib/animations";
@@ -36,10 +37,11 @@ function GuideCard({ post }: { post: SelectGuidePost }) {
           {/* Imagem de Capa 16:9 */}
           {post.heroImageUrl && (
             <div className="aspect-video w-full overflow-hidden">
-              <img 
+              <LazyImage
                 src={post.heroImageUrl} 
                 alt={post.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                aspectRatio="video"
+                className="group-hover:scale-105 transition-transform duration-300"
               />
             </div>
           )}
