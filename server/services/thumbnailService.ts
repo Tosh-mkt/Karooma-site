@@ -92,16 +92,23 @@ export class ThumbnailService {
 
   /**
    * Faz upload da thumbnail para o Object Storage
+   * Usa o mesmo diretório de uploads que as imagens originais
    */
   private async uploadThumbnail(buffer: Buffer, originalUrl: string): Promise<string> {
-    const privateObjectDir = this.objectStorageService.getPrivateObjectDir();
+    let privateObjectDir = this.objectStorageService.getPrivateObjectDir();
     
-    // Gerar nome único para a thumbnail
+    // Garantir que não termina com /
+    if (privateObjectDir.endsWith('/')) {
+      privateObjectDir = privateObjectDir.slice(0, -1);
+    }
+    
+    // Gerar nome único para a thumbnail (uploads/thumb_xxx para manter consistência)
     const thumbnailId = `thumb_${randomUUID()}`;
-    const fullPath = `${privateObjectDir}/thumbnails/${thumbnailId}.jpg`;
+    const fullPath = `${privateObjectDir}/uploads/${thumbnailId}.jpg`;
 
-    // Parse do path
-    const pathParts = fullPath.split('/').filter(p => p);
+    // Parse do path para obter bucket e object name
+    const pathWithSlash = fullPath.startsWith('/') ? fullPath : `/${fullPath}`;
+    const pathParts = pathWithSlash.split('/').filter(p => p);
     const bucketName = pathParts[0];
     const objectName = pathParts.slice(1).join('/');
 
@@ -116,14 +123,16 @@ export class ThumbnailService {
       },
     });
 
-    // Configurar como público
+    // Configurar como público usando mesma política que imagens normais
     await setObjectAclPolicy(file, {
       owner: 'admin-karooma',
       visibility: 'public',
     });
 
-    // Retornar path normalizado
-    return `/objects/thumbnails/${thumbnailId}.jpg`;
+    // Retornar path normalizado (consistente com getObjectEntityFile)
+    // O path deve corresponder ao que getObjectEntityFile espera: /objects/{entityId}
+    // onde entityId = uploads/thumb_xxx.jpg
+    return `/objects/uploads/${thumbnailId}.jpg`;
   }
 
   /**
