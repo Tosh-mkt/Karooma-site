@@ -114,6 +114,8 @@ export class ChatbotService {
     let ragContext: Array<{ source: string; title: string; url?: string }> = [];
     let contextPrompt = "";
 
+    const missionsContext = await this.ragService.buildMissionsContext();
+
     if (config.ragEnabled) {
       const ragResults = await this.ragService.search(request.message, {
         sources: (config.ragSources || ["missions", "blog", "products"]) as RAGSource[],
@@ -130,9 +132,13 @@ export class ChatbotService {
       }
     }
 
-    const systemPrompt = contextPrompt
-      ? `${config.systemPrompt}\n\n${contextPrompt}`
-      : config.systemPrompt;
+    let systemPrompt = config.systemPrompt || "";
+    if (missionsContext) {
+      systemPrompt += `\n\n${missionsContext}`;
+    }
+    if (contextPrompt) {
+      systemPrompt += `\n\n${contextPrompt}`;
+    }
 
     const messages = [
       { role: "system" as const, content: systemPrompt },
@@ -185,6 +191,8 @@ export class ChatbotService {
     let contextPrompt = "";
     let ragContext: unknown[] = [];
 
+    const missionsContext = await this.ragService.buildMissionsContext();
+
     if (config.ragEnabled) {
       const ragResults = await this.ragService.search(request.message, {
         sources: (config.ragSources || ["missions", "blog", "products"]) as RAGSource[],
@@ -201,9 +209,13 @@ export class ChatbotService {
       }
     }
 
-    const systemPrompt = contextPrompt
-      ? `${config.systemPrompt}\n\n${contextPrompt}`
-      : config.systemPrompt;
+    let systemPrompt = config.systemPrompt || "";
+    if (missionsContext) {
+      systemPrompt += `\n\n${missionsContext}`;
+    }
+    if (contextPrompt) {
+      systemPrompt += `\n\n${contextPrompt}`;
+    }
 
     const messages = [
       { role: "system" as const, content: systemPrompt },

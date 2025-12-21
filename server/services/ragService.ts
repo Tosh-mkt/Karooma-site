@@ -311,6 +311,54 @@ ${contextParts.join("\n\n")}
 ---
 `;
   }
+
+  async buildMissionsContext(): Promise<string> {
+    const publishedMissions = await db
+      .select({
+        title: missions.title,
+        slug: missions.slug,
+        category: missions.category,
+        descricao: missions.descricao,
+        energyLevel: missions.energyLevel,
+        estimatedMinutes: missions.estimatedMinutes,
+        productAsins: missions.productAsins,
+        tarefas: missions.tarefasSimplesDeExecucao,
+      })
+      .from(missions)
+      .where(eq(missions.isPublished, true))
+      .orderBy(desc(missions.createdAt));
+
+    if (publishedMissions.length === 0) {
+      return "";
+    }
+
+    const missionSummaries = publishedMissions.map((m) => {
+      const tarefas = m.tarefas as Array<{ task: string; subtext?: string }> | null;
+      const tarefasList = tarefas && tarefas.length > 0
+        ? tarefas.map((t) => t.task).join(", ")
+        : "sem tarefas definidas";
+
+      const productAsins = m.productAsins || [];
+      const hasProducts = Array.isArray(productAsins) && productAsins.length > 0;
+      const productInfo = hasProducts
+        ? `Tem ${productAsins.length} produto(s) recomendado(s)`
+        : "Sem produtos recomendados";
+
+      return `• "${m.title}" (${m.category || "geral"})
+  - ${m.descricao || "Missão prática"}
+  - Energia: ${m.energyLevel || "média"} | Tempo: ${m.estimatedMinutes || "?"} min
+  - Tarefas: ${tarefasList}
+  - ${productInfo}
+  - Link: /missoes/${m.slug}`;
+    });
+
+    return `
+MISSÕES DISPONÍVEIS NO KAROOMA (use estas informações para reconhecer e sugerir missões):
+${missionSummaries.join("\n\n")}
+---
+Quando a usuária mencionar temas relacionados a estas missões, sugira a missão correspondente com o link correto.
+`;
+  }
 }
 
 export function createRAGService(): RAGService {
