@@ -441,6 +441,43 @@ router.put("/admin/files/config", extractUserInfo, async (req: any, res: Respons
   }
 });
 
+router.get("/admin/files/prompt", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const content = await chatbotConfigLoader.loadKarooTutorPrompt();
+    res.json({ content: content || "" });
+  } catch (error) {
+    console.error("Error loading prompt:", error);
+    res.status(500).json({ error: "Failed to load prompt" });
+  }
+});
+
+router.put("/admin/files/prompt", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { content } = req.body;
+    if (content === undefined || typeof content !== "string") {
+      return res.status(400).json({ error: "Content must be a string" });
+    }
+
+    const success = await chatbotConfigLoader.saveKarooTutorPrompt(content);
+    if (!success) {
+      return res.status(500).json({ error: "Failed to save prompt" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error saving prompt:", error);
+    res.status(500).json({ error: "Failed to save prompt" });
+  }
+});
+
 function generateSessionId(): string {
   return `chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }

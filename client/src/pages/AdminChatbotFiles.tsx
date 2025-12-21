@@ -60,6 +60,8 @@ export default function AdminChatbotFiles() {
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importJsonText, setImportJsonText] = useState("");
+  const [promptContent, setPromptContent] = useState("");
+  const [isEditingPrompt, setIsEditingPrompt] = useState(false);
 
   const { data: filesData, isLoading, refetch } = useQuery<ChatbotFilesData>({
     queryKey: ["/api/chatbot/admin/files"],
@@ -137,7 +139,6 @@ export default function AdminChatbotFiles() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/chatbot/admin/files"] });
       setShowImportDialog(false);
-      // Mantém o JSON no campo para referência/edição futura
       toast({ title: "Configuração importada com sucesso!" });
     },
     onError: (error: any) => {
@@ -148,6 +149,35 @@ export default function AdminChatbotFiles() {
       });
     },
   });
+
+  const { data: promptData, isLoading: promptLoading } = useQuery<{ content: string }>({
+    queryKey: ["/api/chatbot/admin/files/prompt"],
+  });
+
+  const savePromptMutation = useMutation({
+    mutationFn: async (content: string) => {
+      return apiRequest("PUT", "/api/chatbot/admin/files/prompt", { content });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/chatbot/admin/files/prompt"] });
+      setIsEditingPrompt(false);
+      toast({ title: "Prompt salvo com sucesso!" });
+    },
+    onError: () => {
+      toast({ title: "Erro ao salvar prompt", variant: "destructive" });
+    },
+  });
+
+  const handleEditPrompt = () => {
+    if (promptData) {
+      setPromptContent(promptData.content);
+      setIsEditingPrompt(true);
+    }
+  };
+
+  const handleSavePrompt = () => {
+    savePromptMutation.mutate(promptContent);
+  };
 
   const handleImportConfig = () => {
     try {
@@ -277,6 +307,94 @@ export default function AdminChatbotFiles() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="bg-white/80 backdrop-blur border-2 border-purple-200">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageCircle className="w-5 h-5 text-purple-600" />
+                  Prompt de Instrução da Karoo
+                </CardTitle>
+                <CardDescription>
+                  Edite a personalidade, comportamento e diretrizes do chatbot
+                </CardDescription>
+              </div>
+              {!isEditingPrompt ? (
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  onClick={handleEditPrompt}
+                  disabled={promptLoading}
+                  data-testid="button-edit-prompt"
+                >
+                  <Edit className="w-4 h-4 mr-1" />
+                  Editar Prompt
+                </Button>
+              ) : (
+                <div className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setIsEditingPrompt(false)}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    onClick={handleSavePrompt}
+                    disabled={savePromptMutation.isPending}
+                    className="bg-purple-600 hover:bg-purple-700"
+                    data-testid="button-save-prompt"
+                  >
+                    {savePromptMutation.isPending ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-1" />
+                    ) : (
+                      <Save className="w-4 h-4 mr-1" />
+                    )}
+                    Salvar
+                  </Button>
+                </div>
+              )}
+            </div>
+          </CardHeader>
+          <CardContent>
+            {promptLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-purple-600" />
+              </div>
+            ) : isEditingPrompt ? (
+              <div className="space-y-4">
+                <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm text-purple-800">
+                    <p className="font-medium">Dicas de edição:</p>
+                    <ul className="mt-1 list-disc list-inside space-y-1">
+                      <li>Use ## para criar seções</li>
+                      <li>Use **texto** para negrito</li>
+                      <li>Use listas com - para bullet points</li>
+                      <li>Use tabelas com | para gatilhos de resposta</li>
+                    </ul>
+                  </div>
+                </div>
+                <Textarea 
+                  value={promptContent}
+                  onChange={(e) => setPromptContent(e.target.value)}
+                  className="min-h-[500px] font-mono text-sm"
+                  placeholder="Prompt de instrução da Karoo..."
+                  data-testid="textarea-prompt-content"
+                />
+              </div>
+            ) : (
+              <div className="prose prose-sm max-w-none">
+                <div className="bg-gray-50 rounded-lg p-4 max-h-[300px] overflow-y-auto">
+                  <pre className="whitespace-pre-wrap text-sm text-gray-700 font-mono">
+                    {promptData?.content?.slice(0, 1500) || "Carregando..."}
+                    {(promptData?.content?.length || 0) > 1500 && (
+                      <span className="text-purple-600">... (clique em Editar para ver completo)</span>
+                    )}
+                  </pre>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="bg-white/80 backdrop-blur">

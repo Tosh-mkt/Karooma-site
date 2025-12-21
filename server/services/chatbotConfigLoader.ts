@@ -111,6 +111,37 @@ export class ChatbotConfigLoader {
     }
   }
 
+  async loadKarooTutorPrompt(): Promise<string | null> {
+    const promptPath = path.join(CONFIG_DIR, "prompts/karoo-tutor.md");
+    if (!fs.existsSync(promptPath)) {
+      console.log("[ChatbotConfigLoader] karoo-tutor.md not found");
+      return null;
+    }
+
+    try {
+      return fs.readFileSync(promptPath, "utf-8");
+    } catch (error) {
+      console.error("[ChatbotConfigLoader] Error loading karoo-tutor.md:", error);
+      return null;
+    }
+  }
+
+  async saveKarooTutorPrompt(content: string): Promise<boolean> {
+    const promptPath = path.join(CONFIG_DIR, "prompts/karoo-tutor.md");
+    try {
+      fs.writeFileSync(promptPath, content, "utf-8");
+      
+      this.configCache = null;
+      this.lastLoadTime = 0;
+      
+      console.log("[ChatbotConfigLoader] karoo-tutor.md saved successfully");
+      return true;
+    } catch (error) {
+      console.error("[ChatbotConfigLoader] Error saving karoo-tutor.md:", error);
+      return false;
+    }
+  }
+
   async loadFAQFromFiles(): Promise<FAQEntry[]> {
     const faqDir = path.join(CONFIG_DIR, "faq");
     return this.loadMDFilesFromDir(faqDir, "faq");
