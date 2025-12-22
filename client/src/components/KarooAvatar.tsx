@@ -79,7 +79,7 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setState("options")}
-        className="fixed right-4 bottom-4 z-50 w-14 h-14 rounded-full shadow-lg overflow-hidden border-2 border-white dark:border-gray-800"
+        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-14 h-14 rounded-full shadow-lg overflow-hidden border-2 border-white dark:border-gray-800"
         data-testid="karoo-minimized-button"
       >
         <img 
@@ -92,7 +92,7 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   }
 
   return (
-    <div className="fixed right-4 bottom-24 z-40 flex flex-col items-end gap-3">
+    <div className="fixed right-4 top-1/2 -translate-y-1/2 z-40 flex flex-col items-end gap-3">
       <AnimatePresence mode="wait">
         {state === "options" && (
           <motion.div
