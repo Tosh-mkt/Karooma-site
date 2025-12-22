@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { MessageCircle, X, Send, Loader2, Bot, User, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -203,8 +203,8 @@ export function ChatWidget({
               style={{ backgroundColor: config.widgetPrimaryColor }}
             >
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-                  <Bot className="w-5 h-5" />
+                <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-white/30">
+                  <img src={karooImage} alt="Karoo" className="w-full h-full object-cover" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">{config.name}</h3>
@@ -234,16 +234,16 @@ export function ChatWidget({
                     }`}
                   >
                     <div
-                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${
+                      className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden ${
                         message.role === "user"
                           ? "bg-indigo-100 dark:bg-indigo-900"
-                          : "bg-purple-100 dark:bg-purple-900"
+                          : ""
                       }`}
                     >
                       {message.role === "user" ? (
                         <User className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                       ) : (
-                        <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        <img src={karooImage} alt="Karoo" className="w-full h-full object-cover" />
                       )}
                     </div>
                     <div
@@ -265,8 +265,8 @@ export function ChatWidget({
                     animate={{ opacity: 1 }}
                     className="flex gap-2"
                   >
-                    <div className="w-7 h-7 rounded-full bg-purple-100 dark:bg-purple-900 flex items-center justify-center">
-                      <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                    <div className="w-7 h-7 rounded-full overflow-hidden flex-shrink-0">
+                      <img src={karooImage} alt="Karoo" className="w-full h-full object-cover" />
                     </div>
                     <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-bl-none px-4 py-3">
                       <div className="flex gap-1">
