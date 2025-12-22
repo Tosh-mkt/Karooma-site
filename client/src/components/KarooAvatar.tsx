@@ -78,7 +78,7 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
         animate={{ opacity: 1, scale: 1 }}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => onOpenChat("")}
+        onClick={() => setState("options")}
         className="fixed right-4 bottom-4 z-50 w-14 h-14 rounded-full shadow-lg overflow-hidden border-2 border-white dark:border-gray-800"
         data-testid="karoo-minimized-button"
       >
