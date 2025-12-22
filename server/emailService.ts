@@ -711,3 +711,152 @@ export async function sendPriceAlertEmail(data: PriceAlertData): Promise<boolean
     return false;
   }
 }
+
+// ============== VISITOR FEEDBACK NOTIFICATION ==============
+
+interface VisitorFeedbackNotificationData {
+  type: 'suggestion' | 'complaint' | 'request';
+  message: string;
+  visitorName?: string | null;
+  visitorEmail?: string | null;
+  pageUrl?: string | null;
+  conversationContext?: string | null;
+  timestamp: string;
+}
+
+export async function sendVisitorFeedbackNotification(data: VisitorFeedbackNotificationData): Promise<boolean> {
+  const sendgrid = await getSendGridClient();
+  if (!sendgrid) {
+    console.log('SendGrid não configurado. Notificação de feedback desabilitada.');
+    return false;
+  }
+
+  const { client, fromEmail } = sendgrid;
+  const adminEmail = 'admin@karooma.life';
+
+  const typeLabels: Record<string, { label: string; emoji: string; color: string }> = {
+    suggestion: { label: 'Sugestão', emoji: '💡', color: '#10b981' },
+    complaint: { label: 'Reclamação', emoji: '⚠️', color: '#ef4444' },
+    request: { label: 'Pedido', emoji: '📋', color: '#3b82f6' },
+  };
+
+  const typeInfo = typeLabels[data.type] || typeLabels.request;
+
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <title>${typeInfo.emoji} Novo Feedback - Karooma</title>
+      <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f8f9fa; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .header { background: ${typeInfo.color}; color: white; padding: 24px; border-radius: 12px 12px 0 0; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 600; }
+        .type-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 14px; margin-top: 8px; }
+        .content { padding: 24px; }
+        .message-box { background: #f3f4f6; border-left: 4px solid ${typeInfo.color}; padding: 16px; border-radius: 0 8px 8px 0; margin-bottom: 20px; }
+        .message-text { color: #374151; font-size: 15px; line-height: 1.6; white-space: pre-wrap; }
+        .info-grid { display: grid; gap: 12px; }
+        .info-item { background: #f9fafb; padding: 12px; border-radius: 8px; }
+        .label { font-weight: 600; color: #6b7280; font-size: 12px; text-transform: uppercase; margin-bottom: 4px; }
+        .value { color: #374151; font-size: 14px; }
+        .context-box { background: #fef3cd; border-radius: 8px; padding: 12px; margin-top: 16px; }
+        .context-title { font-weight: 600; color: #856404; font-size: 12px; margin-bottom: 8px; }
+        .context-text { color: #856404; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+        .footer { padding: 16px 24px; background: #f9fafb; border-radius: 0 0 12px 12px; text-align: center; color: #6b7280; font-size: 13px; }
+        .action-hint { background: ${typeInfo.color}15; border: 1px solid ${typeInfo.color}30; border-radius: 8px; padding: 12px; margin-top: 16px; }
+        .action-hint p { margin: 0; color: ${typeInfo.color}; font-size: 13px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>${typeInfo.emoji} Novo Feedback do Chatbot</h1>
+          <span class="type-badge">${typeInfo.label}</span>
+        </div>
+        
+        <div class="content">
+          <div class="message-box">
+            <div class="label">Mensagem do visitante:</div>
+            <div class="message-text">${data.message}</div>
+          </div>
+          
+          <div class="info-grid">
+            ${data.visitorName ? `
+            <div class="info-item">
+              <div class="label">👤 Nome</div>
+              <div class="value">${data.visitorName}</div>
+            </div>
+            ` : ''}
+            
+            ${data.visitorEmail ? `
+            <div class="info-item">
+              <div class="label">📧 Email</div>
+              <div class="value"><a href="mailto:${data.visitorEmail}">${data.visitorEmail}</a></div>
+            </div>
+            ` : ''}
+            
+            ${data.pageUrl ? `
+            <div class="info-item">
+              <div class="label">📍 Página</div>
+              <div class="value"><a href="${data.pageUrl}">${data.pageUrl}</a></div>
+            </div>
+            ` : ''}
+            
+            <div class="info-item">
+              <div class="label">⏰ Data/Hora</div>
+              <div class="value">${new Date(data.timestamp).toLocaleString('pt-BR')}</div>
+            </div>
+          </div>
+          
+          ${data.conversationContext ? `
+          <div class="context-box">
+            <div class="context-title">💬 Contexto da Conversa:</div>
+            <div class="context-text">${data.conversationContext}</div>
+          </div>
+          ` : ''}
+          
+          <div class="action-hint">
+            <p>💡 Acesse o painel admin em <strong>/admin/feedback</strong> para gerenciar este feedback.</p>
+          </div>
+        </div>
+        
+        <div class="footer">
+          <p>Karooma Chatbot - Sistema de Feedback</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const textContent = `
+${typeInfo.emoji} NOVO FEEDBACK - ${typeInfo.label.toUpperCase()}
+
+📝 Mensagem:
+${data.message}
+
+${data.visitorName ? `👤 Nome: ${data.visitorName}\n` : ''}${data.visitorEmail ? `📧 Email: ${data.visitorEmail}\n` : ''}${data.pageUrl ? `📍 Página: ${data.pageUrl}\n` : ''}⏰ Data/Hora: ${new Date(data.timestamp).toLocaleString('pt-BR')}
+
+${data.conversationContext ? `💬 Contexto da Conversa:\n${data.conversationContext}\n` : ''}
+---
+Acesse /admin/feedback para gerenciar este feedback.
+Karooma Chatbot - Sistema de Feedback
+  `;
+
+  try {
+    await client.send({
+      to: adminEmail,
+      from: fromEmail,
+      subject: `${typeInfo.emoji} ${typeInfo.label}: Novo feedback via chatbot`,
+      text: textContent,
+      html: htmlContent,
+    });
+    
+    console.log(`✅ Email de feedback enviado para ${adminEmail}`);
+    return true;
+  } catch (error) {
+    console.error('❌ Erro ao enviar email de feedback:', error);
+    return false;
+  }
+}

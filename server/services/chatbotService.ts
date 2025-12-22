@@ -4,6 +4,7 @@ import {
   chatConversations,
   chatMessages,
   chatKnowledgeBase,
+  visitorFeedback,
   type ChatbotConfig,
   type ChatMessage,
   type InsertChatMessage,
@@ -12,6 +13,7 @@ import {
 import { eq, desc, and } from "drizzle-orm";
 import { LLMService, createLLMService } from "./llmService";
 import { RAGService, createRAGService } from "./ragService";
+import { sendVisitorFeedbackNotification } from "../emailService";
 
 interface ChatRequest {
   sessionId: string;
@@ -55,6 +57,72 @@ REGRAS:
 
 CONTEXTO ADICIONAL:
 Se informações do site forem fornecidas abaixo, use-as para enriquecer sua resposta.`;
+
+// Helper function to extract and process feedback from AI response
+interface FeedbackMetadata {
+  conversationContext?: string;
+  visitorName?: string | null;
+  visitorEmail?: string | null;
+  pageUrl?: string | null;
+  userAgent?: string | null;
+}
+
+async function extractAndProcessFeedback(
+  responseContent: string,
+  metadata: FeedbackMetadata = {}
+): Promise<{ cleanedContent: string; feedbackExtracted: boolean }> {
+  const feedbackPattern = /\[FEEDBACK:(suggestion|complaint|request):([^\]]+)\]/gi;
+  const matches = Array.from(responseContent.matchAll(feedbackPattern));
+
+  if (matches.length === 0) {
+    return { cleanedContent: responseContent, feedbackExtracted: false };
+  }
+
+  // Process each feedback match
+  for (const match of matches) {
+    const [, type, message] = match;
+    
+    try {
+      // Insert feedback into database with all available metadata
+      const [feedback] = await db.insert(visitorFeedback).values({
+        type: type.toLowerCase() as "suggestion" | "complaint" | "request",
+        message: message.trim(),
+        conversationContext: metadata.conversationContext || null,
+        visitorName: metadata.visitorName || null,
+        visitorEmail: metadata.visitorEmail || null,
+        pageUrl: metadata.pageUrl || null,
+        userAgent: metadata.userAgent || null,
+        status: "pending",
+      }).returning();
+
+      // Send email notification with all metadata
+      const emailSent = await sendVisitorFeedbackNotification({
+        type: type.toLowerCase() as "suggestion" | "complaint" | "request",
+        message: message.trim(),
+        visitorName: metadata.visitorName,
+        visitorEmail: metadata.visitorEmail,
+        pageUrl: metadata.pageUrl,
+        conversationContext: metadata.conversationContext,
+        timestamp: new Date().toISOString(),
+      });
+
+      // Update email_sent status
+      if (emailSent && feedback) {
+        await db.update(visitorFeedback)
+          .set({ emailSent: true })
+          .where(eq(visitorFeedback.id, feedback.id));
+      }
+
+      console.log(`[Chatbot] Feedback captured: ${type} - ${message.substring(0, 50)}...`);
+    } catch (error) {
+      console.error("[Chatbot] Error processing feedback:", error);
+    }
+  }
+
+  // Remove feedback tags from the response
+  const cleanedContent = responseContent.replace(feedbackPattern, "").trim();
+  return { cleanedContent, feedbackExtracted: true };
+}
 
 export class ChatbotService {
   private ragService: RAGService;
@@ -157,10 +225,24 @@ export class ChatbotService {
 
     const response = await llmService.chat(messages);
 
+    // Extract and process any feedback tags from the response
+    const conversationContextSummary = history.length > 0 
+      ? history.slice(-3).map(m => `${m.role}: ${m.content.substring(0, 100)}`).join("\n")
+      : `user: ${request.message}`;
+    
+    const { cleanedContent } = await extractAndProcessFeedback(
+      response.content,
+      {
+        conversationContext: conversationContextSummary,
+        visitorName: request.userName || null,
+        visitorEmail: request.userEmail || null,
+      }
+    );
+
     await this.saveMessage({
       conversationId: conversation.id,
       role: "assistant",
-      content: response.content,
+      content: cleanedContent,
       ragContext: ragContext.length > 0 ? ragContext : undefined,
       tokensUsed: response.tokensUsed,
       llmProvider: response.provider,
@@ -168,7 +250,7 @@ export class ChatbotService {
     });
 
     return {
-      message: response.content,
+      message: cleanedContent,
       conversationId: conversation.id,
       ragContext: ragContext.length > 0 ? ragContext : undefined,
       tokensUsed: response.tokensUsed,
@@ -239,10 +321,24 @@ export class ChatbotService {
       yield chunk.content;
     }
 
+    // Extract and process any feedback tags from the response (async, after streaming)
+    const conversationContextSummary = history.length > 0 
+      ? history.slice(-3).map(m => `${m.role}: ${m.content.substring(0, 100)}`).join("\n")
+      : `user: ${request.message}`;
+    
+    const { cleanedContent } = await extractAndProcessFeedback(
+      fullResponse,
+      {
+        conversationContext: conversationContextSummary,
+        visitorName: request.userName || null,
+        visitorEmail: request.userEmail || null,
+      }
+    );
+
     await this.saveMessage({
       conversationId: conversation.id,
       role: "assistant",
-      content: fullResponse,
+      content: cleanedContent,
       ragContext: ragContext.length > 0 ? ragContext : undefined,
       llmProvider: config.llmProvider,
       llmModel: config.llmModel,

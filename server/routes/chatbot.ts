@@ -3,6 +3,10 @@ import { createChatbotService } from "../services/chatbotService";
 import { LLMService } from "../services/llmService";
 import { chatbotConfigLoader } from "../services/chatbotConfigLoader";
 import { extractUserInfo } from "../middleware/flipbookAuth";
+import { sendVisitorFeedbackNotification } from "../emailService";
+import { db } from "../db";
+import { visitorFeedback } from "@shared/schema";
+import { eq, desc } from "drizzle-orm";
 import { z } from "zod";
 
 const router = Router();
@@ -481,6 +485,149 @@ router.put("/admin/files/prompt", extractUserInfo, async (req: any, res: Respons
 function generateSessionId(): string {
   return `chat_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 }
+
+// ============== VISITOR FEEDBACK ROUTES ==============
+
+const feedbackSchema = z.object({
+  type: z.enum(["suggestion", "complaint", "request"]),
+  message: z.string().min(1),
+  visitorName: z.string().optional(),
+  visitorEmail: z.string().email().optional().or(z.literal("")),
+  pageUrl: z.string().optional(),
+  conversationContext: z.string().optional(),
+});
+
+const feedbackUpdateSchema = z.object({
+  status: z.enum(["pending", "reviewed", "resolved"]).optional(),
+  adminNotes: z.string().optional(),
+});
+
+// Public endpoint to submit feedback
+router.post("/feedback", async (req: Request, res: Response) => {
+  try {
+    const parsed = feedbackSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid request", details: parsed.error.errors });
+    }
+
+    const data = parsed.data;
+    const userAgent = req.headers["user-agent"] || null;
+
+    // Insert feedback into database
+    const [feedback] = await db.insert(visitorFeedback).values({
+      type: data.type,
+      message: data.message,
+      visitorName: data.visitorName || null,
+      visitorEmail: data.visitorEmail || null,
+      pageUrl: data.pageUrl || null,
+      conversationContext: data.conversationContext || null,
+      userAgent: userAgent,
+    }).returning();
+
+    // Send email notification
+    const emailSent = await sendVisitorFeedbackNotification({
+      type: data.type,
+      message: data.message,
+      visitorName: data.visitorName,
+      visitorEmail: data.visitorEmail,
+      pageUrl: data.pageUrl,
+      conversationContext: data.conversationContext,
+      timestamp: new Date().toISOString(),
+    });
+
+    // Update email_sent status
+    if (emailSent) {
+      await db.update(visitorFeedback)
+        .set({ emailSent: true })
+        .where(eq(visitorFeedback.id, feedback.id));
+    }
+
+    res.json({ 
+      success: true, 
+      message: "Feedback recebido com sucesso! Obrigada por compartilhar.",
+      id: feedback.id 
+    });
+  } catch (error) {
+    console.error("Error submitting feedback:", error);
+    res.status(500).json({ error: "Failed to submit feedback" });
+  }
+});
+
+// Admin: List all feedback
+router.get("/admin/feedback", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const feedbackList = await db
+      .select()
+      .from(visitorFeedback)
+      .orderBy(desc(visitorFeedback.createdAt));
+
+    res.json(feedbackList);
+  } catch (error) {
+    console.error("Error fetching feedback:", error);
+    res.status(500).json({ error: "Failed to fetch feedback" });
+  }
+});
+
+// Admin: Update feedback status/notes
+router.put("/admin/feedback/:id", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { id } = req.params;
+    const parsed = feedbackUpdateSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid request", details: parsed.error.errors });
+    }
+
+    const [updated] = await db
+      .update(visitorFeedback)
+      .set({
+        ...parsed.data,
+        updatedAt: new Date(),
+      })
+      .where(eq(visitorFeedback.id, id))
+      .returning();
+
+    if (!updated) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    res.json(updated);
+  } catch (error) {
+    console.error("Error updating feedback:", error);
+    res.status(500).json({ error: "Failed to update feedback" });
+  }
+});
+
+// Admin: Delete feedback
+router.delete("/admin/feedback/:id", extractUserInfo, async (req: any, res: Response) => {
+  try {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    const { id } = req.params;
+    const [deleted] = await db
+      .delete(visitorFeedback)
+      .where(eq(visitorFeedback.id, id))
+      .returning();
+
+    if (!deleted) {
+      return res.status(404).json({ error: "Feedback not found" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting feedback:", error);
+    res.status(500).json({ error: "Failed to delete feedback" });
+  }
+});
 
 export function registerChatbotRoutes(app: any) {
   app.use("/api/chatbot", router);
