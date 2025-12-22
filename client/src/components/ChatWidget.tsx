@@ -5,6 +5,7 @@ import { MessageCircle, X, Send, Loader2, Bot, User, Sparkles } from "lucide-rea
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import karooImage from "@assets/karoo_1766395905884.png";
 
 interface Message {
   id: string;
@@ -337,8 +338,8 @@ export function ChatWidget({
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-4 ${positionClasses} z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center text-white transition-colors`}
-        style={{ backgroundColor: config.widgetPrimaryColor }}
+        className={`fixed bottom-4 ${positionClasses} z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center overflow-hidden transition-colors ${isOpen ? 'bg-gray-700' : ''}`}
+        style={isOpen ? {} : { padding: 0 }}
         data-testid="button-toggle-chat"
       >
         <AnimatePresence mode="wait">
@@ -349,18 +350,24 @@ export function ChatWidget({
               animate={{ rotate: 0, opacity: 1 }}
               exit={{ rotate: 90, opacity: 0 }}
               transition={{ duration: 0.15 }}
+              className="text-white"
             >
               <X className="w-6 h-6" />
             </motion.div>
           ) : (
             <motion.div
               key="open"
-              initial={{ rotate: 90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: -90, opacity: 0 }}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
               transition={{ duration: 0.15 }}
+              className="w-full h-full"
             >
-              <MessageCircle className="w-6 h-6" />
+              <img 
+                src={karooImage} 
+                alt="Karoo" 
+                className="w-full h-full object-cover rounded-full"
+              />
             </motion.div>
           )}
         </AnimatePresence>

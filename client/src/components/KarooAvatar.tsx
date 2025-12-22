@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Home, Target, Coffee, MessageCircle } from "lucide-react";
-import karooImage from "@assets/generated_images/karoo_owl_mascot_warm_colors.png";
+import karooImage from "@assets/karoo_1766395905884.png";
 
 interface KarooAvatarProps {
   onOpenChat: (initialMessage?: string) => void;
@@ -249,7 +249,7 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
         className="relative cursor-pointer"
         data-testid="karoo-avatar-image"
       >
-        <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-lg bg-gradient-to-br from-purple-100 to-orange-100 dark:from-purple-900 dark:to-orange-900">
+        <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white dark:border-gray-800 shadow-xl bg-gradient-to-br from-purple-100 to-orange-100 dark:from-purple-900 dark:to-orange-900">
           <img
             src={karooImage}
             alt="Karoo - Assistente Karooma"
