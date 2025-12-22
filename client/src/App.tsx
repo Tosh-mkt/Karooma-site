@@ -175,12 +175,23 @@ function Router() {
 function ChatWithAvatar() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [initialMessage, setInitialMessage] = useState<string | undefined>(undefined);
+  const [hasActiveConversation, setHasActiveConversation] = useState(() => {
+    try {
+      const stored = sessionStorage.getItem("karoo-chat-session");
+      if (stored) {
+        const data = JSON.parse(stored);
+        return data.messages && data.messages.length > 1;
+      }
+    } catch (e) {}
+    return false;
+  });
 
   const handleOpenChat = useCallback((message?: string) => {
     if (message) {
       setInitialMessage(message);
     }
     setIsChatOpen(true);
+    setHasActiveConversation(true);
   }, []);
 
   const handleInitialMessageSent = useCallback(() => {
@@ -191,7 +202,8 @@ function ChatWithAvatar() {
     <>
       <KarooAvatar 
         onOpenChat={handleOpenChat} 
-        isChatOpen={isChatOpen} 
+        isChatOpen={isChatOpen}
+        hasActiveConversation={hasActiveConversation}
       />
       <ChatWidget 
         isOpen={isChatOpen}

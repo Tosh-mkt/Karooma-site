@@ -6,13 +6,14 @@ import karooImage from "@assets/karoo_1766395905884.png";
 interface KarooAvatarProps {
   onOpenChat: (initialMessage?: string) => void;
   isChatOpen: boolean;
+  hasActiveConversation?: boolean;
 }
 
 type AvatarState = "hidden" | "minimized" | "waving" | "options" | "diagnostic-info";
 
 const SNOOZE_DURATION_HOURS = 24;
 
-export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
+export function KarooAvatar({ onOpenChat, isChatOpen, hasActiveConversation = false }: KarooAvatarProps) {
   const [state, setState] = useState<AvatarState>("minimized");
   const [showWelcome, setShowWelcome] = useState(false);
   const [showWaveHint, setShowWaveHint] = useState(false);
@@ -111,7 +112,7 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
           }}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          onClick={() => setState("options")}
+          onClick={() => hasActiveConversation ? onOpenChat("") : setState("options")}
           className="w-14 h-14 rounded-full shadow-lg overflow-hidden border-2 border-white dark:border-gray-800"
           data-testid="karoo-minimized-button"
         >
