@@ -13,37 +13,32 @@ type AvatarState = "hidden" | "minimized" | "waving" | "options" | "diagnostic-i
 const SNOOZE_DURATION_HOURS = 24;
 
 export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
-  const [state, setState] = useState<AvatarState>("hidden");
-  const [isSnoozed, setIsSnoozed] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const [state, setState] = useState<AvatarState>("minimized");
+  const [showWelcome, setShowWelcome] = useState(false);
 
+  // Check if we should show the welcome animation (only on first visit)
   useEffect(() => {
-    const snoozeUntil = localStorage.getItem("karoo-avatar-snooze-until");
-    if (snoozeUntil && Date.now() < parseInt(snoozeUntil, 10)) {
-      setIsSnoozed(true);
-      setState("minimized");
-      return;
-    }
-    
-    localStorage.removeItem("karoo-avatar-snooze-until");
-
-    const timer = setTimeout(() => {
-      if (!isChatOpen) {
+    const hasSeenWelcome = localStorage.getItem("karoo-has-seen-welcome");
+    if (!hasSeenWelcome && !isChatOpen) {
+      const timer = setTimeout(() => {
         setState("waving");
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
+        setShowWelcome(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
   }, []);
 
+  // Handle chat open/close
   useEffect(() => {
     if (isChatOpen) {
       setState("hidden");
-      setHasInteracted(true);
-    } else if (hasInteracted && !isSnoozed) {
+      // Mark that user has seen welcome
+      localStorage.setItem("karoo-has-seen-welcome", "true");
+    } else {
+      // Always show minimized button when chat closes
       setState("minimized");
     }
-  }, [isChatOpen, isSnoozed, hasInteracted]);
+  }, [isChatOpen]);
 
   useEffect(() => {
     if (state === "waving") {
