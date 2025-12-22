@@ -10,16 +10,20 @@ interface KarooAvatarProps {
 
 type AvatarState = "hidden" | "waving" | "options" | "diagnostic-info";
 
+const SNOOZE_DURATION_HOURS = 24;
+
 export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   const [state, setState] = useState<AvatarState>("hidden");
-  const [hasBeenDismissed, setHasBeenDismissed] = useState(false);
+  const [isSnoozed, setIsSnoozed] = useState(false);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem("karoo-avatar-dismissed");
-    if (dismissed) {
-      setHasBeenDismissed(true);
+    const snoozeUntil = localStorage.getItem("karoo-avatar-snooze-until");
+    if (snoozeUntil && Date.now() < parseInt(snoozeUntil, 10)) {
+      setIsSnoozed(true);
       return;
     }
+    
+    localStorage.removeItem("karoo-avatar-snooze-until");
 
     const timer = setTimeout(() => {
       if (!isChatOpen) {
@@ -33,13 +37,13 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   useEffect(() => {
     if (isChatOpen) {
       setState("hidden");
-    } else if (!hasBeenDismissed && state === "hidden") {
+    } else if (!isSnoozed && state === "hidden") {
       const timer = setTimeout(() => {
         setState("waving");
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [isChatOpen, hasBeenDismissed]);
+  }, [isChatOpen, isSnoozed]);
 
   useEffect(() => {
     if (state === "waving") {
@@ -52,8 +56,9 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
 
   const handleDismiss = () => {
     setState("hidden");
-    setHasBeenDismissed(true);
-    localStorage.setItem("karoo-avatar-dismissed", "true");
+    setIsSnoozed(true);
+    const snoozeUntil = Date.now() + (SNOOZE_DURATION_HOURS * 60 * 60 * 1000);
+    localStorage.setItem("karoo-avatar-snooze-until", snoozeUntil.toString());
   };
 
   const handleOptionClick = (option: "explore" | "problem" | "diagnostic") => {
@@ -70,7 +75,7 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
     window.location.href = "/diagnostico";
   };
 
-  if (hasBeenDismissed || state === "hidden") {
+  if (isSnoozed || state === "hidden") {
     return null;
   }
 
