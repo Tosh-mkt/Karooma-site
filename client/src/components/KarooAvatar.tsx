@@ -15,6 +15,7 @@ const SNOOZE_DURATION_HOURS = 24;
 export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   const [state, setState] = useState<AvatarState>("minimized");
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showWaveHint, setShowWaveHint] = useState(false);
 
   // Check if we should show the welcome animation (only on first visit)
   useEffect(() => {
@@ -27,6 +28,17 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
       return () => clearTimeout(timer);
     }
   }, []);
+
+  // Periodic wave hint on minimized state
+  useEffect(() => {
+    if (state === "minimized" && !isChatOpen) {
+      const interval = setInterval(() => {
+        setShowWaveHint(true);
+        setTimeout(() => setShowWaveHint(false), 3000);
+      }, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [state, isChatOpen]);
 
   // Handle chat open/close
   useEffect(() => {
@@ -73,21 +85,43 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
 
   if (state === "minimized") {
     return (
-      <motion.button
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setState("options")}
-        className="fixed right-4 top-1/2 -translate-y-1/2 z-50 w-14 h-14 rounded-full shadow-lg overflow-hidden border-2 border-white dark:border-gray-800"
-        data-testid="karoo-minimized-button"
-      >
-        <img 
-          src={karooImage} 
-          alt="Karoo - Abrir chat" 
-          className="w-full h-full object-cover"
-        />
-      </motion.button>
+      <div className="fixed right-4 top-1/2 -translate-y-1/2 z-50 flex items-center gap-2">
+        <AnimatePresence>
+          {showWaveHint && (
+            <motion.div
+              initial={{ opacity: 0, x: 10, scale: 0.9 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              exit={{ opacity: 0, x: 10, scale: 0.9 }}
+              className="bg-white dark:bg-gray-800 rounded-xl shadow-lg px-3 py-2 border border-gray-200 dark:border-gray-700"
+            >
+              <p className="text-sm text-gray-700 dark:text-gray-200 whitespace-nowrap">
+                👋 Oi! Precisa de ajuda?
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ 
+            opacity: 1, 
+            scale: showWaveHint ? [1, 1.1, 1] : 1,
+          }}
+          transition={{ 
+            scale: { duration: 0.5, repeat: showWaveHint ? 2 : 0 }
+          }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setState("options")}
+          className="w-14 h-14 rounded-full shadow-lg overflow-hidden border-2 border-white dark:border-gray-800"
+          data-testid="karoo-minimized-button"
+        >
+          <img 
+            src={karooImage} 
+            alt="Karoo - Abrir chat" 
+            className="w-full h-full object-cover"
+          />
+        </motion.button>
+      </div>
     );
   }
 
