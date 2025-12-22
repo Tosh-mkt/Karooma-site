@@ -15,11 +15,13 @@ const SNOOZE_DURATION_HOURS = 24;
 export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   const [state, setState] = useState<AvatarState>("hidden");
   const [isSnoozed, setIsSnoozed] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   useEffect(() => {
     const snoozeUntil = localStorage.getItem("karoo-avatar-snooze-until");
     if (snoozeUntil && Date.now() < parseInt(snoozeUntil, 10)) {
       setIsSnoozed(true);
+      setState("minimized");
       return;
     }
     
@@ -37,10 +39,11 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   useEffect(() => {
     if (isChatOpen) {
       setState("hidden");
-    } else if (!isSnoozed) {
+      setHasInteracted(true);
+    } else if (hasInteracted && !isSnoozed) {
       setState("minimized");
     }
-  }, [isChatOpen, isSnoozed]);
+  }, [isChatOpen, isSnoozed, hasInteracted]);
 
   useEffect(() => {
     if (state === "waving") {
@@ -68,10 +71,6 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   const handleDiagnosticStart = () => {
     window.location.href = "/diagnostico";
   };
-
-  if (isSnoozed) {
-    return null;
-  }
 
   if (state === "hidden") {
     return null;
