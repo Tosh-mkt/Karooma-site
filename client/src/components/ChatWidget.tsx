@@ -73,6 +73,52 @@ interface Message {
   timestamp: Date;
 }
 
+const CHAT_STORAGE_KEY = "karoo-chat-session";
+
+interface ChatStorageData {
+  messages: Message[];
+  sessionId: string | null;
+  timestamp: number;
+}
+
+function saveChatToSession(messages: Message[], sessionId: string | null) {
+  try {
+    const data: ChatStorageData = {
+      messages,
+      sessionId,
+      timestamp: Date.now(),
+    };
+    sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn("[ChatWidget] Failed to save chat to sessionStorage:", e);
+  }
+}
+
+function loadChatFromSession(): ChatStorageData | null {
+  try {
+    const stored = sessionStorage.getItem(CHAT_STORAGE_KEY);
+    if (stored) {
+      const data = JSON.parse(stored) as ChatStorageData;
+      data.messages = data.messages.map(m => ({
+        ...m,
+        timestamp: new Date(m.timestamp),
+      }));
+      return data;
+    }
+  } catch (e) {
+    console.warn("[ChatWidget] Failed to load chat from sessionStorage:", e);
+  }
+  return null;
+}
+
+function clearChatSession() {
+  try {
+    sessionStorage.removeItem(CHAT_STORAGE_KEY);
+  } catch (e) {
+    console.warn("[ChatWidget] Failed to clear chat session:", e);
+  }
+}
+
 interface ChatConfig {
   name: string;
   welcomeMessage: string;
@@ -106,12 +152,28 @@ export function ChatWidget({
       setInternalIsOpen(open);
     }
   };
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const saved = loadChatFromSession();
+    return saved?.messages || [];
+  });
   const [input, setInput] = useState("");
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(() => {
+    const saved = loadChatFromSession();
+    return saved?.sessionId || null;
+  });
   const [isStreaming, setIsStreaming] = useState(false);
+  const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(() => {
+    const saved = loadChatFromSession();
+    return saved !== null && saved.messages.length > 0;
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      saveChatToSession(messages, sessionId);
+    }
+  }, [messages, sessionId]);
 
   const { data: config, isLoading: configLoading } = useQuery<ChatConfig>({
     queryKey: ["/api/chatbot/config/public"],
@@ -163,7 +225,7 @@ export function ChatWidget({
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen && messages.length === 0 && config?.welcomeMessage) {
+    if (isOpen && messages.length === 0 && config?.welcomeMessage && !hasLoadedFromStorage) {
       setMessages([
         {
           id: "welcome",
@@ -173,7 +235,7 @@ export function ChatWidget({
         },
       ]);
     }
-  }, [isOpen, config]);
+  }, [isOpen, config, hasLoadedFromStorage]);
 
   useEffect(() => {
     if (isOpen && initialMessage && initialMessage.trim() && messages.length <= 1) {
