@@ -7,6 +7,65 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import karooImage from "@assets/karoo_1766395905884.png";
 
+function renderMessageWithLinks(content: string): JSX.Element[] {
+  const parts: JSX.Element[] = [];
+  const linkRegex = /(`\/[a-zA-Z0-9\-\/]+`|\/[a-zA-Z0-9\-\/]+(?=\s|$|[.,!?)])|https?:\/\/[^\s]+)/g;
+  
+  let lastIndex = 0;
+  let match;
+  let keyIndex = 0;
+  
+  while ((match = linkRegex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(<span key={keyIndex++}>{content.slice(lastIndex, match.index)}</span>);
+    }
+    
+    let linkText = match[0];
+    let href = linkText;
+    
+    if (linkText.startsWith('`') && linkText.endsWith('`')) {
+      linkText = linkText.slice(1, -1);
+      href = linkText;
+    }
+    
+    if (href.startsWith('/')) {
+      parts.push(
+        <a
+          key={keyIndex++}
+          href={href}
+          className="text-purple-600 dark:text-purple-400 underline hover:text-purple-800 dark:hover:text-purple-300 font-medium"
+          onClick={(e) => {
+            e.preventDefault();
+            window.location.href = href;
+          }}
+        >
+          {linkText}
+        </a>
+      );
+    } else {
+      parts.push(
+        <a
+          key={keyIndex++}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-purple-600 dark:text-purple-400 underline hover:text-purple-800 dark:hover:text-purple-300"
+        >
+          {linkText}
+        </a>
+      );
+    }
+    
+    lastIndex = match.index + match[0].length;
+  }
+  
+  if (lastIndex < content.length) {
+    parts.push(<span key={keyIndex++}>{content.slice(lastIndex)}</span>);
+  }
+  
+  return parts.length > 0 ? parts : [<span key="0">{content}</span>];
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -254,7 +313,12 @@ export function ChatWidget({
                       }`}
                       data-testid={`message-${message.role}-${message.id}`}
                     >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
+                      <p className="whitespace-pre-wrap">
+                        {message.role === "assistant" 
+                          ? renderMessageWithLinks(message.content)
+                          : message.content
+                        }
+                      </p>
                     </div>
                   </motion.div>
                 ))}
