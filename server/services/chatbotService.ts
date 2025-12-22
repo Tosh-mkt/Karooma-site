@@ -14,6 +14,8 @@ import { eq, desc, and } from "drizzle-orm";
 import { LLMService, createLLMService } from "./llmService";
 import { RAGService, createRAGService } from "./ragService";
 import { sendVisitorFeedbackNotification } from "../emailService";
+import * as fs from "fs";
+import * as path from "path";
 
 interface ChatRequest {
   sessionId: string;
@@ -34,29 +36,24 @@ interface ChatResponse {
   tokensUsed?: number;
 }
 
-const DEFAULT_SYSTEM_PROMPT = `Você é a assistente virtual do site Karooma, um portal brasileiro dedicado a simplificar a vida de mães que trabalham.
+// Load Karoo tutor prompt from file
+function getKarooTutorPrompt(): string {
+  try {
+    const promptPath = path.join(process.cwd(), "server/chatbot-config/prompts/karoo-tutor.md");
+    if (fs.existsSync(promptPath)) {
+      return fs.readFileSync(promptPath, "utf-8");
+    }
+  } catch (error) {
+    console.error("[Chatbot] Error loading karoo-tutor.md:", error);
+  }
+  
+  // Fallback prompt if file not found
+  return `Você é a Karoo, guia do site Karooma.life.
+Ajude mães ocupadas a encontrar soluções práticas.
+Seja empática, concisa e direta. Use português brasileiro.`;
+}
 
-SOBRE O KAROOMA:
-- Ajudamos mães ocupadas a encontrar soluções práticas para o dia a dia
-- Oferecemos missões (guias práticos), artigos de blog e produtos recomendados
-- Nosso foco é organização, alimentação, bem-estar e gestão da casa
-
-PERSONALIDADE:
-- Tom empático e acolhedor
-- Linguagem simples e direta
-- Sempre prática e orientada a soluções
-- Evite jargões técnicos
-
-REGRAS:
-1. Responda sempre em português brasileiro
-2. Seja concisa mas completa
-3. Quando relevante, sugira missões ou produtos do site
-4. Se não souber algo, seja honesta e ofereça buscar mais informações
-5. Nunca invente informações sobre produtos ou preços
-6. Para questões complexas ou compras, sugira contato direto
-
-CONTEXTO ADICIONAL:
-Se informações do site forem fornecidas abaixo, use-as para enriquecer sua resposta.`;
+const DEFAULT_SYSTEM_PROMPT = getKarooTutorPrompt();
 
 // Helper function to extract and process feedback from AI response
 interface FeedbackMetadata {
@@ -200,7 +197,8 @@ export class ChatbotService {
       }
     }
 
-    let systemPrompt = config.systemPrompt || "";
+    // Always use the Karoo tutor prompt from file (overrides database config)
+    let systemPrompt = getKarooTutorPrompt();
     if (missionsContext) {
       systemPrompt += `\n\n${missionsContext}`;
     }
@@ -291,7 +289,8 @@ export class ChatbotService {
       }
     }
 
-    let systemPrompt = config.systemPrompt || "";
+    // Always use the Karoo tutor prompt from file (overrides database config)
+    let systemPrompt = getKarooTutorPrompt();
     if (missionsContext) {
       systemPrompt += `\n\n${missionsContext}`;
     }
