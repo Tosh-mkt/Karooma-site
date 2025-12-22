@@ -334,66 +334,6 @@ export function ChatWidget({
         )}
       </AnimatePresence>
 
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-4 ${positionClasses} z-50 w-14 h-14 rounded-full shadow-lg flex items-center justify-center overflow-hidden transition-colors ${isOpen ? 'bg-gray-700' : ''}`}
-        style={isOpen ? {} : { padding: 0 }}
-        data-testid="button-toggle-chat"
-      >
-        <AnimatePresence mode="wait">
-          {isOpen ? (
-            <motion.div
-              key="close"
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              exit={{ rotate: 90, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="text-white"
-            >
-              <X className="w-6 h-6" />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="open"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="w-full h-full"
-            >
-              <img 
-                src={karooImage} 
-                alt="Karoo" 
-                className="w-full h-full object-cover rounded-full"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.button>
-
-      {!isOpen && (
-        <motion.div
-          initial={{ opacity: 0, x: 10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 2 }}
-          className={`fixed bottom-6 ${
-            config.widgetPosition === "bottom-left" ? "left-20" : "right-20"
-          } z-40 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-w-[200px]`}
-        >
-          <p className="text-sm text-gray-700 dark:text-gray-300">
-            {config.widgetTitle}
-          </p>
-          <div
-            className={`absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rotate-45 ${
-              config.widgetPosition === "bottom-left"
-                ? "-left-1.5 border-l border-b"
-                : "-right-1.5 border-r border-t"
-            }`}
-          />
-        </motion.div>
-      )}
     </>
   );
 }

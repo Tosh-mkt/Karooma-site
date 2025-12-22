@@ -8,7 +8,7 @@ interface KarooAvatarProps {
   isChatOpen: boolean;
 }
 
-type AvatarState = "hidden" | "waving" | "options" | "diagnostic-info";
+type AvatarState = "hidden" | "minimized" | "waving" | "options" | "diagnostic-info";
 
 const SNOOZE_DURATION_HOURS = 24;
 
@@ -37,11 +37,8 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   useEffect(() => {
     if (isChatOpen) {
       setState("hidden");
-    } else if (!isSnoozed && state === "hidden") {
-      const timer = setTimeout(() => {
-        setState("waving");
-      }, 2000);
-      return () => clearTimeout(timer);
+    } else if (!isSnoozed) {
+      setState("minimized");
     }
   }, [isChatOpen, isSnoozed]);
 
@@ -55,10 +52,7 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
   }, [state]);
 
   const handleDismiss = () => {
-    setState("hidden");
-    setIsSnoozed(true);
-    const snoozeUntil = Date.now() + (SNOOZE_DURATION_HOURS * 60 * 60 * 1000);
-    localStorage.setItem("karoo-avatar-snooze-until", snoozeUntil.toString());
+    setState("minimized");
   };
 
   const handleOptionClick = (option: "explore" | "problem" | "diagnostic") => {
@@ -75,8 +69,32 @@ export function KarooAvatar({ onOpenChat, isChatOpen }: KarooAvatarProps) {
     window.location.href = "/diagnostico";
   };
 
-  if (isSnoozed || state === "hidden") {
+  if (isSnoozed) {
     return null;
+  }
+
+  if (state === "hidden") {
+    return null;
+  }
+
+  if (state === "minimized") {
+    return (
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => onOpenChat("")}
+        className="fixed right-4 bottom-4 z-50 w-14 h-14 rounded-full shadow-lg overflow-hidden border-2 border-white dark:border-gray-800"
+        data-testid="karoo-minimized-button"
+      >
+        <img 
+          src={karooImage} 
+          alt="Karoo - Abrir chat" 
+          className="w-full h-full object-cover"
+        />
+      </motion.button>
+    );
   }
 
   return (
