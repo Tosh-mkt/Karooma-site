@@ -67,7 +67,9 @@ import { AutoNotification } from "./components/content/auto-notification";
 import { CookieConsent } from "./components/CookieConsent";
 import { ConsentProvider } from "./contexts/ConsentContext";
 import { ChatWidget } from "./components/ChatWidget";
+import { KarooAvatar } from "./components/KarooAvatar";
 import { motion } from "framer-motion";
+import { useState, useCallback } from "react";
 
 function Router() {
   return (
@@ -170,6 +172,37 @@ function Router() {
   );
 }
 
+function ChatWithAvatar() {
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [initialMessage, setInitialMessage] = useState<string | undefined>(undefined);
+
+  const handleOpenChat = useCallback((message?: string) => {
+    if (message) {
+      setInitialMessage(message);
+    }
+    setIsChatOpen(true);
+  }, []);
+
+  const handleInitialMessageSent = useCallback(() => {
+    setInitialMessage(undefined);
+  }, []);
+
+  return (
+    <>
+      <KarooAvatar 
+        onOpenChat={handleOpenChat} 
+        isChatOpen={isChatOpen} 
+      />
+      <ChatWidget 
+        isOpen={isChatOpen}
+        onOpenChange={setIsChatOpen}
+        initialMessage={initialMessage}
+        onInitialMessageSent={handleInitialMessageSent}
+      />
+    </>
+  );
+}
+
 function App() {
   // Auto-detectar e corrigir cache antigo
   useEffect(() => {
@@ -183,7 +216,7 @@ function App() {
           <div className="custom-scrollbar">
             <Router />
             <CookieConsent />
-            <ChatWidget />
+            <ChatWithAvatar />
             <Toaster />
           </div>
         </ConsentProvider>

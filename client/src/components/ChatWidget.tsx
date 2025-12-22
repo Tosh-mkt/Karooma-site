@@ -23,8 +23,29 @@ interface ChatConfig {
   isActive: boolean;
 }
 
-export function ChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
+interface ChatWidgetProps {
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  initialMessage?: string;
+  onInitialMessageSent?: () => void;
+}
+
+export function ChatWidget({ 
+  isOpen: controlledIsOpen, 
+  onOpenChange,
+  initialMessage,
+  onInitialMessageSent 
+}: ChatWidgetProps = {}) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  const setIsOpen = (open: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(open);
+    } else {
+      setInternalIsOpen(open);
+    }
+  };
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -93,6 +114,25 @@ export function ChatWidget() {
       ]);
     }
   }, [isOpen, config]);
+
+  useEffect(() => {
+    if (isOpen && initialMessage && initialMessage.trim() && messages.length <= 1) {
+      const timer = setTimeout(() => {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `user-${Date.now()}`,
+            role: "user",
+            content: initialMessage,
+            timestamp: new Date(),
+          },
+        ]);
+        chatMutation.mutate(initialMessage);
+        onInitialMessageSent?.();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, initialMessage, messages.length]);
 
   const handleSend = async () => {
     if (!input.trim() || chatMutation.isPending) return;
