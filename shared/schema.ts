@@ -1404,7 +1404,37 @@ export const chatKnowledgeBase = pgTable("chat_knowledge_base", {
   index("idx_chat_kb_active").on(table.isActive),
 ]);
 
+// Visitor feedback (sugestões, reclamações, pedidos)
+export const visitorFeedback = pgTable("visitor_feedback", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: varchar("type", { length: 50 }).notNull(), // suggestion, complaint, request
+  message: text("message").notNull(),
+  visitorName: varchar("visitor_name", { length: 255 }),
+  visitorEmail: varchar("visitor_email", { length: 255 }),
+  conversationContext: text("conversation_context"), // Contexto da conversa
+  pageUrl: varchar("page_url", { length: 500 }), // Página onde estava
+  userAgent: varchar("user_agent", { length: 500 }),
+  status: varchar("status", { length: 50 }).default("pending"), // pending, reviewed, resolved
+  adminNotes: text("admin_notes"),
+  emailSent: boolean("email_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_visitor_feedback_type").on(table.type),
+  index("idx_visitor_feedback_status").on(table.status),
+  index("idx_visitor_feedback_created").on(table.createdAt),
+]);
+
 // Schemas
+export const insertVisitorFeedbackSchema = createInsertSchema(visitorFeedback).omit({
+  id: true,
+  emailSent: true,
+  status: true,
+  adminNotes: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertChatbotConfigSchema = createInsertSchema(chatbotConfig).omit({
   id: true,
   createdAt: true,
@@ -1441,3 +1471,7 @@ export type InsertChatKnowledgeBase = z.infer<typeof insertChatKnowledgeBaseSche
 // LLM Provider type
 export type LLMProvider = typeof LLMProviders[keyof typeof LLMProviders];
 export type RAGSource = typeof RAGSources[keyof typeof RAGSources];
+
+// Visitor feedback types
+export type VisitorFeedback = typeof visitorFeedback.$inferSelect;
+export type InsertVisitorFeedback = z.infer<typeof insertVisitorFeedbackSchema>;
