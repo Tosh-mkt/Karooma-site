@@ -44,14 +44,30 @@ export function getAffiliateTag(marketplace: string): string {
 }
 
 /**
+ * Verifica se uma URL é de um domínio Amazon válido
+ */
+export function isAmazonUrl(url: string): boolean {
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.hostname.includes('amazon.');
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Gera link de afiliado a partir de uma URL de produto Amazon
  * 
  * @param url - URL do produto na Amazon (ex: https://www.amazon.com.br/dp/B09NCKFBGQ)
  * @param customTag - Tag customizada (opcional, usa a configurada por marketplace)
- * @returns URL com tag de afiliado ou null se ASIN não encontrado
+ * @returns URL com tag de afiliado ou null se ASIN não encontrado ou URL não é da Amazon
  */
 export function gerarLinkAfiliadoAPartirDaURL(url: string, customTag?: string): string | null {
   if (!url) return null;
+
+  if (!isAmazonUrl(url)) {
+    return null;
+  }
 
   const asin = extractASINFromUrl(url);
   if (!asin) return null;

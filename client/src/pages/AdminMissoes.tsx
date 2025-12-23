@@ -10,16 +10,18 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit, Plus, Eye, ExternalLink } from "lucide-react";
+import { Trash2, Edit, Plus, Eye, ExternalLink, Package, Search } from "lucide-react";
 import { Link } from "wouter";
 import { ImageUploader } from "@/components/admin/ImageUploader";
 import { AudioUploader } from "@/components/admin/AudioUploader";
+import { ProductsAsinForm } from "@/components/admin/ProductsAsinForm";
 import type { SelectMission } from "@shared/schema";
 
 export default function AdminMissoes() {
   const { toast } = useToast();
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingMission, setEditingMission] = useState<SelectMission | null>(null);
+  const [isProductFormOpen, setIsProductFormOpen] = useState(false);
 
   const { data: missions, isLoading } = useQuery<SelectMission[]>({
     queryKey: ["/api/missions"],
@@ -581,7 +583,20 @@ export default function AdminMissoes() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="productAsins">ASINs dos Produtos (opcional)</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="productAsins">ASINs dos Produtos (opcional)</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsProductFormOpen(true)}
+                      className="gap-1"
+                      data-testid="btn-open-product-search"
+                    >
+                      <Search className="w-4 h-4" />
+                      Buscar Produtos
+                    </Button>
+                  </div>
                   <Textarea
                     id="productAsins"
                     value={formData.productAsins}
@@ -591,6 +606,24 @@ export default function AdminMissoes() {
                   />
                   <p className="text-sm text-gray-500">ASINs específicos da Amazon separados por | (pipe) ou vírgula</p>
                 </div>
+
+                <ProductsAsinForm
+                  open={isProductFormOpen}
+                  onOpenChange={setIsProductFormOpen}
+                  onProductAdded={(product) => {
+                    if (product?.asin) {
+                      const currentAsins = formData.productAsins.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+                      if (!currentAsins.includes(product.asin)) {
+                        const newAsins = [...currentAsins, product.asin].join('|');
+                        setFormData(prev => ({ ...prev, productAsins: newAsins }));
+                        toast({
+                          title: "ASIN adicionado!",
+                          description: `${product.asin} foi adicionado à lista de produtos da missão.`
+                        });
+                      }
+                    }
+                  }}
+                />
 
                 <div className="space-y-2">
                   <Label htmlFor="tarefasSimplesDeExecucao">Checklist de Tarefas (opcional)</Label>
