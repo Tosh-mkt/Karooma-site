@@ -1,0 +1,418 @@
+# Amazon Product Advertising API (PA API)
+## Guia Técnico Consolidado para Implementação, Recomendação e Monetização
+
+Este documento consolida práticas reais de uso da Amazon Product Advertising API (PA API),
+incluindo busca de produtos, simulação de recomendações, arquitetura backend,
+limites, compliance e monetização via Amazon Associates.
+
+---
+
+## 1. Conceitos Fundamentais
+
+### 1.1 Lookup por ASIN (GetItems)
+- Endpoint: `GetItems`
+- Finalidade: retornar dados de um ASIN específico
+- Não permite refinamento por:
+  - mais vendidos
+  - recomendados
+  - ofertas
+- É um lookup direto, não exploratório.
+
+Uso típico:
+- Detalhes do produto
+- Preço atual
+- Buy Box (quando disponível)
+- Avaliações
+- Imagens
+
+---
+
+### 1.2 Busca Exploratória (SearchItems)
+- Endpoint: `SearchItems`
+- Usado para descobrir produtos com base em critérios.
+- É onde ocorre ordenação e filtragem.
+
+Parâmetros principais:
+- `Keywords`
+- `BrowseNodeId`
+- `Brand`
+- `MinPrice` / `MaxPrice`
+- `Merchant`
+- `Condition`
+- `SortBy`
+- `ItemCount`
+
+Valores comuns de `SortBy`:
+- `SalesRank` → mais vendidos (por categoria)
+- `ReviewRank` → melhor avaliados
+- `Relevance` → relevância geral
+- `Price:LowToHigh`
+
+Não existem parâmetros oficiais para:
+- "produtos recomendados"
+- "best sellers oficiais"
+- "ofertas do dia"
+
+Esses conceitos precisam ser inferidos.
+
+---
+
+## 2. Diferença entre PA API e Front-end da Amazon
+
+### 2.1 Front-end Amazon (site/app)
+- Usa machine learning proprietário
+- Considera:
+  - histórico do usuário
+  - navegação
+  - compras anteriores
+- Exibe:
+  - "Clientes também compraram"
+  - "Recomendados para você"
+  - Best sellers dinâmicos
+
+Esses dados NÃO são expostos na PA API.
+
+---
+
+### 2.2 PA API
+- Dados estruturados e determinísticos
+- Não personalizados
+- Não expõe algoritmos de recomendação
+
+O `SalesRank`:
+- É por categoria
+- Não equivale exatamente ao ranking visual do site
+- Pode variar entre chamadas
+
+---
+
+## 3. Simulação de Produtos Recomendados (Lógica Programática)
+
+### 3.1 Fluxo Geral
+1. Obter ASIN base via `GetItems`
+2. Extrair atributos:
+   - BrowseNodeId
+   - Marca
+   - Faixa de preço
+   - Palavras-chave do título
+3. Executar `SearchItems` com filtros similares
+4. Aplicar score próprio
+5. Retornar lista de "produtos similares"
+
+---
+
+### 3.2 Exemplo de SearchItems
+```json
+{
+  "Keywords": "cafeteira italiana inox",
+  "BrowseNodeId": "227213",
+  "Marketplace": "www.amazon.com.br",
+  "PartnerTag": "karoom-20",
+  "PartnerType": "Associates",
+  "SortBy": "SalesRank",
+  "ItemCount": 10
+}
+```
+
+---
+
+### 3.3 Score de Recomendação (Exemplo)
+
+```
+Score =
+  (1 / SalesRank) * 0.4 +
+  (ReviewRating * ReviewCount) * 0.4 +
+  (Prime ? 1 : 0) * 0.2
+```
+
+Esse score substitui o conceito de "recomendado".
+
+---
+
+### 3.4 Termos Permitidos
+
+Use:
+- Produtos similares
+- Produtos populares
+- Bem avaliados na categoria
+
+Nunca use:
+- "Recomendado pela Amazon"
+
+---
+
+## 4. Exemplo Completo de Resposta (SearchItems)
+
+```json
+{
+  "ASIN": "B0XXXXXXX",
+  "ItemInfo": {
+    "Title": {
+      "DisplayValue": "Cafeteira Italiana Inox 6 Xícaras"
+    }
+  },
+  "Offers": {
+    "Listings": [
+      {
+        "Price": {
+          "Amount": 99.90,
+          "Currency": "BRL"
+        }
+      }
+    ]
+  },
+  "CustomerReviews": {
+    "StarRating": {
+      "Value": 4.6
+    },
+    "Count": 1832
+  }
+}
+```
+
+---
+
+## 5. Limites, Throttling e Erros
+
+### 5.1 Limites Iniciais (típicos)
+- ~1 request/segundo
+- ~8.640 requests/dia
+
+Os limites aumentam conforme vendas qualificadas no programa de afiliados.
+
+---
+
+### 5.2 Throttling
+
+Erro HTTP 429:
+```json
+{
+  "Code": "TooManyRequests",
+  "Message": "Request throttled"
+}
+```
+
+Boas práticas:
+- Backoff exponencial
+- Retry com delay
+- Processamento assíncrono
+
+---
+
+### 5.3 Erros Comuns
+
+| Erro | Causa | Solução |
+|------|-------|---------|
+| InvalidSignature | Clock fora de sync | Sincronizar NTP |
+| AccessDenied | PartnerTag incorreto | Conferir Associates |
+| InvalidParameterValue | BrowseNode inválido | Validar marketplace |
+| MissingPartnerTag | Tag ausente | Obrigatória |
+
+BrowseNodes são específicos por marketplace.
+
+---
+
+## 6. Armazenamento e Cache (Compliance)
+
+### 6.1 Pode armazenar
+- ASIN
+- Título
+- Marca
+- Categoria
+- Imagens
+- Avaliações
+
+### 6.2 NÃO pode armazenar > 24h
+- Preço
+- Disponibilidade
+- Ofertas
+
+---
+
+### 6.3 Estrutura Recomendada
+
+```
+products
+ ├── asin
+ ├── title
+ ├── brand
+ ├── browse_node
+ ├── image_url
+ ├── rating
+ ├── review_count
+ └── last_static_update
+
+offers_cache
+ ├── asin
+ ├── price
+ ├── currency
+ ├── last_checked
+ └── expires_at
+```
+
+---
+
+### 6.4 TTL Sugerido
+
+| Dado | TTL |
+|------|-----|
+| Preço | 12–24h |
+| Disponibilidade | 12h |
+| Avaliações | 7 dias |
+| Similaridade | 30 dias |
+
+---
+
+## 7. Arquitetura Backend Recomendada
+
+### 7.1 Visão Geral
+
+```
+Frontend
+  ↓
+API própria (REST/GraphQL)
+  ↓
+Cache (Redis/Memória)
+  ↓
+Workers assíncronos
+  ↓
+Amazon PA API
+```
+
+---
+
+### 7.2 Regras de Ouro
+- Nunca chamar PA API por page view
+- Sempre servir cache ao usuário
+- Atualizar dados em background
+- Usar filas e jobs assíncronos
+
+---
+
+## 8. SEO e Conteúdo Automatizado
+
+### 8.1 Estruturas que escalam
+- /categoria/{browseNode}
+- /alternativas/{asin}
+- /melhores-{produto}-{ano}
+- /comparativo/{asin1}-vs-{asin2}
+
+---
+
+### 8.2 Frases Permitidas
+- Produto popular na categoria
+- Bem avaliado por consumidores
+- Entre os mais vendidos
+
+---
+
+## 9. Monetização com Amazon Associates
+
+### 9.1 Modelos que funcionam
+- Reviews SEO
+- Comparativos
+- Páginas de decisão
+- Widgets automatizados
+
+---
+
+### 9.2 Comissões (aprox.)
+- Casa & Cozinha: ~8%
+- Eletrônicos: ~3%
+- Moda: ~10%
+- Livros: ~4,5%
+
+---
+
+### 9.3 Compliance Obrigatório
+- Aviso de afiliado
+- Preços atualizados ≤ 24h
+- Links com PartnerTag
+
+Proibido:
+- Incentivar cliques artificiais
+- Afirmar recomendação oficial da Amazon
+
+---
+
+## 10. Regra Final
+
+> Menos chamadas à PA API. Mais cache. Mais lógica local. Mais compliance.
+
+Essa abordagem é escalável, segura e usada em produção.
+
+---
+
+## 11. Geração de Link de Afiliado
+
+### 11.1 Função para Gerar Link
+
+```javascript
+const AFFILIATE_TAGS = {
+  "www.amazon.com.br": "karoom-20"
+};
+
+function gerarLinkAfiliadoAPartirDaURL(url, tag) {
+  if (!url || !tag) {
+    throw new Error("URL e tag são obrigatórios");
+  }
+
+  // Suporta /dp/, /gp/product/ e /product/
+  const asinMatch = url.match(/\/dp\/([A-Z0-9]{10})|\/gp\/product\/([A-Z0-9]{10})|\/product\/([A-Z0-9]{10})/i);
+
+  if (!asinMatch) {
+    throw new Error("ASIN não encontrado na URL");
+  }
+
+  const asin = asinMatch[1] || asinMatch[2] || asinMatch[3];
+  
+  // Detecta marketplace ou usa padrão Brasil
+  let marketplace = "www.amazon.com.br";
+  try {
+    const parsedUrl = new URL(url);
+    if (parsedUrl.hostname.includes("amazon")) {
+      marketplace = parsedUrl.hostname;
+    }
+  } catch (e) {}
+
+  return `https://${marketplace}/dp/${asin}?tag=${tag}`;
+}
+```
+
+### 11.2 Uso
+
+```javascript
+const affiliateUrl = gerarLinkAfiliadoAPartirDaURL(productUrl, AFFILIATE_TAGS["www.amazon.com.br"]);
+```
+
+---
+
+## 12. Estrutura JSON para Inserção Manual
+
+### 12.1 Campos Obrigatórios
+
+```json
+{
+  "asin": "B09NCKFBGQ",
+  "title": "Nome do Produto",
+  "imageUrl": "https://m.media-amazon.com/images/I/xxx.jpg",
+  "productUrl": "https://www.amazon.com.br/dp/B09NCKFBGQ",
+  "price": 179.80
+}
+```
+
+### 12.2 Campos Opcionais
+
+```json
+{
+  "brand": "Marca",
+  "category": "Categoria",
+  "originalPrice": 229.00,
+  "rating": 4.4,
+  "reviewCount": 636,
+  "isPrime": true,
+  "isAvailable": true
+}
+```
+
+O `affiliateUrl` é gerado automaticamente a partir do `productUrl` + tag.
