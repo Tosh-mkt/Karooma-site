@@ -150,6 +150,9 @@ export const products = pgTable("products", {
   unavailableSince: timestamp("unavailable_since"), // Quando ficou indisponível
   // Cache de dados da API
   amazonData: json("amazon_data"), // Cache dos dados completos da PA API
+  // Controle de edição manual e critérios originais
+  isManuallyEdited: boolean("is_manually_edited").default(false), // Se foi editado manualmente (não sobrescreve em updates automáticos)
+  originalCriteria: json("original_criteria"), // Critérios originais de seleção para buscar substitutos {category, priceRange, minRating, keywords}
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
