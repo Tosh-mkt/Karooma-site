@@ -3130,6 +3130,414 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ===== NOVOS ENDPOINTS DE PRODUTOS =====
+  
+  // Import affiliate link utilities
+  const { 
+    processProductJson, 
+    calculateRecommendationScore, 
+    isValidASIN,
+    gerarLinkAfiliadoAPartirDaURL 
+  } = await import('./utils/affiliateLink');
+
+  // POST /api/admin/products/search - Buscar produtos na Amazon por termo
+  app.post("/api/admin/products/search", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+
+      const { keywords, category, minPrice, maxPrice, minRating, sortBy, itemCount } = req.body;
+
+      if (!keywords && !category) {
+        return res.status(400).json({ error: "keywords ou category são obrigatórios" });
+      }
+
+      // Verificar se PA API está configurada
+      if (!amazonService.isConfigured()) {
+        return res.status(503).json({ 
+          error: "PA API não configurada",
+          message: "A Amazon Product Advertising API não está configurada. Use inserção manual via JSON."
+        });
+      }
+
+      const searchResult = await amazonService.searchItems({
+        keywords,
+        category,
+        minPrice,
+        maxPrice,
+        minRating,
+        sortBy: sortBy || 'Featured',
+        itemCount: itemCount || 10
+      });
+
+      if (!searchResult.success || !searchResult.products) {
+        return res.status(404).json({ 
+          error: searchResult.error || "Nenhum produto encontrado",
+          apiConfigured: amazonService.isConfigured()
+        });
+      }
+
+      // Adicionar score de recomendação a cada produto
+      const productsWithScore = searchResult.products.map(product => ({
+        ...product,
+        recommendationScore: calculateRecommendationScore(
+          product.bestSellerRank,
+          product.rating,
+          product.reviewCount,
+          product.isPrime
+        )
+      }));
+
+      // Ordenar por score de recomendação
+      productsWithScore.sort((a, b) => b.recommendationScore - a.recommendationScore);
+
+      res.json({
+        success: true,
+        products: productsWithScore,
+        totalResults: searchResult.totalResults,
+        searchCriteria: { keywords, category, minPrice, maxPrice, minRating, sortBy }
+      });
+    } catch (error) {
+      console.error("Erro na busca de produtos:", error);
+      res.status(500).json({ error: "Erro ao buscar produtos", message: String(error) });
+    }
+  });
+
+  // POST /api/admin/products/json - Inserir produto via JSON manual
+  app.post("/api/admin/products/json", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+
+      const productInput = req.body;
+
+      // Validar campos obrigatórios
+      const requiredFields = ['asin', 'title', 'imageUrl', 'productUrl', 'price'];
+      const missingFields = requiredFields.filter(field => !productInput[field]);
+      
+      if (missingFields.length > 0) {
+        return res.status(400).json({ 
+          error: "Campos obrigatórios faltando",
+          missingFields,
+          requiredFormat: {
+            asin: "B09NCKFBGQ",
+            title: "Nome do Produto",
+            imageUrl: "https://m.media-amazon.com/images/I/xxx.jpg",
+            productUrl: "https://www.amazon.com.br/dp/B09NCKFBGQ",
+            price: 179.80,
+            brand: "(opcional)",
+            category: "(opcional)",
+            originalPrice: "(opcional)",
+            rating: "(opcional)",
+            reviewCount: "(opcional)",
+            isPrime: "(opcional, boolean)",
+            isAvailable: "(opcional, boolean)"
+          }
+        });
+      }
+
+      // Validar ASIN
+      if (!isValidASIN(productInput.asin)) {
+        return res.status(400).json({ 
+          error: "ASIN inválido",
+          message: "ASIN deve ter 10 caracteres alfanuméricos"
+        });
+      }
+
+      // Verificar se produto já existe
+      const existingProducts = await storage.getAllProducts();
+      const existingProduct = existingProducts.find(p => p.asin === productInput.asin);
+
+      if (existingProduct) {
+        return res.status(409).json({ 
+          error: "Produto já existe",
+          existingProductId: existingProduct.id,
+          message: "Use PUT para atualizar o produto existente"
+        });
+      }
+
+      // Processar JSON e gerar link afiliado
+      const processedProduct = processProductJson(productInput);
+
+      // Criar produto no banco
+      const newProduct = await storage.createProduct({
+        title: processedProduct.title,
+        description: productInput.description || processedProduct.title,
+        category: processedProduct.category || 'geral',
+        imageUrl: processedProduct.imageUrl,
+        currentPrice: processedProduct.price.toString(),
+        originalPrice: processedProduct.originalPrice?.toString() || null,
+        affiliateLink: processedProduct.affiliateLink,
+        productLink: processedProduct.productUrl,
+        rating: processedProduct.rating?.toString() || null,
+        discount: processedProduct.originalPrice && processedProduct.price
+          ? Math.round(((processedProduct.originalPrice - processedProduct.price) / processedProduct.originalPrice) * 100)
+          : null,
+        featured: false,
+        brand: processedProduct.brand || null,
+        asin: processedProduct.asin,
+        isPrime: processedProduct.isPrime || false,
+        reviewCount: processedProduct.reviewCount || 0,
+        availability: processedProduct.isAvailable !== false ? 'available' : 'unavailable',
+        status: 'active',
+        isManuallyEdited: true,
+        originalCriteria: JSON.stringify({
+          category: processedProduct.category,
+          priceRange: { min: processedProduct.price * 0.8, max: processedProduct.price * 1.2 },
+          minRating: processedProduct.rating ? processedProduct.rating - 0.5 : null
+        })
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Produto criado com sucesso",
+        product: newProduct,
+        affiliateLink: processedProduct.affiliateLink
+      });
+    } catch (error) {
+      console.error("Erro ao criar produto via JSON:", error);
+      res.status(500).json({ error: "Erro ao criar produto", message: String(error) });
+    }
+  });
+
+  // GET /api/admin/products/suggestions/:asin - Buscar produtos similares para substituição
+  app.get("/api/admin/products/suggestions/:asin", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+
+      const { asin } = req.params;
+
+      // Buscar produto original
+      const allProducts = await storage.getAllProducts();
+      const originalProduct = allProducts.find(p => p.asin === asin);
+
+      if (!originalProduct) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      // Extrair critérios originais ou inferir do produto
+      let criteria: any = {};
+      if (originalProduct.originalCriteria) {
+        criteria = typeof originalProduct.originalCriteria === 'string' 
+          ? JSON.parse(originalProduct.originalCriteria)
+          : originalProduct.originalCriteria;
+      } else {
+        // Inferir critérios do produto
+        const price = parseFloat(originalProduct.currentPrice?.toString() || '0');
+        criteria = {
+          category: originalProduct.category,
+          priceRange: { min: price * 0.7, max: price * 1.3 },
+          minRating: originalProduct.rating ? parseFloat(originalProduct.rating.toString()) - 0.5 : 3.5
+        };
+      }
+
+      // Se PA API estiver configurada, buscar sugestões
+      if (amazonService.isConfigured()) {
+        const searchResult = await amazonService.searchItems({
+          keywords: originalProduct.title.split(' ').slice(0, 3).join(' '),
+          category: criteria.category,
+          minPrice: criteria.priceRange?.min,
+          maxPrice: criteria.priceRange?.max,
+          minRating: criteria.minRating,
+          sortBy: 'Featured',
+          itemCount: 5
+        });
+
+        if (searchResult.success && searchResult.products) {
+          // Filtrar o produto original e adicionar scores
+          const suggestions = searchResult.products
+            .filter(p => p.asin !== asin)
+            .map(product => ({
+              ...product,
+              recommendationScore: calculateRecommendationScore(
+                product.bestSellerRank,
+                product.rating,
+                product.reviewCount,
+                product.isPrime
+              )
+            }))
+            .sort((a, b) => b.recommendationScore - a.recommendationScore)
+            .slice(0, 5);
+
+          return res.json({
+            success: true,
+            originalProduct: {
+              asin: originalProduct.asin,
+              title: originalProduct.title,
+              availability: originalProduct.availability
+            },
+            criteria,
+            suggestions,
+            source: 'amazon_api'
+          });
+        }
+      }
+
+      // Fallback: buscar produtos similares do banco local
+      const localSuggestions = allProducts
+        .filter(p => p.asin !== asin && p.category === originalProduct.category && p.availability === 'available')
+        .slice(0, 5)
+        .map(p => ({
+          asin: p.asin,
+          title: p.title,
+          imageUrl: p.imageUrl,
+          currentPrice: parseFloat(p.currentPrice?.toString() || '0'),
+          rating: parseFloat(p.rating?.toString() || '0'),
+          reviewCount: p.reviewCount || 0,
+          isPrime: p.isPrime,
+          availability: p.availability
+        }));
+
+      res.json({
+        success: true,
+        originalProduct: {
+          asin: originalProduct.asin,
+          title: originalProduct.title,
+          availability: originalProduct.availability
+        },
+        criteria,
+        suggestions: localSuggestions,
+        source: 'local_database',
+        message: amazonService.isConfigured() ? 'Busca na Amazon falhou, usando banco local' : 'PA API não configurada, usando banco local'
+      });
+    } catch (error) {
+      console.error("Erro ao buscar sugestões:", error);
+      res.status(500).json({ error: "Erro ao buscar sugestões", message: String(error) });
+    }
+  });
+
+  // GET /api/admin/products/unavailable - Listar produtos indisponíveis com sugestões
+  app.get("/api/admin/products/unavailable", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+
+      const allProducts = await storage.getAllProducts();
+      const unavailableProducts = allProducts.filter(p => p.availability === 'unavailable' || p.status === 'inactive');
+
+      res.json({
+        success: true,
+        count: unavailableProducts.length,
+        products: unavailableProducts.map(p => ({
+          id: p.id,
+          asin: p.asin,
+          title: p.title,
+          category: p.category,
+          availability: p.availability,
+          status: p.status,
+          unavailableSince: p.unavailableSince,
+          lastChecked: p.lastChecked
+        }))
+      });
+    } catch (error) {
+      console.error("Erro ao listar produtos indisponíveis:", error);
+      res.status(500).json({ error: "Erro ao listar produtos", message: String(error) });
+    }
+  });
+
+  // PUT /api/admin/products/:id/replace - Substituir produto indisponível
+  app.put("/api/admin/products/:id/replace", extractUserInfo, async (req: any, res) => {
+    try {
+      if (!checkIsAdmin(req.user)) {
+        return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+      }
+
+      const { id } = req.params;
+      const { newAsin, useJsonData, jsonData } = req.body;
+
+      // Buscar produto original
+      const allProducts = await storage.getAllProducts();
+      const originalProduct = allProducts.find(p => p.id === id);
+
+      if (!originalProduct) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      let newProductData: any;
+
+      if (useJsonData && jsonData) {
+        // Usar dados JSON fornecidos
+        const processedProduct = processProductJson(jsonData);
+        newProductData = {
+          title: processedProduct.title,
+          imageUrl: processedProduct.imageUrl,
+          currentPrice: processedProduct.price.toString(),
+          originalPrice: processedProduct.originalPrice?.toString() || null,
+          affiliateLink: processedProduct.affiliateLink,
+          productLink: processedProduct.productUrl,
+          rating: processedProduct.rating?.toString() || null,
+          brand: processedProduct.brand || null,
+          asin: processedProduct.asin,
+          isPrime: processedProduct.isPrime || false,
+          reviewCount: processedProduct.reviewCount || 0,
+          availability: 'available',
+          status: 'active',
+          isManuallyEdited: true,
+          lastUpdated: new Date()
+        };
+      } else if (newAsin && amazonService.isConfigured()) {
+        // Buscar dados via PA API
+        const amazonResult = await amazonService.getProductByASIN(newAsin);
+        
+        if (!amazonResult.success || !amazonResult.product) {
+          return res.status(404).json({ 
+            error: "Produto não encontrado na Amazon",
+            message: amazonResult.error
+          });
+        }
+
+        const amazonProduct = amazonResult.product;
+        newProductData = {
+          title: amazonProduct.title,
+          imageUrl: amazonProduct.imageUrl,
+          currentPrice: amazonProduct.currentPrice?.toString(),
+          originalPrice: amazonProduct.originalPrice?.toString(),
+          affiliateLink: amazonProduct.productUrl,
+          productLink: amazonProduct.productUrl,
+          rating: amazonProduct.rating?.toString(),
+          brand: amazonProduct.brand,
+          asin: newAsin,
+          isPrime: amazonProduct.isPrime,
+          reviewCount: amazonProduct.reviewCount,
+          availability: amazonProduct.availability,
+          status: 'active',
+          isManuallyEdited: false,
+          lastUpdated: new Date(),
+          lastChecked: new Date()
+        };
+      } else {
+        return res.status(400).json({ 
+          error: "Dados insuficientes",
+          message: "Forneça newAsin (com PA API configurada) ou useJsonData com jsonData"
+        });
+      }
+
+      // Preservar categoria e critérios originais
+      newProductData.category = originalProduct.category;
+      newProductData.originalCriteria = originalProduct.originalCriteria;
+
+      // Atualizar produto
+      await storage.updateProduct(id, newProductData);
+
+      res.json({
+        success: true,
+        message: "Produto substituído com sucesso",
+        oldAsin: originalProduct.asin,
+        newAsin: newProductData.asin
+      });
+    } catch (error) {
+      console.error("Erro ao substituir produto:", error);
+      res.status(500).json({ error: "Erro ao substituir produto", message: String(error) });
+    }
+  });
+
+  // ===== FIM DOS NOVOS ENDPOINTS DE PRODUTOS =====
+
   // Endpoint de teste do SendGrid
   app.post("/api/admin/test-email", async (req, res) => {
     try {
