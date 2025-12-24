@@ -1,0 +1,103 @@
+{
+  "kit": {
+    "title": "Kit Detox Sensorial: O Guia Anti-Estimulação",
+    "slug": "kit-detox-sensorial-anti-telas",
+    "theme": "Desenvolvimento Infantil",
+    "taskIntent": "Reduzir o vício em dopamina visual e restaurar o foco em atividades analógicas.",
+    "problemToSolve": ["Irritabilidade pós-tela", "Falta de concentração", "Dificuldade em brincar sozinho"],
+    "shortDescription": "Ferramentas para reajustar o foco da criança e reduzir a dependência de estímulos digitais rápidos.",
+    "category": "Parentalidade Consciente"
+  },
+  "conceptItems": [
+    {
+      "name": "Blocos Magnéticos de Construção",
+      "role": "MAIN",
+      "weight": 1.0,
+      "description": "Engaja a criança em resolução de problemas espaciais sem o ritmo frenético das telas.",
+      "criteria": {
+        "mustKeywords": ["blocos magneticos", "brinquedo educativo", "stem"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 80.0,
+        "priceMax": 250.0,
+        "ratingMin": 4.7,
+        "primeOnly": true
+      }
+    },
+    {
+      "name": "Lousa Mágica Tablet LCD",
+      "role": "MAIN",
+      "weight": 1.0,
+      "description": "Oferece a sensação do desenho digital mas sem luz azul ou troca de cenas constante.",
+      "criteria": {
+        "mustKeywords": ["lousa magica lcd", "tablet desenho"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 30.0,
+        "priceMax": 100.0,
+        "ratingMin": 4.5,
+        "primeOnly": true
+      }
+    },
+    {
+      "name": "Livro de Atividades Procure e Ache",
+      "role": "SUPPORT",
+      "weight": 0.7,
+      "description": "Treina a visão para focar em detalhes estáticos, combatendo o vício em cortes rápidos de vídeo.",
+      "criteria": {
+        "mustKeywords": ["onde esta wally", "procure e ache", "livro atividades"],
+        "category": "Livros",
+        "priceMin": 20.0,
+        "priceMax": 60.0,
+        "ratingMin": 4.8,
+        "primeOnly": true
+      }
+    },
+    {
+      "name": "Kit Massinha de Modelar Profissional",
+      "role": "SUPPORT",
+      "weight": 0.7,
+      "description": "Estímulo tátil profundo que ajuda a autorregular o sistema nervoso da criança.",
+      "criteria": {
+        "mustKeywords": ["play-doh kit", "massinha de modelar"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 40.0,
+        "priceMax": 120.0,
+        "ratingMin": 4.6,
+        "primeOnly": true
+      }
+    },
+    {
+      "name": "Caixa de Som Bluetooth Portátil",
+      "role": "OPTIONAL",
+      "weight": 0.4,
+      "description": "Permite que a criança ouça histórias e músicas (imaginação ativa) sem fixar os olhos em telas.",
+      "criteria": {
+        "mustKeywords": ["caixa som bluetooth", "jbl go", "caixa portatil"],
+        "category": "Eletrônicos",
+        "priceMin": 100.0,
+        "priceMax": 300.0,
+        "ratingMin": 4.8,
+        "primeOnly": true
+      }
+    },
+    {
+      "name": "Barraca Infantil Toca",
+      "role": "OPTIONAL",
+      "weight": 0.4,
+      "description": "Cria um ambiente de baixa estimulação visual para acalmar após o uso de tecnologia.",
+      "criteria": {
+        "mustKeywords": ["barraca infantil", "toca", "cabana"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 70.0,
+        "priceMax": 180.0,
+        "ratingMin": 4.5,
+        "primeOnly": true
+      }
+    }
+  ],
+  "rulesConfig": {
+    "minItems": 6,
+    "maxItems": 8,
+    "ratingMin": 4.0,
+    "updateFrequency": "weekly"
+  }
+}
