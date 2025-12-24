@@ -1282,10 +1282,18 @@ export const kitConceptItemCriteriaSchema = z.object({
   featureFlags: z.array(z.string()).optional(),
 });
 
+const roleEnumWithSynonyms = z.string().transform((val) => {
+  const normalized = val.toUpperCase();
+  if (normalized === 'SUPPORT') return 'SECONDARY' as const;
+  if (normalized === 'OPTIONAL') return 'COMPLEMENT' as const;
+  return normalized as 'MAIN' | 'SECONDARY' | 'COMPLEMENT';
+}).pipe(z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT']));
+
 export const kitConceptItemSchema = z.object({
   name: z.string(),
-  role: z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT']),
+  role: roleEnumWithSynonyms,
   weight: z.number().optional(),
+  description: z.string().optional(),
   criteria: kitConceptItemCriteriaSchema,
   resolvedAsin: z.string().optional(),
 });
