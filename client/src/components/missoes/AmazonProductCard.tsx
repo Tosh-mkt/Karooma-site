@@ -19,9 +19,10 @@ interface AmazonProduct {
 interface AmazonProductCardProps {
   product: AmazonProduct;
   index?: number;
+  paapiEnabled?: boolean;
 }
 
-export function AmazonProductCard({ product, index = 0 }: AmazonProductCardProps) {
+export function AmazonProductCard({ product, index = 0, paapiEnabled = false }: AmazonProductCardProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
@@ -66,8 +67,8 @@ export function AmazonProductCard({ product, index = 0 }: AmazonProductCardProps
             </div>
           )}
           
-          {/* Discount Badge */}
-          {discount > 0 && (
+          {/* Discount Badge - only show when PA-API enabled */}
+          {paapiEnabled && discount > 0 && (
             <div className="absolute top-2 left-2">
               <Badge className="bg-red-500 text-white font-semibold text-xs">
                 -{discount}%
@@ -75,8 +76,8 @@ export function AmazonProductCard({ product, index = 0 }: AmazonProductCardProps
             </div>
           )}
 
-          {/* Prime Badge */}
-          {product.isPrime && (
+          {/* Prime Badge - only show when PA-API enabled */}
+          {paapiEnabled && product.isPrime && (
             <div className="absolute top-2 right-2">
               <Badge className="bg-blue-500 text-white font-semibold text-xs">
                 Prime
@@ -115,9 +116,9 @@ export function AmazonProductCard({ product, index = 0 }: AmazonProductCardProps
             </div>
           )}
 
-          {/* Pricing */}
+          {/* Pricing - conditional based on PA-API status */}
           <div className="mb-3 flex-shrink-0">
-            {product.currentPrice ? (
+            {paapiEnabled && product.currentPrice ? (
               <>
                 <div className="text-lg font-bold text-red-700 dark:text-red-400">
                   {formatPrice(product.currentPrice)}
@@ -129,8 +130,8 @@ export function AmazonProductCard({ product, index = 0 }: AmazonProductCardProps
                 )}
               </>
             ) : (
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                Produto recomendado
+              <div className="text-sm text-purple-600 dark:text-purple-400 font-medium">
+                Ver preço na Amazon
               </div>
             )}
           </div>

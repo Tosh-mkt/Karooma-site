@@ -19,12 +19,19 @@ interface AmazonProduct {
   productUrl: string;
 }
 
+interface AmazonProductsResponse {
+  success: boolean;
+  products: AmazonProduct[];
+  cached?: boolean;
+  paapiEnabled?: boolean;
+}
+
 interface ProductsSectionProps {
   slug: string;
 }
 
 export function ProductsSection({ slug }: ProductsSectionProps) {
-  const { data: amazonData, isLoading: amazonLoading } = useQuery<{ success: boolean; products: AmazonProduct[]; cached?: boolean }>({
+  const { data: amazonData, isLoading: amazonLoading } = useQuery<AmazonProductsResponse>({
     queryKey: ['/api/missions', slug, 'amazon-products'],
     enabled: !!slug,
   });
@@ -94,6 +101,7 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
                     key={product.asin} 
                     product={product}
                     index={index}
+                    paapiEnabled={amazonData?.paapiEnabled ?? false}
                   />
                 ))}
               </div>

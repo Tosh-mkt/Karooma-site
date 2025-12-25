@@ -1893,7 +1893,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             cached: false,
             source: 'kit',
             kitId: linkedKit.id,
-            kitTitle: linkedKit.title
+            kitTitle: linkedKit.title,
+            paapiEnabled: linkedKit.paapiEnabled || false
           });
         }
         
@@ -1933,7 +1934,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             cached: false,
             source: 'kit-manual',
             kitId: linkedKit.id,
-            kitTitle: linkedKit.title
+            kitTitle: linkedKit.title,
+            paapiEnabled: linkedKit.paapiEnabled || false
           });
         }
       }
@@ -4776,10 +4778,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
     
     try {
       const { id } = req.params;
-      const validatedData = insertProductKitSchema.partial().parse(req.body);
+      const { manualProducts, ...kitData } = req.body;
+      
+      // Update kit basic data
+      const validatedData = insertProductKitSchema.partial().parse(kitData);
       const kit = await storage.updateProductKit(id, validatedData);
       
-      console.log('✅ Kit atualizado:', { id: kit.id, title: kit.title });
+      // If manualProducts provided, add them to kit_products
+      if (manualProducts && Array.isArray(manualProducts) && manualProducts.length > 0) {
+        // Clear existing products first
+        await storage.clearKitProducts(id);
+        
+        // Add new products
+        for (let i = 0; i < manualProducts.length; i++) {
+          const p = manualProducts[i];
+          await storage.addKitProduct({
+            kitId: id,
+            asin: p.asin,
+            title: p.title,
+            description: null,
+            imageUrl: p.imageUrl,
+            price: String(p.price || 0),
+            originalPrice: p.originalPrice ? String(p.originalPrice) : null,
+            rating: p.rating ? String(p.rating) : null,
+            reviewCount: p.reviewCount || null,
+            isPrime: p.isPrime || false,
+            role: i === 0 ? 'MAIN' : (i < 3 ? 'SECONDARY' : 'COMPLEMENT'),
+            rankScore: String(1 - (i * 0.1)),
+            affiliateLink: p.affiliateLink || `https://www.amazon.com.br/dp/${p.asin}?tag=karoom-20`,
+            addedVia: 'MANUAL',
+            sortOrder: i
+          });
+        }
+        
+        console.log(`✅ ${manualProducts.length} produtos manuais adicionados ao kit ${id}`);
+      }
+      
+      console.log('✅ Kit atualizado:', { id: kit.id, title: kit.title, paapiEnabled: kit.paapiEnabled });
       res.json(kit);
     } catch (error) {
       if (error instanceof z.ZodError) {

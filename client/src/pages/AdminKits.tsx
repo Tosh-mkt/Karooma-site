@@ -619,15 +619,105 @@ interface KitWithProducts extends SelectProductKit {
   }>;
 }
 
+interface ParsedProduct {
+  asin: string;
+  title: string;
+  price: number;
+  originalPrice: number | null;
+  rating: number | null;
+  reviewCount: number | null;
+  category: string;
+  imageUrl: string;
+  affiliateLink: string;
+  isPrime: boolean;
+}
+
+function parseMarkdownTable(tableText: string): ParsedProduct[] {
+  const lines = tableText.trim().split('\n').filter(line => line.trim());
+  if (lines.length < 2) return [];
+  
+  const dataLines = lines.filter(line => !line.includes('---') && line.includes('|'));
+  if (dataLines.length < 2) return [];
+  
+  // Parse headers: split by | and trim, keeping all positions
+  const headerLine = dataLines[0];
+  const headerParts = headerLine.split('|').map(h => h.trim().toLowerCase());
+  // If line starts/ends with |, first/last will be empty - skip them
+  const headers = headerParts[0] === '' ? headerParts.slice(1) : headerParts;
+  if (headers[headers.length - 1] === '') headers.pop();
+  
+  const products: ParsedProduct[] = [];
+  
+  for (let i = 1; i < dataLines.length; i++) {
+    // Parse cells: split by | and trim, keeping empty cells for alignment
+    const cellParts = dataLines[i].split('|').map(c => c.trim());
+    // If line starts/ends with |, first/last will be empty - skip them
+    const cells = cellParts[0] === '' ? cellParts.slice(1) : cellParts;
+    if (cells[cells.length - 1] === '') cells.pop();
+    
+    if (cells.length < 5) continue;
+    
+    const getCell = (index: number) => cells[index] || '';
+    
+    const parsePrice = (priceStr: string): number => {
+      const cleaned = priceStr.replace(/[R$\s.]/g, '').replace(',', '.');
+      return parseFloat(cleaned) || 0;
+    };
+    
+    const parseRating = (ratingStr: string): number | null => {
+      const match = ratingStr.match(/(\d+[,.]?\d*)/);
+      return match ? parseFloat(match[1].replace(',', '.')) : null;
+    };
+    
+    const parseReviews = (reviewStr: string): number | null => {
+      const cleaned = reviewStr.replace(/[.\s]/g, '');
+      const num = parseInt(cleaned);
+      return isNaN(num) ? null : num;
+    };
+    
+    const asinIdx = headers.findIndex(h => h === 'asin');
+    const titleIdx = headers.findIndex(h => h.includes('tulo') || h === 'title');
+    const priceIdx = headers.findIndex(h => h.includes('atual') || h === 'price');
+    const origPriceIdx = headers.findIndex(h => h.includes('original'));
+    const ratingIdx = headers.findIndex(h => h === 'rating' || h.includes('avalia'));
+    const reviewIdx = headers.findIndex(h => h.includes('avalia') && !h.includes('rating'));
+    const catIdx = headers.findIndex(h => h.includes('categ'));
+    const imgIdx = headers.findIndex(h => h.includes('imagem') || h.includes('image'));
+    const linkIdx = headers.findIndex(h => h.includes('link') || h.includes('afil'));
+    const primeIdx = headers.findIndex(h => h === 'prime');
+    
+    const asin = getCell(asinIdx >= 0 ? asinIdx : 0);
+    if (!asin || asin.length < 5) continue;
+    
+    products.push({
+      asin,
+      title: getCell(titleIdx >= 0 ? titleIdx : 1),
+      price: parsePrice(getCell(priceIdx >= 0 ? priceIdx : 2)),
+      originalPrice: origPriceIdx >= 0 ? parsePrice(getCell(origPriceIdx)) : null,
+      rating: parseRating(getCell(ratingIdx >= 0 ? ratingIdx : 4)),
+      reviewCount: parseReviews(getCell(reviewIdx >= 0 ? reviewIdx : 5)),
+      category: getCell(catIdx >= 0 ? catIdx : 6),
+      imageUrl: getCell(imgIdx >= 0 ? imgIdx : 7),
+      affiliateLink: getCell(linkIdx >= 0 ? linkIdx : 8) || `https://www.amazon.com.br/dp/${asin}?tag=karoom-20`,
+      isPrime: getCell(primeIdx >= 0 ? primeIdx : 9).toLowerCase() === 'sim' || getCell(primeIdx >= 0 ? primeIdx : 9).toLowerCase() === 'yes'
+    });
+  }
+  
+  return products;
+}
+
 function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: () => void }) {
   const [open, setOpen] = useState(false);
   const [title, setTitle] = useState(kit.title);
   const [shortDescription, setShortDescription] = useState(kit.shortDescription);
   const [status, setStatus] = useState(kit.status);
   const [selectedMissionId, setSelectedMissionId] = useState(kit.missionId || "");
-  const [manualAsinsText, setManualAsinsText] = useState((kit.manualAsins || []).join(", "));
+  const [paapiEnabled, setPaapiEnabled] = useState(kit.paapiEnabled || false);
+  const [productsTableText, setProductsTableText] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
+
+  const parsedProducts = parseMarkdownTable(productsTableText);
 
   // Reset form state when dialog opens or kit data changes
   const resetForm = () => {
@@ -635,7 +725,8 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
     setShortDescription(kit.shortDescription);
     setStatus(kit.status);
     setSelectedMissionId(kit.missionId || "");
-    setManualAsinsText((kit.manualAsins || []).join(", "));
+    setPaapiEnabled(kit.paapiEnabled || false);
+    setProductsTableText("");
   };
 
   // Reset when dialog opens
@@ -661,10 +752,9 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
           title,
           shortDescription,
           status,
+          paapiEnabled,
           missionId: selectedMissionId && selectedMissionId !== "none" ? selectedMissionId : null,
-          manualAsins: manualAsinsText.trim() 
-            ? manualAsinsText.split(/[,\s\n]+/).map(a => a.trim()).filter(a => a.length > 0)
-            : null
+          manualProducts: parsedProducts.length > 0 ? parsedProducts : undefined
         })
       });
       
@@ -677,7 +767,10 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
         return;
       }
       
-      toast({ title: "Kit atualizado com sucesso!" });
+      const message = parsedProducts.length > 0 
+        ? `Kit atualizado com ${parsedProducts.length} produtos!`
+        : "Kit atualizado com sucesso!";
+      toast({ title: message });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/kits"] });
       setOpen(false);
       onSuccess();
@@ -768,17 +861,58 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-asins">ASINs de Produtos (manual)</Label>
-            <Textarea
-              id="edit-asins"
-              value={manualAsinsText}
-              onChange={(e) => setManualAsinsText(e.target.value)}
-              placeholder="B070VSD7JN, B091D4H69L, B07J5P7J8K"
-              className="h-20 resize-none font-mono text-sm"
-              data-testid="textarea-edit-asins"
-            />
+            <div className="flex items-center justify-between">
+              <Label>PA-API Ativa</Label>
+              <Switch
+                checked={paapiEnabled}
+                onCheckedChange={setPaapiEnabled}
+                data-testid="switch-paapi-enabled"
+              />
+            </div>
             <p className="text-xs text-gray-500">
-              Cole os ASINs separados por vírgula, espaço ou nova linha. Estes produtos serão exibidos na missão vinculada enquanto a PA-API está bloqueada.
+              {paapiEnabled 
+                ? "Cards exibem preços e badges Prime (dados atualizados via API)."
+                : "Cards exibem apenas título, imagem e avaliação (modo compliance)."}
+            </p>
+          </div>
+
+          <div className="space-y-2 border-t pt-4">
+            <div className="flex items-center justify-between">
+              <Label>Produtos do Kit</Label>
+              <Badge variant="outline">{parsedProducts.length} produtos</Badge>
+            </div>
+            <Textarea
+              value={productsTableText}
+              onChange={(e) => setProductsTableText(e.target.value)}
+              placeholder={`Cole a tabela markdown com os produtos:
+
+| ASIN | Título | Preço atual | Preço original | Rating | Avaliações | Categoria | URL Imagem | Link Afiliado | Prime |
+|------|--------|-------------|----------------|--------|------------|-----------|------------|---------------|-------|
+| B09NCKR24R | Vaporizador... | R$ 186,90 | R$ 224,14 | 4,2/5 | 239 | Casa | https://... | https://... | Sim |`}
+              className="h-40 resize-none font-mono text-xs"
+              data-testid="textarea-products-table"
+            />
+            {parsedProducts.length > 0 && (
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 space-y-2">
+                <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                  {parsedProducts.length} produtos reconhecidos:
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {parsedProducts.slice(0, 5).map((p, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {p.asin}
+                    </Badge>
+                  ))}
+                  {parsedProducts.length > 5 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{parsedProducts.length - 5} mais
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              Cole a tabela de produtos coletada pelo assistente de pesquisa. Os dados de preço só serão exibidos se a PA-API estiver ativa.
             </p>
           </div>
         </div>
