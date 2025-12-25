@@ -625,6 +625,7 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
   const [shortDescription, setShortDescription] = useState(kit.shortDescription);
   const [status, setStatus] = useState(kit.status);
   const [selectedMissionId, setSelectedMissionId] = useState(kit.missionId || "");
+  const [manualAsinsText, setManualAsinsText] = useState((kit.manualAsins || []).join(", "));
   const [isUpdating, setIsUpdating] = useState(false);
   const { toast } = useToast();
 
@@ -634,6 +635,7 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
     setShortDescription(kit.shortDescription);
     setStatus(kit.status);
     setSelectedMissionId(kit.missionId || "");
+    setManualAsinsText((kit.manualAsins || []).join(", "));
   };
 
   // Reset when dialog opens
@@ -659,7 +661,10 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
           title,
           shortDescription,
           status,
-          missionId: selectedMissionId && selectedMissionId !== "none" ? selectedMissionId : null
+          missionId: selectedMissionId && selectedMissionId !== "none" ? selectedMissionId : null,
+          manualAsins: manualAsinsText.trim() 
+            ? manualAsinsText.split(/[,\s\n]+/).map(a => a.trim()).filter(a => a.length > 0)
+            : null
         })
       });
       
@@ -759,6 +764,21 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
             </Select>
             <p className="text-xs text-gray-500">
               Produtos deste Kit aparecerão na página da missão selecionada.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-asins">ASINs de Produtos (manual)</Label>
+            <Textarea
+              id="edit-asins"
+              value={manualAsinsText}
+              onChange={(e) => setManualAsinsText(e.target.value)}
+              placeholder="B070VSD7JN, B091D4H69L, B07J5P7J8K"
+              className="h-20 resize-none font-mono text-sm"
+              data-testid="textarea-edit-asins"
+            />
+            <p className="text-xs text-gray-500">
+              Cole os ASINs separados por vírgula, espaço ou nova linha. Estes produtos serão exibidos na missão vinculada enquanto a PA-API está bloqueada.
             </p>
           </div>
         </div>

@@ -1896,6 +1896,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
             kitTitle: linkedKit.title
           });
         }
+        
+        // Priority 0.5: Use Kit's manualAsins if available (fallback when PA-API is blocked)
+        if (linkedKit.manualAsins && linkedKit.manualAsins.length > 0) {
+          const productsWithData: any[] = [];
+          
+          for (const asin of linkedKit.manualAsins.slice(0, 10)) {
+            try {
+              const result = await amazonApiService.getProductByASIN(asin);
+              if (result.success && result.product) {
+                productsWithData.push({ ...result.product, source: 'kit-manual' });
+              } else {
+                productsWithData.push({
+                  asin: asin,
+                  title: `Produto recomendado (${asin})`,
+                  productUrl: `https://www.amazon.com.br/dp/${asin}?tag=${PARTNER_TAG}`,
+                  fallback: true,
+                  source: 'kit-manual'
+                });
+              }
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (error) {
+              productsWithData.push({
+                asin: asin,
+                title: `Produto recomendado (${asin})`,
+                productUrl: `https://www.amazon.com.br/dp/${asin}?tag=${PARTNER_TAG}`,
+                fallback: true,
+                source: 'kit-manual'
+              });
+            }
+          }
+          
+          return res.json({ 
+            success: true, 
+            products: productsWithData, 
+            cached: false,
+            source: 'kit-manual',
+            kitId: linkedKit.id,
+            kitTitle: linkedKit.title
+          });
+        }
       }
       
       // Priority 1: Use specific ASINs if available

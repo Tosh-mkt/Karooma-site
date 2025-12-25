@@ -1032,6 +1032,7 @@ export const productKits = pgTable("product_kits", {
   rulesConfig: json("rules_config").$type<KitRulesConfig>(),
   conceptItems: json("concept_items").$type<KitConceptItem[]>(),
   missionId: varchar("mission_id"),
+  manualAsins: json("manual_asins").$type<string[]>(),
   views: integer("views").default(0),
   paapiEnabled: boolean("paapi_enabled").default(false),
   lastResolvedAt: timestamp("last_resolved_at"),
@@ -1316,6 +1317,7 @@ export const insertProductKitSchema = z.object({
   rulesConfig: kitRulesConfigSchema.optional(),
   conceptItems: z.array(kitConceptItemSchema).optional(),
   missionId: z.string().optional(),
+  manualAsins: z.array(z.string()).optional(),
   paapiEnabled: z.boolean().optional(),
 });
 
