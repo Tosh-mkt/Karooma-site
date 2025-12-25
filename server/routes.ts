@@ -4917,7 +4917,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       shortDescription: z.string().min(1).max(500),
       longDescription: z.string().optional(),
       category: z.string().optional(),
-      missionSlug: z.string().optional()
+      missionSlug: z.string().optional(),
+      missionId: z.string().optional()
     }),
     conceptItems: z.array(z.object({
       name: z.string().min(1),
@@ -4999,7 +5000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         shortDescription: kitData.shortDescription,
         longDescription: kitData.longDescription || null,
         category: kitData.category || null,
-        missionId: kitData.missionSlug || null,
+        missionId: kitData.missionId || kitData.missionSlug || null,
         status: 'CONCEPT_ONLY' as const,
         conceptItems: cleanedConceptItems,
         rulesConfig: rulesConfig ? {

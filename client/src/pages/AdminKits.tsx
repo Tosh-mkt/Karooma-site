@@ -234,12 +234,25 @@ interface ValidationResponse {
   errors?: Array<{ path: string; message: string }>;
 }
 
+interface Mission {
+  id: string;
+  title: string;
+  slug: string;
+  isPublished: boolean;
+}
+
 function ImportJsonDialog({ onSuccess }: { onSuccess: () => void }) {
   const [jsonInput, setJsonInput] = useState("");
   const [isValidating, setIsValidating] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [validationResult, setValidationResult] = useState<ValidationResponse | null>(null);
+  const [selectedMissionId, setSelectedMissionId] = useState<string>("");
   const { toast } = useToast();
+
+  // Fetch missions for the dropdown
+  const { data: missions = [] } = useQuery<Mission[]>({
+    queryKey: ["/api/admin/missions"],
+  });
 
   const handleValidate = async () => {
     if (!jsonInput.trim()) {
@@ -306,6 +319,14 @@ function ImportJsonDialog({ onSuccess }: { onSuccess: () => void }) {
     try {
       const parsed = JSON.parse(jsonInput);
       
+      // Inject selected missionId into the kit data
+      if (selectedMissionId && selectedMissionId !== "none") {
+        parsed.kit = {
+          ...parsed.kit,
+          missionId: selectedMissionId
+        };
+      }
+      
       const response = await fetch("/api/admin/kits/import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -331,6 +352,7 @@ function ImportJsonDialog({ onSuccess }: { onSuccess: () => void }) {
       
       setJsonInput("");
       setValidationResult(null);
+      setSelectedMissionId("");
       queryClient.invalidateQueries({ queryKey: ["/api/admin/kits"] });
       onSuccess();
     } catch (error: any) {
@@ -347,6 +369,7 @@ function ImportJsonDialog({ onSuccess }: { onSuccess: () => void }) {
   const handleClear = () => {
     setJsonInput("");
     setValidationResult(null);
+    setSelectedMissionId("");
   };
 
   const handlePasteExample = () => {
@@ -444,6 +467,26 @@ function ImportJsonDialog({ onSuccess }: { onSuccess: () => void }) {
               className="font-mono text-sm h-64 resize-none"
               data-testid="textarea-json-input"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="mission-select">Vincular a uma Missão (opcional)</Label>
+            <Select value={selectedMissionId} onValueChange={setSelectedMissionId}>
+              <SelectTrigger data-testid="select-mission">
+                <SelectValue placeholder="Selecione uma missão..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma missão</SelectItem>
+                {missions.map((mission) => (
+                  <SelectItem key={mission.id} value={mission.id}>
+                    {mission.title} {!mission.isPublished && "(Rascunho)"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500">
+              Ao vincular, os produtos deste Kit serão exibidos na página da missão selecionada.
+            </p>
           </div>
 
           {validationResult && (
