@@ -1867,6 +1867,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const PARTNER_TAG = process.env.AMAZON_PARTNER_TAG || 'karoom-20';
       
+      // Priority 0: Check if there's a linked Kit with products
+      const linkedKit = await storage.getProductKitByMissionId(mission.id);
+      if (linkedKit) {
+        const kitProducts = await storage.getKitProducts(linkedKit.id);
+        if (kitProducts && kitProducts.length > 0) {
+          const formattedProducts = kitProducts.map(kp => ({
+            asin: kp.asin,
+            title: kp.title,
+            description: kp.description,
+            imageUrl: kp.imageUrl,
+            currentPrice: kp.price ? parseFloat(kp.price) : undefined,
+            originalPrice: kp.originalPrice ? parseFloat(kp.originalPrice) : undefined,
+            rating: kp.rating ? parseFloat(kp.rating) : undefined,
+            reviewCount: kp.reviewCount,
+            isPrime: kp.isPrime,
+            productUrl: kp.affiliateLink,
+            role: kp.role,
+            rationale: kp.rationale,
+            source: 'kit'
+          }));
+          return res.json({ 
+            success: true, 
+            products: formattedProducts, 
+            cached: false,
+            source: 'kit',
+            kitId: linkedKit.id,
+            kitTitle: linkedKit.title
+          });
+        }
+      }
+      
       // Priority 1: Use specific ASINs if available
       if (mission.productAsins && mission.productAsins.length > 0) {
         const cacheKey = `mission:${mission.id}:asin-products`;
