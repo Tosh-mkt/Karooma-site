@@ -792,7 +792,7 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
           <Edit className="w-4 h-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Edit className="w-5 h-5 text-blue-500" />
@@ -803,7 +803,7 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 overflow-y-auto flex-1">
           <div className="space-y-2">
             <Label htmlFor="edit-title">Título</Label>
             <Input
