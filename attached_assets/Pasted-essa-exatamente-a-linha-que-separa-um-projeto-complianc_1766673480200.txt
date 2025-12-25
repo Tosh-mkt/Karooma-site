@@ -1,0 +1,203 @@
+essa é exatamente a linha que separa um projeto compliance-safe de um projeto que pode levar a ban no Amazon Associates.
+
+Vou responder de forma objetiva, normativa e aplicada aos seus dados.
+
+✅ Premissa importante (contexto)
+
+Você deixou claro que:
+
+❌ NÃO está usando a PA API
+
+✔ Está usando dados coletados manualmente / previamente
+
+✔ Vai criar cards de produtos (UI)
+
+👉 Nesse cenário, a Amazon impõe restrições específicas sobre dados dinâmicos.
+
+🚫 Dados que NÃO podem aparecer nos cards (sem PA API)
+
+Pelas Amazon Associates Operating Agreement + Program Policies, qualquer dado que varie com o tempo NÃO pode ser exibido se não for atualizado via PA API.
+
+❌ 1️⃣ Preço atual
+
+Coluna:
+
+Preço atual
+
+
+Exemplo:
+
+R$ 186,90
+
+
+🚫 PROIBIDO
+Motivo:
+
+Preço muda constantemente
+
+Exibição sem atualização automática ≤ 24h viola as políticas
+
+❌ 2️⃣ Preço original / preço riscado
+
+Coluna:
+
+Preço original
+
+
+Exemplo:
+
+R$ 224,14
+
+
+🚫 PROIBIDO (ainda mais grave)
+Motivo:
+
+Pode induzir desconto inexistente
+
+A Amazon é extremamente rigorosa com “preço comparativo”
+
+📌 Esse é um dos principais motivos de ban.
+
+❌ 3️⃣ Indicação de Prime (Sim / Não)
+
+Coluna:
+
+Prime
+
+
+🚫 PROIBIDO
+Motivo:
+
+Elegibilidade Prime pode mudar
+
+Depende de logística, estoque e seller
+
+Considerado informação dinâmica de oferta
+
+❌ 4️⃣ Qualquer claim comercial derivado
+
+Exemplos que não podem aparecer no card:
+
+“Em oferta”
+
+“Com desconto”
+
+“Frete grátis”
+
+“Prime”
+
+“Entrega rápida”
+
+Mesmo que estivesse verdadeiro no momento da coleta.
+
+⚠️ Dados que PODEM aparecer com ressalvas
+⚠️ 5️⃣ Rating e número de avaliações
+
+Colunas:
+
+Rating
+Avaliações
+
+
+Exemplo:
+
+4,2/5 — 239 avaliações
+
+
+✔ PERMITIDO, desde que:
+
+Você não afirme que é “atual”
+
+Use linguagem neutra:
+
+“Avaliação média informada pela Amazon”
+
+“Baseado em avaliações de clientes”
+
+📌 Rating muda, mas a Amazon permite exibição estática se não for apresentada como “tempo real”.
+
+✅ Dados que PODEM aparecer livremente
+
+Esses dados são considerados estáticos ou identificadores.
+
+✅ 6️⃣ ASIN
+B09NCKR24R
+
+
+✔ Permitido
+
+✅ 7️⃣ Título do produto
+Vaporizador E Higienizador 1200w Vapor Top Clean Intech Machine 220V
+
+
+✔ Permitido
+⚠️ Desde que não altere ou reescreva de forma enganosa
+
+✅ 8️⃣ Categoria
+Casa/Higienização
+
+
+✔ Permitido
+
+✅ 9️⃣ Imagem do produto
+https://m.media-amazon.com/images/...
+
+
+✔ Permitido
+📌 Imagens oficiais da Amazon podem ser usadas somente para link afiliado
+
+✅ 🔟 Link afiliado
+https://www.amazon.com.br/dp/ASIN?tag=karoom-20
+
+
+✔ Permitido
+✔ Obrigatório para monetização
+
+📊 Resumo direto (tabela)
+Campo	Pode aparecer sem PA API?
+ASIN	✅ Sim
+Título	✅ Sim
+Categoria	✅ Sim
+Imagem	✅ Sim
+Link afiliado	✅ Sim
+Rating	⚠️ Sim (sem “tempo real”)
+Nº de avaliações	⚠️ Sim (sem “tempo real”)
+Preço atual	❌ Não
+Preço original	❌ Não
+Prime	❌ Não
+Desconto / Oferta	❌ Não
+🧠 Como adaptar os cards corretamente (best practice)
+❌ Card errado (risco de ban)
+
+Vaporizador por R$ 186,90
+De R$ 224,14
+⭐ 4,2 | Prime
+
+✅ Card correto (compliance-safe)
+
+Vaporizador e Higienizador Intech Machine
+⭐ 4,2 (239 avaliações)
+Ver preço na Amazon
+
+🔘 Botão: “Ver na Amazon”
+
+📌 O preço aparece somente após o clique, no site da Amazon.
+
+✅ Conclusão final (importante)
+
+Sem PA API:
+
+❌ Nunca exiba preço
+
+❌ Nunca exiba Prime
+
+❌ Nunca exiba desconto
+
+✔ Use cards informativos + CTA
+
+✔ Deixe dados comerciais para a Amazon
+
+Essa abordagem é:
+✔ 100% compliance
+✔ Escalável
+✔ Usada por afiliados profissionais
