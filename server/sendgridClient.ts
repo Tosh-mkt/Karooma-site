@@ -61,12 +61,6 @@ async function getCredentials() {
       throw new Error('SendGrid connection not found in API response');
     }
     
-    console.log(`🔧 Connection settings:`, {
-      hasApiKey: !!connectionSettings.settings?.api_key,
-      hasFromEmail: !!connectionSettings.settings?.from_email,
-      fromEmail: connectionSettings.settings?.from_email,
-      apiKeyLength: connectionSettings.settings?.api_key?.length
-    });
 
     if (!connectionSettings.settings.api_key || !connectionSettings.settings.from_email) {
       console.error('❌ SendGrid não está completamente configurado');
