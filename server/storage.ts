@@ -243,6 +243,7 @@ export interface IStorage {
   getActiveProductKits(): Promise<SelectProductKit[]>;
   getProductKitById(id: string): Promise<SelectProductKit | undefined>;
   getProductKitBySlug(slug: string): Promise<SelectProductKit | undefined>;
+  getProductKitByMissionId(missionId: string): Promise<SelectProductKit | undefined>;
   getProductKitsByCategory(category: string): Promise<SelectProductKit[]>;
   getProductKitsByStatus(status: string): Promise<SelectProductKit[]>;
   createProductKit(data: InsertProductKit): Promise<SelectProductKit>;
@@ -2514,6 +2515,15 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(productKits)
       .where(eq(productKits.slug, slug))
+      .limit(1);
+    return kit;
+  }
+
+  async getProductKitByMissionId(missionId: string): Promise<SelectProductKit | undefined> {
+    const [kit] = await db
+      .select()
+      .from(productKits)
+      .where(eq(productKits.missionId, missionId))
       .limit(1);
     return kit;
   }
