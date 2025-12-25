@@ -1222,7 +1222,7 @@ export const insertKitProductSchema = z.object({
   rating: z.number().optional(),
   reviewCount: z.number().optional(),
   isPrime: z.boolean().optional(),
-  role: z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT']),
+  role: z.enum(['MAIN', 'SECONDARY', 'COMPLEMENT', 'SUPPORT', 'OPTIONAL']),
   rankScore: z.number(),
   taskMatchScore: z.number().optional(),
   rationale: z.string().optional(),
