@@ -619,7 +619,179 @@ interface KitWithProducts extends SelectProductKit {
   }>;
 }
 
-function KitRow({ kit, onDelete }: { kit: KitWithProducts; onDelete: (id: string) => void }) {
+function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState(kit.title);
+  const [shortDescription, setShortDescription] = useState(kit.shortDescription);
+  const [status, setStatus] = useState(kit.status);
+  const [selectedMissionId, setSelectedMissionId] = useState(kit.missionId || "");
+  const [isUpdating, setIsUpdating] = useState(false);
+  const { toast } = useToast();
+
+  // Reset form state when dialog opens or kit data changes
+  const resetForm = () => {
+    setTitle(kit.title);
+    setShortDescription(kit.shortDescription);
+    setStatus(kit.status);
+    setSelectedMissionId(kit.missionId || "");
+  };
+
+  // Reset when dialog opens
+  const handleOpenChange = (newOpen: boolean) => {
+    if (newOpen) {
+      resetForm();
+    }
+    setOpen(newOpen);
+  };
+
+  const { data: missions = [] } = useQuery<Mission[]>({
+    queryKey: ["/api/admin/missions"],
+  });
+
+  const handleUpdate = async () => {
+    setIsUpdating(true);
+    try {
+      const response = await fetch(`/api/admin/kits/${kit.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          title,
+          shortDescription,
+          status,
+          missionId: selectedMissionId && selectedMissionId !== "none" ? selectedMissionId : null
+        })
+      });
+      
+      if (!response.ok) {
+        const result = await response.json();
+        toast({ 
+          title: result.error || "Erro ao atualizar",
+          variant: "destructive" 
+        });
+        return;
+      }
+      
+      toast({ title: "Kit atualizado com sucesso!" });
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/kits"] });
+      setOpen(false);
+      onSuccess();
+    } catch (error: any) {
+      toast({ 
+        title: "Erro ao atualizar",
+        description: error.message,
+        variant: "destructive" 
+      });
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size="sm" data-testid={`btn-edit-${kit.id}`}>
+          <Edit className="w-4 h-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Edit className="w-5 h-5 text-blue-500" />
+            Editar Kit
+          </DialogTitle>
+          <DialogDescription>
+            Atualize as informações do kit "{kit.title}"
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="edit-title">Título</Label>
+            <Input
+              id="edit-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              data-testid="input-edit-title"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-description">Descrição Curta</Label>
+            <Textarea
+              id="edit-description"
+              value={shortDescription}
+              onChange={(e) => setShortDescription(e.target.value)}
+              className="h-20 resize-none"
+              data-testid="textarea-edit-description"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-status">Status</Label>
+            <Select value={status} onValueChange={setStatus}>
+              <SelectTrigger data-testid="select-edit-status">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CONCEPT_ONLY">Conceitual</SelectItem>
+                <SelectItem value="DRAFT">Rascunho</SelectItem>
+                <SelectItem value="ACTIVE">Ativo</SelectItem>
+                <SelectItem value="NEEDS_REVIEW">Precisa Revisão</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="edit-mission">Vincular a Missão</Label>
+            <Select value={selectedMissionId || "none"} onValueChange={setSelectedMissionId}>
+              <SelectTrigger data-testid="select-edit-mission">
+                <SelectValue placeholder="Selecione uma missão..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma missão</SelectItem>
+                {missions.map((mission) => (
+                  <SelectItem key={mission.id} value={mission.id}>
+                    {mission.title} {!mission.isPublished && "(Rascunho)"}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500">
+              Produtos deste Kit aparecerão na página da missão selecionada.
+            </p>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => handleOpenChange(false)} disabled={isUpdating}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleUpdate}
+            disabled={isUpdating || !title.trim() || !shortDescription.trim()}
+            className="bg-gradient-to-r from-blue-500 to-indigo-500"
+            data-testid="btn-save-kit"
+          >
+            {isUpdating ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Salvando...
+              </>
+            ) : (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Salvar
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function KitRow({ kit, onDelete, onEdit }: { kit: KitWithProducts; onDelete: (id: string) => void; onEdit: () => void }) {
   const status = statusConfig[kit.status as keyof typeof statusConfig] || statusConfig.DRAFT;
   const StatusIcon = status.icon;
   const products = kit.products || [];
@@ -707,9 +879,7 @@ function KitRow({ kit, onDelete }: { kit: KitWithProducts; onDelete: (id: string
                   <Eye className="w-4 h-4" />
                 </Button>
               </Link>
-              <Button variant="ghost" size="sm" data-testid={`btn-edit-${kit.id}`}>
-                <Edit className="w-4 h-4" />
-              </Button>
+              <EditKitDialog kit={kit} onSuccess={onEdit} />
               <Button variant="ghost" size="sm" data-testid={`btn-settings-${kit.id}`}>
                 <Settings className="w-4 h-4" />
               </Button>
@@ -939,7 +1109,7 @@ export default function AdminKits() {
             </Card>
           ) : (
             filteredKits.map((kit) => (
-              <KitRow key={kit.id} kit={kit} onDelete={handleDelete} />
+              <KitRow key={kit.id} kit={kit} onDelete={handleDelete} onEdit={() => refetch()} />
             ))
           )}
         </div>
