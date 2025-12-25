@@ -1,0 +1,57 @@
+[
+  {
+    "ASIN": "B07LHC55HY",
+    "Título": "Pais & Filhos - Caiu Perdeu, 54 Pçs, idade mínima recomendada - 6 anos",
+    "Preço atual": 16.55,
+    "Preço original": 21.77,
+    "Rating": 4.8,
+    "Avaliações": 24149,
+    "Categoria": "Brinquedos e Jogos",
+    "URL Imagem": "https://m.media-amazon.com/images/I/81aLRl7uj9L._AC_SL1500_.jpg",
+    "Link Afiliado": "https://amzn.to/44Kh1FF"
+  },
+  {
+    "ASIN": "B0CZ3X78BQ",
+    "Título": "Placa de Montessori Sensorial para Crianças Maleta Educativa Brinquedo (Rosa)",
+    "Preço atual": 76.0,
+    "Preço original": null,
+    "Rating": 4.7,
+    "Avaliações": 531,
+    "Categoria": "Brinquedos e Jogos",
+    "URL Imagem": "https://m.media-amazon.com/images/I/719qQFvOduL._AC_SX679_.jpg",
+    "Link Afiliado": "https://amzn.to/3YLsOQw"
+  },
+  {
+    "ASIN": "B077Q7GDLN",
+    "Título": "Balde com Massas Acrilex 1.5 kg",
+    "Preço atual": 59.99,
+    "Preço original": null,
+    "Rating": 4.9,
+    "Avaliações": 2193,
+    "Categoria": "Brinquedos e Jogos",
+    "URL Imagem": "https://m.media-amazon.com/images/I/71sqcWdO7SL._AC_SL1500_.jpg",
+    "Link Afiliado": "https://amzn.to/45s8LKH"
+  },
+  {
+    "ASIN": "B0F4DT3TTR",
+    "Título": "Lanterna Projetora Infantil com 3 Discos e 24 Imagens Sortidas – Brinquedo Educativo e Divertido - TYDA (AZUL)",
+    "Preço atual": 27.0,
+    "Preço original": 38.9,
+    "Rating": 4.6,
+    "Avaliações": 43,
+    "Categoria": "Brinquedos e Jogos",
+    "URL Imagem": "https://m.media-amazon.com/images/I/41uNa0MLEWL._AC_SL1200_.jpg",
+    "Link Afiliado": "https://amzn.to/4st7zAS"
+  },
+  {
+    "ASIN": "B07CQ6427G",
+    "Título": "Pais & Filhos - Quebra-Cabeça Madeira Floresta, 30 Peças, Multicor, Multicor",
+    "Preço atual": 12.06,
+    "Preço original": 19.9,
+    "Rating": 4.8,
+    "Avaliações": 2602,
+    "Categoria": "Brinquedos e Jogos",
+    "URL Imagem": "https://m.media-amazon.com/images/I/71V4cNsllxL._AC_SL1000_.jpg",
+    "Link Afiliado": "https://amzn.to/3MZ70yg"
+  }
+]
