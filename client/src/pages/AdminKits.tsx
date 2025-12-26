@@ -633,16 +633,21 @@ interface ParsedProduct {
 }
 
 function parseMarkdownTable(tableText: string): ParsedProduct[] {
-  const lines = tableText.trim().split('\n').filter(line => line.trim());
+  let lines = tableText.trim().split('\n').filter(line => line.trim());
   if (lines.length < 2) return [];
+  
+  const firstLine = lines[0];
+  const isTabSeparated = firstLine.includes('\t') && !firstLine.includes('|');
+  
+  if (isTabSeparated) {
+    lines = lines.map(line => '| ' + line.split('\t').join(' | ') + ' |');
+  }
   
   const dataLines = lines.filter(line => !line.includes('---') && line.includes('|'));
   if (dataLines.length < 2) return [];
   
-  // Parse headers: split by | and trim, keeping all positions
   const headerLine = dataLines[0];
   const headerParts = headerLine.split('|').map(h => h.trim().toLowerCase());
-  // If line starts/ends with |, first/last will be empty - skip them
   const headers = headerParts[0] === '' ? headerParts.slice(1) : headerParts;
   if (headers[headers.length - 1] === '') headers.pop();
   
