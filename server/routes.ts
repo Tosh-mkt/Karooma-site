@@ -1868,7 +1868,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const PARTNER_TAG = process.env.AMAZON_PARTNER_TAG || 'karoom-20';
       
       // Priority 0: Check if there's a linked Kit with products
+      console.log(`🔍 Buscando Kit vinculado à missão: ${mission.id} (${mission.title})`);
       const linkedKit = await storage.getProductKitByMissionId(mission.id);
+      console.log(`🔍 Kit encontrado:`, linkedKit ? `${linkedKit.id} - ${linkedKit.title}` : 'NENHUM');
       if (linkedKit) {
         const kitProducts = await storage.getKitProducts(linkedKit.id);
         if (kitProducts && kitProducts.length > 0) {
