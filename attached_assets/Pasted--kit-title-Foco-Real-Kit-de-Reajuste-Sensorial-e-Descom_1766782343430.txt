@@ -1,0 +1,118 @@
+{
+  "kit": {
+    "title": "Foco Real: Kit de Reajuste Sensorial e Descompressão Digital",
+    "slug": "foco-real-reajuste-sensorial-pos-tela",
+    "theme": "desenvolvimento-infantil",
+    "taskIntent": "Reduzir a hiperestimulação e recuperar o foco no mundo real",
+    "problemToSolve": [
+      "Irritabilidade e crises de tédio após o uso de telas",
+      "Dificuldade de concentração em atividades de ritmo lento (livros/blocos)",
+      "Vício cerebral em estímulos visuais de troca rápida (jatos de dopamina)"
+    ],
+    "shortDescription": "Ferramentas para ajudar o cérebro do seu filho a 'reduzir a marcha' e redescobrir o prazer no que é calmo e real.",
+    "longDescription": "Sabemos que o desenho 'educativo' é muitas vezes o seu único respiro para cozinhar ou descansar, mas o preço vem logo depois com a irritabilidade e o choro. Você não falhou como mãe; o cérebro deles apenas foi treinado para uma velocidade que a vida real não tem.\n\nEste kit foca em sintonizar o foco na frequência certa. Em vez de cores vibrantes e cortes de cena a cada 3 segundos, oferecemos texturas, cores naturais e o ritmo das mãos. É um treinamento de paciência e exploração para o cérebro plástico da criança.\n\nImagine seus filhos brincando de forma independente com blocos ou livros, sem precisar de luzes ou sons ininterruptos. Você devolve a eles a capacidade de criar e a você a paz de uma casa sem o caos do pós-tela.",
+    "category": "Brinquedos e Jogos",
+    "missionSlug": "guia-anti-estimulacao-telas"
+  },
+  "conceptItems": [
+    {
+      "name": "Blocos de Montar em Madeira Natural",
+      "role": "MAIN",
+      "weight": 1.0,
+      "searchUrl": "https://www.amazon.com.br/s?k=blocos+de+montar+madeira+natural&rh=p_72:17833786011&s=review-rank",
+      "criteria": {
+        "mustKeywords": ["blocos de montar", "madeira", "natural"],
+        "optionalKeywords": ["pedagógico", "montessori", "sem tinta"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 60,
+        "priceMax": 180,
+        "ratingMin": 4.8,
+        "primeOnly": true,
+        "featureFlags": ["durável", "sustentável", "multiuso"]
+      }
+    },
+    {
+      "name": "Livro Sensorial de Feltro (Quiet Book)",
+      "role": "MAIN",
+      "weight": 1.0,
+      "searchUrl": "https://www.amazon.com.br/s?k=livro+sensorial+feltro+quiet+book&rh=p_72:17833786011&s=review-rank",
+      "criteria": {
+        "mustKeywords": ["livro sensorial", "feltro", "quiet book"],
+        "optionalKeywords": ["atividades manuais", "coordenação motora", "silencioso"],
+        "category": "Bebês",
+        "priceMin": 50,
+        "priceMax": 150,
+        "ratingMin": 4.7,
+        "primeOnly": true,
+        "featureFlags": ["silencioso", "portátil", "ergonômico"]
+      }
+    },
+    {
+      "name": "Areia Mágica ou Massa de Modelar Orgânica",
+      "role": "SECONDARY",
+      "weight": 0.8,
+      "searchUrl": "https://www.amazon.com.br/s?k=areia+cinetica+massinha+atoxico&rh=p_72:17833786011&s=review-rank",
+      "criteria": {
+        "mustKeywords": ["areia cinética", "massinha", "atóxico"],
+        "optionalKeywords": ["terapêutico", "estimulação sensorial", "kit moldes"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 40,
+        "priceMax": 95,
+        "ratingMin": 4.5,
+        "primeOnly": true,
+        "featureFlags": ["fácil-limpeza", "baixa-manutenção"]
+      }
+    },
+    {
+      "name": "Lanterna Projetora de Histórias Estáticas",
+      "role": "SECONDARY",
+      "weight": 0.7,
+      "searchUrl": "https://www.amazon.com.br/s?k=lanterna+projetora+historias+infantil&rh=p_72:17833786011&s=review-rank",
+      "criteria": {
+        "mustKeywords": ["lanterna projetora", "histórias", "infantil"],
+        "optionalKeywords": ["luz suave", "educativo", "sono"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 35,
+        "priceMax": 85,
+        "ratingMin": 4.3,
+        "primeOnly": false,
+        "featureFlags": ["compacto", "silencioso"]
+      }
+    },
+    {
+      "name": "Quebra-cabeça de Chão em Papelão Resistente",
+      "role": "COMPLEMENT",
+      "weight": 0.5,
+      "searchUrl": "https://www.amazon.com.br/s?k=quebra-cabeça+gigante+chão+infantil&rh=p_72:17833786011&s=review-rank",
+      "criteria": {
+        "mustKeywords": ["quebra-cabeça", "gigante", "infantil"],
+        "optionalKeywords": ["progressivo", "lúdico", "educativo"],
+        "category": "Brinquedos e Jogos",
+        "priceMin": 30,
+        "priceMax": 70,
+        "ratingMin": 4.6,
+        "primeOnly": true,
+        "featureFlags": ["durável", "fácil-limpeza"]
+      }
+    }
+  ],
+  "rulesConfig": {
+    "minItems": 3,
+    "maxItems": 5,
+    "priceRange": {
+      "min": 150,
+      "max": 500
+    },
+    "ratingMin": 4.5,
+    "primeOnly": false,
+    "allowedCategories": [
+      "Brinquedos e Jogos",
+      "Bebês"
+    ],
+    "updateFrequency": "weekly",
+    "fallbackStrategy": {
+      "useManualAsins": false,
+      "substituteByCategory": true
+    }
+  }
+}
