@@ -59,6 +59,22 @@ interface SearchItemsResponse {
   timestamp: Date;
 }
 
+// Status global da PA-API (cache)
+interface PAAPIStatus {
+  isActive: boolean;
+  lastChecked: Date;
+  error?: string;
+}
+
+let globalPAAPIStatus: PAAPIStatus = {
+  isActive: false,
+  lastChecked: new Date(0), // Never checked
+  error: 'Not checked yet'
+};
+
+// Tempo de cache do status (5 minutos)
+const PAAPI_STATUS_CACHE_TTL = 5 * 60 * 1000;
+
 export class AmazonPAAPIService {
   private config: AmazonPAAPIConfig;
 
@@ -74,6 +90,71 @@ export class AmazonPAAPIService {
     if (!this.config.accessKey || !this.config.secretKey || !this.config.partnerTag) {
       console.warn('Amazon PA API credentials not configured');
     }
+  }
+
+  /**
+   * Retorna o status global da PA-API (cached)
+   */
+  getGlobalStatus(): PAAPIStatus {
+    return { ...globalPAAPIStatus };
+  }
+
+  /**
+   * Verifica se a PA-API está ativa (usa cache se não expirado)
+   */
+  async checkAndCacheStatus(forceCheck: boolean = false): Promise<PAAPIStatus> {
+    const now = new Date();
+    const cacheAge = now.getTime() - globalPAAPIStatus.lastChecked.getTime();
+
+    // Se o cache ainda é válido e não é forçado, retorna o cache
+    if (!forceCheck && cacheAge < PAAPI_STATUS_CACHE_TTL) {
+      return { ...globalPAAPIStatus };
+    }
+
+    // Verifica se está configurado
+    if (!this.isConfigured()) {
+      globalPAAPIStatus = {
+        isActive: false,
+        lastChecked: now,
+        error: 'PA-API credentials not configured'
+      };
+      return { ...globalPAAPIStatus };
+    }
+
+    // Tenta uma chamada de teste com um ASIN conhecido (produto Amazon Basics)
+    try {
+      const testAsin = 'B0BSHF7WHW'; // Amazon Basics product (usually available)
+      const result = await this.getProductByASIN(testAsin);
+
+      if (result.success) {
+        globalPAAPIStatus = {
+          isActive: true,
+          lastChecked: now
+        };
+        console.log('✅ PA-API status check: ACTIVE');
+      } else {
+        // Verifica se o erro é de elegibilidade (AssociateNotEligible)
+        const isEligibilityError = result.error?.includes('AssociateNotEligible') || 
+                                   result.error?.includes('403');
+        globalPAAPIStatus = {
+          isActive: false,
+          lastChecked: now,
+          error: isEligibilityError 
+            ? 'Account not eligible for PA-API (need 3 sales in 180 days)' 
+            : result.error
+        };
+        console.log(`⚠️ PA-API status check: INACTIVE - ${globalPAAPIStatus.error}`);
+      }
+    } catch (error) {
+      globalPAAPIStatus = {
+        isActive: false,
+        lastChecked: now,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+      console.log(`❌ PA-API status check: ERROR - ${globalPAAPIStatus.error}`);
+    }
+
+    return { ...globalPAAPIStatus };
   }
 
   /**

@@ -47,6 +47,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Amazon API Service
   const amazonApiService = new AmazonPAAPIService();
 
+  // Verificar status da PA-API na inicialização (em background)
+  amazonApiService.checkAndCacheStatus().then(status => {
+    console.log(`🔍 PA-API Status inicial: ${status.isActive ? 'ACTIVE' : 'INACTIVE'} - ${status.error || 'OK'}`);
+  });
+
+  // Endpoint para verificar status global da PA-API
+  app.get("/api/paapi/status", async (req, res) => {
+    try {
+      const forceCheck = req.query.force === 'true';
+      const status = await amazonApiService.checkAndCacheStatus(forceCheck);
+      res.json({
+        isActive: status.isActive,
+        lastChecked: status.lastChecked,
+        error: status.error,
+        message: status.isActive 
+          ? 'PA-API está ativa. Preços e dados em tempo real disponíveis.'
+          : 'PA-API inativa. Exibindo dados manuais com links de afiliado.'
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        isActive: false, 
+        error: 'Failed to check PA-API status' 
+      });
+    }
+  });
 
   // Object Storage routes
   app.get("/objects/:objectPath(*)", async (req, res) => {
@@ -1871,6 +1896,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`🔍 Buscando Kit vinculado à missão: ${mission.id} (${mission.title})`);
       const linkedKit = await storage.getProductKitByMissionId(mission.id);
       console.log(`🔍 Kit encontrado:`, linkedKit ? `${linkedKit.id} - ${linkedKit.title}` : 'NENHUM');
+      
+      // Obter status global da PA-API (automático)
+      const paapiStatus = amazonApiService.getGlobalStatus();
+      const isPaapiActive = paapiStatus.isActive;
+      
       if (linkedKit) {
         const kitProducts = await storage.getKitProducts(linkedKit.id);
         if (kitProducts && kitProducts.length > 0) {
@@ -1896,7 +1926,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             source: 'kit',
             kitId: linkedKit.id,
             kitTitle: linkedKit.title,
-            paapiEnabled: linkedKit.paapiEnabled || false
+            paapiEnabled: isPaapiActive // Usa status global automático
           });
         }
         
@@ -1937,7 +1967,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             source: 'kit-manual',
             kitId: linkedKit.id,
             kitTitle: linkedKit.title,
-            paapiEnabled: linkedKit.paapiEnabled || false
+            paapiEnabled: isPaapiActive // Usa status global automático
           });
         }
       }
