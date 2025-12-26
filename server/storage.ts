@@ -2520,10 +2520,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProductKitByMissionId(missionId: string): Promise<SelectProductKit | undefined> {
+    // Prioriza Kits com status ACTIVE primeiro, depois por data de criação mais recente
     const [kit] = await db
       .select()
       .from(productKits)
       .where(eq(productKits.missionId, missionId))
+      .orderBy(
+        desc(sql`CASE WHEN ${productKits.status} = 'ACTIVE' THEN 1 ELSE 0 END`),
+        desc(productKits.createdAt)
+      )
       .limit(1);
     return kit;
   }
