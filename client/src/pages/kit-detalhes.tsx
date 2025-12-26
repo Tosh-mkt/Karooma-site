@@ -137,7 +137,7 @@ function KitProductCard({ product, index }: { product: SelectKitProduct; index: 
                 
                 {product.rankScore && (
                   <span className="text-xs text-gray-500 dark:text-gray-400">
-                    Score: {(product.rankScore * 100).toFixed(0)}%
+                    Score: {(Number(product.rankScore) * 100).toFixed(0)}%
                   </span>
                 )}
               </div>
@@ -149,7 +149,7 @@ function KitProductCard({ product, index }: { product: SelectKitProduct; index: 
               <div className="flex items-center gap-2 mb-2">
                 {product.rating && (
                   <>
-                    <RatingStars rating={product.rating} />
+                    <RatingStars rating={Number(product.rating)} />
                     <span className="text-xs text-gray-600 dark:text-gray-400">
                       ({product.reviewCount?.toLocaleString()})
                     </span>
@@ -323,8 +323,8 @@ export default function KitDetalhes() {
   const secondaryProducts = products.filter(p => p.role === 'SECONDARY');
   const complementProducts = products.filter(p => p.role === 'COMPLEMENT');
 
-  const totalPrice = products.reduce((sum, p) => sum + (p.price || 0), 0);
-  const totalOriginalPrice = products.reduce((sum, p) => sum + (p.originalPrice || p.price || 0), 0);
+  const totalPrice = products.reduce((sum, p) => sum + (parseFloat(String(p.price)) || 0), 0);
+  const totalOriginalPrice = products.reduce((sum, p) => sum + (parseFloat(String(p.originalPrice || p.price)) || 0), 0);
   const totalSavings = totalOriginalPrice - totalPrice;
 
   return (
