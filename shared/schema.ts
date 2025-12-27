@@ -1063,6 +1063,8 @@ export const kitProducts = pgTable("kit_products", {
   scoreBreakdown: json("score_breakdown").$type<KitProductScoreBreakdown>(),
   sortOrder: integer("sort_order").default(0),
   lastCheckedAt: timestamp("last_checked_at"),
+  availabilityStatus: varchar("availability_status", { length: 20 }).default('active'), // active, unavailable, checking
+  failedChecks: integer("failed_checks").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   ageSegment: text("age_segment"),
   differential: text("differential"),

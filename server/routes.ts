@@ -5230,6 +5230,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ========================================
+  // KIT PRODUCT REPLACEMENT SYSTEM
+  // ========================================
+
+  // Get search URL for similar products on Amazon
+  app.get("/api/admin/kits/products/:productId/search-similar", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { productId } = req.params;
+      const kitProduct = await storage.getKitProductById(productId);
+      
+      if (!kitProduct) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      // Generate search URL based on product title keywords
+      const keywords = kitProduct.title
+        .replace(/[^\w\sÀ-ÿ]/g, ' ')
+        .split(' ')
+        .filter(w => w.length > 2)
+        .slice(0, 5)
+        .join('+');
+      
+      const searchUrl = `https://www.amazon.com.br/s?k=${encodeURIComponent(keywords)}&tag=karoom-20`;
+      
+      res.json({
+        success: true,
+        searchUrl,
+        productTitle: kitProduct.title,
+        currentAsin: kitProduct.asin
+      });
+    } catch (error) {
+      console.error("Erro ao gerar URL de busca:", error);
+      res.status(500).json({ error: "Erro ao gerar URL de busca" });
+    }
+  });
+
+  // Preview product data by ASIN (for replacement modal)
+  app.get("/api/admin/kits/products/preview-asin/:asin", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { asin } = req.params;
+      
+      // Check PA-API status
+      const paapiStatus = await amazonApiService.checkAndCacheStatus();
+      
+      if (paapiStatus.isActive) {
+        // Try to get real data from PA-API
+        const result = await amazonApiService.getProductByASIN(asin);
+        if (result.success && result.product) {
+          return res.json({
+            success: true,
+            paapiEnabled: true,
+            product: {
+              asin,
+              title: result.product.title,
+              imageUrl: result.product.imageUrl,
+              currentPrice: result.product.currentPrice,
+              originalPrice: result.product.originalPrice,
+              rating: result.product.rating,
+              reviewCount: result.product.reviewCount,
+              isPrime: result.product.isPrime,
+              productUrl: `https://www.amazon.com.br/dp/${asin}?tag=karoom-20`
+            }
+          });
+        }
+      }
+      
+      // PA-API not available - return basic info
+      res.json({
+        success: true,
+        paapiEnabled: false,
+        product: {
+          asin,
+          title: `Produto ASIN: ${asin}`,
+          productUrl: `https://www.amazon.com.br/dp/${asin}?tag=karoom-20`
+        },
+        message: "PA-API inativa. Dados completos não disponíveis. O produto será salvo apenas com ASIN e link."
+      });
+    } catch (error) {
+      console.error("Erro ao buscar preview do produto:", error);
+      res.status(500).json({ error: "Erro ao buscar dados do produto" });
+    }
+  });
+
+  // Replace a kit product with a new ASIN
+  app.post("/api/admin/kits/products/:productId/replace", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { productId } = req.params;
+      const { newAsin, title, imageUrl, price, originalPrice, rating, reviewCount, isPrime } = req.body;
+      
+      if (!newAsin) {
+        return res.status(400).json({ error: "Novo ASIN é obrigatório" });
+      }
+
+      const existingProduct = await storage.getKitProductById(productId);
+      if (!existingProduct) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      // Update product with new ASIN and data
+      const updatedProduct = await storage.updateKitProduct(productId, {
+        asin: newAsin,
+        title: title || `Produto ${newAsin}`,
+        imageUrl: imageUrl || null,
+        price: price?.toString() || existingProduct.price,
+        originalPrice: originalPrice?.toString() || null,
+        rating: rating?.toString() || null,
+        reviewCount: reviewCount || null,
+        isPrime: isPrime || false,
+        affiliateLink: `https://www.amazon.com.br/dp/${newAsin}?tag=karoom-20`,
+        availabilityStatus: 'active',
+        failedChecks: 0,
+        lastCheckedAt: new Date()
+      });
+
+      res.json({
+        success: true,
+        message: `Produto substituído com sucesso! ASIN antigo: ${existingProduct.asin} → Novo: ${newAsin}`,
+        product: updatedProduct
+      });
+    } catch (error) {
+      console.error("Erro ao substituir produto:", error);
+      res.status(500).json({ error: "Erro ao substituir produto" });
+    }
+  });
+
+  // Get kit products with unavailable status (for admin dashboard)
+  app.get("/api/admin/kits/products/unavailable", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const unavailableProducts = await storage.getUnavailableKitProducts();
+      res.json({
+        success: true,
+        count: unavailableProducts.length,
+        products: unavailableProducts
+      });
+    } catch (error) {
+      console.error("Erro ao buscar produtos indisponíveis:", error);
+      res.status(500).json({ error: "Erro ao buscar produtos indisponíveis" });
+    }
+  });
+
+  // Mark a kit product as unavailable (manual trigger or from monitoring)
+  app.post("/api/admin/kits/products/:productId/mark-unavailable", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { productId } = req.params;
+      const product = await storage.getKitProductById(productId);
+      
+      if (!product) {
+        return res.status(404).json({ error: "Produto não encontrado" });
+      }
+
+      await storage.updateKitProduct(productId, {
+        availabilityStatus: 'unavailable',
+        lastCheckedAt: new Date()
+      });
+
+      res.json({
+        success: true,
+        message: "Produto marcado como indisponível"
+      });
+    } catch (error) {
+      console.error("Erro ao marcar produto como indisponível:", error);
+      res.status(500).json({ error: "Erro ao atualizar status do produto" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

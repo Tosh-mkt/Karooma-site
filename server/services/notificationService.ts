@@ -1,8 +1,16 @@
 import { sendEmail } from "../emailService";
-import type { Product } from "@shared/schema";
+import type { Product, SelectKitProduct, SelectProductKit } from "@shared/schema";
+
+export interface KitProductUnavailableInfo {
+  kitProduct: SelectKitProduct;
+  kit: SelectProductKit;
+  searchUrl: string;
+  replaceUrl: string;
+}
 
 export interface NotificationService {
   sendProductUnavailableAlert(product: Product): Promise<boolean>;
+  sendKitProductUnavailableAlert(info: KitProductUnavailableInfo): Promise<boolean>;
   sendProductUpdateSummary(summary: UpdateSummary): Promise<boolean>;
   sendErrorAlert(error: string, context?: string): Promise<boolean>;
 }
@@ -18,6 +26,76 @@ export interface UpdateSummary {
 
 export class EmailNotificationService implements NotificationService {
   private adminEmail = "admin@karooma.life";
+  private baseUrl = process.env.REPLIT_DEPLOYMENT_URL || process.env.REPLIT_DEV_DOMAIN || "https://karooma.life";
+
+  async sendKitProductUnavailableAlert(info: KitProductUnavailableInfo): Promise<boolean> {
+    const { kitProduct, kit, searchUrl, replaceUrl } = info;
+    const subject = `🚨 Produto de Kit Indisponível - ${kitProduct.title}`;
+    
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #e74c3c;">Produto de Kit Indisponível</h2>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c3e50;">${kitProduct.title}</h3>
+          <p><strong>ASIN:</strong> ${kitProduct.asin}</p>
+          <p><strong>Kit:</strong> ${kit.title}</p>
+          <p><strong>Categoria:</strong> ${kit.category || 'Não definida'}</p>
+          ${kitProduct.imageUrl ? `<img src="${kitProduct.imageUrl}" alt="${kitProduct.title}" style="max-width: 150px; border-radius: 8px; margin-top: 10px;">` : ''}
+        </div>
+        
+        <div style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 0 0 15px 0;"><strong>🔍 Encontrar Substituto:</strong></p>
+          <a href="${searchUrl}" style="display: inline-block; background: #ff9800; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Buscar Produtos Similares na Amazon
+          </a>
+        </div>
+        
+        <div style="background: #e3f2fd; border: 1px solid #bbdefb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+          <p style="margin: 0 0 15px 0;"><strong>✏️ Substituir Produto:</strong></p>
+          <a href="${replaceUrl}" style="display: inline-block; background: #2196f3; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Abrir Admin para Substituir
+          </a>
+        </div>
+        
+        <div style="background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px;">
+          <p style="margin: 0;"><strong>⚠️ Ação Necessária:</strong></p>
+          <p style="margin: 5px 0 0 0;">Este produto foi marcado como indisponível após múltiplas falhas de verificação.</p>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+          <p>Sistema de Monitoramento Karooma - ${new Date().toLocaleString('pt-BR')}</p>
+        </div>
+      </div>
+    `;
+
+    const text = `
+      PRODUTO DE KIT INDISPONÍVEL
+      
+      Produto: ${kitProduct.title}
+      ASIN: ${kitProduct.asin}
+      Kit: ${kit.title}
+      Categoria: ${kit.category || 'Não definida'}
+      
+      Buscar Substitutos: ${searchUrl}
+      Substituir no Admin: ${replaceUrl}
+      
+      Este produto foi marcado como indisponível e precisa de substituição.
+    `;
+
+    try {
+      return await sendEmail({
+        to: this.adminEmail,
+        from: "no-reply@karooma.net",
+        subject,
+        text,
+        html
+      });
+    } catch (error) {
+      console.error('Erro ao enviar alerta de produto de kit indisponível:', error);
+      return false;
+    }
+  }
   
   async sendProductUnavailableAlert(product: Product): Promise<boolean> {
     const subject = `🚨 Produto Indisponível - ${product.title}`;

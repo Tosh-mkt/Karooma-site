@@ -253,6 +253,8 @@ export interface IStorage {
   
   // Kit Products methods (products within kits)
   getKitProducts(kitId: string): Promise<SelectKitProduct[]>;
+  getKitProductById(id: string): Promise<SelectKitProduct | undefined>;
+  getUnavailableKitProducts(): Promise<Array<SelectKitProduct & { kit: SelectProductKit }>>;
   addKitProduct(data: InsertKitProduct): Promise<SelectKitProduct>;
   updateKitProduct(id: string, data: Partial<InsertKitProduct>): Promise<SelectKitProduct>;
   removeKitProduct(id: string): Promise<void>;
@@ -1045,6 +1047,12 @@ export class MemStorage implements IStorage {
     throw new Error("Method not implemented - Use DatabaseStorage");
   }
   async getKitProducts(kitId: string): Promise<SelectKitProduct[]> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getKitProductById(id: string): Promise<SelectKitProduct | undefined> {
+    throw new Error("Method not implemented - Use DatabaseStorage");
+  }
+  async getUnavailableKitProducts(): Promise<Array<SelectKitProduct & { kit: SelectProductKit }>> {
     throw new Error("Method not implemented - Use DatabaseStorage");
   }
   async addKitProduct(data: InsertKitProduct): Promise<SelectKitProduct> {
@@ -2628,6 +2636,30 @@ export class DatabaseStorage implements IStorage {
 
   async clearKitProducts(kitId: string): Promise<void> {
     await db.delete(kitProducts).where(eq(kitProducts.kitId, kitId));
+  }
+
+  async getKitProductById(id: string): Promise<SelectKitProduct | undefined> {
+    const [product] = await db
+      .select()
+      .from(kitProducts)
+      .where(eq(kitProducts.id, id));
+    return product;
+  }
+
+  async getUnavailableKitProducts(): Promise<Array<SelectKitProduct & { kit: SelectProductKit }>> {
+    const results = await db
+      .select({
+        product: kitProducts,
+        kit: productKits
+      })
+      .from(kitProducts)
+      .innerJoin(productKits, eq(kitProducts.kitId, productKits.id))
+      .where(eq(kitProducts.availabilityStatus, 'unavailable'));
+    
+    return results.map(r => ({
+      ...r.product,
+      kit: r.kit
+    }));
   }
 }
 
