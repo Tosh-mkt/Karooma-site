@@ -1064,6 +1064,8 @@ export const kitProducts = pgTable("kit_products", {
   sortOrder: integer("sort_order").default(0),
   lastCheckedAt: timestamp("last_checked_at"),
   createdAt: timestamp("created_at").defaultNow(),
+  ageSegment: text("age_segment"),
+  differential: text("differential"),
 }, (table) => [
   index("idx_kit_products_kit_id").on(table.kitId),
   index("idx_kit_products_asin").on(table.asin),

@@ -630,6 +630,8 @@ interface ParsedProduct {
   imageUrl: string;
   affiliateLink: string;
   isPrime: boolean;
+  ageSegment: string | null;
+  differential: string | null;
 }
 
 function parseMarkdownTable(tableText: string): ParsedProduct[] {
@@ -680,31 +682,38 @@ function parseMarkdownTable(tableText: string): ParsedProduct[] {
       return isNaN(num) ? null : num;
     };
     
+    const segmentIdx = headers.findIndex(h => h.includes('segmenta') || h.includes('segment'));
     const asinIdx = headers.findIndex(h => h === 'asin');
     const titleIdx = headers.findIndex(h => h.includes('tulo') || h === 'title');
+    const diffIdx = headers.findIndex(h => h.includes('por que') || h.includes('diferencial') || h.includes('ajuda'));
     const priceIdx = headers.findIndex(h => h.includes('atual') || h === 'price');
     const origPriceIdx = headers.findIndex(h => h.includes('original'));
-    const ratingIdx = headers.findIndex(h => h === 'rating' || h.includes('avalia'));
-    const reviewIdx = headers.findIndex(h => h.includes('avalia') && !h.includes('rating'));
+    const ratingIdx = headers.findIndex(h => h === 'rating');
+    const reviewIdx = headers.findIndex(h => h.includes('avalia'));
     const catIdx = headers.findIndex(h => h.includes('categ'));
     const imgIdx = headers.findIndex(h => h.includes('imagem') || h.includes('image'));
     const linkIdx = headers.findIndex(h => h.includes('link') || h.includes('afil'));
     const primeIdx = headers.findIndex(h => h === 'prime');
     
-    const asin = getCell(asinIdx >= 0 ? asinIdx : 0);
+    const asin = getCell(asinIdx >= 0 ? asinIdx : 2);
     if (!asin || asin.length < 5) continue;
+    
+    const ageSegmentValue = segmentIdx >= 0 ? getCell(segmentIdx).trim() : null;
+    const differentialValue = diffIdx >= 0 ? getCell(diffIdx).trim() : null;
     
     products.push({
       asin,
       title: getCell(titleIdx >= 0 ? titleIdx : 1),
-      price: parsePrice(getCell(priceIdx >= 0 ? priceIdx : 2)),
+      price: parsePrice(getCell(priceIdx >= 0 ? priceIdx : 4)),
       originalPrice: origPriceIdx >= 0 ? parsePrice(getCell(origPriceIdx)) : null,
-      rating: parseRating(getCell(ratingIdx >= 0 ? ratingIdx : 4)),
-      reviewCount: parseReviews(getCell(reviewIdx >= 0 ? reviewIdx : 5)),
-      category: getCell(catIdx >= 0 ? catIdx : 6),
-      imageUrl: getCell(imgIdx >= 0 ? imgIdx : 7),
-      affiliateLink: getCell(linkIdx >= 0 ? linkIdx : 8) || `https://www.amazon.com.br/dp/${asin}?tag=karoom-20`,
-      isPrime: getCell(primeIdx >= 0 ? primeIdx : 9).toLowerCase() === 'sim' || getCell(primeIdx >= 0 ? primeIdx : 9).toLowerCase() === 'yes'
+      rating: parseRating(getCell(ratingIdx >= 0 ? ratingIdx : 6)),
+      reviewCount: parseReviews(getCell(reviewIdx >= 0 ? reviewIdx : 7)),
+      category: getCell(catIdx >= 0 ? catIdx : 8),
+      imageUrl: getCell(imgIdx >= 0 ? imgIdx : 9),
+      affiliateLink: `https://www.amazon.com.br/dp/${asin}?tag=karoom-20`,
+      isPrime: getCell(primeIdx >= 0 ? primeIdx : 10).toLowerCase() === 'sim' || getCell(primeIdx >= 0 ? primeIdx : 10).toLowerCase() === 'yes',
+      ageSegment: ageSegmentValue || null,
+      differential: differentialValue || null
     });
   }
   

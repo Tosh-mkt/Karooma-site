@@ -1917,8 +1917,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
             productUrl: kp.affiliateLink,
             role: kp.role,
             rationale: kp.rationale,
-            source: 'kit'
+            source: 'kit',
+            ageSegment: kp.ageSegment || null,
+            differential: kp.differential || null
           }));
+          
+          const availableSegments = [...new Set(formattedProducts.map(p => p.ageSegment).filter(Boolean))];
           return res.json({ 
             success: true, 
             products: formattedProducts, 
@@ -1926,7 +1930,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             source: 'kit',
             kitId: linkedKit.id,
             kitTitle: linkedKit.title,
-            paapiEnabled: isPaapiActive // Usa status global automático
+            paapiEnabled: isPaapiActive,
+            availableSegments: availableSegments
           });
         }
         
@@ -4837,9 +4842,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
             isPrime: p.isPrime || false,
             role: i === 0 ? 'MAIN' : (i < 3 ? 'SECONDARY' : 'COMPLEMENT'),
             rankScore: String(1 - (i * 0.1)),
-            affiliateLink: p.affiliateLink || `https://www.amazon.com.br/dp/${p.asin}?tag=karoom-20`,
+            affiliateLink: `https://www.amazon.com.br/dp/${p.asin}?tag=karoom-20`,
             addedVia: 'MANUAL',
-            sortOrder: i
+            sortOrder: i,
+            ageSegment: p.ageSegment || null,
+            differential: p.differential || null
           });
         }
         

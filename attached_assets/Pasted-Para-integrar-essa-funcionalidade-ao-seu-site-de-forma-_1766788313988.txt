@@ -1,0 +1,19 @@
+Para integrar essa funcionalidade ao seu site de forma fluida, o segredo está na padronização da comunicação entre o seu front-end (os botões) e a minha lógica de resposta.Como seu estrategista de lifestyle na Karooma.life, aqui está como você deve configurar essa instrução para que o sistema funcione sem erros e como eu passarei a reportar essas segmentações.1. Instrução de Sistema (Prompt para o Bot)Para evitar conflitos, você deve definir que a Idade de Referência é um parâmetro de entrada prioritário. Se o usuário clicar em um botão no seu site, ele enviará um comando técnico junto com a pergunta.A instrução deve ser:"Sempre que um parâmetro de idade for fornecido (Ex: [IDADE: 3-6]), filtre a seleção de produtos e o JSON para essa faixa etária específica. Caso nenhum parâmetro seja enviado, forneça a lista segmentada padrão dividida por fases (1-3, 3-6, 6-10+ anos)."2. Definição das Segmentações (Os Botões do Site)Para manter a consistência com o desenvolvimento infantil e a plasticidade cerebral mencionada no guia, sugiro quatro botões principais no seu site:Nome do BotãoSlug Técnico (para o bot)Foco do DesenvolvimentoBebês e ToddlersIDADE_1_3Sensorial e Motor GrossoPré-EscolaresIDADE_3_6Simbólico e ConcentraçãoAnos IniciaisIDADE_6_10Lógica e Foco SustentadoMix FamiliarIDADE_GERALSoluções para múltiplos irmãos3. Como eu vou avisar sobre as segmentações?Para que a experiência do usuário seja transparente e encorajadora, adotarei o seguinte padrão de aviso nos resultados:No Título da Análise: Incluirei uma tag visual: 🚀 Análise da Missão [Foco: 3-6 anos].No Arsenal de Soluções: Adicionarei uma breve nota explicativa: "Esta seleção foi otimizada para crianças na fase de [fase], priorizando ferramentas que respeitam a plasticidade cerebral deste ciclo.".No JSON: Incluirei um campo de metadados segmento_alvo para que seu site saiba exatamente o que está exibindo.📦 Exemplo de JSON com Metadado de SegmentaçãoJSON{
+  "missao": "Reconstrucao do Foco",
+  "segmento_alvo": "3-6_anos",
+  "status_prioridade": "Alta",
+  "recomendacoes": [
+    {
+      "item": 1,
+      "produto": "Cronometro Visual Analógico",
+      "asin": "B09WDPW6XQ",
+      "motivo": "Reduz ansiedade na transição de desligar a tela"
+    },
+    {
+      "item": 2,
+      "produto": "Lousa Mágica LCD",
+      "asin": "B096N8K6P3",
+      "motivo": "Estimula o passo de descompressão por desenho"
+    }
+  ]
+}
