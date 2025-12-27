@@ -976,8 +976,8 @@ function ReplaceProductModal({
   const [searchUrl, setSearchUrl] = useState("");
   const { toast } = useToast();
 
-  // Fetch search URL when modal opens
-  const fetchSearchUrl = async () => {
+  // Fetch search URL and open in new tab
+  const handleSearchAmazon = async () => {
     if (!product) return;
     try {
       const response = await fetch(`/api/admin/kits/products/${product.id}/search-similar`, {
@@ -986,9 +986,11 @@ function ReplaceProductModal({
       if (response.ok) {
         const data = await response.json();
         setSearchUrl(data.searchUrl);
+        window.open(data.searchUrl, '_blank');
       }
     } catch (error) {
       console.error("Error fetching search URL:", error);
+      toast({ title: "Erro ao buscar link de pesquisa", variant: "destructive" });
     }
   };
 
@@ -1071,10 +1073,7 @@ function ReplaceProductModal({
             <Button 
               variant="outline" 
               className="w-full justify-start gap-2"
-              onClick={() => {
-                fetchSearchUrl();
-                if (searchUrl) window.open(searchUrl, '_blank');
-              }}
+              onClick={handleSearchAmazon}
               data-testid="btn-search-amazon"
             >
               <Search className="w-4 h-4" />
