@@ -959,6 +959,215 @@ function EditKitDialog({ kit, onSuccess }: { kit: KitWithProducts; onSuccess: ()
   );
 }
 
+// Modal for replacing a product with a new ASIN
+function ReplaceProductModal({ 
+  product, 
+  onClose, 
+  onSuccess 
+}: { 
+  product: { id: string; asin: string; title: string; kitTitle: string } | null;
+  onClose: () => void;
+  onSuccess: () => void;
+}) {
+  const [newAsin, setNewAsin] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [isReplacing, setIsReplacing] = useState(false);
+  const [preview, setPreview] = useState<any>(null);
+  const [searchUrl, setSearchUrl] = useState("");
+  const { toast } = useToast();
+
+  // Fetch search URL when modal opens
+  const fetchSearchUrl = async () => {
+    if (!product) return;
+    try {
+      const response = await fetch(`/api/admin/kits/products/${product.id}/search-similar`, {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSearchUrl(data.searchUrl);
+      }
+    } catch (error) {
+      console.error("Error fetching search URL:", error);
+    }
+  };
+
+  // Preview new ASIN
+  const handlePreview = async () => {
+    if (!newAsin.trim()) return;
+    setIsSearching(true);
+    setPreview(null);
+    try {
+      const response = await fetch(`/api/admin/kits/products/preview-asin/${newAsin.trim()}`, {
+        credentials: 'include'
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setPreview(data);
+      } else {
+        toast({ title: "ASIN não encontrado", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Erro ao buscar produto", variant: "destructive" });
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  // Replace product
+  const handleReplace = async () => {
+    if (!product || !preview?.product) return;
+    setIsReplacing(true);
+    try {
+      const response = await fetch(`/api/admin/kits/products/${product.id}/replace`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          newAsin: newAsin.trim(),
+          ...preview.product
+        })
+      });
+      
+      if (response.ok) {
+        toast({ title: "Produto substituído com sucesso!" });
+        onSuccess();
+        onClose();
+      } else {
+        const data = await response.json();
+        toast({ title: data.error || "Erro ao substituir", variant: "destructive" });
+      }
+    } catch (error) {
+      toast({ title: "Erro ao substituir produto", variant: "destructive" });
+    } finally {
+      setIsReplacing(false);
+    }
+  };
+
+  if (!product) return null;
+
+  return (
+    <Dialog open={!!product} onOpenChange={() => onClose()}>
+      <DialogContent className="sm:max-w-[550px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <RefreshCw className="w-5 h-5 text-orange-500" />
+            Substituir Produto
+          </DialogTitle>
+          <DialogDescription>
+            Substituir "{product.title}" no kit "{product.kitTitle}"
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* Current Product Info */}
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-3 border border-red-200 dark:border-red-800">
+            <p className="text-sm font-medium text-red-700 dark:text-red-300 mb-1">Produto atual (indisponível):</p>
+            <p className="text-xs text-red-600 dark:text-red-400">ASIN: {product.asin}</p>
+          </div>
+
+          {/* Search Link */}
+          <div className="space-y-2">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-2"
+              onClick={() => {
+                fetchSearchUrl();
+                if (searchUrl) window.open(searchUrl, '_blank');
+              }}
+              data-testid="btn-search-amazon"
+            >
+              <Search className="w-4 h-4" />
+              Buscar produtos similares na Amazon
+              <ExternalLink className="w-3 h-3 ml-auto" />
+            </Button>
+            <p className="text-xs text-gray-500">
+              Abra a Amazon, encontre um produto substituto e copie o ASIN da URL.
+            </p>
+          </div>
+
+          {/* New ASIN Input */}
+          <div className="space-y-2">
+            <Label>Novo ASIN</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Ex: B09NCKR24R"
+                value={newAsin}
+                onChange={(e) => setNewAsin(e.target.value.toUpperCase())}
+                data-testid="input-new-asin"
+              />
+              <Button 
+                variant="secondary" 
+                onClick={handlePreview}
+                disabled={!newAsin.trim() || isSearching}
+                data-testid="btn-preview-asin"
+              >
+                {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
+              </Button>
+            </div>
+          </div>
+
+          {/* Preview */}
+          {preview?.product && (
+            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 border border-green-200 dark:border-green-800">
+              <p className="text-sm font-medium text-green-700 dark:text-green-300 mb-2">
+                Preview do novo produto:
+              </p>
+              <div className="flex gap-3">
+                {preview.product.imageUrl && (
+                  <img 
+                    src={preview.product.imageUrl} 
+                    alt={preview.product.title}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{preview.product.title}</p>
+                  <p className="text-xs text-gray-500">ASIN: {preview.product.asin}</p>
+                  {preview.product.currentPrice && (
+                    <p className="text-sm font-medium text-green-600">
+                      R$ {preview.product.currentPrice.toFixed(2)}
+                    </p>
+                  )}
+                  {!preview.paapiEnabled && (
+                    <Badge variant="outline" className="mt-1 text-xs">
+                      PA-API inativa - dados básicos
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleReplace}
+            disabled={!preview?.product || isReplacing}
+            className="bg-gradient-to-r from-orange-500 to-amber-500"
+            data-testid="btn-confirm-replace"
+          >
+            {isReplacing ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Substituindo...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Confirmar Substituição
+              </>
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function KitRow({ kit, onDelete, onEdit }: { kit: KitWithProducts; onDelete: (id: string) => void; onEdit: () => void }) {
   const status = statusConfig[kit.status as keyof typeof statusConfig] || statusConfig.DRAFT;
   const StatusIcon = status.icon;
@@ -1068,13 +1277,28 @@ function KitRow({ kit, onDelete, onEdit }: { kit: KitWithProducts; onDelete: (id
   );
 }
 
+interface UnavailableProduct {
+  id: string;
+  asin: string;
+  title: string;
+  kitId: string;
+  availabilityStatus: string;
+  kit: { id: string; title: string };
+}
+
 export default function AdminKits() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [productToReplace, setProductToReplace] = useState<{ id: string; asin: string; title: string; kitTitle: string } | null>(null);
   const { toast } = useToast();
 
   const { data: kits = [], isLoading, refetch } = useQuery<KitWithProducts[]>({
     queryKey: ["/api/admin/kits"],
+  });
+
+  // Fetch unavailable products
+  const { data: unavailableData } = useQuery<{ products: UnavailableProduct[] }>({
+    queryKey: ["/api/admin/kits/products/unavailable"],
   });
 
   const deleteMutation = useMutation({
@@ -1213,6 +1437,67 @@ export default function AdminKits() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Unavailable Products Alert */}
+        {unavailableData?.products && unavailableData.products.length > 0 && (
+          <Card className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+                <h4 className="font-semibold text-red-800 dark:text-red-200">
+                  {unavailableData.products.length} Produto(s) Indisponível(is)
+                </h4>
+              </div>
+              <div className="grid gap-2">
+                {unavailableData.products.slice(0, 5).map((product) => (
+                  <div 
+                    key={product.id}
+                    className="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-100 dark:border-red-900"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {product.title}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        ASIN: {product.asin} • Kit: {product.kit.title}
+                      </p>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      className="ml-2 border-orange-300 text-orange-700 hover:bg-orange-50"
+                      onClick={() => setProductToReplace({
+                        id: product.id,
+                        asin: product.asin,
+                        title: product.title,
+                        kitTitle: product.kit.title
+                      })}
+                      data-testid={`btn-replace-${product.id}`}
+                    >
+                      <RefreshCw className="w-4 h-4 mr-1" />
+                      Substituir
+                    </Button>
+                  </div>
+                ))}
+                {unavailableData.products.length > 5 && (
+                  <p className="text-sm text-red-600 text-center mt-2">
+                    + {unavailableData.products.length - 5} mais produtos indisponíveis
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Replace Product Modal */}
+        <ReplaceProductModal 
+          product={productToReplace}
+          onClose={() => setProductToReplace(null)}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["/api/admin/kits/products/unavailable"] });
+            refetch();
+          }}
+        />
 
         {/* Filters */}
         <div className="flex items-center gap-4 mb-6">
