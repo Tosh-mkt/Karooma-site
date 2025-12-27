@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Package, Loader2, ChevronRight } from "lucide-react";
 import { AmazonProductCard } from "./AmazonProductCard";
@@ -17,6 +18,8 @@ interface AmazonProduct {
   reviewCount?: number;
   isPrime?: boolean;
   productUrl: string;
+  differential?: string | null;
+  ageSegment?: string | null;
 }
 
 interface AmazonProductsResponse {
@@ -24,6 +27,7 @@ interface AmazonProductsResponse {
   products: AmazonProduct[];
   cached?: boolean;
   paapiEnabled?: boolean;
+  availableSegments?: string[];
 }
 
 interface ProductsSectionProps {
@@ -31,6 +35,8 @@ interface ProductsSectionProps {
 }
 
 export function ProductsSection({ slug }: ProductsSectionProps) {
+  const [selectedSegment, setSelectedSegment] = useState<string | null>(null);
+  
   const { data: amazonData, isLoading: amazonLoading } = useQuery<AmazonProductsResponse>({
     queryKey: ['/api/missions', slug, 'amazon-products'],
     enabled: !!slug,
@@ -43,6 +49,14 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
 
   const hasAmazonProducts = amazonData?.products && amazonData.products.length > 0;
   const hasApparelProducts = apparelData && apparelData.length > 0;
+  const availableSegments = amazonData?.availableSegments || [];
+  const hasSegments = availableSegments.length > 1;
+  
+  const filteredProducts = hasAmazonProducts 
+    ? selectedSegment 
+      ? amazonData!.products.filter(p => p.ageSegment === selectedSegment)
+      : amazonData!.products
+    : [];
   
   if (amazonLoading && apparelLoading) {
     return (
@@ -95,8 +109,39 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
         <TabsContent value="resolvem">
           {hasAmazonProducts && (
             <>
+              {/* Segment Filter Buttons */}
+              {hasSegments && (
+                <div className="flex flex-wrap gap-2 mb-6 justify-center">
+                  <button
+                    onClick={() => setSelectedSegment(null)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      selectedSegment === null
+                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                    }`}
+                    data-testid="filter-segment-all"
+                  >
+                    Todos
+                  </button>
+                  {availableSegments.map((segment) => (
+                    <button
+                      key={segment}
+                      onClick={() => setSelectedSegment(segment)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                        selectedSegment === segment
+                          ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                      }`}
+                      data-testid={`filter-segment-${segment.toLowerCase().replace(/\s+/g, '-')}`}
+                    >
+                      {segment}
+                    </button>
+                  ))}
+                </div>
+              )}
+              
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
-                {amazonData!.products.map((product, index) => (
+                {filteredProducts.map((product, index) => (
                   <AmazonProductCard 
                     key={product.asin} 
                     product={product}

@@ -14,6 +14,8 @@ interface AmazonProduct {
   reviewCount?: number;
   isPrime?: boolean;
   productUrl: string;
+  differential?: string | null;
+  ageSegment?: string | null;
 }
 
 interface AmazonProductCardProps {
@@ -101,6 +103,15 @@ export function AmazonProductCard({ product, index = 0, paapiEnabled = false }: 
         </CardHeader>
 
         <CardContent className="pt-2 px-3 pb-3 flex-1 flex flex-col">
+          {/* Differential - Por que ajuda */}
+          {product.differential && (
+            <div className="mb-2 p-2 bg-purple-50 dark:bg-purple-900/20 rounded-md border border-purple-100 dark:border-purple-800/30">
+              <p className="text-xs text-purple-700 dark:text-purple-300 leading-tight line-clamp-3">
+                {product.differential}
+              </p>
+            </div>
+          )}
+          
           {/* Rating */}
           {product.rating && (
             <div className="flex items-center gap-1 mb-2">
