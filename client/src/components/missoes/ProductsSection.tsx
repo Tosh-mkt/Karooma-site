@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Package, Loader2, ChevronRight } from "lucide-react";
 import { AmazonProductCard } from "./AmazonProductCard";
 import { ApparelCard } from "./ApparelCard";
+import { AmazonComplianceSection } from "@/components/AmazonComplianceSection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "wouter";
@@ -196,6 +197,8 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
                   />
                 ))}
               </div>
+              
+              <AmazonComplianceSection compact />
             </>
           )}
         </TabsContent>
