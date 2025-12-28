@@ -40,6 +40,10 @@ import {
   type InsertProductKit,
   type SelectKitProduct,
   type InsertKitProduct,
+  type ProductIssue,
+  type InsertProductIssue,
+  type ProductReplacementLog,
+  type InsertProductReplacementLog,
   users,
   content,
   products,
@@ -62,6 +66,8 @@ import {
   guidePosts,
   productKits,
   kitProducts,
+  productIssues,
+  productReplacementLog,
   type FlipbookConversion,
   type InsertFlipbookConversion,
   type FlipbookModalTrigger,
@@ -259,6 +265,21 @@ export interface IStorage {
   updateKitProduct(id: string, data: Partial<InsertKitProduct>): Promise<SelectKitProduct>;
   removeKitProduct(id: string): Promise<void>;
   clearKitProducts(kitId: string): Promise<void>;
+  
+  // Product Issues methods
+  getProductIssues(filters?: { status?: string; issueType?: string; kitId?: string }): Promise<ProductIssue[]>;
+  getProductIssueById(id: string): Promise<ProductIssue | undefined>;
+  createProductIssue(data: InsertProductIssue): Promise<ProductIssue>;
+  updateProductIssue(id: string, data: Partial<InsertProductIssue>): Promise<ProductIssue>;
+  resolveProductIssue(id: string, resolvedBy: string, resolutionNotes?: string): Promise<ProductIssue>;
+  ignoreProductIssue(id: string, resolvedBy: string, reason?: string): Promise<ProductIssue>;
+  getPendingIssuesCount(): Promise<number>;
+  getIssuesSummary(): Promise<{ type: string; count: number }[]>;
+  markIssuesDigestSent(issueIds: string[]): Promise<void>;
+  
+  // Product Replacement Log methods
+  getReplacementLog(filters?: { kitId?: string }): Promise<ProductReplacementLog[]>;
+  createReplacementLog(data: InsertProductReplacementLog): Promise<ProductReplacementLog>;
 }
 
 export class MemStorage implements IStorage {
@@ -2660,6 +2681,139 @@ export class DatabaseStorage implements IStorage {
       ...r.product,
       kit: r.kit
     }));
+  }
+
+  // Product Issues methods
+  async getProductIssues(filters?: { status?: string; issueType?: string; kitId?: string }): Promise<ProductIssue[]> {
+    const conditions = [];
+    if (filters?.status) {
+      conditions.push(eq(productIssues.status, filters.status));
+    }
+    if (filters?.issueType) {
+      conditions.push(eq(productIssues.issueType, filters.issueType));
+    }
+    if (filters?.kitId) {
+      conditions.push(eq(productIssues.kitId, filters.kitId));
+    }
+    
+    if (conditions.length > 0) {
+      return await db
+        .select()
+        .from(productIssues)
+        .where(and(...conditions))
+        .orderBy(desc(productIssues.createdAt));
+    }
+    
+    return await db
+      .select()
+      .from(productIssues)
+      .orderBy(desc(productIssues.createdAt));
+  }
+
+  async getProductIssueById(id: string): Promise<ProductIssue | undefined> {
+    const [issue] = await db
+      .select()
+      .from(productIssues)
+      .where(eq(productIssues.id, id));
+    return issue;
+  }
+
+  async createProductIssue(data: InsertProductIssue): Promise<ProductIssue> {
+    const [issue] = await db
+      .insert(productIssues)
+      .values(data)
+      .returning();
+    return issue;
+  }
+
+  async updateProductIssue(id: string, data: Partial<InsertProductIssue>): Promise<ProductIssue> {
+    const [issue] = await db
+      .update(productIssues)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(productIssues.id, id))
+      .returning();
+    return issue;
+  }
+
+  async resolveProductIssue(id: string, resolvedBy: string, resolutionNotes?: string): Promise<ProductIssue> {
+    const [issue] = await db
+      .update(productIssues)
+      .set({ 
+        status: 'RESOLVED',
+        resolvedAt: new Date(),
+        resolvedBy,
+        resolutionNotes,
+        updatedAt: new Date()
+      })
+      .where(eq(productIssues.id, id))
+      .returning();
+    return issue;
+  }
+
+  async ignoreProductIssue(id: string, resolvedBy: string, reason?: string): Promise<ProductIssue> {
+    const [issue] = await db
+      .update(productIssues)
+      .set({ 
+        status: 'IGNORED',
+        resolvedAt: new Date(),
+        resolvedBy,
+        resolutionNotes: reason,
+        updatedAt: new Date()
+      })
+      .where(eq(productIssues.id, id))
+      .returning();
+    return issue;
+  }
+
+  async getPendingIssuesCount(): Promise<number> {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(productIssues)
+      .where(eq(productIssues.status, 'PENDING'));
+    return Number(result[0]?.count ?? 0);
+  }
+
+  async getIssuesSummary(): Promise<{ type: string; count: number }[]> {
+    const result = await db
+      .select({
+        type: productIssues.issueType,
+        count: sql<number>`count(*)`
+      })
+      .from(productIssues)
+      .where(eq(productIssues.status, 'PENDING'))
+      .groupBy(productIssues.issueType);
+    return result.map(r => ({ type: r.type, count: Number(r.count) }));
+  }
+
+  async markIssuesDigestSent(issueIds: string[]): Promise<void> {
+    if (issueIds.length === 0) return;
+    await db
+      .update(productIssues)
+      .set({ emailSent: true, updatedAt: new Date() })
+      .where(sql`${productIssues.id} = ANY(${issueIds})`);
+  }
+
+  // Product Replacement Log methods
+  async getReplacementLog(filters?: { kitId?: string }): Promise<ProductReplacementLog[]> {
+    if (filters?.kitId) {
+      return await db
+        .select()
+        .from(productReplacementLog)
+        .where(eq(productReplacementLog.kitId, filters.kitId))
+        .orderBy(desc(productReplacementLog.createdAt));
+    }
+    return await db
+      .select()
+      .from(productReplacementLog)
+      .orderBy(desc(productReplacementLog.createdAt));
+  }
+
+  async createReplacementLog(data: InsertProductReplacementLog): Promise<ProductReplacementLog> {
+    const [log] = await db
+      .insert(productReplacementLog)
+      .values(data)
+      .returning();
+    return log;
   }
 }
 
