@@ -4,7 +4,7 @@ import connectPgSimple from "connect-pg-simple";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { getProductUpdateJobs } from "./jobs/productUpdateJobs";
-import { startAlertScheduler } from "./jobs/scheduler";
+import { startAlertScheduler, startIssueDigestScheduler } from "./jobs/scheduler";
 import { seedChatbot } from "./seed/chatbotSeed";
 import { pool } from "./db";
 import path from "path";
@@ -166,6 +166,14 @@ app.get('/sw.js', (req, res) => {
       log('Alert scheduler initialized successfully');
     } catch (error) {
       log('Failed to initialize alert scheduler:', String(error));
+    }
+    
+    // Inicializar scheduler de digest diário de pendências de produtos
+    try {
+      startIssueDigestScheduler();
+      log('Issue digest scheduler initialized successfully');
+    } catch (error) {
+      log('Failed to initialize issue digest scheduler:', String(error));
     }
   });
 })();
