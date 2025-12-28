@@ -108,23 +108,27 @@ function CreateKitDialog() {
         body: JSON.stringify(kitData)
       });
 
-      if (!response.ok) {
-        const text = await response.text();
-        try {
-          const result = JSON.parse(text);
-          toast({ title: result.error || "Erro ao criar kit", variant: "destructive" });
-        } catch {
-          toast({ title: "Erro ao criar kit", description: text.substring(0, 100), variant: "destructive" });
-        }
+      const responseText = await response.text();
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        console.error('Resposta não é JSON:', responseText.substring(0, 200));
+        toast({ title: "Erro ao criar kit", description: "Resposta inválida do servidor", variant: "destructive" });
         return;
       }
 
-      const result = await response.json();
+      if (!response.ok) {
+        toast({ title: result.error || "Erro ao criar kit", variant: "destructive" });
+        return;
+      }
+
       console.log('Kit criado:', result);
+      const kitId = result.kit?.id;
       
-      if (parsedProducts.length > 0 && result.kit?.id) {
-        console.log('Adicionando produtos ao kit:', result.kit.id, parsedProducts.length);
-        const updateResponse = await fetch(`/api/admin/kits/${result.kit.id}`, {
+      if (parsedProducts.length > 0 && kitId) {
+        console.log('Adicionando produtos ao kit:', kitId, parsedProducts.length);
+        const updateResponse = await fetch(`/api/admin/kits/${kitId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -133,12 +137,12 @@ function CreateKitDialog() {
           })
         });
         
+        const updateText = await updateResponse.text();
         if (updateResponse.ok) {
           toast({ title: `Kit criado com ${parsedProducts.length} produtos!` });
         } else {
-          const errText = await updateResponse.text();
-          console.error('Erro ao adicionar produtos:', errText);
-          toast({ title: "Kit criado, mas erro ao adicionar produtos", description: errText.substring(0, 100), variant: "destructive" });
+          console.error('Erro ao adicionar produtos:', updateText);
+          toast({ title: "Kit criado, mas erro ao adicionar produtos", variant: "destructive" });
         }
       } else {
         toast({ title: "Kit conceitual criado com sucesso!" });
