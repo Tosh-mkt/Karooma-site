@@ -1,11 +1,12 @@
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Package, Loader2, ChevronRight } from "lucide-react";
+import { Package, Loader2, ChevronRight, Info } from "lucide-react";
 import { AmazonProductCard } from "./AmazonProductCard";
 import { ApparelCard } from "./ApparelCard";
 import { AmazonComplianceSection } from "@/components/AmazonComplianceSection";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Link } from "wouter";
 import type { FeaturedApparel } from "@shared/schema";
 
@@ -165,22 +166,61 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
                       }
 
                       return (
-                        <Tooltip key={segment}>
-                          <TooltipTrigger asChild>
-                            {buttonElement}
-                          </TooltipTrigger>
-                          <TooltipContent 
-                            side="bottom" 
-                            className="max-w-xs bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 shadow-lg p-3"
+                        <div key={segment} className="flex items-center gap-1">
+                          {/* Desktop: Tooltip on hover */}
+                          <Tooltip>
+                            <TooltipTrigger asChild className="hidden md:inline-flex">
+                              {buttonElement}
+                            </TooltipTrigger>
+                            <TooltipContent 
+                              side="bottom" 
+                              className="max-w-xs bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 shadow-lg p-3"
+                            >
+                              <p className="text-sm text-purple-700 dark:text-purple-300 font-medium mb-1">
+                                Por que ajuda?
+                              </p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">
+                                {descriptions[0]}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                          
+                          {/* Mobile: Button without tooltip + Info icon with Popover */}
+                          <button
+                            onClick={() => setSelectedSegment(segment)}
+                            className={`md:hidden px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                              selectedSegment === segment
+                                ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
+                            }`}
+                            data-testid={`filter-segment-mobile-${segment.toLowerCase().replace(/\s+/g, '-')}`}
                           >
-                            <p className="text-sm text-purple-700 dark:text-purple-300 font-medium mb-1">
-                              Por que ajuda?
-                            </p>
-                            <p className="text-xs text-gray-600 dark:text-gray-400">
-                              {descriptions[0]}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
+                            {segment}
+                          </button>
+                          
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <button 
+                                className="md:hidden p-1 text-purple-500 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 transition-colors"
+                                data-testid={`info-segment-${segment.toLowerCase().replace(/\s+/g, '-')}`}
+                                aria-label={`Informações sobre ${segment}`}
+                              >
+                                <Info className="w-4 h-4" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent 
+                              side="bottom" 
+                              className="max-w-xs bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 shadow-lg p-3"
+                            >
+                              <p className="text-sm text-purple-700 dark:text-purple-300 font-medium mb-1">
+                                Por que ajuda?
+                              </p>
+                              <p className="text-xs text-gray-600 dark:text-gray-400">
+                                {descriptions[0]}
+                              </p>
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       );
                     })}
                   </div>
