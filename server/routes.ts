@@ -5502,6 +5502,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Manually trigger daily digest email
+  app.post("/api/admin/product-issues/send-digest", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { issueTrackerService } = await import("./services/issueTrackerService");
+      const sent = await issueTrackerService.sendDailyDigest();
+      res.json({ success: true, sent, message: sent ? "Digest enviado com sucesso" : "Nenhuma pendência para enviar" });
+    } catch (error) {
+      console.error("Erro ao enviar digest:", error);
+      res.status(500).json({ error: "Erro ao enviar digest" });
+    }
+  });
+
   // Get replacement log
   app.get("/api/admin/replacement-log", extractUserInfo, async (req: any, res) => {
     if (!checkIsAdmin(req.user)) {

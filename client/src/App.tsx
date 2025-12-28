@@ -43,6 +43,7 @@ import AdminRoadmap from "./pages/AdminRoadmap";
 import AdminMissoes from "./pages/AdminMissoes";
 import AdminApparel from "./pages/AdminApparel";
 import AdminKits from "./pages/AdminKits";
+import AdminProductIssues from "./pages/AdminProductIssues";
 import AdminChatbot from "./pages/AdminChatbot";
 import AdminChatbotFiles from "./pages/AdminChatbotFiles";
 import AdminFeedback from "./pages/AdminFeedback";
@@ -139,6 +140,7 @@ function Router() {
               <Route path="/admin/missoes" component={AdminMissoes} />
               <Route path="/admin/apparel" component={AdminApparel} />
               <Route path="/admin/kits" component={AdminKits} />
+              <Route path="/admin/product-issues" component={AdminProductIssues} />
               <Route path="/admin/chatbot" component={AdminChatbot} />
               <Route path="/admin/chatbot-knowledge" component={AdminChatbotFiles} />
               <Route path="/admin/feedback" component={AdminFeedback} />
