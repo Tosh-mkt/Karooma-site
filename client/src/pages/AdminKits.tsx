@@ -65,21 +65,89 @@ const statusConfig = {
 };
 
 function CreateKitDialog() {
+  const [open, setOpen] = useState(false);
   const [theme, setTheme] = useState("");
   const [minItems, setMinItems] = useState(3);
   const [maxItems, setMaxItems] = useState(7);
   const [ratingMin, setRatingMin] = useState([4.0]);
   const [primeOnly, setPrimeOnly] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [productsTableText, setProductsTableText] = useState("");
+  const { toast } = useToast();
+
+  const parsedProducts = parseMarkdownTable(productsTableText);
 
   const handleGenerate = async () => {
+    if (!theme.trim()) {
+      toast({ title: "Informe o tema do kit", variant: "destructive" });
+      return;
+    }
+
     setIsGenerating(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsGenerating(false);
+    try {
+      const slug = theme.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .substring(0, 50);
+
+      const kitData = {
+        title: theme,
+        slug: slug + '-' + Date.now().toString(36),
+        shortDescription: `Kit com produtos selecionados para: ${theme}`,
+        taskIntent: theme,
+        status: parsedProducts.length > 0 ? 'ACTIVE' : 'CONCEPT_ONLY',
+        paapiEnabled: false,
+        conceptItems: []
+      };
+
+      const response = await fetch('/api/admin/kits/import-json', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(kitData)
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        toast({ title: result.error || "Erro ao criar kit", variant: "destructive" });
+        return;
+      }
+
+      const result = await response.json();
+      
+      if (parsedProducts.length > 0) {
+        const updateResponse = await fetch(`/api/admin/kits/${result.kit.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            manualProducts: parsedProducts
+          })
+        });
+        
+        if (updateResponse.ok) {
+          toast({ title: `Kit criado com ${parsedProducts.length} produtos!` });
+        } else {
+          toast({ title: "Kit criado, mas houve erro ao adicionar produtos", variant: "destructive" });
+        }
+      } else {
+        toast({ title: "Kit conceitual criado com sucesso!" });
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/kits"] });
+      setOpen(false);
+      setTheme("");
+      setProductsTableText("");
+    } catch (error: any) {
+      toast({ title: "Erro ao criar kit", description: error.message, variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white">
           <Plus className="w-4 h-4 mr-2" />
@@ -90,10 +158,10 @@ function CreateKitDialog() {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-green-500" />
-            Criar Kit Automaticamente
+            Criar Kit
           </DialogTitle>
           <DialogDescription>
-            Digite o tema do kit e o sistema irá gerar automaticamente as regras, buscar produtos e montar o kit.
+            Digite o tema do kit e cole a tabela de produtos para criar um kit manualmente.
           </DialogDescription>
         </DialogHeader>
 
@@ -173,16 +241,55 @@ function CreateKitDialog() {
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-amber-800 dark:text-amber-200">
-                  <strong>PA-API Bloqueada:</strong> A busca automática de produtos está temporariamente indisponível. 
-                  O kit será criado como rascunho para inserção manual de ASINs.
+                  <strong>PA-API Bloqueada:</strong> Cole abaixo a tabela de produtos para criar o kit manualmente.
                 </div>
               </div>
             </CardContent>
           </Card>
+
+          <div className="space-y-2 border-t pt-4">
+            <div className="flex items-center justify-between">
+              <Label>Produtos do Kit</Label>
+              <Badge variant="outline">{parsedProducts.length} produtos</Badge>
+            </div>
+            <Textarea
+              value={productsTableText}
+              onChange={(e) => setProductsTableText(e.target.value)}
+              placeholder={`Cole a tabela markdown com os produtos:
+
+| Segmentação | Título | ASIN | Por que ajuda | Preço atual | Preço original | Rating | Avaliações | Categoria | URL Imagem | Link Afiliado |
+|-------------|--------|------|---------------|-------------|----------------|--------|------------|-----------|------------|---------------|
+| Kits Experiência - Piquenique | Cesta Térmica... | B0FB1VVN42 | Cria memórias ao ar livre... | R$ 89,90 | R$ 120,00 | 4,5 | 150 | Casa | https://... | https://... |`}
+              className="h-40 resize-none font-mono text-xs"
+              data-testid="textarea-create-products-table"
+            />
+            {parsedProducts.length > 0 && (
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 space-y-2">
+                <p className="text-sm font-medium text-green-700 dark:text-green-300">
+                  {parsedProducts.length} produtos reconhecidos:
+                </p>
+                <div className="flex flex-wrap gap-1">
+                  {parsedProducts.slice(0, 5).map((p, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {p.asin}
+                    </Badge>
+                  ))}
+                  {parsedProducts.length > 5 && (
+                    <Badge variant="outline" className="text-xs">
+                      +{parsedProducts.length - 5} mais
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+            <p className="text-xs text-gray-500">
+              Cole a tabela de produtos coletada pelo assistente de pesquisa ou da planilha.
+            </p>
+          </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" disabled={isGenerating}>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={isGenerating}>
             Cancelar
           </Button>
           <Button 
@@ -194,12 +301,12 @@ function CreateKitDialog() {
             {isGenerating ? (
               <>
                 <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                Gerando...
+                Criando...
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Gerar Kit
+                <Plus className="w-4 h-4 mr-2" />
+                Criar Kit
               </>
             )}
           </Button>
