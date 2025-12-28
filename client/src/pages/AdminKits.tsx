@@ -101,7 +101,7 @@ function CreateKitDialog() {
         conceptItems: []
       };
 
-      const response = await fetch('/api/admin/kits/import', {
+      const response = await fetch('/api/admin/kits', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -119,12 +119,13 @@ function CreateKitDialog() {
       }
 
       if (!response.ok) {
-        toast({ title: result.error || "Erro ao criar kit", variant: "destructive" });
+        const errorMsg = result.error || result.details?.[0]?.message || "Erro ao criar kit";
+        toast({ title: errorMsg, variant: "destructive" });
         return;
       }
 
       console.log('Kit criado:', result);
-      const kitId = result.kit?.id;
+      const kitId = result.id;
       
       if (parsedProducts.length > 0 && kitId) {
         console.log('Adicionando produtos ao kit:', kitId, parsedProducts.length);
