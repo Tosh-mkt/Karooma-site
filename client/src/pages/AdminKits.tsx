@@ -109,14 +109,21 @@ function CreateKitDialog() {
       });
 
       if (!response.ok) {
-        const result = await response.json();
-        toast({ title: result.error || "Erro ao criar kit", variant: "destructive" });
+        const text = await response.text();
+        try {
+          const result = JSON.parse(text);
+          toast({ title: result.error || "Erro ao criar kit", variant: "destructive" });
+        } catch {
+          toast({ title: "Erro ao criar kit", description: text.substring(0, 100), variant: "destructive" });
+        }
         return;
       }
 
       const result = await response.json();
+      console.log('Kit criado:', result);
       
-      if (parsedProducts.length > 0) {
+      if (parsedProducts.length > 0 && result.kit?.id) {
+        console.log('Adicionando produtos ao kit:', result.kit.id, parsedProducts.length);
         const updateResponse = await fetch(`/api/admin/kits/${result.kit.id}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
@@ -129,7 +136,9 @@ function CreateKitDialog() {
         if (updateResponse.ok) {
           toast({ title: `Kit criado com ${parsedProducts.length} produtos!` });
         } else {
-          toast({ title: "Kit criado, mas houve erro ao adicionar produtos", variant: "destructive" });
+          const errText = await updateResponse.text();
+          console.error('Erro ao adicionar produtos:', errText);
+          toast({ title: "Kit criado, mas erro ao adicionar produtos", description: errText.substring(0, 100), variant: "destructive" });
         }
       } else {
         toast({ title: "Kit conceitual criado com sucesso!" });
