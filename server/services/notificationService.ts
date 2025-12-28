@@ -1,5 +1,5 @@
 import { sendEmail } from "../emailService";
-import type { Product, SelectKitProduct, SelectProductKit } from "@shared/schema";
+import type { Product, SelectKitProduct, SelectProductKit, ProductIssue } from "@shared/schema";
 
 export interface KitProductUnavailableInfo {
   kitProduct: SelectKitProduct;
@@ -8,11 +8,18 @@ export interface KitProductUnavailableInfo {
   replaceUrl: string;
 }
 
+export interface IssueDigestData {
+  issues: ProductIssue[];
+  summary: { type: string; count: number }[];
+  pendingCount: number;
+}
+
 export interface NotificationService {
   sendProductUnavailableAlert(product: Product): Promise<boolean>;
   sendKitProductUnavailableAlert(info: KitProductUnavailableInfo): Promise<boolean>;
   sendProductUpdateSummary(summary: UpdateSummary): Promise<boolean>;
   sendErrorAlert(error: string, context?: string): Promise<boolean>;
+  sendDailyIssueDigest(data: IssueDigestData): Promise<boolean>;
 }
 
 export interface UpdateSummary {
@@ -281,6 +288,124 @@ export class EmailNotificationService implements NotificationService {
       });
     } catch (error) {
       console.error('Erro ao enviar alerta de erro:', error);
+      return false;
+    }
+  }
+
+  async sendDailyIssueDigest(data: IssueDigestData): Promise<boolean> {
+    if (data.pendingCount === 0) {
+      console.log('Nenhuma pendência para enviar no digest diário');
+      return true;
+    }
+
+    const subject = `📋 Resumo Diário: ${data.pendingCount} Pendência(s) de Produtos - Karooma`;
+    const dashboardUrl = `${this.baseUrl}/admin/products`;
+
+    const issueTypeLabels: Record<string, string> = {
+      'UNAVAILABLE': '🚫 Indisponível',
+      'PRICE_CHANGE': '💰 Mudança de Preço',
+      'DATA_STALE': '⏰ Dados Desatualizados',
+      'LOW_RATING': '⭐ Avaliação Baixa',
+      'OUT_OF_STOCK': '📦 Fora de Estoque'
+    };
+
+    const summaryHtml = data.summary.map(s => 
+      `<li>${issueTypeLabels[s.type] || s.type}: <strong>${s.count}</strong></li>`
+    ).join('');
+
+    const issuesListHtml = data.issues.slice(0, 10).map(issue => `
+      <tr style="border-bottom: 1px solid #eee;">
+        <td style="padding: 12px 8px;">${issue.productTitle || issue.asin}</td>
+        <td style="padding: 12px 8px;">${issue.asin}</td>
+        <td style="padding: 12px 8px;">${issueTypeLabels[issue.issueType] || issue.issueType}</td>
+        <td style="padding: 12px 8px; text-align: center;">
+          <span style="background: ${issue.priority === 3 ? '#e74c3c' : issue.priority === 2 ? '#f39c12' : '#3498db'}; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px;">
+            ${issue.priority === 3 ? 'Alta' : issue.priority === 2 ? 'Média' : 'Baixa'}
+          </span>
+        </td>
+      </tr>
+    `).join('');
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; max-width: 700px; margin: 0 auto;">
+        <h2 style="color: #9b59b6;">📋 Resumo Diário de Pendências</h2>
+        
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="margin-top: 0; color: #2c3e50;">Total: ${data.pendingCount} Pendência(s)</h3>
+          
+          <div style="display: flex; gap: 20px; margin: 15px 0;">
+            <div style="flex: 1;">
+              <h4 style="margin: 0 0 10px 0; color: #7f8c8d;">Por Tipo:</h4>
+              <ul style="margin: 0; padding-left: 20px;">
+                ${summaryHtml}
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        ${data.issues.length > 0 ? `
+          <div style="margin: 20px 0;">
+            <h3 style="color: #2c3e50;">Pendências Recentes</h3>
+            <table style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+              <thead>
+                <tr style="background: #ecf0f1;">
+                  <th style="padding: 12px 8px; text-align: left;">Produto</th>
+                  <th style="padding: 12px 8px; text-align: left;">ASIN</th>
+                  <th style="padding: 12px 8px; text-align: left;">Tipo</th>
+                  <th style="padding: 12px 8px; text-align: center;">Prioridade</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${issuesListHtml}
+              </tbody>
+            </table>
+            ${data.issues.length > 10 ? `<p style="color: #7f8c8d; font-style: italic;">...e mais ${data.issues.length - 10} pendência(s)</p>` : ''}
+          </div>
+        ` : ''}
+        
+        <div style="background: #e8f5e9; border: 1px solid #c8e6c9; padding: 15px; border-radius: 5px; margin: 20px 0; text-align: center;">
+          <p style="margin: 0 0 15px 0;"><strong>✅ Resolver Pendências:</strong></p>
+          <a href="${dashboardUrl}" style="display: inline-block; background: #27ae60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Abrir Dashboard de Produtos
+          </a>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #666;">
+          <p>Sistema de Monitoramento Karooma - ${new Date().toLocaleString('pt-BR')}</p>
+          <p style="margin: 5px 0 0 0;">Este email é enviado automaticamente uma vez por dia.</p>
+        </div>
+      </div>
+    `;
+
+    const issuesListText = data.issues.slice(0, 10).map(issue => 
+      `- ${issue.productTitle || issue.asin} (${issue.asin}) - ${issue.issueType}`
+    ).join('\n');
+
+    const text = `
+      RESUMO DIÁRIO DE PENDÊNCIAS
+      
+      Total: ${data.pendingCount} Pendência(s)
+      
+      Por Tipo:
+      ${data.summary.map(s => `- ${s.type}: ${s.count}`).join('\n')}
+      
+      Pendências Recentes:
+      ${issuesListText}
+      ${data.issues.length > 10 ? `\n...e mais ${data.issues.length - 10} pendência(s)` : ''}
+      
+      Resolver: ${dashboardUrl}
+    `;
+
+    try {
+      return await sendEmail({
+        to: this.adminEmail,
+        from: "no-reply@karooma.net",
+        subject,
+        text,
+        html
+      });
+    } catch (error) {
+      console.error('Erro ao enviar digest diário:', error);
       return false;
     }
   }
