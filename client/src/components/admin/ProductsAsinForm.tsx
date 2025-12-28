@@ -504,7 +504,7 @@ export function ProductsAsinForm({ open, onOpenChange, onProductAdded }: Product
                         <SelectValue placeholder="Qualquer" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Qualquer</SelectItem>
+                        <SelectItem value="any">Qualquer</SelectItem>
                         <SelectItem value="4">4+ estrelas</SelectItem>
                         <SelectItem value="4.5">4.5+ estrelas</SelectItem>
                       </SelectContent>

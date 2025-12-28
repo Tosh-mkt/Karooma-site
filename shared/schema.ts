@@ -1492,3 +1492,92 @@ export type RAGSource = typeof RAGSources[keyof typeof RAGSources];
 // Visitor feedback types
 export type VisitorFeedback = typeof visitorFeedback.$inferSelect;
 export type InsertVisitorFeedback = z.infer<typeof insertVisitorFeedbackSchema>;
+
+// ============================================
+// Product Issues & Replacement Tracking System
+// ============================================
+
+// Issue types for products
+export const ProductIssueType = {
+  UNAVAILABLE: 'UNAVAILABLE',
+  PRICE_CHANGE: 'PRICE_CHANGE',
+  DATA_STALE: 'DATA_STALE',
+  LOW_RATING: 'LOW_RATING',
+  OUT_OF_STOCK: 'OUT_OF_STOCK'
+} as const;
+
+export const ProductIssueStatus = {
+  PENDING: 'PENDING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+  IGNORED: 'IGNORED'
+} as const;
+
+// Product issues table - tracks problems that need attention
+export const productIssues = pgTable("product_issues", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  kitProductId: varchar("kit_product_id").references(() => kitProducts.id, { onDelete: "cascade" }),
+  kitId: varchar("kit_id").notNull().references(() => productKits.id, { onDelete: "cascade" }),
+  asin: varchar("asin", { length: 20 }).notNull(),
+  productTitle: text("product_title"),
+  issueType: varchar("issue_type", { length: 30 }).notNull(), // UNAVAILABLE, PRICE_CHANGE, DATA_STALE, LOW_RATING
+  issueDetails: json("issue_details").$type<{
+    previousPrice?: number;
+    currentPrice?: number;
+    priceChangePercent?: number;
+    previousRating?: number;
+    currentRating?: number;
+    lastAvailableAt?: string;
+    failedChecks?: number;
+  }>(),
+  status: varchar("status", { length: 20 }).notNull().default('PENDING'), // PENDING, IN_PROGRESS, RESOLVED, IGNORED
+  priority: integer("priority").default(1), // 1=low, 2=medium, 3=high
+  resolvedAt: timestamp("resolved_at"),
+  resolvedBy: varchar("resolved_by"),
+  resolutionNotes: text("resolution_notes"),
+  emailSent: boolean("email_sent").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_product_issues_status").on(table.status),
+  index("idx_product_issues_kit").on(table.kitId),
+  index("idx_product_issues_type").on(table.issueType),
+  index("idx_product_issues_created").on(table.createdAt),
+]);
+
+// Product replacement log - history of replacements
+export const productReplacementLog = pgTable("product_replacement_log", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  kitId: varchar("kit_id").notNull().references(() => productKits.id, { onDelete: "cascade" }),
+  issueId: varchar("issue_id").references(() => productIssues.id, { onDelete: "set null" }),
+  oldAsin: varchar("old_asin", { length: 20 }).notNull(),
+  oldProductTitle: text("old_product_title"),
+  newAsin: varchar("new_asin", { length: 20 }).notNull(),
+  newProductTitle: text("new_product_title"),
+  replacementReason: varchar("replacement_reason", { length: 50 }), // unavailable, better_price, better_rating
+  replacedBy: varchar("replaced_by"),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => [
+  index("idx_replacement_log_kit").on(table.kitId),
+  index("idx_replacement_log_created").on(table.createdAt),
+]);
+
+// Schemas for product issues
+export const insertProductIssueSchema = createInsertSchema(productIssues).omit({
+  id: true,
+  emailSent: true,
+  resolvedAt: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertProductReplacementLogSchema = createInsertSchema(productReplacementLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Types for product issues
+export type ProductIssue = typeof productIssues.$inferSelect;
+export type InsertProductIssue = z.infer<typeof insertProductIssueSchema>;
+export type ProductReplacementLog = typeof productReplacementLog.$inferSelect;
+export type InsertProductReplacementLog = z.infer<typeof insertProductReplacementLogSchema>;
