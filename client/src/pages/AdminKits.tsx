@@ -101,7 +101,7 @@ function CreateKitDialog() {
         conceptItems: []
       };
 
-      const response = await fetch('/api/admin/kits/import-json', {
+      const response = await fetch('/api/admin/kits/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
