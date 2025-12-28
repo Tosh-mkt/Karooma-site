@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Search, Menu, Rocket, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import karoomaIcon from "@assets/ICON_KAROOMA_Y_1753945353338.png";
-import karoomaLogo from "@assets/LOGO_KAROOMA_TIPO_1753945361411.png";
+import karoomaLogo from "@assets/LOGO_CAROOMA_1766929364461.png";
 
 export default function Navigation() {
   const [location] = useLocation();
@@ -38,24 +37,13 @@ export default function Navigation() {
         {/* Logo */}
         <Link href="/">
           <motion.div 
-            className="flex items-center space-x-3 cursor-pointer"
+            className="flex items-center cursor-pointer"
             whileHover={{ scale: 1.05 }}
           >
-            <motion.div 
-              className="w-14 h-14 md:w-12 md:h-12 flex items-center justify-center"
-              whileHover={{ rotate: [0, -10, 10, 0] }}
-              transition={{ duration: 0.5 }}
-            >
-              <img 
-                src={karoomaIcon} 
-                alt="Karooma Icon" 
-                className="w-full h-full object-contain"
-              />
-            </motion.div>
             <motion.img 
               src={karoomaLogo} 
               alt="Karooma" 
-              className="h-8.5 md:h-6.5 object-contain"
+              className="h-10 md:h-8 object-contain"
               whileHover={{ scale: 1.02 }}
             />
           </motion.div>
