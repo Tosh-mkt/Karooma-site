@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Package, Loader2, ChevronRight } from "lucide-react";
 import { AmazonProductCard } from "./AmazonProductCard";
 import { ApparelCard } from "./ApparelCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Link } from "wouter";
 import type { FeaturedApparel } from "@shared/schema";
 
@@ -52,6 +53,22 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
   const availableSegments = amazonData?.availableSegments || [];
   const hasSegments = availableSegments.length > 1;
   
+  const segmentDescriptions = useMemo(() => {
+    if (!amazonData?.products) return {};
+    const descriptions: Record<string, string[]> = {};
+    amazonData.products.forEach(product => {
+      if (product.ageSegment && product.differential) {
+        if (!descriptions[product.ageSegment]) {
+          descriptions[product.ageSegment] = [];
+        }
+        if (!descriptions[product.ageSegment].includes(product.differential)) {
+          descriptions[product.ageSegment].push(product.differential);
+        }
+      }
+    });
+    return descriptions;
+  }, [amazonData?.products]);
+
   const filteredProducts = hasAmazonProducts 
     ? selectedSegment 
       ? amazonData!.products.filter(p => p.ageSegment === selectedSegment)
@@ -111,33 +128,62 @@ export function ProductsSection({ slug }: ProductsSectionProps) {
             <>
               {/* Segment Filter Buttons */}
               {hasSegments && (
-                <div className="flex flex-wrap gap-2 mb-6 justify-center">
-                  <button
-                    onClick={() => setSelectedSegment(null)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                      selectedSegment === null
-                        ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                    }`}
-                    data-testid="filter-segment-all"
-                  >
-                    Todos
-                  </button>
-                  {availableSegments.map((segment) => (
+                <TooltipProvider delayDuration={300}>
+                  <div className="flex flex-wrap gap-2 mb-6 justify-center">
                     <button
-                      key={segment}
-                      onClick={() => setSelectedSegment(segment)}
+                      onClick={() => setSelectedSegment(null)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                        selectedSegment === segment
+                        selectedSegment === null
                           ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
                           : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
-                      data-testid={`filter-segment-${segment.toLowerCase().replace(/\s+/g, '-')}`}
+                      data-testid="filter-segment-all"
                     >
-                      {segment}
+                      Todos
                     </button>
-                  ))}
-                </div>
+                    {availableSegments.map((segment) => {
+                      const descriptions = segmentDescriptions[segment] || [];
+                      const hasDescription = descriptions.length > 0;
+                      
+                      const buttonElement = (
+                        <button
+                          onClick={() => setSelectedSegment(segment)}
+                          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                            selectedSegment === segment
+                              ? 'bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md'
+                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          }`}
+                          data-testid={`filter-segment-${segment.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          {segment}
+                        </button>
+                      );
+
+                      if (!hasDescription) {
+                        return <span key={segment}>{buttonElement}</span>;
+                      }
+
+                      return (
+                        <Tooltip key={segment}>
+                          <TooltipTrigger asChild>
+                            {buttonElement}
+                          </TooltipTrigger>
+                          <TooltipContent 
+                            side="bottom" 
+                            className="max-w-xs bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-700 shadow-lg p-3"
+                          >
+                            <p className="text-sm text-purple-700 dark:text-purple-300 font-medium mb-1">
+                              Por que ajuda?
+                            </p>
+                            <p className="text-xs text-gray-600 dark:text-gray-400">
+                              {descriptions[0]}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
+                    })}
+                  </div>
+                </TooltipProvider>
               )}
               
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
