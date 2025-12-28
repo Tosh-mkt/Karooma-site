@@ -5415,6 +5415,179 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================
+  // Product Issues Management API
+  // ============================================
+
+  // Get all product issues with optional filters
+  app.get("/api/admin/product-issues", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { status, issueType, kitId } = req.query;
+      const filters: { status?: string; issueType?: string; kitId?: string } = {};
+      if (status) filters.status = status;
+      if (issueType) filters.issueType = issueType;
+      if (kitId) filters.kitId = kitId;
+
+      const issues = await storage.getProductIssues(filters);
+      const summary = await storage.getIssuesSummary();
+      const pendingCount = await storage.getPendingIssuesCount();
+
+      res.json({
+        success: true,
+        issues,
+        summary,
+        pendingCount
+      });
+    } catch (error) {
+      console.error("Erro ao buscar pendências:", error);
+      res.status(500).json({ error: "Erro ao buscar pendências de produtos" });
+    }
+  });
+
+  // Get single product issue by ID
+  app.get("/api/admin/product-issues/:id", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const issue = await storage.getProductIssueById(req.params.id);
+      if (!issue) {
+        return res.status(404).json({ error: "Pendência não encontrada" });
+      }
+      res.json({ success: true, issue });
+    } catch (error) {
+      console.error("Erro ao buscar pendência:", error);
+      res.status(500).json({ error: "Erro ao buscar pendência" });
+    }
+  });
+
+  // Resolve a product issue
+  app.post("/api/admin/product-issues/:id/resolve", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { resolutionNotes } = req.body;
+      const resolvedBy = req.user?.email || 'admin';
+      
+      const issue = await storage.resolveProductIssue(req.params.id, resolvedBy, resolutionNotes);
+      res.json({ success: true, issue });
+    } catch (error) {
+      console.error("Erro ao resolver pendência:", error);
+      res.status(500).json({ error: "Erro ao resolver pendência" });
+    }
+  });
+
+  // Ignore a product issue
+  app.post("/api/admin/product-issues/:id/ignore", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { reason } = req.body;
+      const resolvedBy = req.user?.email || 'admin';
+      
+      const issue = await storage.ignoreProductIssue(req.params.id, resolvedBy, reason);
+      res.json({ success: true, issue });
+    } catch (error) {
+      console.error("Erro ao ignorar pendência:", error);
+      res.status(500).json({ error: "Erro ao ignorar pendência" });
+    }
+  });
+
+  // Get replacement log
+  app.get("/api/admin/replacement-log", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { kitId } = req.query;
+      const filters: { kitId?: string } = {};
+      if (kitId) filters.kitId = kitId;
+
+      const log = await storage.getReplacementLog(filters);
+      res.json({ success: true, log });
+    } catch (error) {
+      console.error("Erro ao buscar histórico:", error);
+      res.status(500).json({ error: "Erro ao buscar histórico de substituições" });
+    }
+  });
+
+  // Replace product and log the replacement
+  app.post("/api/admin/product-issues/:id/replace", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const issue = await storage.getProductIssueById(req.params.id);
+      if (!issue) {
+        return res.status(404).json({ error: "Pendência não encontrada" });
+      }
+
+      const { newAsin, newProductTitle, newProductData } = req.body;
+      if (!newAsin) {
+        return res.status(400).json({ error: "Novo ASIN é obrigatório" });
+      }
+
+      const resolvedBy = req.user?.email || 'admin';
+
+      // Log the replacement
+      await storage.createReplacementLog({
+        kitId: issue.kitId,
+        issueId: issue.id,
+        oldAsin: issue.asin,
+        oldProductTitle: issue.productTitle || undefined,
+        newAsin,
+        newProductTitle: newProductTitle || undefined,
+        replacementReason: issue.issueType,
+        resolvedBy
+      });
+
+      // If we have the kit product, update it with new data
+      if (issue.kitProductId && newProductData) {
+        await storage.updateKitProduct(issue.kitProductId, {
+          asin: newAsin,
+          title: newProductData.title || newProductTitle,
+          imageUrl: newProductData.imageUrl,
+          price: newProductData.price,
+          originalPrice: newProductData.originalPrice,
+          rating: newProductData.rating,
+          reviewCount: newProductData.reviewCount,
+          isPrime: newProductData.isPrime,
+          affiliateLink: newProductData.affiliateLink || `https://www.amazon.com.br/dp/${newAsin}?tag=karoom-20`,
+          availabilityStatus: 'active',
+          failedChecks: 0,
+          lastCheckedAt: new Date()
+        });
+      }
+
+      // Mark the issue as resolved
+      const resolvedIssue = await storage.resolveProductIssue(
+        issue.id, 
+        resolvedBy, 
+        `Substituído por ASIN: ${newAsin}`
+      );
+
+      res.json({ 
+        success: true, 
+        issue: resolvedIssue,
+        message: "Produto substituído com sucesso"
+      });
+    } catch (error) {
+      console.error("Erro ao substituir produto:", error);
+      res.status(500).json({ error: "Erro ao substituir produto" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
