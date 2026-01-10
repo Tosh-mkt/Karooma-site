@@ -85,8 +85,10 @@ Todos os templates de desenvolvimento seguem o padrão: `[tipo]-template-dev`
   - **Content Refinement Chat**: Interactive refinement with AI instructions for tone, length, emphasis adjustments
   - **Seasonal Calendar** (`seasonal_themes` table): 12+ pre-populated annual themes with start/end dates, priority levels, and suggested topics
   - **Seasonal Alerts**: Active and upcoming theme notifications in Content Hub admin panel
+  - **Trending Topics**: Gemini-powered trend detection for content opportunities specific to mothers' interests
+  - **Unified Articles Page**: `/artigos` combines blog posts and guides in a single filterable view
   - **Admin Pages**: `/admin/content-hub` (article generation), `/admin/seasonal-calendar` (theme management)
-  - **Future Phases**: YouTube trends integration, Blog/Guias unification into `/artigos` with 301 redirects
+  - **Backwards Compatibility**: `/blog` and `/guias` routes remain active alongside `/artigos`
 
 # External Dependencies
 

@@ -4542,18 +4542,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Fetch guide posts
       const guidePosts = await storage.getPublishedGuidePosts();
       
+      // Helper: calculate reading time from content (avg 200 words per minute)
+      const calculateReadingTime = (content: string | null | undefined): number => {
+        if (!content) return 1;
+        const wordCount = content.trim().split(/\s+/).length;
+        const minutes = Math.ceil(wordCount / 200);
+        return Math.max(1, minutes);
+      };
+      
       // Unify into single format
       const articles = [
         ...blogPosts.filter(p => p.isPublished).map(post => ({
           id: post.id,
-          slug: post.id, // blog uses id as slug
+          slug: post.id, // blog route uses id
           title: post.title,
           description: post.description || "",
           category: post.category || "Geral",
           categoryEmoji: "",
           type: "artigo" as const,
           heroImageUrl: post.heroImageUrl || post.imageUrl,
-          readingTime: Math.ceil((post.content?.length || 0) / 1000),
+          readingTime: calculateReadingTime(post.content),
           views: post.views || 0,
           createdAt: post.createdAt?.toISOString() || new Date().toISOString(),
         })),
