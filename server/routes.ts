@@ -4531,6 +4531,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // ========================================
+  // Unified Articles API - /api/artigos
+  // ========================================
+  
+  app.get("/api/artigos", async (req, res) => {
+    try {
+      // Fetch blog posts (type=blog from content table)
+      const blogPosts = await storage.getContentByType("blog");
+      
+      // Fetch guide posts
+      const guidePosts = await storage.getPublishedGuidePosts();
+      
+      // Unify into single format
+      const articles = [
+        ...blogPosts.filter(p => p.isPublished).map(post => ({
+          id: post.id,
+          slug: post.id, // blog uses id as slug
+          title: post.title,
+          description: post.description || "",
+          category: post.category || "Geral",
+          categoryEmoji: "",
+          type: "artigo" as const,
+          heroImageUrl: post.heroImageUrl || post.imageUrl,
+          readingTime: Math.ceil((post.content?.length || 0) / 1000),
+          views: post.views || 0,
+          createdAt: post.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+        ...guidePosts.map(post => ({
+          id: post.id,
+          slug: post.slug,
+          title: post.title,
+          description: post.metaDescription || post.sectionEuTeEntendo?.substring(0, 150) || "",
+          category: post.category,
+          categoryEmoji: post.categoryEmoji || "",
+          type: "guia" as const,
+          heroImageUrl: post.heroImageUrl,
+          readingTime: post.readingTime || 5,
+          views: post.views || 0,
+          createdAt: post.createdAt?.toISOString() || new Date().toISOString(),
+        })),
+      ];
+      
+      // Sort by date, most recent first
+      articles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      
+      res.json({ success: true, articles });
+    } catch (error) {
+      console.error("Erro ao buscar artigos unificados:", error);
+      res.status(500).json({ error: "Erro ao buscar artigos" });
+    }
+  });
+
+  // ========================================
   // Guide Posts Routes - Posts de Guia
   // ========================================
 
