@@ -118,20 +118,26 @@ export default function AdminContentHub() {
   useEffect(() => {
     if (debouncedTopic.length >= 3) {
       setIsLoadingSuggestions(true);
-      fetch(`/api/content-hub/missions/by-topic?topic=${encodeURIComponent(debouncedTopic)}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success && data.missions?.length > 0) {
-            setSuggestedMissions(data.missions);
-            if (!selectedMissionId) {
-              setSelectedMissionId(data.missions[0].id);
+      try {
+        const encodedTopic = encodeURIComponent(debouncedTopic);
+        fetch(`/api/content-hub/missions/by-topic?topic=${encodedTopic}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.success && data.missions?.length > 0) {
+              setSuggestedMissions(data.missions);
+              if (!selectedMissionId) {
+                setSelectedMissionId(data.missions[0].id);
+              }
+            } else {
+              setSuggestedMissions([]);
             }
-          } else {
-            setSuggestedMissions([]);
-          }
-        })
-        .catch(() => setSuggestedMissions([]))
-        .finally(() => setIsLoadingSuggestions(false));
+          })
+          .catch(() => setSuggestedMissions([]))
+          .finally(() => setIsLoadingSuggestions(false));
+      } catch (e) {
+        setIsLoadingSuggestions(false);
+        setSuggestedMissions([]);
+      }
     }
   }, [debouncedTopic]);
 
