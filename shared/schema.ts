@@ -872,6 +872,38 @@ export type InsertDiagnostic = z.infer<typeof insertDiagnosticSchema>;
 export type SelectDiagnostic = typeof diagnostics.$inferSelect;
 
 // ========================================
+// Content Hub - Temas Sazonais
+// ========================================
+
+export const seasonalThemes = pgTable("seasonal_themes", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  slug: varchar("slug", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  suggestedTopics: text("suggested_topics").array(),
+  relatedCategories: text("related_categories").array(),
+  relatedMissionSlugs: text("related_mission_slugs").array(),
+  priority: varchar("priority", { length: 20 }).default("medium"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => [
+  index("idx_seasonal_themes_dates").on(table.startDate, table.endDate),
+  index("idx_seasonal_themes_active").on(table.isActive),
+]);
+
+export const insertSeasonalThemeSchema = createInsertSchema(seasonalThemes).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export type InsertSeasonalTheme = z.infer<typeof insertSeasonalThemeSchema>;
+export type SelectSeasonalTheme = typeof seasonalThemes.$inferSelect;
+
+// ========================================
 // Posts de Guia - Bridge entre teoria e prática
 // ========================================
 

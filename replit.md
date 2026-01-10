@@ -77,6 +77,16 @@ Todos os templates de desenvolvimento seguem o padrão: `[tipo]-template-dev`
 - **Price Alert System**: Personalized alerts for product and category promotions via email and web push. Integrates with Amazon PA API for real-time price checking and uses a scheduled job (`node-cron`).
 - **Blog Content Standards**: Defines target persona (Cláudia), 5-element content structure, voice/tone, visual concept (Origami Transformation), category-specific templates, quality metrics, CTAs, semantic tags, and automated content validation.
 - **E-book System Standards**: Defines visual identity, structure template, and technical implementation for interactive flipbooks optimized for mobile, with a centralized color system and admin interface for theme management.
+- **Content Intelligence Hub**: AI-powered content generation system with:
+  - **Unified Categories**: 7 categories (Rotina, Casa, Cozinha, Educação, Bem-estar, Passeios, Saúde) replacing separate Blog/Guias taxonomies
+  - **AI Draft Generation**: Gemini-powered with Karoo's voice (empathetic, practical, conversational Portuguese) and built-in SEO optimization
+  - **Papercraft Origami 3D**: Default image style for all article imagery (volumetric paper art with vibrant colors)
+  - **Mission Matching**: Automatic linking of articles to relevant Missões by category/topic keywords
+  - **Content Refinement Chat**: Interactive refinement with AI instructions for tone, length, emphasis adjustments
+  - **Seasonal Calendar** (`seasonal_themes` table): 12+ pre-populated annual themes with start/end dates, priority levels, and suggested topics
+  - **Seasonal Alerts**: Active and upcoming theme notifications in Content Hub admin panel
+  - **Admin Pages**: `/admin/content-hub` (article generation), `/admin/seasonal-calendar` (theme management)
+  - **Future Phases**: YouTube trends integration, Blog/Guias unification into `/artigos` with 301 redirects
 
 # External Dependencies
 

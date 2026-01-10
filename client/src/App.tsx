@@ -47,6 +47,8 @@ import AdminProductIssues from "./pages/AdminProductIssues";
 import AdminChatbot from "./pages/AdminChatbot";
 import AdminChatbotFiles from "./pages/AdminChatbotFiles";
 import AdminFeedback from "./pages/AdminFeedback";
+import AdminContentHub from "./pages/AdminContentHub";
+import AdminSeasonalCalendar from "./pages/AdminSeasonalCalendar";
 import Kits from "./pages/kits";
 import KitDetalhes from "./pages/kit-detalhes";
 import { TempLogin } from "./pages/TempLogin";
@@ -144,6 +146,8 @@ function Router() {
               <Route path="/admin/chatbot" component={AdminChatbot} />
               <Route path="/admin/chatbot-knowledge" component={AdminChatbotFiles} />
               <Route path="/admin/feedback" component={AdminFeedback} />
+              <Route path="/admin/content-hub" component={AdminContentHub} />
+              <Route path="/admin/seasonal-calendar" component={AdminSeasonalCalendar} />
               <Route path="/admin/guide-posts" component={AdminGuidePosts} />
               <Route path="/admin/flipbook-users" component={FlipbookUsersAdmin} />
               <Route path="/admin/flipbook-themes" component={FlipbookThemesAdmin} />

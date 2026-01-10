@@ -1,0 +1,65 @@
+Para que o **Replit Agent** (ou o assistente de arquitetura) construa exatamente o que você precisa, você deve entregar um "Briefing de Engenharia". Este documento resume toda a nossa conversa em requisitos técnicos.
+
+Copie e cole o texto abaixo no chat do Replit para iniciar a construção do seu **Karooma Content Engine**:
+
+---
+
+## 🛠️ Briefing: Karooma Content Engine (Automação de Blog SEO + Missões)
+
+### 1. Visão Geral
+
+Construir um orquestrador em Python que automatiza o ciclo de vida do conteúdo do site **karooma.life**. O sistema deve identificar tendências para pais ocupados, cruzar com uma base de dados de "Missões" internas, gerar posts otimizados para SEO e criar imagens temáticas via API.
+
+### 2. Stack Tecnológica e APIs
+
+* **Linguagem:** Python.
+* **Cérebro (Texto/SEO):** Gemini 1.5 Flash API (Google AI Studio).
+* **Pesquisa de Tendências:** Perplexity API (Modelos Sonar).
+* **Geração de Imagem:** Pollinations.ai (Free/Fast) ou Together AI (Stable Diffusion).
+* **Banco de Dados:** Arquivo `missoes.json` (Local no Replit).
+
+### 3. Estrutura do Arquivo de Missões (`missoes.json`)
+
+O agente deve considerar este formato para realizar o "matching" de conteúdo:
+
+```json
+[
+  {
+    "id": "M01",
+    "titulo": "Nome da Missão",
+    "tags": ["tag1", "tag2"],
+    "url": "link-da-missao"
+  }
+]
+
+```
+
+### 4. Requisitos Funcionais (O que o script deve fazer)
+
+1. **Etapa de Scanner:** Chamar a API da Perplexity para buscar os 5 tópicos mais quentes da semana sobre "parentalidade, burnout, IA doméstica e produtividade para pais".
+2. **Etapa de Matching:** Enviar os tópicos e a lista de missões para o Gemini. O Gemini deve escolher qual missão melhor resolve a dor do tópico.
+3. **Etapa de Escrita (SEO Expert):** * Gerar título H1, subtítulos H2/H3.
+* Gerar Meta-Description (155 caracteres).
+* Gerar Slug de URL amigável.
+* Gerar o corpo do texto em HTML usando parágrafos curtos e bullet points.
+* **Injetar o Widget da Missão:** Inserir um card HTML ao final do post com o CTA para a missão escolhida.
+
+
+4. **Etapa Visual:** Gerar um prompt de imagem descritivo e disparar a chamada para a API de imagem, retornando a URL final.
+
+### 5. Prompt de Sistema para o Agente (Core Logic)
+
+> "Siga a 'Vibe Karooma': empática, prática e focada em redução de esforço. O conteúdo deve ser escaneável. O output final deve ser um objeto JSON estruturado contendo: Título, Slug, Meta-Description, HTML do Post, URL da Imagem e ID da Missão vinculada."
+
+### 6. Próximos Passos para o Replit Agent
+
+1. Configurar as variáveis de ambiente (`GEMINI_API_KEY`, `PERPLEXITY_API_KEY`).
+2. Criar a estrutura de pastas: `/scripts`, `/data`, `/output`.
+3. Desenvolver o módulo de "Curadoria Automática" que seleciona o tema antes de escrever.
+4. (Opcional) Criar uma rota Flask/FastAPI básica para visualizar o post gerado antes da publicação.
+
+---
+
+**Dica para você:** Ao colar isso no Replit, o assistente pode te perguntar sobre o "deploy". Você pode dizer: *"Por enquanto, quero que o script salve o resultado final em um arquivo .html na pasta /output para eu revisar"*.
+
+Deseja que eu detalhe mais algum desses pontos técnicos antes de você levar para o Replit?

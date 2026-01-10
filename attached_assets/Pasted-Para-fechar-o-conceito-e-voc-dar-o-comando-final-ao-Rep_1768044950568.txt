@@ -1,0 +1,59 @@
+Para fechar o conceito e você dar o comando final ao **Replit Agent**, vamos estruturar o design da interface (UI) e compilar todo o projeto em um documento técnico de arquitetura.
+
+### 1. Visualização da Interface (UX/UI Design)
+
+Imagine o seu painel Admin do Karooma com esta disposição. O foco é **minimalismo e ação**.
+
+* **Lado Esquerdo (Preview):** O post formatado (H1, imagem, texto, Widget da Missão).
+* **Lado Direito (AI Sidebar):** * **Chat de Refino:** "Ajuste o tom...", "Adicione uma dica de app...".
+* **Controle de Imagem:** O prompt atual em um campo de texto e botões de estilo (Photo, Minimalist, 3D).
+
+
+* **Rodapé:** Botão "Publicar no Blog".
+
+---
+
+### 2. Compilado Estratégico para o Replit Agent
+
+Copie e cole este resumo final para o assistente do Replit. Ele une sua infraestrutura atual (**TypeScript/Node**) com as funcionalidades de **Curadoria, SEO e Edição Assistida**.
+
+---
+
+**PROJETO: Karooma Content Intelligence Hub**
+
+**Objetivo:** Evoluir o admin existente para um sistema de criação de conteúdo assistido por IA que conecta tendências externas às missões internas da plataforma.
+
+**Arquitetura Técnica:**
+
+* **Stack:** Manter em TypeScript/Node.js.
+* **IA de Texto & Busca:** Gemini 2.0 (com Google Search Grounding).
+* **IA de Imagem:** Integração via API (Pollinations ou Together AI) para baixo custo.
+* **Base de Dados:** Conectar ao banco de dados de Missões já existente no projeto.
+
+**Funcionalidades de Edição & Refino (Requisitos):**
+
+1. **Iterative Text Editing:** Implementar uma função que envie o rascunho atual + um "comando de ajuste" do usuário para o Gemini, retornando a versão atualizada.
+2. **Prompt-Based Image Edit:** A imagem deve ter seu prompt visível e editável. Ao alterar o texto do prompt e clicar em 'Regerar', a API deve ser chamada novamente para atualizar o componente visual.
+3. **SEO Automation:** O sistema deve preencher automaticamente Meta-tags, Slugs e Alt-texts baseado no conteúdo final aprovado.
+4. **Mission Matching Service:** Um serviço que filtra as missões por `tags` ou `categorias` baseadas no tema do post gerado.
+
+**Fluxo de Usuário (User Journey):**
+
+1. O usuário clica em "Sugerir Temas".
+2. O sistema apresenta 3 cards (Tema + Dor do Público + Missão Relacionada).
+3. O usuário escolhe um e o sistema gera o "Draft Completo".
+4. O usuário refina texto e imagem através da barra lateral de IA.
+5. O usuário clica em "Publicar" e o post vai para o banco de dados do blog.
+
+---
+
+### 3. Por que isso funciona para você?
+
+* **Escalabilidade:** Você pode gerar 5 posts de alta qualidade em 15 minutos, em vez de passar horas escrevendo.
+* **Consistência:** A IA sempre lembrará de incluir a **Missão** e os **Links de Afiliado**, algo que um redator humano poderia esquecer.
+* **Vibe Coding:** Como está tudo em TS no Replit, você pode ajustar o código do "Widget de Missão" ou do "Estilo da Imagem" sempre que sentir que a "vibe" da Karooma mudou.
+
+**Próximo Passo:**
+Envie este compilado para o Replit Agent e peça: **"Pode começar criando o Service de Matching de Missões em TypeScript e a interface básica de 'Sugestão de Temas'?"**.
+
+Estou aqui se precisar de ajuda para ajustar algum dos prompts específicos que ele for usar dentro do código!

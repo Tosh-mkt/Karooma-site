@@ -5604,6 +5604,222 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ============================================
+  // CONTENT HUB ROUTES
+  // ============================================
+  const { contentHubService } = await import("./services/contentHubService");
+
+  // Get unified categories
+  app.get("/api/content-hub/categories", (req, res) => {
+    const categories = contentHubService.getUnifiedCategories();
+    res.json({ success: true, categories });
+  });
+
+  // Match missions by category
+  app.get("/api/content-hub/missions/by-category/:categoryId", async (req, res) => {
+    try {
+      const missions = await contentHubService.matchMissionsByCategory(req.params.categoryId);
+      res.json({ success: true, missions });
+    } catch (error) {
+      console.error("Erro ao buscar missões por categoria:", error);
+      res.status(500).json({ error: "Erro ao buscar missões" });
+    }
+  });
+
+  // Match missions by topic
+  app.get("/api/content-hub/missions/by-topic", async (req, res) => {
+    try {
+      const topic = req.query.topic as string;
+      if (!topic) {
+        return res.status(400).json({ error: "Tópico é obrigatório" });
+      }
+      const missions = await contentHubService.matchMissionsByTopic(topic);
+      res.json({ success: true, missions });
+    } catch (error) {
+      console.error("Erro ao buscar missões por tópico:", error);
+      res.status(500).json({ error: "Erro ao buscar missões" });
+    }
+  });
+
+  // Suggest themes (AI-powered)
+  app.get("/api/admin/content-hub/suggest-themes", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const themes = await contentHubService.suggestThemes();
+      res.json({ success: true, themes });
+    } catch (error) {
+      console.error("Erro ao sugerir temas:", error);
+      res.status(500).json({ error: "Erro ao sugerir temas" });
+    }
+  });
+
+  // Generate draft (AI-powered)
+  app.post("/api/admin/content-hub/generate-draft", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { topic, category, missionId, keywords, tone, type } = req.body;
+      if (!topic || !category) {
+        return res.status(400).json({ error: "Tópico e categoria são obrigatórios" });
+      }
+
+      const draft = await contentHubService.generateDraft({
+        topic,
+        category,
+        missionId,
+        keywords,
+        tone,
+        type,
+      });
+      res.json({ success: true, draft });
+    } catch (error) {
+      console.error("Erro ao gerar draft:", error);
+      res.status(500).json({ error: "Erro ao gerar draft" });
+    }
+  });
+
+  // Refine draft (AI-powered)
+  app.post("/api/admin/content-hub/refine-draft", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { content, instruction } = req.body;
+      if (!content || !instruction) {
+        return res.status(400).json({ error: "Conteúdo e instrução são obrigatórios" });
+      }
+
+      const refinedContent = await contentHubService.refineDraft(content, instruction);
+      res.json({ success: true, content: refinedContent });
+    } catch (error) {
+      console.error("Erro ao refinar draft:", error);
+      res.status(500).json({ error: "Erro ao refinar draft" });
+    }
+  });
+
+  // Generate image prompt
+  app.post("/api/admin/content-hub/image-prompt", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado. Somente administradores." });
+    }
+
+    try {
+      const { topic, category } = req.body;
+      if (!topic) {
+        return res.status(400).json({ error: "Tópico é obrigatório" });
+      }
+
+      const imagePrompt = await contentHubService.generateImagePrompt(topic, category || "");
+      res.json({ success: true, imagePrompt });
+    } catch (error) {
+      console.error("Erro ao gerar prompt de imagem:", error);
+      res.status(500).json({ error: "Erro ao gerar prompt de imagem" });
+    }
+  });
+
+  // Search articles (flexible search by term and/or category)
+  app.get("/api/artigos", async (req, res) => {
+    try {
+      const searchTerm = req.query.q as string | undefined;
+      const categoryId = req.query.category as string | undefined;
+
+      const articles = await contentHubService.searchByTermOrCategory(searchTerm, categoryId);
+      res.json({ success: true, articles });
+    } catch (error) {
+      console.error("Erro ao buscar artigos:", error);
+      res.status(500).json({ error: "Erro ao buscar artigos" });
+    }
+  });
+
+  // ========== Seasonal Themes (Calendar) ==========
+  
+  // Get all seasonal themes (admin)
+  app.get("/api/admin/seasonal-themes", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado" });
+    }
+    try {
+      const themes = await contentHubService.getAllSeasonalThemes();
+      res.json({ success: true, themes });
+    } catch (error) {
+      console.error("Erro ao buscar temas sazonais:", error);
+      res.status(500).json({ error: "Erro ao buscar temas sazonais" });
+    }
+  });
+
+  // Get active seasonal themes (public for content hub alerts)
+  app.get("/api/seasonal-themes/active", async (req, res) => {
+    try {
+      const themes = await contentHubService.getActiveSeasonalThemes();
+      res.json({ success: true, themes });
+    } catch (error) {
+      console.error("Erro ao buscar temas ativos:", error);
+      res.status(500).json({ error: "Erro ao buscar temas ativos" });
+    }
+  });
+
+  // Get seasonal alerts (combines active + upcoming themes with missions)
+  app.get("/api/admin/content-hub/alerts", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado" });
+    }
+    try {
+      const alerts = await contentHubService.getSeasonalAlerts();
+      res.json({ success: true, alerts });
+    } catch (error) {
+      console.error("Erro ao buscar alertas:", error);
+      res.status(500).json({ error: "Erro ao buscar alertas" });
+    }
+  });
+
+  // Create seasonal theme
+  app.post("/api/admin/seasonal-themes", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado" });
+    }
+    try {
+      const theme = await contentHubService.createSeasonalTheme(req.body);
+      res.json({ success: true, theme });
+    } catch (error) {
+      console.error("Erro ao criar tema sazonal:", error);
+      res.status(500).json({ error: "Erro ao criar tema sazonal" });
+    }
+  });
+
+  // Update seasonal theme
+  app.patch("/api/admin/seasonal-themes/:id", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado" });
+    }
+    try {
+      const theme = await contentHubService.updateSeasonalTheme(req.params.id, req.body);
+      res.json({ success: true, theme });
+    } catch (error) {
+      console.error("Erro ao atualizar tema sazonal:", error);
+      res.status(500).json({ error: "Erro ao atualizar tema sazonal" });
+    }
+  });
+
+  // Delete seasonal theme
+  app.delete("/api/admin/seasonal-themes/:id", extractUserInfo, async (req: any, res) => {
+    if (!checkIsAdmin(req.user)) {
+      return res.status(403).json({ error: "Acesso negado" });
+    }
+    try {
+      await contentHubService.deleteSeasonalTheme(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Erro ao excluir tema sazonal:", error);
+      res.status(500).json({ error: "Erro ao excluir tema sazonal" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
