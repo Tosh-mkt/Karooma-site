@@ -401,12 +401,12 @@ export default function AdminContentHub() {
 
                 <div>
                   <Label>Missão Relacionada (opcional)</Label>
-                  <Select value={selectedMissionId} onValueChange={setSelectedMissionId}>
+                  <Select value={selectedMissionId || "none"} onValueChange={(v) => setSelectedMissionId(v === "none" ? "" : v)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Vincular a uma missão..." />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Nenhuma</SelectItem>
+                      <SelectItem value="none">Nenhuma</SelectItem>
                       {missions.map(m => (
                         <SelectItem key={m.id} value={m.id}>
                           🎯 {m.title}
