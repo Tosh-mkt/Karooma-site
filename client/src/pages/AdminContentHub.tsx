@@ -85,7 +85,6 @@ export default function AdminContentHub() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedMissionId, setSelectedMissionId] = useState("");
   const [selectedType, setSelectedType] = useState<"artigo" | "guia">("artigo");
-  const [keywords, setKeywords] = useState("");
   const [draft, setDraft] = useState<GeneratedDraft | null>(null);
   const [refineInstruction, setRefineInstruction] = useState("");
   const [isThemesOpen, setIsThemesOpen] = useState(true);
@@ -170,7 +169,6 @@ export default function AdminContentHub() {
       topic,
       category: selectedCategory,
       missionId: selectedMissionId || undefined,
-      keywords: keywords ? keywords.split(",").map(k => k.trim()) : undefined,
       type: selectedType,
     });
   };
@@ -446,15 +444,6 @@ export default function AdminContentHub() {
                   </Select>
                 </div>
 
-                <div>
-                  <Label>Palavras-chave SEO (separadas por vírgula)</Label>
-                  <Input
-                    placeholder="rotina, organização, manhã, crianças"
-                    value={keywords}
-                    onChange={(e) => setKeywords(e.target.value)}
-                  />
-                </div>
-
                 <Button
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
                   onClick={handleGenerate}
@@ -560,20 +549,41 @@ export default function AdminContentHub() {
                 {/* SEO Info */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-sm">SEO (auto-preenchido)</CardTitle>
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-purple-500" />
+                      SEO (gerado pela IA)
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     <div>
                       <Label className="text-xs text-gray-500">Slug</Label>
-                      <Input value={`/artigos/${draft.slug}`} readOnly className="text-xs" />
+                      <Input 
+                        value={draft.slug} 
+                        onChange={(e) => setDraft({ ...draft, slug: e.target.value })}
+                        className="text-xs" 
+                      />
                     </div>
                     <div>
                       <Label className="text-xs text-gray-500">Meta Description</Label>
-                      <Textarea value={draft.metaDescription} readOnly className="text-xs" rows={2} />
+                      <Textarea 
+                        value={draft.metaDescription} 
+                        onChange={(e) => setDraft({ ...draft, metaDescription: e.target.value })}
+                        className="text-xs" 
+                        rows={2} 
+                      />
                     </div>
                     <div>
-                      <Label className="text-xs text-gray-500">Keywords</Label>
-                      <div className="flex flex-wrap gap-1 mt-1">
+                      <Label className="text-xs text-gray-500">Keywords (geradas pela IA - edite se necessário)</Label>
+                      <Input
+                        value={draft.keywords.join(", ")}
+                        onChange={(e) => setDraft({ 
+                          ...draft, 
+                          keywords: e.target.value.split(",").map(k => k.trim()).filter(k => k) 
+                        })}
+                        className="text-xs mt-1"
+                        placeholder="palavra1, palavra2, palavra3"
+                      />
+                      <div className="flex flex-wrap gap-1 mt-2">
                         {draft.keywords.map((kw, idx) => (
                           <Badge key={idx} variant="secondary" className="text-xs">{kw}</Badge>
                         ))}

@@ -165,7 +165,6 @@ Missão relacionada para incluir CTA:
 
 Gere um ${input.type || "artigo"} sobre: "${input.topic}"
 Categoria: ${input.category}
-${input.keywords?.length ? `Palavras-chave SEO: ${input.keywords.join(", ")}` : ""}
 ${missionContext}
 
 IMPORTANTE: O conteúdo deve ser em HTML com tags semânticas (h2, h3, p, ul, li).
@@ -176,7 +175,7 @@ Retorne um JSON válido com esta estrutura exata:
   "slug": "url-amigavel-sem-acentos",
   "metaDescription": "Descrição SEO com até 155 caracteres",
   "content": "<p>Conteúdo HTML completo...</p>",
-  "keywords": ["palavra1", "palavra2", "palavra3"]
+  "keywords": ["5-8 palavras-chave SEO long-tail baseadas no conteúdo gerado, ex: rotina matinal com filhos pequenos"]
 }
 
 ${input.missionId ? `
