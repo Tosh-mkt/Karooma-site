@@ -433,6 +433,74 @@ Retorne APENAS o JSON array, sem markdown.`;
     
     return alerts;
   }
+
+  async getTrendingTopics(): Promise<TrendAlert[]> {
+    if (!this.genAI) {
+      return [];
+    }
+
+    try {
+      const currentMonth = new Date().toLocaleString('pt-BR', { month: 'long' });
+      const prompt = `Você é um especialista em tendências de conteúdo para mães brasileiras.
+      
+Considerando o mês atual (${currentMonth}), liste 5 tópicos que estão em alta ou têm potencial viral para o público de mães com filhos de 2-10 anos.
+
+Para cada tópico, forneça:
+1. Título curto (máx 50 caracteres)
+2. Por que está em alta (1 frase)
+3. Categoria relacionada: rotina-organizacao, casa-ordem, cozinha-alimentacao, educacao-brincadeiras, bem-estar-autocuidado, passeios-viagens, ou saude-seguranca
+4. Nível de urgência: alta, media, baixa
+
+Responda APENAS em JSON válido:
+{
+  "trends": [
+    {
+      "title": "string",
+      "reason": "string",
+      "category": "string",
+      "priority": "alta|media|baixa"
+    }
+  ]
+}`;
+
+      const result = await this.genAI.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: prompt,
+      });
+
+      const text = result.text || "";
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return [];
+
+      const parsed = JSON.parse(jsonMatch[0]);
+      const alerts: TrendAlert[] = [];
+
+      for (const trend of parsed.trends || []) {
+        const relatedMissions = await this.matchMissionsByTopic(trend.title);
+        alerts.push({
+          id: `trend-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+          type: "trending",
+          title: `🔥 ${trend.title}`,
+          description: trend.reason,
+          suggestedMissions: relatedMissions.slice(0, 3).map(m => ({ id: m.id, title: m.title, slug: m.slug })),
+          priority: trend.priority === "alta" ? "high" : trend.priority === "media" ? "medium" : "low",
+        });
+      }
+
+      return alerts;
+    } catch (error) {
+      console.error("Error fetching trending topics:", error);
+      return [];
+    }
+  }
+
+  async getAllAlerts(): Promise<{ seasonal: TrendAlert[]; trending: TrendAlert[] }> {
+    const [seasonal, trending] = await Promise.all([
+      this.getSeasonalAlerts(),
+      this.getTrendingTopics(),
+    ]);
+    return { seasonal, trending };
+  }
 }
 
 export const contentHubService = new ContentHubService();

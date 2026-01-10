@@ -5764,14 +5764,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get seasonal alerts (combines active + upcoming themes with missions)
+  // Get all alerts (seasonal + trending)
   app.get("/api/admin/content-hub/alerts", extractUserInfo, async (req: any, res) => {
     if (!checkIsAdmin(req.user)) {
       return res.status(403).json({ error: "Acesso negado" });
     }
     try {
-      const alerts = await contentHubService.getSeasonalAlerts();
-      res.json({ success: true, alerts });
+      const { seasonal, trending } = await contentHubService.getAllAlerts();
+      res.json({ success: true, alerts: { seasonal, trending } });
     } catch (error) {
       console.error("Erro ao buscar alertas:", error);
       res.status(500).json({ error: "Erro ao buscar alertas" });

@@ -108,7 +108,7 @@ export default function AdminContentHub() {
     enabled: false,
   });
 
-  const { data: alertsData } = useQuery<{ success: boolean; alerts: TrendAlert[] }>({
+  const { data: alertsData } = useQuery<{ success: boolean; alerts: { seasonal: TrendAlert[]; trending: TrendAlert[] } }>({
     queryKey: ["/api/admin/content-hub/alerts"],
   });
 
@@ -206,8 +206,10 @@ export default function AdminContentHub() {
   const categories = categoriesData?.categories || [];
   const missions = missionsData?.missions || [];
   const themes = themesData?.themes || [];
-  const alerts = alertsData?.alerts || [];
-  const activeAlerts = alerts.filter(a => a.priority === "high" || a.priority === "medium");
+  const seasonalAlerts = alertsData?.alerts?.seasonal || [];
+  const trendingAlerts = alertsData?.alerts?.trending || [];
+  const allAlerts = [...seasonalAlerts, ...trendingAlerts];
+  const activeAlerts = allAlerts.filter(a => a.priority === "high" || a.priority === "medium");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 p-6">
@@ -234,56 +236,84 @@ export default function AdminContentHub() {
           </div>
         </motion.div>
 
-        {activeAlerts.length > 0 && (
+        {(seasonalAlerts.length > 0 || trendingAlerts.length > 0) && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
+            className="mb-6 grid grid-cols-1 lg:grid-cols-2 gap-4"
           >
-            <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-lg flex items-center gap-2 text-orange-700">
-                  <Bell className="w-5 h-5" />
-                  Alertas Sazonais ({activeAlerts.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  {activeAlerts.slice(0, 3).map((alert) => (
-                    <div
-                      key={alert.id}
-                      className="flex items-center justify-between p-3 bg-white/80 rounded-lg cursor-pointer hover:bg-white transition-colors"
-                      onClick={() => {
-                        const themeName = alert.title.replace(/^[🗓️⏰]\s*/, "").replace(/\s*em \d+ dias$/, "");
-                        setTopic(themeName);
-                      }}
-                    >
-                      <div className="flex-1">
-                        <span className="font-medium">{alert.title}</span>
-                        <p className="text-sm text-gray-500">{alert.description}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
+            {seasonalAlerts.length > 0 && (
+              <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-yellow-50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2 text-orange-700">
+                    <Calendar className="w-5 h-5" />
+                    Alertas Sazonais ({seasonalAlerts.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {seasonalAlerts.slice(0, 3).map((alert) => (
+                      <div
+                        key={alert.id}
+                        className="flex items-center justify-between p-3 bg-white/80 rounded-lg cursor-pointer hover:bg-white transition-colors"
+                        onClick={() => {
+                          const themeName = alert.title.replace(/^[🗓️⏰🔥]\s*/, "").replace(/\s*em \d+ dias$/, "");
+                          setTopic(themeName);
+                        }}
+                      >
+                        <div className="flex-1">
+                          <span className="font-medium">{alert.title}</span>
+                          <p className="text-sm text-gray-500">{alert.description}</p>
+                        </div>
                         <Badge variant={alert.priority === "high" ? "destructive" : "secondary"}>
                           {alert.priority === "high" ? "Urgente" : "Em breve"}
                         </Badge>
-                        {alert.suggestedMissions?.length > 0 && (
-                          <Badge variant="outline" className="text-xs">
-                            {alert.suggestedMissions.length} missões
-                          </Badge>
-                        )}
                       </div>
-                    </div>
-                  ))}
-                </div>
-                {activeAlerts.length > 3 && (
-                  <Link href="/admin/seasonal-calendar">
-                    <Button variant="link" size="sm" className="mt-2 p-0 text-orange-600">
-                      Ver todos os {activeAlerts.length} alertas →
-                    </Button>
-                  </Link>
-                )}
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                  {seasonalAlerts.length > 3 && (
+                    <Link href="/admin/seasonal-calendar">
+                      <Button variant="link" size="sm" className="mt-2 p-0 text-orange-600">
+                        Ver todos →
+                      </Button>
+                    </Link>
+                  )}
+                </CardContent>
+              </Card>
+            )}
+            
+            {trendingAlerts.length > 0 && (
+              <Card className="border-pink-200 bg-gradient-to-r from-pink-50 to-purple-50">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-lg flex items-center gap-2 text-pink-700">
+                    <TrendingUp className="w-5 h-5" />
+                    Tendências ({trendingAlerts.length})
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-2">
+                    {trendingAlerts.slice(0, 3).map((alert) => (
+                      <div
+                        key={alert.id}
+                        className="flex items-center justify-between p-3 bg-white/80 rounded-lg cursor-pointer hover:bg-white transition-colors"
+                        onClick={() => {
+                          const themeName = alert.title.replace(/^[🔥]\s*/, "");
+                          setTopic(themeName);
+                        }}
+                      >
+                        <div className="flex-1">
+                          <span className="font-medium">{alert.title}</span>
+                          <p className="text-sm text-gray-500">{alert.description}</p>
+                        </div>
+                        <Badge variant={alert.priority === "high" ? "destructive" : "outline"} className="text-pink-700">
+                          {alert.priority === "high" ? "Em alta" : "Relevante"}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </motion.div>
         )}
 
