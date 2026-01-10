@@ -18,7 +18,7 @@ import {
   BarChart3, Users, Settings, Zap, Database, Eye, ExternalLink, Star, TrendingUp,
   Plus, Edit, Trash2, Save, RefreshCw, Shield, Activity, Wifi, WifiOff, LogIn, Layout,
   Bell, Mail, Clock, Filter, Download, Globe, Key, CheckCircle, AlertCircle, Rocket, Search,
-  Terminal, FileText, Upload, Brain, Bot, Shirt, Book, Package, MessageCircle
+  Terminal, FileText, Upload, Brain, Bot, Shirt, Book, Package, MessageCircle, Sparkles
 } from "lucide-react";
 import type { Product, Content } from "@shared/schema";
 import { NewProductModal } from "@/components/admin/NewProductModal";
@@ -332,6 +332,32 @@ function DashboardOverview() {
             <Button variant="outline" className="w-full bg-white hover:bg-cyan-50" onClick={() => window.location.href = '/admin/chatbot-knowledge'}>
               <Book className="w-4 h-4 mr-2" />
               Base de Conhecimento
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="glassmorphism border-0 bg-gradient-to-br from-pink-50 to-rose-50 hover:shadow-lg transition-all duration-300 cursor-pointer"
+          onClick={() => window.location.href = '/admin/content-hub'}
+        >
+          <CardHeader className="px-4 py-4">
+            <CardTitle className="flex items-center text-base md:text-lg">
+              <Sparkles className="w-5 h-5 mr-2 text-pink-600" />
+              Content Hub
+            </CardTitle>
+            <CardDescription className="text-sm">
+              Criação de conteúdo com IA
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 pb-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Gere artigos automaticamente com IA, alertas sazonais e sugestões de temas.
+            </p>
+            <Button variant="outline" className="w-full bg-white hover:bg-pink-50" onClick={(e) => {
+              e.stopPropagation();
+              window.location.href = '/admin/content-hub';
+            }}>
+              <Sparkles className="w-4 h-4 mr-2" />
+              Abrir Content Hub
             </Button>
           </CardContent>
         </Card>
