@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { 
@@ -101,6 +101,39 @@ export default function AdminContentHub() {
     },
     enabled: !!selectedCategory,
   });
+
+  const [debouncedTopic, setDebouncedTopic] = useState("");
+  const [suggestedMissions, setSuggestedMissions] = useState<Mission[]>([]);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (topic.length >= 3) {
+        setDebouncedTopic(topic);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [topic]);
+
+  useEffect(() => {
+    if (debouncedTopic.length >= 3) {
+      setIsLoadingSuggestions(true);
+      fetch(`/api/content-hub/missions/by-topic?topic=${encodeURIComponent(debouncedTopic)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.missions?.length > 0) {
+            setSuggestedMissions(data.missions);
+            if (!selectedMissionId) {
+              setSelectedMissionId(data.missions[0].id);
+            }
+          } else {
+            setSuggestedMissions([]);
+          }
+        })
+        .catch(() => setSuggestedMissions([]))
+        .finally(() => setIsLoadingSuggestions(false));
+    }
+  }, [debouncedTopic]);
 
   const { data: themesData, isLoading: isLoadingThemes, refetch: refetchThemes } = useQuery<{ success: boolean; themes: ThemeSuggestion[] }>({
     queryKey: ["/api/admin/content-hub/suggest-themes"],
@@ -428,20 +461,46 @@ export default function AdminContentHub() {
                 </div>
 
                 <div>
-                  <Label>Missão Relacionada (opcional)</Label>
+                  <Label className="flex items-center gap-2">
+                    Missão Relacionada
+                    {isLoadingSuggestions && <Loader2 className="w-3 h-3 animate-spin text-purple-500" />}
+                    {suggestedMissions.length > 0 && !isLoadingSuggestions && (
+                      <Badge variant="secondary" className="text-xs bg-purple-100 text-purple-700">
+                        ✨ Sugerida pela IA
+                      </Badge>
+                    )}
+                  </Label>
                   <Select value={selectedMissionId || "none"} onValueChange={(v) => setSelectedMissionId(v === "none" ? "" : v)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Vincular a uma missão..." />
+                    <SelectTrigger className={suggestedMissions.length > 0 && selectedMissionId ? "border-purple-300 bg-purple-50" : ""}>
+                      <SelectValue placeholder="Auto-detectando..." />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">Nenhuma</SelectItem>
-                      {missions.map(m => (
+                      {suggestedMissions.length > 0 && (
+                        <>
+                          <div className="px-2 py-1 text-xs text-purple-600 font-medium">Sugeridas pelo tópico:</div>
+                          {suggestedMissions.map(m => (
+                            <SelectItem key={m.id} value={m.id}>
+                              ✨ {m.title}
+                            </SelectItem>
+                          ))}
+                          {missions.filter(m => !suggestedMissions.find(s => s.id === m.id)).length > 0 && (
+                            <div className="px-2 py-1 text-xs text-gray-500 font-medium border-t mt-1">Outras da categoria:</div>
+                          )}
+                        </>
+                      )}
+                      {missions.filter(m => !suggestedMissions.find(s => s.id === m.id)).map(m => (
                         <SelectItem key={m.id} value={m.id}>
                           🎯 {m.title}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                  {suggestedMissions.length > 0 && selectedMissionId && (
+                    <p className="text-xs text-purple-600 mt-1">
+                      💡 Missão auto-selecionada com base no tópico
+                    </p>
+                  )}
                 </div>
 
                 <Button
